@@ -1,0 +1,3182 @@
+{
+  "metadata": {
+    "title": "Aafiya | Plateforme Médicale Numérique Nationale Unifiée",
+    "description": "La plateforme algérienne unifiée pour la gestion des services médicaux, réservations, laboratoires et centres de radiologie"
+  },
+  "doctorAssistant": {
+    "clinicName": "Clinique Spécialisée Ibn Sina",
+    "portalBadge": "Portail Assistant Médical",
+    "home": "Accueil",
+    "themeToggle": "Changer le Thème",
+    "docVerifiedNotice": "Document vérifié avec succès : {code}",
+    "shift": {
+      "title": "Statut du Shift Opérationnel",
+      "activeNow": "Actif Maintenant",
+      "assistantName": "Assistante : Sara Tlemçani",
+      "loginDetails": "Connexion : 08:00 | Clinique Principale"
+    },
+    "tabs": {
+      "dashboard": "Tableau de Bord Quotidien",
+      "today": "Rendez-vous du Jour",
+      "waitingRoom": "Salle d'Attente en Direct",
+      "appointments": "Registre des Rendez-vous",
+      "reception": "Accueil & Enregistrement",
+      "notifications": "Alertes & Notifications",
+      "calendar": "Planning du Cabinet",
+      "reports": "Rapports Opérationnels",
+      "profile": "Profil de l'Assistant",
+      "settings": "Paramètres du Compte"
+    },
+    "badges": {
+      "todayAppts": "{count} RDV"
+    },
+    "rbac": {
+      "title": "Permissions Opérationnelles de l'Assistant (RBAC)",
+      "subtitle": "Permissions configurées et approuvées par le médecin directeur :",
+      "canApprove": "Approuver et confirmer les rendez-vous",
+      "canEdit": "Modifier les détails des rendez-vous",
+      "canReschedule": "Reprogrammer et annuler des rendez-vous",
+      "canQueue": "Gérer la file d'attente en direct",
+      "ehrRestricted": "Accès restreint au dossier médical (EHR)",
+      "visitRestricted": "Démarrage d'examen médical restreint"
+    },
+    "kpis": {
+      "expectedToday": "Rendez-vous Prévus Aujourd'hui",
+      "totalCount": "{count} Réservations",
+      "sentSmsSuccess": "Rappel SMS envoyé aux patients non arrivés",
+      "quickSms": "Envoyer SMS Rapide",
+      "checkedIn": "Enregistrés à l'accueil",
+      "patientsCount": "{count} Patients",
+      "readyWaiting": "Prêts et en attente d'appel",
+      "manageQueue": "Gérer la File d'Attente",
+      "latePatients": "Patients en Retard",
+      "lateDesc": "Plus de 15 min de retard",
+      "calledLateSuccess": "Appel téléphonique effectué pour vérifier le patient en retard",
+      "confirmCall": "Appel de Confirmation",
+      "needReview": "Rendez-vous à Réviser",
+      "apptsCount": "{count} RDV",
+      "reviewDesc": "Demandes de reprogrammation depuis le portail",
+      "reviewAppts": "Réviser les RDV"
+    },
+    "today": {
+      "title": "Planning des Rendez-vous du Jour (06 Août 2026)",
+      "totalAppts": "18 Réservations Totales",
+      "searchPlaceholder": "Rechercher par nom de patient ou téléphone...",
+      "confirmArrival": "Confirmer l'Arrivée",
+      "nextCalled": "Patient suivant appelé automatiquement",
+      "table": {
+        "ref": "Réf Réservation",
+        "patient": "Patient",
+        "date": "Date RDV",
+        "status": "Statut",
+        "actions": "Actions",
+        "reschedule": "Reprogrammer",
+        "cancel": "Annuler"
+      }
+    },
+    "notifications": {
+      "title": "Centre d'Alertes & Notifications du Cabinet"
+    },
+    "calendar": {
+      "title": "Calendrier Général & Planning du Cabinet",
+      "viewTitle": "Afficher le Calendrier Clinique Général",
+      "description": "L'assistant peut consulter le planning et les rendez-vous réservés avec code couleur sans pouvoir modifier les horaires du médecin."
+    },
+    "reports": {
+      "title": "Rapports & Statistiques Opérationnels (Non Cliniques)",
+      "disciplineRate": "Taux de Ponctualité des Rendez-vous",
+      "disciplineDesc": "Pourcentage de patients arrivés à l'heure cette semaine",
+      "avgWaiting": "Temps Moyen d'Attente au Cabinet",
+      "avgWaitingVal": "11.5 min",
+      "avgWaitingDesc": "De l'enregistrement à l'entrée en salle d'examen"
+    },
+    "profile": {
+      "title": "Profil de l'Assistant",
+      "nameLabel": "Nom de l'Assistant :",
+      "nameVal": "Sara Ibrahim Al-Tilmisani",
+      "clinicLabel": "Cabinet Assigné :",
+      "clinicVal": "Cabinet Dr. Mohamed El-Arabi",
+      "phoneLabel": "Téléphone Professionnel :",
+      "phoneVal": "0555 12 34 56",
+      "roleLabel": "Poste :",
+      "roleVal": "Assistant Médical / Réceptionniste Agréé"
+    },
+    "settings": {
+      "title": "Paramètres Personnels de l'Assistant",
+      "fullName": "Nom Complet"
+    },
+    "toast": {
+      "checkedInSuccess": "Patient enregistré et ajouté à la file d'attente avec succès"
+    },
+    "dashboard": {
+      "title": "Tableau de Bord Opérationnel de l'Assistant",
+      "subtitle": "Gestion de l'accueil, de la file d'attente et coordination",
+      "checkIn": "Enregistrer un Patient",
+      "newBooking": "Nouveau Rendez-vous",
+      "scanDoc": "Scanner Document / QR",
+      "instructionTitle": "Directives Actuelles du Médecin",
+      "tasksTitle": "Tâches Opérationnelles & Suivi",
+      "tasksSubtitle": "Liste des tâches quotidiennes coordonnées",
+      "criticalTasks": "Tâches Urgentes Requérant Action",
+      "stats": {
+        "todayAppointments": "Total RDV Aujourd'hui",
+        "inWaitingRoom": "En Salle d'Attente",
+        "completed": "Consultations Terminées",
+        "remaining": "RDV Restants",
+        "noShow": "Absences Enregistrées",
+        "avgWaiting": "Temps Moyen d'Attente"
+      }
+    },
+    "waitingRoom": {
+      "title": "Salle d'Attente en Direct & Appel",
+      "callNext": "Appeler Patient Suivant",
+      "fullScreen": "Plein Écran",
+      "status": {
+        "pending": "En attente de confirmation",
+        "confirmed": "Confirmé",
+        "waiting": "En salle d'attente",
+        "called": "Appelé",
+        "in_consultation": "En consultation",
+        "completed": "Terminé",
+        "cancelled": "Annulé",
+        "rejected": "Rejeté",
+        "rescheduled": "Replanifié",
+        "attended": "Présent",
+        "absent": "Absent",
+        "expired": "Expiré"
+      },
+      "table": {
+        "queueNum": "N°",
+        "patientName": "Nom du Patient",
+        "time": "Heure d'Arrivée",
+        "action": "Action",
+        "status": "Statut"
+      },
+      "actions": {
+        "callToClinic": "Appeler en Salle Médecin",
+        "postpone": "Reporter le Tour",
+        "considerAbsent": "Marquer comme Absent"
+      }
+    },
+    "reception": {
+      "title": "Accueil & Enregistrement Rapide",
+      "searchLabel": "Rechercher un Rendez-vous Enregistré",
+      "searchPlaceholder": "Numéro de téléphone, nom ou identifiant...",
+      "alreadyInQueue": "Patient enregistré et présent dans la file",
+      "quickCheckIn": {
+        "title": "Enregistrement Rapide sans RDV",
+        "patientName": "Nom Complet du Patient",
+        "phone": "Numéro de Téléphone",
+        "submit": "Confirmer & Ajouter à la File"
+      },
+      "confirmArrival": "Confirmer l'Arrivée"
+    },
+    "common": {
+      "cancel": "Annuler"
+    },
+    "logout": "Déconnexion"
+  },
+  "common": {
+    "title": "Aafiya | Plateforme Médicale Numérique Nationale Unifiée",
+    "description": "La plateforme algérienne unifiée pour la gestion des services médicaux, réservations, laboratoires et centres de radiologie",
+    "welcome": "Bienvenue sur Aafiya",
+    "version": "Aafiya V1.0",
+    "portalName": "Portail Unifié des Établissements de Santé",
+    "emergencyContact": "Centre d'opérations: 021-XXX-XXX",
+    "language": "Langue",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "loading": "Chargement...",
+    "noResults": "Aucun résultat trouvé",
+    "copyright": "Tous droits réservés © 2026",
+    "readMore": "Lire la suite",
+    "learnMore": "En savoir plus",
+    "getStarted": "Commencer",
+    "register": "S'inscrire",
+    "login": "Se connecter",
+    "back": "Retour",
+    "logout": "Déconnexion"
+  },
+  "navigation": {
+    "home": "Accueil",
+    "directory": "Annuaire des Médecins & Services",
+    "features": "Fonctionnalités",
+    "benefits": "Avantages",
+    "workflow": "Parcours de Réservation",
+    "packages": "Forfaits Opérationnels",
+    "faq": "FAQ",
+    "landing": "Page d'Accueil",
+    "doctor_dashboard": "Tableau de Bord Médecin",
+    "assistant_dashboard": "Tableau de Bord Assistant",
+    "booking_center_dashboard": "Console Centre de Réservation",
+    "laboratory_dashboard": "Console Gestionnaire Labo",
+    "lab_assistant_dashboard": "Console Assistant Labo",
+    "patient_dashboard": "Portail Patient",
+    "platform_admin_dashboard": "Admin Plateforme",
+    "platform_assistant_dashboard": "Assistant Admin",
+    "radiology_dashboard": "Gestionnaire Radiologie",
+    "rad_assistant_dashboard": "Assistant Radiologie",
+    "calculator": "Simulateur de Réservation"
+  },
+  "topbar": {
+    "announcement": "Plateforme de santé numérique unifiée — Ouverture de l'accréditation pour les centres agréés dans les 48 wilayas",
+    "packageCalculator": "Calculateur de Forfait"
+  },
+  "hero": {
+    "badge": "Votre Portail Unifié pour la Santé Numérique",
+    "title_part1": "Plateforme numérique pour organiser les services de santé...",
+    "title_accent": "et faire gagner du temps aux patients.",
+    "description": "Aafiya est conçu pour soulager la souffrance des patients lors de l'obtention de rendez-vous médicaux en connectant des centres de réservation agréés aux médecins au sein d'un système numérique unifié. Il réduit les temps d'attente, organise le processus de réservation et offre une expérience de soins plus confortable et efficace.",
+    "cta_register": "S'inscrire Maintenant",
+    "cta_workflow": "Découvrir le fonctionnement",
+    "illustration_title": "Écosystème Aafiya",
+    "illustration_subtitle": "Connexion fluide et coordonnée",
+    "unified_system": "Système Unifié",
+    "patients_title": "Patients et Visiteurs",
+    "patients_desc": "Réservation certifiée et gain de temps et d'effort sans file d'attente.",
+    "centers_title": "Centres de Réservation Agréés",
+    "centers_desc": "Coordination et organisation des demandes de réservation avec une haute efficacité.",
+    "doctors_title": "Médecins et Cliniques",
+    "doctors_desc": "Accréditation directe des rendez-vous et organisation des plannings de consultation.",
+    "footer_badge": "Réorganiser l'expérience de santé de manière sûre et professionnelle"
+  },
+  "statistics": {
+    "centers": "Centres de Réservation Agréés",
+    "centers_desc": "Points de réservation de confiance dans toutes les wilayas",
+    "doctors": "Médecins et Établissements de Santé",
+    "doctors_desc": "Cliniques et centres médicaux multidisciplinaires",
+    "appointments": "Rendez-vous Médicaux Confirmés",
+    "appointments_desc": "Gérés avec succès via la plateforme",
+    "patients": "Dossiers Médicaux Électroniques",
+    "patients_desc": "Pour les patients inscrits avec protection et cryptage",
+    "performance_indicator": "Indicateur de Performance"
+  },
+  "features": {
+    "section_badge": "Fonctions Structurelles de la Plateforme",
+    "title": "Fonctionnalités de la Plateforme Numérique Aafiya",
+    "subtitle": "Chaque fonctionnalité est conçue selon des règles de gestion approuvées, au service de toutes les parties avec les plus hauts niveaux de transparence et d'efficacité.",
+    "official_function": "Fonction Opérationnelle Officielle",
+    "booking_engine": {
+      "title": "Système de Réservation Accrédité",
+      "description": "Permet aux centres de réservation de gérer et confirmer facilement les demandes et d'utiliser les soldes de forfaits avec une précision extrême.",
+      "badge": "Centralisé",
+      "cta": "Explorer le Mécanisme de Réservation"
+    },
+    "emr_system": {
+      "title": "Dossier Médical Électronique (EMR)",
+      "description": "Un dossier de santé numérique unifié avec un identifiant unique (UUID) qui accompagne le patient et sauvegarde son historique de soins et ses visites.",
+      "badge": "Permanent & Continu",
+      "cta": "Voir les Caractéristiques du Dossier"
+    },
+    "doctor_approval": {
+      "title": "Accréditation des Rendez-vous Médecins",
+      "description": "Flexibilité totale pour le médecin et son assistant(e) pour confirmer le rendez-vous, suggérer une autre date ou reporter selon le planning réel.",
+      "badge": "Direct",
+      "cta": "Tableau de Bord Médecin"
+    },
+    "digital_prescriptions": {
+      "title": "Ordonnances Numériques Approuvées",
+      "description": "Émission et impression d'ordonnances médicales en un clic, sauvegardées automatiquement dans le dossier numérique du patient.",
+      "badge": "Précis & Sécurisé",
+      "cta": "Modèle d'Ordonnance"
+    },
+    "labs_and_radiology": {
+      "title": "Résultats d'Analyses & Examens",
+      "description": "Connexion des demandes de labo et de radiologie, et téléchargement des résultats et rapports directement sur le dossier médical électronique.",
+      "badge": "Intégration Numérique",
+      "cta": "Flux de Travail Analyses"
+    },
+    "packages_management": {
+      "title": "Forfaits Opérationnels Transparents",
+      "description": "Déduction réelle uniquement lors d'une réservation réussie, sans aucune déduction en cas de rejet ou d'échec technique avec compensation confirmée.",
+      "badge": "100% Transparence",
+      "cta": "Calculateur de Forfait"
+    }
+  },
+  "benefits": {
+    "section_badge": "Avantages & Cadre des Parties Prenantes",
+    "title": "Quelle est la valeur ajoutée que nous vous offrons ?",
+    "subtitle": "La plateforme garantit une valeur ajoutée pour toutes les catégories concernées avec un engagement total envers les limites de responsabilité et les règles opérationnelles numériques.",
+    "cta_prefix": "Commencez maintenant en tant que ",
+    "trust_text": "Rejoignez plus de 500 établissements médicaux accrédités",
+    "reg_patient": {
+      "title": "Patient Inscrit (Compte Permanent)",
+      "highlight": "Dossier Médical Électronique Unifié",
+      "description": "Le patient inscrit bénéficie d'un dossier de santé permanent qui regroupe toutes ses visites, ordonnances et résultats d'examens dans un seul compte.",
+      "points": [
+        "Identifiant unique permanent (UUID) qui accompagne votre parcours médical",
+        "Suivi du statut des rendez-vous et réception de notifications instantanées",
+        "Historique complet des ordonnances et résultats d'analyses/radios",
+        "Haute confidentialité et cryptage des données médicales selon les normes"
+      ]
+    },
+    "guest_patient": {
+      "title": "Patient Visiteur (Sans Compte)",
+      "highlight": "Réservation Rapide via Centre",
+      "description": "Service rapide et facile pour les patients visiteurs via les centres de réservation sans nécessité de créer un compte.",
+      "points": [
+        "Finalisez la réservation immédiatement via un centre agréé",
+        "Impression des ordonnances et demandes d'examens directement",
+        "Le centre de réservation informe le patient de tout changement de rendez-vous",
+        "La responsabilité de la plateforme prend fin après la réception des documents imprimés"
+      ]
+    },
+    "booking_center": {
+      "title": "Centres de Réservation Agréés",
+      "highlight": "Modèle Opérationnel Financier Rentable",
+      "description": "Les centres de réservation sont le principal partenaire commercial et opérationnel de la plateforme Aafiya.",
+      "points": [
+        "Achat de divers forfaits opérationnels (100, 250, 500, 1000 opérations)",
+        "Collecte directe des frais de service de réservation auprès des patients",
+        "Aucune déduction du solde du forfait avant la confirmation réussie du rendez-vous",
+        "Tableau de bord complet pour suivre les réservations, le solde et les rapports"
+      ]
+    },
+    "doctor": {
+      "title": "Médecins et Cliniques",
+      "highlight": "Organisation des Rendez-vous et Visites",
+      "description": "Un environnement numérique dédié aux médecins et leurs assistants pour gérer le cabinet et les rendez-vous avec une efficacité extrême.",
+      "points": [
+        "Examen des demandes : accepter, rejeter ou fixer une date alternative",
+        "Accès au dossier médical précédent du patient inscrit",
+        "Émission et mise à jour des ordonnances et demandes médicales en un clic",
+        "Séparation totale entre la plateforme et les honoraires de consultation du médecin"
+      ]
+    },
+    "lab": {
+      "title": "Laboratoires d'Analyses",
+      "highlight": "Réception des Demandes et Envoi des Résultats",
+      "description": "Facilite la réception des demandes d'analyses par numéro de commande et la documentation électronique des résultats.",
+      "points": [
+        "Recherche de demandes d'analyses via le numéro de commande imprimé",
+        "Envoi des résultats et rapports directement sur le dossier du patient inscrit",
+        "Notifications instantanées pour le médecin et le patient lors de la validation",
+        "Journal d'audit complet pour toutes les opérations de téléchargement"
+      ]
+    },
+    "radiology": {
+      "title": "Centres de Radiologie",
+      "highlight": "Partage de Rapports Radiologiques",
+      "description": "Un système sécurisé pour recevoir les demandes de radiologie et partager les images et rapports avec les médecins.",
+      "points": [
+        "Réception des demandes et identification directe du type d'examen",
+        "Envoi des rapports médicaux et images vers les parcours de soins approuvés",
+        "Possibilité de consulter l'historique radiologique du patient inscrit",
+        "Confidentialité totale et protection des données d'examen médical"
+      ]
+    }
+  },
+  "workflow": {
+    "section_badge": "Parcours Interactif",
+    "title": "Comment fonctionne le parcours de réservation et de soins ?",
+    "subtitle": "Suivez les cinq étapes officielles du service, du centre de réservation jusqu'à la remise des résultats et de l'ordonnance.",
+    "step_prefix": "Étape",
+    "active_phase": "Phase Active du Système",
+    "simulator_cta": "Essayer cette étape dans le simulateur",
+    "step1": {
+      "title": "Demande de Réservation via Centre",
+      "role": "Centre de Réservation",
+      "description": "Le patient se rend dans un centre de réservation agréé, où l'employé recherche le médecin, crée une demande de réservation et détermine le statut du patient (visiteur/inscrit).",
+      "rule": "La demande est enregistrée comme \"En attente d'approbation\" et n'est pas considérée comme un rendez-vous final.",
+      "note": "Si le patient est inscrit, son compte est lié à un UUID ; s'il est visiteur, la demande est créée sans ouvrir de dossier médical permanent."
+    },
+    "step2": {
+      "title": "Examen et Accréditation par le Médecin",
+      "role": "Médecin / Assistant",
+      "description": "La demande parvient au tableau de bord du cabinet, et le médecin ou son assistant l'examine pour s'assurer qu'elle correspond au planning de travail.",
+      "rule": "Le médecin peut accepter (confirmé), rejeter la demande ou fixer directement une date accréditée alternative.",
+      "note": "Si une date alternative est fixée, elle remplace officiellement la date précédente au sein de la plateforme."
+    },
+    "step3": {
+      "title": "Allocation du Forfait et Notification",
+      "role": "Système de la Plateforme",
+      "description": "Uniquement lors de la confirmation du rendez-vous, une opération est déduite du forfait du centre de réservation et le statut est mis à jour avec envoi de notifications.",
+      "rule": "Si le médecin rejette la demande ou si une erreur technique survient, aucune opération n'est déduite du forfait.",
+      "note": "Les patients inscrits reçoivent une notification sur leur compte, tandis que les patients visiteurs sont suivis par le centre de réservation."
+    },
+    "step4": {
+      "title": "Visite Médicale et Examen",
+      "role": "Médecin et Patient",
+      "description": "Le jour du rendez-vous confirmé, le médecin ouvre le dossier de visite. Il consulte l'historique du patient inscrit et rédige le diagnostic.",
+      "rule": "Une visite médicale ne peut commencer que si le statut du rendez-vous est \"Confirmé\".",
+      "note": "Pour les patients inscrits, les données sont sauvegardées dans l'EMR ; pour les visiteurs, les documents sont imprimés sans sauvegarde permanente."
+    },
+    "step5": {
+      "title": "Ordonnances et Analyses de Laboratoire",
+      "role": "Entités de Santé",
+      "description": "The doctor issues prescriptions or test/X-ray requests, which are printed for the patient and digitally linked for registered patients.",
+      "rule": "The platform does not interfere in medical decisions, medicine prices, or tests.",
+      "note": "The laboratory uploads results to the registered patient's file, while the platform's role ends for visitors by enabling them to receive the printed request."
+    }
+  },
+  "packages": {
+    "section_badge": "Chapitre 12 : Forfaits et Centres de Réservation",
+    "title": "Forfaits Opérationnels Flexibles",
+    "subtitle": "Rentable et Durable",
+    "description": "Achetez des crédits d'opérations en gros et offrez des services de prise de rendez-vous aux citoyens tout en réalisant d'excellents rendements opérationnels et une transparence totale.",
+    "most_popular": "Le plus populaire",
+    "currency": "DZD",
+    "op_confirmed": "Opération de Réservation Confirmée",
+    "buy_cta": "Demander l'Achat de Forfait",
+    "calc_title": "Calculateur de Rentabilité (ROI)",
+    "calc_subtitle": "Calculez le bénéfice net mensuel attendu pour votre centre",
+    "daily_bookings_label": "Réservations Journalières Attendues",
+    "daily_bookings_unit": "Réservations",
+    "service_fee_label": "Frais de Service de Réservation Perçus",
+    "rules_title": "Règles de Consommation Approuvées",
+    "rules_description": "Aucune réservation n'est déduite avant l'approbation du médecin et la confirmation finale du rendez-vous. En cas de rejet, aucune déduction n'est effectuée sur le forfait.",
+    "summary_title": "Résumé du Compte Mensuel",
+    "summary_badge": "Estimation Opérationnelle",
+    "total_fees": "Total des Frais de Service",
+    "required_cost": "Coût des Forfaits Requis",
+    "monthly_total": "Total des Réservations Mensuelles",
+    "net_profit": "Bénéfice Net Mensuel",
+    "calc_note": "Basé sur 25 jours ouvrables par mois et l'utilisation du forfait \"Le plus populaire\"",
+    "start_cta": "Devenir un Centre de Réservation Accrédité",
+    "starter": {
+      "name": "Forfait Opérationnel Bronze",
+      "features": [
+        "100 opérations de réservation réussies",
+        "Déduction uniquement lors de la confirmation",
+        "Support d'erreur et compensation instantanée",
+        "Tableau de bord central pour le solde",
+        "Validité illimitée jusqu'à épuisement du solde"
+      ]
+    },
+    "pro": {
+      "name": "Forfait Opérationnel Argent",
+      "features": [
+        "250 opérations de réservation réussies",
+        "Déduction uniquement lors de la confirmation",
+        "Support d'erreur et compensation instantanée",
+        "Rapports de réservation détaillés",
+        "Accréditation prioritaire par l'administration",
+        "Validité illimitée jusqu'à épuisement du solde"
+      ]
+    },
+    "gold": {
+      "name": "Forfait Opérationnel Or",
+      "features": [
+        "500 opérations de réservation réussies",
+        "Déduction uniquement lors de la confirmation",
+        "Rapports statistiques avancés",
+        "Gestionnaire de compte opérationnel dédié",
+        "Mises à jour instantanées du réseau de médecins",
+        "Validité illimitée jusqu'à épuisement du solde"
+      ]
+    },
+    "enterprise": {
+      "name": "Forfait Opérationnel Diamant",
+      "features": [
+        "1 000 opérations de réservation réussies",
+        "Rendement opérationnel le plus élevé",
+        "Intégration personnalisée avec les systèmes",
+        "Support technique VIP 24/7",
+        "Rapports financiers et d'audit complets",
+        "Validité illimitée jusqu'à épuisement du solde"
+      ]
+    }
+  },
+  "faq": {
+    "section_badge": "FAQ et Règles de Gouvernance",
+    "title": "Réponses Officielles Basées sur le",
+    "subtitle": "Document Opérationnel de la Plateforme",
+    "description": "Tout ce que vous voulez savoir sur le modèle économique, les forfaits, l'accréditation des rendez-vous et la sécurité numérique approuvée sur la plateforme.",
+    "search_placeholder": "Rechercher une réponse à votre question...",
+    "source_note": "Basé sur les Chapitres 12, 13, 14 du Document Commercial Officiel",
+    "no_results": "Nous n'avons trouvé aucune question correspondant à votre recherche. Essayez un autre mot.",
+    "categories": {
+      "all": "Toutes les Questions",
+      "booking_center": "Centres de Réservation et Forfaits",
+      "patients": "Patients et Dossiers Médicaux",
+      "doctors": "Médecins et Cliniques",
+      "labs_rad": "Laboratoires et Radiologie",
+      "security": "Sécurité et Confidentialité"
+    },
+    "faq_3": {
+      "question": "Quelle est la différence entre un patient visiteur et un patient inscrit ?",
+      "answer": "Un patient visiteur réserve via le centre de réservation et les documents lui sont imprimés sans ouvrir de dossier électronique permanent. Quant au patient inscrit, il possède un compte personnel avec un identifiant unique (UUID) et un portefeuille numérique complet pour ses ordonnances, analyses et rendez-vous."
+    },
+    "faq_4": {
+      "question": "La plateforme Aafiya interfère-t-elle dans les honoraires des médecins ou les prix des analyses ?",
+      "answer": "Absolument pas. L'article 13.4 stipule clairement que la plateforme n'interfère pas dans les honoraires des médecins, les frais de laboratoire ou les prix des médicaments, et sa responsabilité se limite à la gestion des services numériques et des forfaits opérationnels."
+    },
+    "faq_5": {
+      "question": "L'assistant d'un médecin peut-il approuver des rendez-vous au nom du médecin ?",
+      "answer": "Oui, le système permet de créer des comptes pour les assistants médicaux leur accordant l'autorité de consulter les demandes de réservation et de les approuver ou de suggérer une date alternative sans leur donner accès aux décisions médicales ou aux ordonnances."
+    },
+    "faq_6": {
+      "question": "Comment un laboratoire ou un centre de radiologie envoie-t-il les résultats d'un patient ?",
+      "answer": "Le laboratoire recherche la demande à l'aide du numéro de commande imprimé et télécharge directement les résultats et rapports, qui apparaissent immédiatement dans le dossier médical électronique du patient inscrit et sur le tableau de bord du médecin traitant."
+    },
+    "faq_7": {
+      "question": "Quelles sont les garanties pour la sécurité et la confidentialité des données médicales ?",
+      "answer": "La plateforme applique le principe du moindre privilège (Least Privilege), avec un cryptage des données et une documentation de toutes les opérations dans le journal d'audit (Audit Log), en totale conformité avec les lois de protection des données de santé."
+    }
+  },
+  "directory": {
+    "section_badge": "Annuaire de Recherche Unifié",
+    "title": "Recherchez votre médecin ou le centre de service approprié",
+    "description": "Explorez la liste des médecins certifiés, centres de réservation, laboratoires d'analyses et centres de radiologie en un seul endroit.",
+    "search_placeholder": "Rechercher par nom, spécialité ou lieu...",
+    "all_provinces": "Toutes les Wilayas",
+    "search_cta": "Recherche Instantanée",
+    "results_found": "Nous avons trouvé {count} résultats correspondant à votre recherche",
+    "clear_filters": "Effacer les Filtres",
+    "specialty_label": "Spécialité",
+    "book_now": "Réserver Maintenant",
+    "no_results_title": "Désolé, aucun résultat correspondant n'a été trouvé",
+    "no_results_desc": "Essayez de modifier vos termes de recherche ou la wilaya pour de meilleurs résultats",
+    "view_all": "Voir Tous les Résultats",
+    "tabs": {
+      "all": "Tous",
+      "doctor": "Médecins",
+      "booking_center": "Centres de Réservation",
+      "lab": "Labos",
+      "radiology": "Radiologie"
+    },
+    "cities": {
+      "all": "Toutes les Wilayas",
+      "algiers": "Alger",
+      "oran": "Oran",
+      "constantine": "Constantine",
+      "annaba": "Annaba",
+      "blida": "Blida",
+      "setif": "Sétif",
+      "tlemcen": "Tlemcen"
+    },
+    "providers": {
+      "doc-1": {
+        "name": "Dr. Salim El Amrani",
+        "roleTitle": "Médecin Consultant",
+        "specialty": "Cardiologie, Artères et Cathétérisme Thérapeutique",
+        "city": "Alger",
+        "address": "Rue Didouche Mourad, Immeuble 42, 3ème étage, Alger",
+        "availableDays": "Dimanche - Jeudi",
+        "tags": [
+          "ECG",
+          "Écho Doppler",
+          "Cathétérisme"
+        ]
+      },
+      "doc-2": {
+        "name": "Dr. Meriem El Qasimi",
+        "roleTitle": "Médecin Spécialiste",
+        "specialty": "Médecine Interne, Gastro-entérologie et Endoscopie",
+        "city": "Oran",
+        "address": "Quartier Akid Lotfi, Complexe Médical Al Shifa, Oran",
+        "availableDays": "Samedi - Mercredi",
+        "tags": [
+          "Endoscopie",
+          "Bilan Gastrique",
+          "Colon"
+        ]
+      },
+      "center-1": {
+        "name": "Centre de Réservation Rapide",
+        "roleTitle": "Centre de Réservation Agréé",
+        "specialty": "Coordination et Réservation de Rendez-vous Médicaux toutes Spécialités",
+        "city": "Alger",
+        "address": "Quartier Bab Ezzouar, en face de la station de Tramway, Alger",
+        "availableDays": "Toute la semaine",
+        "tags": [
+          "Réservation Instantanée",
+          "Support 24/7",
+          "Forfaits Certifiés"
+        ]
+      },
+      "lab-1": {
+        "name": "Laboratoire Al-Amal d'Analyses Médicales",
+        "roleTitle": "Laboratoire d'Analyses Médicales",
+        "specialty": "Analyses de Sang, Biochimie, Hormones et Génétique",
+        "city": "Constantine",
+        "address": "Quartier Sidi Mabrouk, Rue Istiqlal, Constantine",
+        "availableDays": "Samedi - Jeudi",
+        "tags": [
+          "Résultats Numériques",
+          "Prélèvement à Domicile",
+          "Analyses Précises"
+        ]
+      },
+      "radio-1": {
+        "name": "Centre de Diagnostic Al-Shifa (Radiologie)",
+        "roleTitle": "Centre d'Imagerie et de Radiologie",
+        "specialty": "Scanner, IRM et Échographie",
+        "city": "Blida",
+        "address": "Rue du 1er Novembre, en face de l'Hôpital Universitaire, Blida",
+        "availableDays": "Dimanche - Jeudi",
+        "tags": [
+          "IRM",
+          "Scanner 3D",
+          "Rayons X"
+        ]
+      },
+      "doc-3": {
+        "name": "Dr. Amine Mansouri",
+        "roleTitle": "Médecin Spécialiste",
+        "specialty": "Chirurgie Orthopédique, Articulations et Blessures Sportives",
+        "city": "Sétif",
+        "address": "Rue du 8 Mai 1945, Complexe des Médecins, Sétif",
+        "availableDays": "Samedi - Mercredi",
+        "tags": [
+          "Articulations",
+          "Arthroscopie",
+          "Fractures"
+        ]
+      },
+      "center-2": {
+        "name": "Centre Aurès de Coordination des Services de Santé",
+        "roleTitle": "Centre de Réservation Agréé",
+        "specialty": "Réception et Réservation de Rendez-vous pour Citoyens et Visiteurs",
+        "city": "Annaba",
+        "address": "Quartier de la Corniche, en face de l'Ancien Siège de la Wilaya, Annaba",
+        "availableDays": "Toute la semaine",
+        "tags": [
+          "Réservation Confirmée",
+          "Suivi Téléphonique",
+          "Rendez-vous Urgents"
+        ]
+      },
+      "doc-4": {
+        "name": "Dr. Fatima Zahra Cherifi",
+        "roleTitle": "Médecin Consultant",
+        "specialty": "Pédiatrie, Néonatologie et Croissance",
+        "city": "Tlemcen",
+        "address": "Rue Imbarek El Mili, Houmet El Jamma, Tlemcen",
+        "availableDays": "Dimanche - Jeudi",
+        "tags": [
+          "Nourrissons",
+          "Vaccins",
+          "Suivi de Croissance"
+        ]
+      }
+    }
+  },
+  "news": {
+    "section_badge": "Latest Updates and Research",
+    "title": "Platform News and",
+    "subtitle": "Digital Health Transformation",
+    "view_all": "All Articles and News",
+    "read_more": "Read Details",
+    "categories": {
+      "digital_health": "Digital Health",
+      "platform_updates": "Platform Updates",
+      "medical_research": "Medical Research"
+    },
+    "article_1": {
+      "title": "Launching the first version of the unified electronic medical file in Algeria",
+      "summary": "Aafiya has officially started activating the digital medical file feature linked to citizens' national identity, facilitating secure treatment history tracking.",
+      "readTime": "5 min read"
+    },
+    "article_2": {
+      "title": "How to choose the right operational package for your booking center?",
+      "summary": "A comprehensive guide for certified booking centers on the mechanism of buying wholesale operation credits and achieving the highest operational return from direct service fees.",
+      "readTime": "4 min read"
+    },
+    "article_3": {
+      "title": "Importance of digitizing medical prescriptions in reducing medication errors",
+      "summary": "A study showing how the Aafiya system contributes to converting paper prescriptions into accurate digital records that prevent drug interactions and protect the patient.",
+      "readTime": "6 min read"
+    }
+  },
+  "cta": {
+    "badge": "Ready for Full Digital Transformation",
+    "title_prefix": "Join the",
+    "title_suffix": "Digital Ecosystem Today",
+    "description": "Whether you are a booking center seeking to expand your operational returns, or a doctor wishing to organize your clinic and medical record, our platform is the ideal choice for the future.",
+    "cta_booking": "Join as a Certified Booking Center",
+    "cta_doctor": "Join as a Doctor / Clinic",
+    "trust1": "Immediate activation after official review",
+    "trust2": "Technical support and free training for teams"
+  },
+  "footer": {
+    "slogan": "The certified digital ecosystem for coordinating appointment booking services and managing electronic medical records in Algeria, following a transparent operational package model.",
+    "official_ref": "Official Operational Reference v1.0",
+    "quick_links": "Quick Links",
+    "role_portals": "Role Portals",
+    "booking_center_portal": "Booking Center Portal",
+    "doctor_portal": "Doctor Portal",
+    "emr_portal": "Medical Record (UUID)",
+    "lab_portal": "Laboratory Portal",
+    "radiology_portal": "Radiology Portal",
+    "contact": "Contact",
+    "address": "Algiers",
+    "copyright_prefix": "All Rights Reserved © 2026",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "compliance": "Compliance"
+  },
+  "dashboard": {
+    "mainMenu": "Menu Principal",
+    "toggleMode": "Changer le mode",
+    "lightMode": "Mode Clair",
+    "darkMode": "Mode Sombre",
+    "platform": "Plateforme",
+    "quickStats": "Stats Rapides",
+    "platformStable": "Performance stable à 100%"
+  },
+  "admin": {
+    "title": "Centre de Contrôle d'Administration de la Plateforme",
+    "sidebarTitle": "Centre de Contrôle",
+    "userName": "SUPER ADMIN",
+    "userRole": "ACCÈS TOTAL",
+    "tabs": {
+      "dashboard": "Tableau de Bord",
+      "users": "Utilisateurs",
+      "doctors": "Médecins",
+      "booking_centers": "Centres de Réservation",
+      "laboratories": "Laboratoires",
+      "radiology": "Radiologie",
+      "packages": "Forfaits",
+      "subscription_requests": "Demandes d'Adhésion",
+      "payments": "Paiements",
+      "advertisements": "Publicités",
+      "reports": "Rapports",
+      "audit_logs": "Journaux d'Audit",
+      "roles_permissions": "Permissions",
+      "assistant_permissions": "Gestion des Assistants",
+      "system_settings": "Paramètres Système",
+      "notifications_center": "Centre de Notifications"
+    },
+    "header": {
+      "scanDocument": "Scanner Document",
+      "systemEfficiency": "Système fonctionnant à 100% d'efficacité"
+    },
+    "overview": {
+      "totalUsers": "Total Utilisateurs",
+      "totalDoctors": "Total Médecins",
+      "approvedDoctors": "Médecins Approuvés",
+      "dailyBookings": "Réservations Quotidiennes",
+      "monthlyRevenue": "Revenu Mensuel",
+      "activeSubscriptions": "Abonnements Actifs",
+      "statsGrowth": "+12% ce mois",
+      "fromRequests": "Sur 1 500 demandes d'inscription",
+      "viaCenters": "Via 85 centres de réservation",
+      "liveActivity": "Métriques d'Activité en Direct",
+      "realtimeUpdate": "Mise à jour en temps réel ⚡",
+      "labOrdersToday": "Demandes Labo Aujourd'hui",
+      "radOrdersToday": "Demandes Radio Aujourd'hui",
+      "verifiedCenters": "Centres de Réservation Vérifiés",
+      "distributedLabs": "Sur 32 laboratoires",
+      "distributedRad": "Sur 18 centres de radiologie",
+      "emrSync": "Sync EMR Directe",
+      "serverStatus": "Statut Serveurs & Base de données :",
+      "dbStatus": "Base EMR Centrale (Cloud Firestore) :",
+      "connected": "Connecté (Uptime 99,99%)",
+      "pendingActions": "Actions en Attente Requises",
+      "pendingDocs": "14 Nouvelles Demandes de Vérification Médecins",
+      "pendingDocsDesc": "Nécessite une revue des documents et licences",
+      "pendingSubs": "8 Demandes d'Abonnement Entreprise",
+      "pendingSubsDesc": "Hôpitaux et centres de radiologie",
+      "review": "Réviser"
+    },
+    "users": {
+      "title": "Liste des Utilisateurs & Personnel",
+      "searchPlaceholder": "Rechercher par nom ou email...",
+      "filterRole": "Filtrer par Rôle",
+      "allRoles": "Tous les Utilisateurs",
+      "table": {
+        "name": "Nom",
+        "role": "Rôle",
+        "status": "Statut",
+        "joinedAt": "Inscrit le",
+        "actions": "Actions"
+      },
+      "status": {
+        "active": "Actif",
+        "blocked": "Bloqué"
+      },
+      "edit": "Modifier"
+    },
+    "doctors": {
+      "title": "Gestion & Vérification des Médecins",
+      "description": "Vérifier les licences, approuver les comptes, suspendre et gérer les abonnements",
+      "verificationPending": "Vérification en attente 🟡",
+      "licenseNumber": "Numéro de Licence :",
+      "approve": "Approuver le Compte ✓",
+      "reject": "Rejeter la Demande"
+    },
+    "centers": {
+      "title": "Gestion des Centres de Réservation",
+      "description": "Connexion entre le personnel des centres et les cliniques",
+      "activeCount": "Il y a actuellement {count} centres de réservation actifs liés au système."
+    },
+    "labs": {
+      "title": "Gestion du Réseau de Laboratoires",
+      "description": "Gérer les comptes, lier les automates et surveiller les résultats critiques",
+      "activeCount": "{count} laboratoires certifiés liés à l'EMR interactif."
+    },
+    "radiology": {
+      "title": "Gestion des Centres de Radiologie",
+      "description": "Contrôle d'accès radiologue, gestion de l'archivage PACS et intégration DICOM",
+      "activeCount": "{count} centres de radiologie avancés activés dans les 48 wilayas."
+    },
+    "packages": {
+      "title": "Gestion des Forfaits & Abonnements",
+      "description": "Définir les tarifs et permissions pour chaque catégorie (cliniques, centres, hôpitaux)",
+      "individual": "Forfait Clinique Individuelle",
+      "medicalCenter": "Forfait Centre Médical",
+      "hospital": "Forfait Entreprise Hôpital",
+      "monthly": "/ mois",
+      "mostPopular": "Le plus populaire",
+      "sar": "DZD"
+    },
+    "ads": {
+      "title": "Système de Gestion des Publicités",
+      "subtitle": "Gérez les campagnes promotionnelles, les bannières et le ciblage d'audience",
+      "createNew": "Créer une Nouvelle Publicité",
+      "stats": {
+        "total": "Total Publicités",
+        "active": "Campagnes Actives",
+        "impressions": "Total Impressions",
+        "ctr": "CTR Moyen"
+      },
+      "filters": {
+        "searchPlaceholder": "Rechercher par nom ou description...",
+        "statusAll": "Tous les Statuts",
+        "statusActive": "Actif",
+        "statusPaused": "En pause",
+        "statusScheduled": "Planifié",
+        "statusEnded": "Terminé"
+      },
+      "table": {
+        "id": "ID Pub",
+        "status": "Statut",
+        "actions": "Actions",
+        "edit": "Modifier",
+        "pause": "Mettre en pause",
+        "play": "Activer",
+        "delete": "Supprimer",
+        "placements": "Placements : {count}",
+        "audience": "Audience : {count}",
+        "specialty": "Spécialité : {specialty}",
+        "period": "Période : {start} - {end}"
+      },
+      "form": {
+        "editTitle": "Modifier la Publicité",
+        "createTitle": "Créer une Nouvelle Publicité",
+        "engine": "Moteur de Configuration de Campagne",
+        "basicInfo": "Informations de Base",
+        "adTitle": "Titre de la Pub",
+        "adTitlePlaceholder": "ex: Remise spéciale nouveaux patients",
+        "imageUrl": "URL de la Bannière",
+        "description": "Description de la Pub",
+        "descriptionPlaceholder": "Expliquez les détails de l'offre ou du message...",
+        "targetUrl": "URL de Destination",
+        "targeting": "Ciblage d'Audience & de Placement",
+        "placement": "Placements",
+        "audience": "Audience Cible",
+        "specialty": "Spécialité Cible (Optionnel)",
+        "specialtyPlaceholder": "ex: Cardiologie, Dentisterie...",
+        "specialtyHint": "Laissez vide pour afficher à toutes les spécialités",
+        "scheduling": "Planification & Statut",
+        "startDate": "Date de Début",
+        "endDate": "Date de Fin",
+        "status": "Statut de la Pub",
+        "cancel": "Annuler",
+        "save": "Enregistrer les Modifications",
+        "publish": "Publier la Pub Maintenant",
+        "confirmDelete": "Êtes-vous sûr de vouloir supprimer cette publicité ?"
+      },
+      "empty": {
+        "title": "Aucune publicité ne correspond à votre recherche",
+        "subtitle": "Commencez par créer la première campagne de la plateforme maintenant"
+      },
+      "placements": {
+        "HOMEPAGE": "Page d'Accueil",
+        "PATIENT_DASHBOARD": "Tableau de Bord Patient",
+        "DOCTOR_DASHBOARD": "Tableau de Bord Docteur",
+        "BOOKING_CENTER": "Centre de Réservation",
+        "LABORATORY": "Laboratoire",
+        "RADIOLOGY": "Radiologie"
+      },
+      "audiences": {
+        "PATIENTS": "Patients",
+        "DOCTORS": "Docteurs",
+        "LAB_STAFF": "Staff Labo",
+        "RAD_STAFF": "Staff Radio",
+        "BOOKING_AGENTS": "Agents de Réservation",
+        "ALL": "Tous"
+      }
+    },
+    "subscriptions": {
+      "title": "Demandes d'Abonnement & Mise à Niveau",
+      "description": "Réviser les demandes et vérifier les virements/cartes",
+      "pendingCount": "Il y a {count} demandes d'abonnement en attente d'accréditation financière."
+    },
+    "payments": {
+      "title": "Historique des Paiements & Facturation",
+      "description": "Suivre tous les transferts, commissions et émettre des factures fiscales certifiées",
+      "totalPayments": "Total des paiements ce mois : {amount}"
+    },
+    "reports": {
+      "title": "Rapports de Performance Complets",
+      "description": "Exporter les rapports de croissance, taux de réservation, usage labo/radio en Excel ou PDF",
+      "preview": "Aperçu de l'en-tête des rapports certifiés de la plateforme",
+      "securityNote": "Le code contient l'empreinte de vérification numérique pour garantir l'intégrité des données statistiques.",
+      "exportCta": "Vous pouvez exporter les rapports de performance en un clic."
+    },
+    "auditLogs": {
+      "title": "Journaux d'Audit de Sécurité & Activité",
+      "description": "Enregistrement précis de toutes les opérations de connexion, modification et accès aux dossiers médicaux"
+    },
+    "notificationsCenter": {
+      "title": "Centre de notifications administratives"
+    }
+  },
+  "doctor": {
+    "days": {
+      "sunday": "Dimanche",
+      "monday": "Lundi",
+      "tuesday": "Mardi",
+      "wednesday": "Mercredi",
+      "thursday": "Jeudi",
+      "friday": "Vendredi",
+      "saturday": "Samedi"
+    },
+    "title": "Tableau de bord stratégique du médecin",
+    "sidebarTitle": "Contrôle Médecin",
+    "userName": "Dr. Mohamed Al-Arabi",
+    "userRole": "Internal Medicine",
+    "tabs": {
+      "dashboard": "Tableau de Bord",
+      "patients": "Mes Patients",
+      "visits": "Historique des Visites",
+      "waitingRoom": "Salle d'Attente",
+      "consultation": "Consultation en Cours",
+      "prescriptions": "Ordonnances & Rx",
+      "labOrders": "Analyses Labo",
+      "radiologyOrders": "Examens Radio",
+      "labResults": "Résultats Labo",
+      "radiologyResults": "Radio & DICOM",
+      "ehr": "Dossier Médical (EHR)",
+      "analytics": "Analyses Cliniques",
+      "notifications": "Centre de Notifications",
+      "settings": "Paramètres & Planning",
+      "activityLog": "Journal d'Audit",
+      "staff": "Personnel & Assistants",
+      "clinicStats": "Statistiques des Médecins"
+    },
+    "badges": {
+      "new": "Nouveau",
+      "urgent": "2 Urgent",
+      "schedule": "Horaires de Travail"
+    },
+    "pendingVerification": {
+      "badge": "Compte en cours d'examen et vérification 🟡",
+      "status": "Statut du compte",
+      "statusValue": "🟡 Vérification en attente",
+      "welcome": "Bienvenue Dr. {name} 👋",
+      "title": "Bienvenue sur Aafiya 👋",
+      "description": "Le compte médecin et le profil de la clinique ont été créés avec succès. L'administration de Aafiya examine actuellement vos qualifications professionnelles et votre licence médicale pour vérification et approbation.",
+      "footnote": "Veuillez patienter jusqu'à la fin du processus de vérification et l'activation de votre compte. Une fois approuvé, vous aurez un accès complet au tableau de bord médical, aux services cliniques et à la gestion de votre clinique.",
+      "doctorDetails": "Informations professionnelles enregistrées",
+      "doctorName": "Médecin",
+      "specialty": "Spécialité",
+      "licenseNumber": "Numéro de licence",
+      "clinicName": "Clinique",
+      "refreshButton": "Actualiser l'état du compte",
+      "logoutButton": "Déconnexion",
+      "supportNotice": "Pour toute question, vous pouvez contacter l'équipe d'assistance de la plateforme."
+    },
+    "unauthorized": {
+      "title": "Accès restreint",
+      "settingsMessage": "Cette section est dédiée à la gestion des paramètres de la clinique et est exclusivement réservée au Directeur de la clinique ou au personnel autorisé.",
+      "staffMessage": "Cette section est dédiée à la gestion et au recrutement du personnel et est exclusivement réservée au Directeur de la clinique.",
+      "clinicStatsMessage": "Cette section est dédiée à la consultation des statistiques et des performances des médecins et est exclusivement réservée au Directeur de la clinique.",
+      "backToDashboard": "Retour au tableau de bord principal"
+    },
+    "directorStats": {
+      "title": "Statistiques des Médecins de la Clinique",
+      "subtitle": "Indicateurs de performance opérationnelle et métriques des rendez-vous pour tous les médecins",
+      "activeClinic": "Clinique Active",
+      "refresh": "Actualiser les données",
+      "loading": "Chargement des statistiques...",
+      "filters": {
+        "doctor": "Filtrer par Médecin",
+        "allDoctors": "Tous les médecins de la clinique",
+        "selectDoctor": "Sélectionner un médecin",
+        "dateMode": "Période",
+        "today": "Aujourd'hui",
+        "specificDate": "Date spécifique",
+        "range": "Plage de dates",
+        "fromDate": "Du",
+        "toDate": "Au",
+        "invalidRange": "La date de fin doit être postérieure ou égale à la date de début."
+      },
+      "kpis": {
+        "totalAppointments": "Total des Rendez-vous",
+        "completed": "Terminés",
+        "inWaitingRoom": "En salle d'attente",
+        "pendingCheckIn": "En attente d'arrivée",
+        "walkInVisits": "Visites directes",
+        "noShow": "Absents (No-Show)",
+        "cancelled": "Annulés",
+        "rescheduled": "Replanifiés",
+        "rejected": "Rejetés",
+        "expired": "Expirés"
+      },
+      "sections": {
+        "primaryKpis": "Indicateurs Opérationnels Principaux",
+        "secondaryKpis": "Autres Statuts de Rendez-vous",
+        "doctorBreakdown": "Détail des Performances par Médecin",
+        "selectedDoctor": "Détails du Médecin Sélectionné"
+      },
+      "table": {
+        "doctor": "Médecin",
+        "specialty": "Spécialité",
+        "position": "Poste",
+        "director": "Directeur de Clinique",
+        "doctorStaff": "Médecin de la Clinique",
+        "total": "Total",
+        "completed": "Terminés",
+        "waiting": "En Attente",
+        "pending": "Enregistrement",
+        "walkIn": "Directe",
+        "noShow": "Absent",
+        "cancelled": "Annulé",
+        "actions": "Actions",
+        "viewDoctor": "Voir Stats"
+      },
+      "selectedDoctorCard": {
+        "viewing": "Statistiques du Médecin :",
+        "specialty": "Spécialité :",
+        "position": "Poste :",
+        "clearFilter": "Réinitialiser à tous les médecins"
+      },
+      "empty": {
+        "title": "Aucun rendez-vous trouvé",
+        "message": "Aucun rendez-vous ou visite clinique trouvée dans cette clinique pour la période sélectionnée."
+      },
+      "error": {
+        "title": "Échec du chargement des statistiques",
+        "retry": "Réessayer",
+        "forbidden": "Vous n'êtes pas autorisé à consulter les statistiques de cette clinique.",
+        "invalidParams": "Les paramètres de filtre sélectionnés sont invalides."
+      }
+    },
+    "overview": {
+      "subtitle": "Tableau de Bord Clinique Principal",
+      "welcome": "Bienvenue sur le tableau de bord clinique",
+      "waitingRoomButton": "Salle d'Attente Direct",
+      "avgWaitTime": "Temps d'Attente Moyen Quotidien",
+      "avgWaitValue": "--",
+      "avgWaitChange": "--",
+      "avgWaitFootnote": "0 examens terminés aujourd'hui",
+      "incomeTitle": "Revenus des Consultations du Jour",
+      "incomeFootnote": "Total des examens et consultations de la clinique aujourd'hui",
+      "waitingPatientsTitle": "Total des Patients en Attente",
+      "waitingPatientsValue": "0 patients",
+      "waitingPatientsFootnote": "Aucun patient en attente actuellement",
+      "prescriptionsTitle": "Ordonnances Électroniques Aujourd'hui",
+      "prescriptionsValue": "0 ordonnances",
+      "prescriptionsFootnote": "Aucune ordonnance émise aujourd'hui",
+      "quickAccess": "Accès Rapide aux Pages Cliniques :",
+      "waitingRoomTitle": "Salle d'Attente en Direct",
+      "consultationTitle": "Consultation en Cours & Page Patient",
+      "labResultsTitle": "Résultats Labo & Comparaison Delta",
+      "labResultsDesc": "Comparer les valeurs précédentes et actuelles",
+      "radiologyResultsTitle": "Visionneuse DICOM & Rapports Radio",
+      "radiologyResultsDesc": "Consulter les images et rapports de radiologie",
+      "prescriptionsTabTitle": "Ordonnances & Favoris",
+      "prescriptionsDesc": "Modèles d'ordonnances et médicaments courants",
+      "activityLogTitle": "Journal d'Audit Médecin",
+      "incomeValue": "0 DZD",
+      "incomeHidden": "•••••••• DZD",
+      "incomeToggleTitle": "Afficher/Masquer les revenus",
+      "welcomeWithName": "Bienvenue {name}"
+    },
+    "consultation": {
+      "title": "Console de Consultation Patient Actuelle",
+      "activePath": "/doctor/consultation/current",
+      "activePatientBadge": "Patient Actif en Révision",
+      "issuePrescription": "Émettre Ordonnance (+Rx)",
+      "requestLab": "Demander Analyses (+Labo)",
+      "requestRad": "Demander Radio (+Radio)",
+      "completeVisit": "Terminer la Visite Officiellement",
+      "patientStatus": "EHR Actif",
+      "age": "Âge",
+      "gender": "Genre",
+      "bloodGroup": "Groupe Sanguin",
+      "years": "ans",
+      "emergencyContact": "Contact d'Urgence",
+      "drugAllergies": "Allergies Médicamenteuses Documentées",
+      "chronicDiseases": "Maladies Chroniques Documentées",
+      "vitals": {
+        "bp": "Pression Artérielle (PA)",
+        "pulse": "Pouls",
+        "temp": "Température (Temp)",
+        "spo2": "Oxygène (SPO2)",
+        "sugar": "Glycémie Aléatoire"
+      },
+      "timelineTitle": "Parcours Clinique",
+      "diagnosisTitle": "Éditeur de Diagnostic & Notes Cliniques",
+      "draftAutosaved": "Brouillon Sauvegardé Automatiquement",
+      "diagnosisLabel": "Diagnostic Clinique Principal (CIM-10) :",
+      "notesLabel": "Notes Cliniques & Recommandations du Médecin :",
+      "saveDraft": "Enregistrer le brouillon",
+      "saveSuccess": "Brouillon sauvegardé avec succès !",
+      "goToPrescription": "Aller à l'Ordonnance",
+      "finishAlert": "La visite clinique a été terminée et le patient a été officiellement libéré.",
+      "clinicalNotesTitle": "Observations et diagnostic clinique",
+      "newSessionBadge": "Nouvelle session de consultation",
+      "noActivePatient": "Aucun patient sélectionné",
+      "guestPatient": "Patient invité",
+      "idleStatus": "Session libre",
+      "female": "Femme",
+      "male": "Homme",
+      "selectPatientPrompt": "Veuillez sélectionner un patient dans la file d'attente pour commencer",
+      "noEmergencyContact": "Aucun contact d'urgence",
+      "draftSaved": "Brouillon enregistré avec succès",
+      "preliminaryDiagnosisPlaceholder": "Entrez le diagnostic clinique préliminaire (ex: Bronchite aiguë)...",
+      "examinationNotesPlaceholder": "Entrez les observations cliniques, symptômes et plan de soins..."
+    },
+    "prescriptions": {
+      "engineName": "E-Prescription Engine",
+      "engineSubtitle": "Electronic and Regulated Prescription Editor",
+      "badgeText": "Rx Engine v1.0",
+      "actionText": "Preview & Print Prescription",
+      "templateTitle": "Favorite Prescription Templates",
+      "templateSubtitle": "Apply common clinical protocols with one click",
+      "activeTableTitle": "Medications in Current Prescription:",
+      "appliedTemplate": "Template Applied:",
+      "addCustomMed": "Add Custom Medication",
+      "emptyStateTitle": "Prescription is Empty",
+      "emptyStateDesc": "Start by selecting a template or add medications manually",
+      "table": {
+        "drugName": "Medication Name",
+        "dosage": "Dosage & Strength",
+        "frequency": "Frequency",
+        "duration": "Duration",
+        "instructions": "Instructions",
+        "actions": "Actions"
+      },
+      "networkNotice": "This prescription will be sent digitally to certified pharmacies via Aafiya EHR, and patients can access it via their app.",
+      "saveFavorite": "Save as Favorite",
+      "previewTitle": "Electronic Prescription Preview",
+      "previewSubtitle": "Electronic Prescription Preview (Standard A5)",
+      "orderNumber": "Prescription No.",
+      "date": "Date",
+      "modal": {
+        "addTitle": "Add New Medication",
+        "editTitle": "Edit Medication",
+        "drugNameLabel": "Medication Name (Generic/Brand)",
+        "searchPlaceholder": "Search for medication...",
+        "dosageLabel": "Dosage & Strength",
+        "dosagePlaceholder": "e.g., 1000mg",
+        "frequencyLabel": "Daily Frequency",
+        "durationLabel": "Duration",
+        "durationPlaceholder": "e.g., 30 days",
+        "timingLabel": "Meal Timing",
+        "instructionsLabel": "Additional Instructions",
+        "instructionsPlaceholder": "e.g., please monitor heart rate after dose...",
+        "cancel": "Cancel",
+        "save": "Save Changes",
+        "add": "Add to Prescription",
+        "deleteConfirm": "Are you sure you want to delete this medication?",
+        "saveNewTemplateAlert": "Prescription saved as a new template (Mock Interaction)",
+        "mockEditAlert": "Changes saved successfully (Simulation)"
+      },
+      "frequencies": {
+        "once": "Once Daily",
+        "twice": "Twice Daily",
+        "thrice": "Thrice Daily",
+        "asNeeded": "As Needed"
+      },
+      "timings": {
+        "before": "Before Meals",
+        "during": "During Meals",
+        "after": "After Meals",
+        "any": "Doesn't Matter"
+      }
+    },
+    "orders": {
+      "labTitle": "Console de Gestion des Demandes d'Analyses",
+      "radTitle": "Console de Gestion des Demandes de Radiologie",
+      "labSubtitle": "Centre des Bilans Biologiques & Demandes de Laboratoire",
+      "radSubtitle": "Centre d'Imagerie & Examens Radiologiques",
+      "labPreviewSubtitle": "Aperçu de la Demande d'Analyses Médicales",
+      "radPreviewSubtitle": "Aperçu de la Demande de Radiologie",
+      "templateTitle": "Bilans et panels de laboratoire favoris",
+      "templateSubtitle": "Ajoutez des bilans complets en un clic à la demande en cours",
+      "previewTitle": "Aperçu de la demande d'analyses médicales",
+      "radTemplateTitle": "Examens & Protocoles Favoris",
+      "radTemplateSubtitle": "Ajouter des examens complets et protocoles en un clic",
+      "badgeText": "Moteur de Demandes v1.0",
+      "activeLabTitle": "Analyses dans la demande actuelle :",
+      "activeRadTitle": "Examens dans la demande actuelle :",
+      "addLab": "Ajouter une Analyse Personnalisée",
+      "addRad": "Ajouter un Examen Radiologique",
+      "emptyLabTitle": "La demande d'analyses est vide",
+      "emptyRadTitle": "La demande de radiologie est vide",
+      "emptyLabDesc": "Commencez par sélectionner un bilan ci-dessus ou ajoutez des analyses manuellement",
+      "emptyRadDesc": "Commencez par sélectionner un forfait d'examen ci-dessus ou ajoutez des examens manuellement",
+      "table": {
+        "testName": "Nom de l'Analyse / Examen",
+        "category": "Catégorie",
+        "reason": "Raison Clinique",
+        "priority": "Priorité",
+        "instructions": "Instructions",
+        "actions": "Actions"
+      },
+      "priority": {
+        "routine": "Routine",
+        "urgent": "Urgent",
+        "stat": "STAT (Urgentissime)"
+      },
+      "labNotice": "Cette demande d'analyses sera envoyée numériquement aux laboratoires certifiés, et les résultats apparaîtront automatiquement dans l'EHR du patient dès qu'ils seront prêts.",
+      "radNotice": "Cette demande de radiologie sera envoyée numériquement aux centres d'imagerie médicale, et vous serez notifié dès que les images DICOM et les rapports seront téléchargés.",
+      "modal": {
+        "addLabTitle": "Ajouter une Nouvelle Analyse",
+        "addRadTitle": "Ajouter un Nouvel Examen Radiologique",
+        "editLabTitle": "Modifier la Demande d'Analyses",
+        "editRadTitle": "Modifier la Demande de Radiologie",
+        "testNameLabel": "Nom de l'Analyse / Examen",
+        "modalityLabel": "Modalité",
+        "priorityLabel": "Niveau de Priorité",
+        "reasonLabel": "Raison Clinique / Indication",
+        "reasonPlaceholder": "Expliquez la raison de l'examen pour aider le radiologue...",
+        "instructionsLabel": "Instructions Cliniques pour le Labo/Centre",
+        "instructionsPlaceholder": "Instructions pour le laboratoire...",
+        "searchPlaceholder": "Rechercher un élément...",
+        "saveNewTemplateAlert": "Demande sauvegardée comme nouveau modèle favori",
+        "mockEditAlert": "Modifications sauvegardées avec succès",
+        "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cet élément de la demande ?",
+        "cancel": "Annuler",
+        "save": "Sauvegarder les Modifications",
+        "add": "Ajouter à la Demande"
+      },
+      "mockData": {
+        "cbc": {
+          "name": "Numération Formule Sanguine (NFS/FNS)",
+          "instructions": "À jeun 8 heures (préféré)",
+          "notes": "Suivi des taux d'hémoglobine"
+        },
+        "fbg": {
+          "name": "Glycémie à jeun",
+          "instructions": "À jeun 12 heures",
+          "notes": "Suivi Diabète de Type 2"
+        },
+        "cxr": {
+          "name": "Radiographie du thorax (Face)",
+          "reason": "Suivi respiratoire et céphalées",
+          "instructions": "Retirer les objets métalliques"
+        },
+        "multiSample": "Multiple",
+        "protocolInstructions": "Selon le protocole du bilan/imagerie",
+        "addedFromTemplate": "Ajouté depuis le modèle :",
+        "noInstructions": "Aucune instruction particulière",
+        "noReason": "Raison clinique non spécifiée",
+        "clinicalIndication": "Suivi du diagnostic clinique"
+      }
+    },
+    "results": {
+      "labTitle": "Tableau de Bord des Résultats de Laboratoire",
+      "radTitle": "Tableau de Bord des Résultats d'Imagerie",
+      "labSubtitle": "Centre de Révision des Bilans Biologiques & Rapports de Labo",
+      "radSubtitle": "Centre d'Imagerie & Rapports de Diagnostic Radiologique",
+      "badgeText": "Moteur de Résultats v2.1",
+      "viewImage": "Ouvrir Images DICOM",
+      "viewReport": "Voir Rapport Médical",
+      "abnormal": "Résultat Anormal",
+      "normal": "Dans la plage normale",
+      "table": {
+        "testName": "Nom du Test / Étude",
+        "category": "Catégorie / Type",
+        "date": "Date de l'examen",
+        "status": "Statut du résultat",
+        "result": "Résultat / Rapport",
+        "actions": "Actions"
+      },
+      "status": {
+        "pending": "En attente de traitement",
+        "preliminary": "Résultats préliminaires",
+        "final": "Résultats finaux",
+        "verified": "Vérifié"
+      },
+      "comparison": {
+        "title": "Matrices de Comparaison Clinique Directe (Précédent vs Actuel)",
+        "subtitle": "Comparaison des changements cliniques entre les tests précédents et actuels",
+        "matrixTitle": "Matrice de Comparaison Labo pour le Patient : {name}",
+        "categories": {
+          "all": "Tous les Tests",
+          "diabetes": "Diabète",
+          "kidney": "Fonction Rénale",
+          "lipids": "Profil Lipidique",
+          "liver": "Fonction Hépatique"
+        },
+        "table": {
+          "testName": "Nom de l'Analyse Labo",
+          "category": "Catégorie",
+          "previous": "Lecture Précédente",
+          "current": "Lecture Actuelle",
+          "diff": "Différence Clinique",
+          "ref": "Plage de Réf (M.R)",
+          "trend": "Tendance"
+        },
+        "trends": {
+          "down": "Amélioration / Baisse",
+          "up": "Augmentation / Hausse",
+          "stable": "Stable"
+        },
+        "processingStatus": "En cours de traitement",
+        "generalAnalysis": "Analyses générales",
+        "withinReference": "Dans les limites de référence",
+        "matrixTitleDefault": "Comparaison delta des analyses du patient",
+        "noResultsRecorded": "Aucun résultat d'analyse comparative disponible"
+      },
+      "dicom": {
+        "viewerTitle": "Visionneuse d'Études Radiologiques & Intégration PACS",
+        "viewerSubtitle": "Système de Gestion & d'Aperçu d'Imagerie Médicale (PACS)",
+        "pacsBadge": "Intégration PACS v2.0",
+        "openLatest": "Ouvrir Dernière Étude",
+        "backToHistory": "Retour à l'Historique",
+        "historyTitle": "Historique & Dossiers Radiologiques",
+        "searchPlaceholder": "Rechercher des études...",
+        "allModalities": "Toutes",
+        "noStudiesFound": "Aucune étude radiologique correspondante trouvée",
+        "resetSearch": "Réinitialiser la Recherche",
+        "viewStudy": "Voir Étude",
+        "studyInfo": "Informations sur l'Étude",
+        "date": "Date",
+        "facility": "Établissement / Centre",
+        "slices": "Nombre de Coupes",
+        "officialReport": "Rapport Officiel du Radiologue",
+        "specialist": "Dr. Kamal El-Jerari",
+        "specialistTitle": "Médecin Radiologue Consultant",
+        "downloadPdf": "Télécharger Rapport PDF",
+        "zoom": "ZOOM",
+        "brightness": "LUMINOSITÉ",
+        "rotation": "ROTATION",
+        "inverted": "INVERSÉ",
+        "metadataTitle": "Afficher les Métadonnées Techniques DICOM",
+        "fullLog": "Ouvrir Journal Complet",
+        "reportReady": "Rapport médical validé et signé",
+        "dicomFrames": "Aperçu des images et coupes DICOM",
+        "viewInDicom": "Ouvrir dans la visionneuse DICOM",
+        "reportDetails": "Détails du compte rendu radiologique",
+        "reportSummary": "Résumé des conclusions et diagnostic radiologique",
+        "currentPatient": "Patient actuel",
+        "noStudiesRecorded": "Aucun examen radiologique ou étude DICOM enregistré",
+        "emptyStateDesc": "Les comptes rendus radiologiques apparaîtront ici une fois demandés ou téléchargés.",
+        "pendingReview": "Compte rendu en cours de validation par le radiologue",
+        "radiologyCenter": "Centre de radiologie diagnostique",
+        "imagingScan": "Examen d'imagerie diagnostique"
+      },
+      "ehr": {
+        "masterHeader": "Dossier EHR Maître",
+        "patientId": "ID Dossier : #{id}",
+        "ageText": "{age} ans",
+        "lastVisit": "Dernière Visite : {date}",
+        "startVisit": "Commencer Nouvelle Visite",
+        "newPrescription": "Nouvelle Ordonnance",
+        "clinicalAlerts": "Alertes Cliniques Importantes",
+        "allergyAlert": "Allergie Médicamenteuse : {name}",
+        "chronicAlert": "Affection Chronique : {name}",
+        "medicalSnapshot": "Aperçu Médical",
+        "bloodGroup": "Sang : {group}",
+        "allergiesTitle": "Allergies",
+        "chronicTitle": "Affections Chroniques",
+        "medicationsTitle": "Médicaments Actuels",
+        "historyTimeline": "Historique Clinique",
+        "searchPlaceholder": "Rechercher dossiers...",
+        "filter": {
+          "all": "Tout",
+          "visit": "Visites",
+          "prescription": "Ordonnances",
+          "lab_result": "Analyses Labo",
+          "radiology": "Radiologie",
+          "review": "Révision Médicale",
+          "default": "Dossier Médical"
+        },
+        "noRecordsFound": "Aucun dossier trouvé pour la recherche actuelle",
+        "viewDetails": "Voir Détails Cliniques",
+        "overviewTitle": "Aperçu",
+        "doctorSupervisor": "Médecin Superviseur :",
+        "medicalFacility": "Établissement Médical :",
+        "comparisonTitle": "Comparaison Résultats Labo (Analyse Delta)",
+        "previousLabel": "Précédent",
+        "currentLabel": "Actuel",
+        "radiologyTitle": "Rapport de Résultats Radiologiques",
+        "clinicalIndication": "Indication Clinique :",
+        "findings": "Résultats :",
+        "openViewer": "Ouvrir Visionneuse Numérique",
+        "mockDoctorName": "Dr. Kamal El-Alami",
+        "mockFacilityName": "Hôpital International Avicenne",
+        "mockIndication": "Suivi de stéatose hépatique et trouble de la fonction hépatique.",
+        "modal": {
+          "allergyTitle": "Ajouter Nouvelle Allergie",
+          "chronicTitle": "Ajouter Affection Chronique",
+          "medTitle": "Ajouter Médicament Régulier",
+          "subtitle": "Le dossier médical du patient sera mis à jour immédiatement",
+          "allergyLabel": "Substance ou Médicament Allergène",
+          "chronicLabel": "Nom de l'Affection",
+          "medLabel": "Nom du Médicament & Posologie",
+          "dateLabel": "Date de Découverte/Début",
+          "severityLabel": "Sévérité/Statut",
+          "severityOptions": {
+            "mild": "Légère",
+            "moderate": "Modérée",
+            "severe": "Sévère"
+          },
+          "addAllergy": "Ajouter une allergie",
+          "addCondition": "Ajouter une affection chronique",
+          "addMedication": "Ajouter un traitement",
+          "inputPlaceholder": "Entrez les détails et observations cliniques...",
+          "save": "Enregistrer dans le dossier",
+          "cancel": "Annuler"
+        },
+        "printReport": "Imprimer Rapport",
+        "sharePatient": "Partager avec le Patient",
+        "officialNote": "Ce dossier est une copie numérique officielle de l'EHR du patient. Les données sont vérifiées et signées par le personnel médical. Toute modification est enregistrée dans le journal d'audit.",
+        "printRecord": "Imprimer le dossier médical",
+        "allergies": "Allergies et Sensibilités",
+        "chronicConditions": "Affections chroniques",
+        "activeMedications": "Traitements actifs",
+        "timelineTitle": "Chronologie clinique unifiée",
+        "timelineSubtitle": "Historique chronologique des consultations, ordonnances et analyses"
+      }
+    },
+    "analytics": {
+      "title": "Rapports de la Clinique et Statistiques Cliniques",
+      "subtitle": "Analyses Cliniques",
+      "stats": {
+        "totalPatients": "Total des patients ce mois :",
+        "totalPatientsValue": "{count} Patients",
+        "issuedPrescriptions": "Ordonnances Émises :",
+        "issuedPrescriptionsValue": "{count} Rx",
+        "labOrders": "Demandes d'Analyses Labo :",
+        "labOrdersValue": "{count} Demandes",
+        "radiologyOrders": "Demandes de Radiologie :",
+        "radiologyOrdersValue": "{count} Demandes"
+      }
+    },
+    "notifications": {
+      "title": "Centre de Notifications et d'Alertes Cliniques",
+      "subtitle": "Notifications Catégorisées & Alertes Urgentes",
+      "categories": {
+        "urgent": "Urgent & Critique",
+        "clinical": "Alertes Cliniques",
+        "administrative": "Administratif",
+        "system": "Mises à jour Système"
+      },
+      "items": {
+        "n1": {
+          "title": "Alerte Critique : Résultat biologique critique pour patient diabétique",
+          "time": "Il y a 10 minutes",
+          "body": "Le laboratoire a envoyé une alerte critique concernant la glycémie à jeun pour Ahmed Al-Qasimi (1.85 g/L)."
+        },
+        "n2": {
+          "title": "Rapport radiologique reçu pour le patient Omar Bouazza",
+          "time": "Il y a 30 minutes",
+          "body": "Le compte-rendu de radiographie pulmonaire est disponible dans le visualiseur DICOM."
+        },
+        "n3": {
+          "title": "Confirmation de nouveau rendez-vous depuis le centre d'appels",
+          "time": "Il y a 1 heure",
+          "body": "Une nouvelle consultation a été confirmée pour demain à 09:30."
+        },
+        "n4": {
+          "title": "Mise à jour du système Aafiya EMR v1.0",
+          "time": "Hier",
+          "body": "La matrice de comparaison évolutive des résultats de biologie (Delta Matrix) a été activée."
+        }
+      }
+    },
+    "settings": {
+      "title": "Paramètres du Médecin et du Cabinet",
+      "subtitle": "Centre de Contrôle Unifié Médecin & Cabinet",
+      "path": "Chemin : /doctor/settings",
+      "workingHoursButton": "Horaires de Travail",
+      "vacationsButton": "Congés & Exceptions",
+      "tabs": {
+        "personal": "1. Données Personnelles",
+        "clinic": "2. Infos Cabinet",
+        "workingHours": "3. Horaires Hebdomadaires",
+        "vacationExceptions": "4. Congés & Exceptions",
+        "assistants": "5. Gestion du Personnel",
+        "bookingRules": "6. Règles de Réservation",
+        "notifications": "7. Paramètres de Notification",
+        "appearance": "8. Langue & Apparence",
+        "security": "9. Sécurité & Utilisateurs",
+        "privacy": "10. Confidentialité",
+        "export": "11. Export & Sauvegardes",
+        "about": "12. À Propos de la Plateforme",
+        "scheduleBadge": "Planning",
+        "vacationBadge": "Congés"
+      },
+      "personal": {
+        "title": "Données Personnelles & Professionnelles du Médecin",
+        "description": "Affichées sur la plateforme et les ordonnances",
+        "academicTitle": "Titre Académique",
+        "fullName": "Nom Complet",
+        "specialty": "Spécialité Clinique",
+        "licenseNumber": "Numéro de Licence / Inscription",
+        "phone": "Téléphone Professionnel",
+        "email": "Email Professionnel",
+        "saveButton": "Sauvegarder Données Personnelles",
+        "successMessage": "Données personnelles et professionnelles sauvegardées avec succès."
+      },
+      "clinic": {
+        "title": "Identité & Infos de la Clinique",
+        "description": "Localisation et contact affichés aux patients et centres de réservation",
+        "name": "Nom Officiel de la Clinique",
+        "city": "Wilaya / Ville",
+        "address": "Adresse Détaillée (Étage, Immeuble)",
+        "phone": "Téléphone Réception",
+        "email": "Email Réservation / Centre",
+        "saveButton": "Sauvegarder Infos Clinique",
+        "successMessage": "Infos de la clinique mises à jour avec succès."
+      },
+      "workingHours": {
+        "ruleTitle": "Règle Métier des Horaires Hebdomadaires :",
+        "ruleDesc": "La modification des horaires de travail s'applique exclusivement aux nouveaux rendez-vous futurs. Les rendez-vous déjà confirmés ne sont pas automatiquement modifiés ou supprimés. En cas de conflit, le rendez-vous est marqué pour révision manuelle par le médecin ou l'assistant afin de le reprogrammer ou de l'annuler, puis le centre de réservation informe le patient du nouvel horaire.",
+        "title": "Horaires de Travail Hebdomadaires",
+        "subtitle": "Définir les heures d'ouverture, de fermeture, de pause et la durée par défaut des consultations par jour",
+        "saveButton": "Sauvegarder & Synchroniser avec le Moteur de Réservation",
+        "openStatus": "Ouvert à la Réservation",
+        "closedStatus": "Fermé (Congé)",
+        "startWork": "Début de Service",
+        "endWork": "Fin de Service",
+        "startBreak": "Début de Pause",
+        "endBreak": "Fin de Pause",
+        "capacity": "Patients / Créneau (Capacité)",
+        "duration": "Durée du Créneau (min)",
+        "minutes": "{count} minutes",
+        "closedNote": "La clinique est fermée ce jour-là - aucune réservation possible",
+        "successMessage": "Horaires de travail sauvegardés et moteur de réservation mis à jour immédiatement. (Les rendez-vous précédents n'ont pas été affectés automatiquement)",
+        "toastUpdated": "Statut du jour mis à jour et enregistré dans le Journal d'Activité.",
+        "fullTime": "Temps Plein",
+        "halfDay": "Demi-journée",
+        "weekend": "Weekend",
+        "complexCases": "Consultations spéciales et cas de suivi complexes"
+      },
+      "vacationExceptions": {
+        "bannerTitle": "Système de Gestion des Vacances & Exceptions :",
+        "bannerDesc": "L'enregistrement d'une vacance, d'une conférence ou d'une fermeture d'urgence bloque immédiatement les réservations pour cette période via la plateforme et le centre de contact. Les rendez-vous déjà programmés pendant cette période apparaissent automatiquement dans la liste des \"Rendez-vous Affectés\" pour que le médecin ou l'assistant puisse les examiner et les reprogrammer.",
+        "addTitle": "Enregistrer Nouvelle Vacance, Conférence ou Fermeture d'Urgence",
+        "typeLabel": "Type d'Exception",
+        "startDate": "Date de Début",
+        "endDate": "Date de Fin",
+        "reasonLabel": "Raison Principale",
+        "reasonPlaceholder": "ex: Conférence Nationale de Médecine Interne",
+        "descriptionLabel": "Description & Directives pour le Centre de Réservation",
+        "descriptionPlaceholder": "Détails supplémentaires pour clarifier les instructions du médecin pour l'assistant et le centre de contact",
+        "saveButton": "Sauvegarder l'Exception & Appliquer le Blocage",
+        "listTitle": "Congés et Jours d'Indisponibilité Enregistrés",
+        "activeCount": "{count} Exceptions Actives",
+        "cancelButton": "Annuler l'Exception",
+        "conflictsTitle": "Rendez-vous Précédents Affectés par la Fermeture (Conflits)",
+        "conflictsDesc": "Ces rendez-vous ont été réservés avant l'enregistrement de la période de fermeture actuelle et nécessitent une action médicale/administrative immédiate.",
+        "patientName": "Nom du Patient :",
+        "appointmentTime": "Heure du Rendez-vous :",
+        "conflictReason": "Raison du Conflit :",
+        "decisionPending": "En attente de décision :",
+        "decisionApproved": "Confirmer le Rendez-vous (Exclu du blocage)",
+        "decisionReschedule": "Reprogrammer à un autre moment",
+        "decisionCancel": "Annuler le Rendez-vous définitivement",
+        "reschedulePlaceholder": "Saisir le nouvel horaire proposé...",
+        "alertMissingData": "Veuillez spécifier au moins la date de début et la raison de l'exception.",
+        "noDetails": "Aucun détail supplémentaire",
+        "toastSuccess": "Période de congé/exception ajoutée avec succès et créneaux de réservation marqués comme indisponibles.",
+        "toastDeleted": "Période d'exception supprimée et créneaux de réservation réouverts.",
+        "rescheduleText": "Reprogrammé pour ({time})",
+        "newTime": "Nouvel horaire",
+        "toastDecision": "Décision mise à jour : \"{action}\". Le centre de réservation en informera le patient."
+      },
+      "types": {
+        "vacation": "Congé Annuel",
+        "conference": "Conférence Médicale",
+        "emergency": "Fermeture d'Urgence",
+        "holiday": "Jour Férié",
+        "pause": "Pause Temporaire des Réservations"
+      },
+      "auditLog": {
+        "title": "Journal d'Audit des Paramètres du Cabinet",
+        "description": "Documentation complète des modifications d'horaires, congés et données sensibles.",
+        "exportButton": "Exporter Journal PDF/CSV",
+        "defaultReason": "Mise à jour des paramètres approuvés de la clinique",
+        "dayStatusField": "Statut du jour pour {day}",
+        "scheduleChangeReason": "Ajustement du planning hebdomadaire",
+        "weeklyScheduleField": "Planning des horaires de travail hebdomadaires",
+        "previousScheduleValue": "Planning précédent",
+        "newScheduleValue": "Nouveaux ajustements de planning appliqués",
+        "saveScheduleReason": "Sauvegarder les mises à jour du planning clinique",
+        "addExceptionField": "Exception/Congé ajouté ({type})",
+        "unavailableValue": "Indisponible du {start} au {end}",
+        "deleteExceptionField": "Période d'exception/congé annulée",
+        "normalWorkValue": "Retour au planning normal",
+        "manualDeleteReason": "Suppression manuelle de l'exception",
+        "appointmentConflictField": "Conflit de rendez-vous patient géré",
+        "affectedValue": "Affecté par la modification",
+        "manualReviewReason": "Révision manuelle du rendez-vous affecté",
+        "table": {
+          "oldValue": "Ancienne valeur",
+          "newValue": "Nouvelle valeur",
+          "reason": "Motif"
+        },
+        "activeLogs": "{count} journaux actifs"
+      },
+      "mockData": {
+        "doctorNameWithRole": "Dr. Mohamed El-Arabi (Médecin Traitant)",
+        "clinicDevice": "Chrome / Windows 11 - Clinique",
+        "personalTitle": "Dr.",
+        "fullName": "Mohamed El-Arabi",
+        "specialty": "Médecine Interne & Gastro-entérologie",
+        "clinicName": "Clinique Spécialisée Ibn Sina de Médecine Interne",
+        "clinicAddress": "Rue Didouche Mourad, Immeuble 14, 2ème Étage",
+        "clinicCity": "Alger",
+        "roomCount": "3 Salles de Consultation",
+        "exc1Reason": "5ème Conférence Nationale de Gastro-entérologie",
+        "exc1Desc": "Participation en tant que conférencier principal à la capitale",
+        "exc2Reason": "Congés Annuels d'Été",
+        "exc2Desc": "Fermeture temporaire de la clinique avec orientation des urgences vers la clinique adjacente",
+        "exc3Reason": "Maintenance d'urgence des équipements de stérilisation et de radiologie",
+        "exc3Desc": "Pause temporaire pour compléter le calibrage annuel",
+        "patient1Name": "Youssef Ech-Charaibi",
+        "patient2Name": "Meriem Ben Ziane",
+        "patient3Name": "Abdelkader Daradji",
+        "apt1Time": "15 Aoû 2026 - 10:00",
+        "apt1Conflict": "Conflit avec la période de Conférence Médicale (15-17 aoû)",
+        "apt2Time": "20 Aoû 2026 - 11:30",
+        "apt2Conflict": "Conflit avec le début du congé annuel (20 aoû)",
+        "apt3Time": "28 Aoû 2026 - 09:00",
+        "apt3Conflict": "Conflit avec le jour de maintenance d'urgence",
+        "log1Field": "Exception Ajoutée : Conférence Médicale",
+        "log1NewValue": "Indisponible (15 - 17 aoû 2026)",
+        "log1Reason": "Participation à la Conférence Nationale de Gastro-entérologie",
+        "log2Field": "Horaires de Travail du Jeudi",
+        "log2Reason": "Réduction des horaires le jeudi pour consultations privées"
+      },
+      "days": {
+        "sunday": "Dimanche",
+        "monday": "Lundi",
+        "tuesday": "Mardi",
+        "wednesday": "Mercredi",
+        "thursday": "Jeudi",
+        "friday": "Vendredi",
+        "saturday": "Samedi"
+      },
+      "activityLog": {
+        "filterPending": "En attente d'examen"
+      },
+      "bookingRules": {
+        "autoApproveLabel": "Approbation automatique pour les patients enregistrés",
+        "autoApproveDesc": "Confirmer instantanément les rendez-vous sans examen manuel"
+      },
+      "notifications": {
+        "description": "Personnaliser les alertes de réservation, notifications médicales et résumés"
+      },
+      "appearance": {
+        "languageLabel": "Langue d'affichage"
+      },
+      "privacy": {
+        "description": "Paramètres de confidentialité et de visibilité dans l'annuaire national"
+      },
+      "export": {
+        "description": "Exporter les dossiers médicaux et journaux d'audit aux formats PDF et CSV"
+      },
+      "about": {
+        "version": "Version 1.0.0 (Édition Médicale Entreprise)",
+        "compliance": "Conforme aux normes nationales de numérisation médicale et de protection des données"
+      },
+      "conflicts": {
+        "reviewStatus": "Statut de révision :",
+        "pendingDecision": "En attente de décision du médecin / assistant",
+        "approvedAsIs": "Rendez-vous confirmé tel quel sans modification",
+        "rescheduledWithTime": "Reprogrammé pour ({time})",
+        "cancelledByClinic": "Réservation annulée sur décision du cabinet",
+        "approveButton": "Confirmer Tel Quel",
+        "rescheduleButton": "Reprogrammer (Nouveau créneau)",
+        "cancelButton": "Annuler Rendez-vous",
+        "noticeSent": "Directive transmise au centre de réservation pour informer le patient"
+      }
+    },
+    "activityLog": {
+      "title": "Journal d'Activité du Médecin",
+      "subtitle": "Journal d'activité clinique et d'audit",
+      "path": "/doctor/activity-log",
+      "stats": "Total des événements enregistrés : {count}",
+      "searchPlaceholder": "Rechercher dans le journal...",
+      "table": {
+        "timestamp": "Horodatage",
+        "type": "Type d'Événement Clinique",
+        "title": "Titre de l'Action",
+        "details": "Détails & Données",
+        "patient": "Nom du Patient Cible",
+        "ip": "Adresse IP"
+      },
+      "noSearchResults": "Aucun journal correspondant",
+      "noLogsRecorded": "Aucun journal d'accès clinique enregistré actuellement",
+      "auditActionPrefix": "Audit d'accès clinique",
+      "reasonPrefix": "Motif"
+    },
+    "waitingRoom": {
+      "subtitle": "Salle d'Attente de la Clinique en Direct",
+      "title": "Salle d'Attente Clinique Indépendante",
+      "waitingNow": "En Attente Maintenant :",
+      "avgTime": "Temps Moyen Réel :",
+      "avgTimeValue": "14 min / patient",
+      "inConsultationTitle": "Patient Actuellement en Salle de Consultation :",
+      "inConsultationBadge": "Consultation en Cours",
+      "inConsultationEmpty": "Aucun patient actuellement en salle de consultation.",
+      "calledTitle": "Patient Actuellement Appelé :",
+      "calledBadge": "Appel en cours",
+      "calledEmpty": "Cliquez sur \"Appeler le Patient\" dans la liste ci-dessous pour appeler le patient suivant.",
+      "startConsultationButton": "Aller à la Page de Consultation",
+      "startVisitButton": "Commencer la Visite Maintenant",
+      "searchPlaceholder": "Rechercher par nom de patient ou raison...",
+      "queueFootnote": "Ordre de la file d'attente basé sur l'heure d'enregistrement clinique",
+      "patientsCount": "{count} Patients",
+      "since": "depuis",
+      "minutesShort": "min",
+      "orderNo": "N° d'Ordre",
+      "table": {
+        "order": "Ordre",
+        "patient": "Nom du Patient",
+        "type": "Type de Patient",
+        "arrival": "Heure d'Arrivée",
+        "wait": "Durée d'Attente",
+        "reason": "Raison de la Visite",
+        "status": "Statut",
+        "actions": "Actions Cliniques"
+      },
+      "patientTypes": {
+        "registered": "Inscrit (EHR)",
+        "guest": "Visiteur"
+      },
+      "status": {
+        "inConsultation": "En Consultation",
+        "called": "Appelé",
+        "waiting": "En Attente"
+      },
+      "actions": {
+        "call": "Appeler le Patient",
+        "start": "Commencer Visite"
+      },
+      "emergency": "Urgence",
+      "noSearchResults": "Aucun résultat correspondant",
+      "noPatientsInQueue": "Aucun patient dans la file d'attente actuellement"
+    },
+    "actions": {
+      "callToClinic": "Appeler à la Clinique",
+      "postpone": "Reporter le Tour",
+      "considerAbsent": "Marquer Absent"
+    },
+    "visits": {
+      "title": "Historique des Visites et Consultations",
+      "subtitle": "Journal chronologique de toutes les consultations médicales documentées",
+      "path": "/doctor/visits",
+      "badge": "Chaque visite est archivée pour le suivi de l'état du patient",
+      "searchPlaceholder": "Rechercher par nom de patient, IPP/MRN, réf visite ou diagnostic...",
+      "filterBy": "Filtrer par type de visite :",
+      "todayLabel": "Aujourd'hui",
+      "doctorLabel": "Médecin traitant :",
+      "close": "Fermer",
+      "stats": {
+        "total": "Total Visites",
+        "totalDesc": "Consultations Documentées",
+        "today": "Visites du Jour",
+        "followUp": "Visites de Suivi",
+        "followUpDesc": "Suivi Thérapeutique & Bilans",
+        "rx": "Ordonnances Émises",
+        "rxDesc": "Prescriptions Électroniques (Rx)",
+        "lab": "Analyses & Imagerie",
+        "labDesc": "Examens Complémentaires"
+      },
+      "typeFilter": {
+        "all": "Tous les types",
+        "consultation": "Première Consultation",
+        "followup": "Suivi Périodique",
+        "emergency": "Urgence Médicale"
+      },
+      "dateFilter": {
+        "all": "Toutes les dates",
+        "today": "Aujourd'hui",
+        "week": "Cette semaine",
+        "month": "Ce mois-ci"
+      },
+      "table": {
+        "date": "Date & Heure",
+        "patient": "Patient & IPP",
+        "type": "Type de Visite",
+        "diagnosis": "Diagnostic Clinique",
+        "details": "Examens & Traitements",
+        "actions": "Détails",
+        "view": "Consulter Visite",
+        "noVisits": "Aucune visite trouvée correspondant aux critères de recherche."
+      }
+    },
+    "patients": {
+      "title": "Répertoire Complet des Patients",
+      "subtitle": "Dossiers Patients Unifiés",
+      "addPatient": "Ajouter un Nouveau Patient",
+      "stats": {
+        "total": "Total Patients",
+        "totalDesc": "Inscrits à la clinique",
+        "newMonth": "Nouveaux ce Mois",
+        "newMonthDesc": "+12% par rapport au dernier",
+        "followUp": "Patients en Suivi",
+        "followUpDesc": "Plans de suivi actifs",
+        "avgVisits": "Moyenne Visites",
+        "avgVisitsDesc": "Visites par patient",
+        "tomorrow": "Rendez-vous Demain",
+        "tomorrowDesc": "Rendez-vous cliniques confirmés"
+      },
+      "searchPlaceholder": "Rechercher par nom, MRN, téléphone, état ou diagnostic...",
+      "filterBy": "Filtrer par :",
+      "filters": {
+        "all": "Tous",
+        "today": "Visites d'Aujourd'hui",
+        "new": "Nouveaux Patients",
+        "followup": "Patients en Suivi",
+        "upcoming": "Rendez-vous à venir",
+        "inactive": "Complété / Inactif"
+      },
+      "table": {
+        "mrn": "MRN",
+        "patientName": "Nom du Patient",
+        "ageGender": "Âge / Genre",
+        "phone": "N° de Téléphone",
+        "state": "Province / État",
+        "firstVisit": "1ère Visite",
+        "lastVisit": "Dernière Visite",
+        "visits": "Visites",
+        "status": "Statut",
+        "nextAppt": "Prochain RDV",
+        "ehr": "Dossier Médical",
+        "noPatients": "Aucun patient ne correspond à la recherche et aux filtres."
+      },
+      "gender": {
+        "male": "Homme",
+        "female": "Femme"
+      },
+      "years": "ans",
+      "visitsUnit": "visites",
+      "noAppointment": "Aucun rendez-vous",
+      "openEhr": "Ouvrir EHR",
+      "status": {
+        "active": "Actif",
+        "followup": "Suivi",
+        "completed": "Complété",
+        "absent": "Absent"
+      },
+      "ehrModal": {
+        "title": "Dossier Médical Unifié (EHR)",
+        "subtitle": "Dossier de Santé Électronique (EHR)",
+        "ageGender": "Âge & Genre :",
+        "phone": "Tél & Contact :",
+        "emergency": "Contact d'Urgence :",
+        "totalVisits": "Total Visites Cliniques :",
+        "visitsCount": "{count} visites enregistrées",
+        "allergies": "Allergies Médicamenteuses & Alertes :",
+        "chronic": "Maladies Chroniques :",
+        "timeline": "Historique des Visites :",
+        "close": "Fermer EHR",
+        "certifiedDoctor": "Médecin Certifié : Dr. Ahmed Al-Qasimi"
+      },
+      "visitTable": {
+        "date": "Date Visite",
+        "time": "Heure",
+        "type": "Type de Visite",
+        "diagnosis": "Diagnostic Clinique",
+        "prescription": "Ordonnance Rx",
+        "lab": "Ordre Labo",
+        "rad": "Ordre Radio",
+        "details": "Détails",
+        "preview": "Aperçu Visite",
+        "dispensed": "Délivré",
+        "requested": "Demandé"
+      },
+      "visitDetail": {
+        "title": "Détails de la Visite Clinique",
+        "patient": "Patient :",
+        "dateTime": "Date & Heure :",
+        "diagnosis": "Diagnostic Officiel :",
+        "vitals": {
+          "bp": "Pression Artérielle",
+          "pulse": "Fréquence Cardiaque",
+          "pulseUnit": "bpm",
+          "temp": "Température",
+          "spo2": "Saturation en Oxygène (SpO2)"
+        },
+        "notes": "Notes du Médecin :",
+        "ok": "OK"
+      },
+      "bloodGroupLabel": "Groupe Sanguin",
+      "noAllergies": "Aucune allergie connue",
+      "noChronic": "Aucune affection chronique enregistrée"
+    },
+    "shared": {
+      "defaultDoctorName": "Dr. Youssef Brahimi",
+      "defaultSpecialty": "Cardiologie & Maladies Vasculaires",
+      "patientLabel": "Patient :",
+      "registeredEhr": "EHR Inscrit",
+      "guestPatient": "Patient Visiteur",
+      "doctorLabel": "Médecin :",
+      "patientNameLabel": "Nom du Patient",
+      "birthDateLabel": "Date de Naissance",
+      "requiredItems": "Éléments Requis :",
+      "certifiedDocument": "Document Médical Certifié Numériquement via Aafiya EHR",
+      "doctorSignature": "Sceau & Signature du Médecin",
+      "cancel": "Annuler",
+      "approveAndPrint": "Approuver & Imprimer la Commande",
+      "certifiedItems": "{count} Éléments Certifiés",
+      "clinicName": "Clinique Aafiya"
+    },
+    "staff": {
+      "title": "Personnel de la clinique & Médecins associés",
+      "directorBadge": "Directeur de la clinique (Autorité de direction)",
+      "employedBadge": "Médecin associé salarié",
+      "addDoctorBtn": "Ajouter un médecin salarié",
+      "addAssistantBtn": "Ajouter un assistant de clinique",
+      "totalDoctors": "Total des médecins praticiens",
+      "totalAssistants": "Total des assistants",
+      "registeredDoctorsCount": "médecins enregistrés",
+      "registeredAssistantsCount": "assistants médicaux et admin",
+      "securityActive": "Système d'autorisation 4D actif",
+      "doctorsSectionTitle": "Corps médical & Médecins praticiens",
+      "assistantsSectionTitle": "Assistants de clinique & Accueil",
+      "noDoctors": "Aucun médecin enregistré dans cette clinique actuellement.",
+      "noAssistants": "Aucun assistant enregistré dans cette clinique pour le moment.",
+      "activeStatus": "Actif & Autorisé",
+      "licenseLabel": "Licence",
+      "editPermissions": "Modifier les autorisations",
+      "saveChanges": "Enregistrer les modifications",
+      "cancel": "Annuler",
+      "createDoctorSuccess": "Compte créé avec succès",
+      "copyCreds": "Copier les identifiants",
+      "copiedSuccess": "Copié avec succès !",
+      "permQueueTitle": "Gestion de la file d'attente",
+      "permQueueDesc": "Organiser l'ordre d'entrée des patients",
+      "permAttendanceTitle": "Confirmation de présence",
+      "permAttendanceDesc": "Enregistrer l'arrivée et la présence du patient",
+      "permBookingTitle": "Prise de rendez-vous",
+      "permBookingDesc": "Enregistrer de nouveaux rendez-vous",
+      "permContactsTitle": "Consulter les coordonnées",
+      "permContactsDesc": "Voir le numéro de téléphone pour rappel",
+      "suspendedStatus": "Suspendu & Temporairement désactivé",
+      "statusActive": "Actif & Autorisé",
+      "statusSuspended": "Suspendu",
+      "staffDetailsTitle": "Fiche du membre du personnel",
+      "staffDetailsSubtitle": "Informations officielles et gestion du cycle de vie du personnel",
+      "joinedDateLabel": "Date d'adhésion à la clinique",
+      "contactInfoLabel": "Coordonnées de contact",
+      "professionalInfoLabel": "Informations professionnelles",
+      "specialtyLabel": "Spécialité médicale",
+      "emailLabel": "Adresse e-mail",
+      "phoneLabel": "Numéro de téléphone",
+      "positionLabel": "Statut dans la clinique",
+      "effectivePermissionsLabel": "Autorisations opérationnelles effectives",
+      "roleBasedPermissionsNotice": "Ces autorisations cliniques sont liées au rôle médical agréé du médecin et ne peuvent être modifiées manuellement.",
+      "directorRoleNotice": "Ce compte représente le directeur désigné de la clinique ; il ne peut être suspendu ou détaché depuis cette interface.",
+      "suspendDoctor": "Suspendre le médecin dans la clinique",
+      "reactivateDoctor": "Réactiver le médecin",
+      "detachDoctor": "Détacher le médecin de la clinique",
+      "suspendAssistant": "Suspendre l'assistant",
+      "reactivateAssistant": "Réactiver l'assistant",
+      "removeAssistant": "Retirer l'assistant de la clinique",
+      "confirmSuspendDoctorTitle": "Confirmer la suspension du médecin",
+      "confirmSuspendDoctorDesc": "Ce médecin sera immédiatement empêché d'effectuer des consultations dans cette clinique. Son compte utilisateur et ses dossiers médicaux historiques restent préservés.",
+      "confirmReactivateDoctorTitle": "Confirmer la réactivation du médecin",
+      "confirmReactivateDoctorDesc": "Le médecin retrouvera ses privilèges cliniques et opérationnels dans cette clinique selon sa licence d'origine.",
+      "confirmDetachDoctorTitle": "Confirmer le détachement du médecin de la clinique",
+      "confirmDetachDoctorDesc": "Ce médecin sera retiré du personnel de cette clinique. IMPORTANT : Cette action ne supprime pas le compte du médecin sur la plateforme, et toutes ses visites et ordonnances historiques restent intégralement conservées.",
+      "confirmSuspendAssistantTitle": "Confirmer la suspension de l'assistant",
+      "confirmSuspendAssistantDesc": "L'assistant sera bloqué dans la gestion des files d'attente et rendez-vous dans cette clinique. Son compte et son journal d'audit restent préservés.",
+      "confirmReactivateAssistantTitle": "Confirmer la réactivation de l'assistant",
+      "confirmReactivateAssistantDesc": "Les autorisations de l'assistant seront réactivées dans cette clinique immédiatement.",
+      "confirmRemoveAssistantTitle": "Confirmer le retrait de l'assistant",
+      "confirmRemoveAssistantDesc": "Cet assistant sera retiré du personnel de cette clinique. L'historique d'audit et les opérations passées resteront archivés.",
+      "confirmAction": "Confirmer l'action",
+      "actionInProgress": "Traitement en cours...",
+      "loadStaffError": "Impossible de charger les détails du membre du personnel. Veuillez réessayer.",
+      "retry": "Réessayer",
+      "close": "Fermer",
+      "doctorPositionDirector": "Directeur de clinique",
+      "doctorPositionEmployed": "Médecin salarié",
+      "assistantPosition": "Assistant de clinique",
+      "addDoctorExistingTab": "Médecin existant (Inviter)",
+      "addDoctorNewTab": "Créer un nouveau compte",
+      "searchDoctorEmail": "Email du médecin",
+      "searchDoctorPlaceholder": "Entrez l'email du médecin inscrit...",
+      "searchDoctorBtn": "Rechercher des médecins",
+      "searching": "Recherche en cours...",
+      "doctorNotFound": "Aucun médecin vérifié trouvé avec cette adresse email.",
+      "doctorFoundTitle": "Profil du médecin trouvé",
+      "privacyBadge": "Protégé par le protocole de confidentialité médicale",
+      "privacyNotice": "Seules les informations professionnelles autorisées sont affichées. Les affiliations avec d'autres cliniques et les dossiers patients sont strictement masqués.",
+      "alreadyMemberWarning": "Ce médecin est déjà membre actif du personnel de cette clinique.",
+      "pendingInviteWarning": "Une invitation en attente a déjà été envoyée à ce médecin.",
+      "sendInviteBtn": "Envoyer l'invitation de la clinique",
+      "sendingInvite": "Envoi de l'invitation...",
+      "inviteSuccess": "Invitation envoyée avec succès au médecin. L'adhésion sera activée dès son acceptation.",
+      "inviteNotesLabel": "Notes ou message de bienvenue (Facultatif)",
+      "inviteNotesPlaceholder": "Bienvenue dans notre équipe médicale...",
+      "sentInvitationsTitle": "Invitations en attente envoyées",
+      "cancelInviteBtn": "Annuler l'invitation",
+      "cancellingInvite": "Annulation en cours...",
+      "cancelInviteSuccess": "Invitation annulée avec succès."
+    },
+    "invitations": {
+      "title": "Invitations de cliniques",
+      "subtitle": "Gérer et répondre aux demandes d'adhésion des cliniques",
+      "inboxBtn": "Invitations de cliniques",
+      "pendingBadge": "Nouveau",
+      "noInvitations": "Aucune invitation pour le moment.",
+      "clinicLabel": "Clinique",
+      "locationLabel": "Emplacement",
+      "phoneLabel": "Téléphone",
+      "positionLabel": "Poste proposé",
+      "statusLabel": "Statut",
+      "sentDate": "Date d'envoi",
+      "expiresAt": "Expire le",
+      "acceptBtn": "Accepter l'invitation",
+      "rejectBtn": "Refuser l'invitation",
+      "accepting": "Acceptation...",
+      "rejecting": "Refus...",
+      "statusPending": "En attente de votre réponse",
+      "statusAccepted": "Acceptée - Membre actif",
+      "statusRejected": "Refusée",
+      "statusCancelled": "Annulée par la clinique",
+      "statusExpired": "Expirée",
+      "acceptSuccess": "Invitation acceptée avec succès ! Vous êtes désormais affilié à la clinique.",
+      "rejectSuccess": "Invitation refusée.",
+      "close": "Fermer"
+    },
+    "clinicSwitcher": {
+      "currentWorkspace": "Clinique actuelle",
+      "switchWorkspace": "Changer de clinique",
+      "allClinics": "Toutes les cliniques (Sélecteur)",
+      "invitations": "Boîte d'invitations",
+      "activeBadge": "Active",
+      "suspendedBadge": "Suspendue",
+      "directorBadge": "Directeur",
+      "doctorBadge": "Médecin",
+      "switching": "Changement en cours...",
+      "suspendedCannotSelect": "Cette clinique est suspendue et ne peut pas être sélectionnée."
+    },
+    "clinicSelector": {
+      "title": "Sélectionner l'espace de travail",
+      "subtitle": "Votre compte est associé à plusieurs cliniques. Veuillez choisir votre espace actif :",
+      "enterWorkspace": "Accéder à l'espace",
+      "primaryBadge": "Clinique principale",
+      "statusActive": "Active et autorisée",
+      "statusSuspended": "Suspendue",
+      "suspendedWarning": "Impossible d'accéder à une clinique suspendue. Veuillez contacter la direction.",
+      "invitationsNotice": "Avez-vous reçu une nouvelle invitation de clinique ?",
+      "viewInvitationsBtn": "Voir les invitations ({count})",
+      "directorPosition": "Directeur de clinique",
+      "doctorPosition": "Médecin salarié"
+    },
+    "noClinic": {
+      "title": "Aucune clinique active associée",
+      "description": "Votre compte médecin est vérifié sur Aafiya, mais vous n'êtes actuellement associé à aucune clinique active. Vous pouvez accepter des invitations ou contacter l'administration.",
+      "pendingInvitationsTitle": "Invitations en attente de votre réponse",
+      "openInvitationsBtn": "Ouvrir la boîte d'invitations",
+      "refreshBtn": "Actualiser le statut",
+      "logoutBtn": "Déconnexion"
+    }
+  },
+  "patient": {
+    "title": "PORTAIL M-PATIENT",
+    "sidebarTitle": "Portail Patient",
+    "tabs": {
+      "dashboard": "Tableau de Bord",
+      "appointments": "Rendez-vous",
+      "visitPass": "Pass de Visite",
+      "medicalRecord": "EMR Unifié",
+      "clinicalVisits": "Visites Cliniques",
+      "prescriptions": "Ordonnances",
+      "labResults": "Résultats Labo",
+      "radResults": "Rapports Radio",
+      "billingSharing": "Facturation & Partage",
+      "profile": "Profil",
+      "settings": "Paramètres"
+    },
+    "dashboard": {
+      "criticalAlert": "Résultat de Santé Critique",
+      "alertDescription": "Les récents résultats vitaminiques montrent une baisse significative. Un traitement de substitution a été prescrit.",
+      "viewDetails": "Voir Détails & Rx",
+      "visitPassBadge": "PASS DE VISITE PATIENT",
+      "bloodType": "Groupe Sanguin",
+      "mrn": "MRN",
+      "nationalId": "N° d'Identité National",
+      "scanCode": "Code de Scan Rapide",
+      "enlargeCode": "Agrandir pour l'accès ←",
+      "nextAppointment": "Prochain Rendez-vous",
+      "clinicCenter": "Clinique & Centre",
+      "lastVisit": "Dernière Visite",
+      "passStatus": "Statut du Pass",
+      "activePass": "Actif & Vérifié 🟢",
+      "vitals": "Signes Vitaux",
+      "lastUpdate": "Dernière mise à jour",
+      "bloodPressure": "Pression Artérielle",
+      "fastingSugar": "Glycémie à jeun",
+      "weightBmi": "Poids & IMC",
+      "hba1c": "HbA1c",
+      "ordersProgress": "Suivi des Commandes en Cours",
+      "treatingDoctor": "Médecin Traitant Actuel",
+      "vitalsStatus": {
+        "excellent": "Excellent / Normal",
+        "withinRange": "Dans la plage",
+        "improvement": "Grande Amélioration"
+      },
+      "orderStatus": {
+        "inProgress": "En cours",
+        "ready": "Rapport Prêt"
+      },
+      "notifications": {
+        "title": "Notifications Médicales",
+        "new": "Nouveau"
+      }
+    },
+    "appointments": {
+      "title": "Gestion des Rendez-vous",
+      "subtitle": "Consultez vos rendez-vous à venir et les instructions de préparation.",
+      "newButton": "+ Réserver Nouveau Rendez-vous",
+      "preparationTitle": "Instructions de Préparation :",
+      "viewPass": "Voir Pass de Visite",
+      "reschedule": "Reprogrammer",
+      "cancel": "Annuler Rendez-vous"
+    }
+  },
+  "bookingCenter": {
+    "pendingVerification": {
+      "badge": "En cours de vérification ⏳",
+      "title": "Demande d'accréditation du centre de réservation en attente",
+      "welcome": "Bienvenue {name} sur Aafiya 👋",
+      "description": "Le compte de votre centre de réservation a été enregistré avec succès. L'administration examine actuellement votre registre de commerce et vos informations administratives.",
+      "footnote": "Une fois vérifié et approuvé, vous bénéficierez d'un accès complet au tableau de bord opérationnel, à l'achat de packs et à la gestion des rendez-vous.",
+      "centerDetails": "Détails enregistrés du centre",
+      "agencyName": "Nom du centre",
+      "commercialRegister": "Registre de commerce",
+      "phone": "Numéro de téléphone",
+      "wilaya": "Wilaya",
+      "checkStatus": "Vérifier le statut",
+      "checking": "Vérification...",
+      "logout": "Déconnexion",
+      "needHelp": "Besoin d'aide ? Contactez le support :"
+    },
+    "rejected": {
+      "badge": "Demande rejetée 🔴",
+      "title": "Demande d'accréditation du centre de réservation rejetée",
+      "message": "Nous regrettons de vous informer {name} que votre demande d'enregistrement a été rejetée par l'administration de la plateforme.",
+      "reasonTitle": "Motif de rejet documenté",
+      "defaultReason": "Documents non conformes ou informations de registre de commerce invalides.",
+      "resubmitButton": "Soumettre à nouveau et corriger les données",
+      "resubmitFormTitle": "Mettre à jour les informations et renvoyer",
+      "newCommercialRegister": "Nouveau registre de commerce (Optionnel)",
+      "phone": "Nouveau numéro de téléphone (Optionnel)",
+      "address": "Nouvelle adresse (Optionnel)",
+      "cancel": "Annuler",
+      "submitting": "Envoi en cours...",
+      "submitResubmission": "Soumettre à nouveau",
+      "logout": "Déconnexion",
+      "contactSupport": "Pour toute question concernant le rejet, contactez le support :"
+    },
+    "suspended": {
+      "badge": "Compte suspendu ⚠️",
+      "title": "Compte du centre de réservation temporairement suspendu",
+      "message": "Bonjour {name}, le centre est vérifié mais son activité opérationnelle a été temporairement suspendue par l'administration.",
+      "description": "Veuillez contacter l'administration de la plateforme pour réactiver votre compte.",
+      "checkStatus": "Vérifier le statut",
+      "checking": "Vérification...",
+      "logout": "Déconnexion",
+      "contactSupport": "Contacter l'administration :"
+    },
+    "zeroBalanceGuard": {
+      "title": "Solde insuffisant pour effectuer une réservation",
+      "availableBalancePrefix": "Votre solde d'opérations disponibles est de",
+      "message": "Vous ne pouvez pas créer de nouvelle réservation pour le moment. Veuillez recharger votre solde d'opérations ou acheter un forfait de réservation pour continuer.",
+      "rechargeAction": "Recharger le solde",
+      "closeAction": "Fermer"
+    },
+    "title": "Centre de Réservation Certifié — Tableau de Bord",
+    "sidebarTitle": "Admin Centre de Réservation",
+    "userName": "Mohamed Ahmed",
+    "userRole": "Réceptionniste",
+    "privacyNotice": "Mur de confidentialité actif : Le système de réservation fonctionne indépendamment ; l'accès à l'EHR n'est pas disponible ici.",
+    "privacyStatus": "Actif",
+    "remaining": "restant",
+    "tabs": {
+      "dashboard": "Tableau de Bord",
+      "newBooking": "Nouvelle Réservation (Assistant)",
+      "bookings": "Gestion des Réservations",
+      "calendar": "Calendrier Interactif",
+      "patients": "Répertoire Patients",
+      "statusTracker": "Statut Réservation",
+      "packages": "Forfaits & Quota",
+      "billing": "Facturation & Paiements",
+      "notifications": "Centre de Notifications",
+      "reports": "Rapports & Stats",
+      "employees": "Employés & Audit",
+      "settings": "Paramètres"
+    },
+    "detailsModal": {
+      "title": "Détails Complets de la Réservation",
+      "operationalStatus": "Statut Opérationnel Actuel",
+      "patientData": "Données Patient",
+      "medicalFacility": "Établissement Médical",
+      "bookingDate": "Date de Réservation Prévue",
+      "bookingTime": "Créneau du Rendez-vous",
+      "createdBy": "Réservation Créée Par",
+      "securityWarning": "Avertissement de Sécurité : La circulation des données médicales sensibles en dehors du mur de confidentialité approuvé v1.0 est interdite.",
+      "sendTicket": "Envoyer Ticket",
+      "printTicket": "Imprimer Ticket",
+      "registeredPatient": "Patient Inscrit",
+      "visitorPatient": "Patient Visiteur"
+    },
+    "list": {
+      "tableHeader": "Registre de toutes les Réservations (Architecture Bookings)",
+      "tableSubtitle": "Rechercher et accéder aux détails des rendez-vous, filtrer, modifier et annuler avec possibilité d'exportation et d'impression",
+      "newBookingBtn": "+ Créer une Nouvelle Réservation",
+      "searchPlaceholder": "Rechercher par Réf BK-xxxx, Nom du Patient, Docteur, ou Téléphone...",
+      "noResults": "Aucun résultat trouvé",
+      "filters": {
+        "allStatuses": "Tous les Statuts",
+        "allDates": "Toutes les Dates",
+        "todayOnly": "Rendez-vous d'Aujourd'hui (05 Août)"
+      },
+      "tableColumns": {
+        "ref": "N° Référence",
+        "patient": "Patient",
+        "phone": "Téléphone",
+        "doctor": "Docteur & Spécialiste",
+        "specialty": "Spécialité / Clinique",
+        "dateTime": "Date & Heure",
+        "status": "Statut",
+        "actions": "Actions Rapides"
+      },
+      "status": {
+        "approved": "Approuvé",
+        "pending": "En Attente",
+        "rescheduled": "Reporté",
+        "rejected": "Rejeté",
+        "cancelled": "Annulé",
+        "completed": "Terminé"
+      },
+      "actions": {
+        "view": "Voir Détails",
+        "edit": "Reporter",
+        "cancel": "Annuler",
+        "print": "Imprimer"
+      },
+      "modals": {
+        "rescheduleTitle": "Reporter le Rendez-vous",
+        "cancelTitle": "Confirmer l'Annulation de la Réservation",
+        "cancelReasonLabel": "Motif d'Annulation *",
+        "patient": "Patient",
+        "doctor": "Docteur",
+        "newTime": "Choisir le Nouvel Horaire :",
+        "confirmReschedule": "Confirmer le Report",
+        "cancelReasonPrompt": "Vous êtes sur le point d'annuler le rendez-vous pour {name}. Veuillez saisir un motif :",
+        "cancelOfficially": "Annuler Officiellement",
+        "back": "Retour",
+        "cancelReasonOptions": {
+          "patientRequest": "Demande du Patient",
+          "doctorEmergency": "Urgence du Docteur",
+          "noShow": "Non-présentation",
+          "other": "Autre"
+        }
+      }
+    },
+    "packages": {
+      "title": "Gestion des Forfaits & Quotas",
+      "subtitle": "Consultez les détails de l'abonnement du centre, la consommation des forfaits et rechargez le solde pour assurer la continuité du service",
+      "techSpecs": "Section 3.6 - Spécifications Techniques Approuvées",
+      "buyMore": "Acheter un Quota Supplémentaire",
+      "currentApprovedPackage": "Forfait Approuvé Actuel",
+      "validity": "Validité : du {start} au {end}",
+      "availableBalance": "Solde Disponible Actuel",
+      "ofTotalQuota": "sur un total de {total} réservations",
+      "usedQuota": "Réservations Consommées : {count} ({percent}%)",
+      "remainingQuota": "Quota Restant : {count} réservations",
+      "dailyAvgRate": "Moyenne de Consommation Quotidienne",
+      "bookingPerDay": "réservation / jour",
+      "activityIndicator": "Indicateur basé sur l'activité du mois en cours",
+      "expectedDepletion": "Jours Restants Estimés",
+      "workingDays": "jours ouvrables",
+      "earlyRechargeWarning": "Alerte auto : recharge anticipée recommandée",
+      "projectedDepletionDate": "Date d'Épuisement Prévue",
+      "algorithmCalculation": "Calcul par l'Algorithme Intelligent de la Plateforme",
+      "historyTitle": "Historique des Achats & Preuves d'Activation (Article 3.6-VII)",
+      "historySubtitle": "Journal électronique garantissant la transparence et l'audit financier pour les activations par l'admin",
+      "totalRequests": "Total des Demandes : {count}",
+      "tableColumns": {
+        "ref": "N° de Réf",
+        "packages": "Forfaits Sélectionnés",
+        "quota": "Quota",
+        "price": "Prix",
+        "paymentMethod": "Mode de Paiement",
+        "date": "Date de Demande",
+        "status": "Statut",
+        "actions": "Actions / Simulation de Décision"
+      },
+      "paymentMethods": {
+        "baridimob": "BaridiMob",
+        "bankTransfer": "Virement Bancaire"
+      },
+      "statuses": {
+        "pending": "En attente de révision",
+        "approved": "Activé & Approuvé",
+        "rejected": "Rejeté"
+      },
+      "viewDetails": "Détails",
+      "approveSimulation": "Approuver",
+      "rejectSimulation": "Rejeter",
+      "approveSimulationTitle": "Simuler l'approbation Admin et l'ajout instantané de quota",
+      "rejectSimulationTitle": "Simuler le rejet Admin",
+      "alerts": {
+        "approveSuccess": "Simulation terminée : Demande approuvée avec succès ! {quota} nouvelles opérations ajoutées au solde du centre.",
+        "rejectPrompt": "Veuillez saisir le motif du rejet pour clarifier pour le centre de réservation :",
+        "rejectDefaultReason": "La preuve de paiement jointe est incomplète أو le transfert bancaire ne peut être vérifié.",
+        "rejectSuccess": "Demande rejetée et motif documenté pour le centre de réservation."
+      },
+      "detailsModal": {
+        "title": "Détails de la Demande d'Achat ({ref})",
+        "package": "Forfait :",
+        "quotaCount": "{count} réservations",
+        "totalAmount": "Montant Total :",
+        "dzd": "DZD",
+        "paymentProofData": "Données de la Preuve de Paiement Jointe :",
+        "transactionRef": "Référence de la Transaction :",
+        "receiptFileName": "Nom du fichier reçu :",
+        "requestDate": "Date d'envoi de la demande :",
+        "activationStatus": "Statut d'Activation : Officiellement Approuvé & Actif",
+        "approvedBy": "Approuvé par : {user} ({date})",
+        "rejectionReasonLabel": "Motif du Rejet Admin :",
+        "rejectionHint": "Le centre peut télécharger une nouvelle preuve avec les données corrigées.",
+        "close": "Fermer"
+      },
+      "wizard": {
+        "title": "Achat de Forfait Opérationnel (Article 3.6)",
+        "subtitle": "Suivez les étapes pour compléter l'achat et envoyer la demande d'activation à l'Admin",
+        "steps": {
+          "1": "1er : Sélection du Forfait",
+          "2": "2ème : Mode de Paiement",
+          "3": "3ème : Téléchargement de la Preuve",
+          "4": "4ème : Soumission de la Demande"
+        },
+        "stepLabel": "Étape {step}",
+        "infoRequirement": "Le centre de réservation doit disposer d'un quota suffisant avant de créer de nouveaux rendez-vous.",
+        "quotaLabel": "Quota : {count} réservations",
+        "validityMonths": "Validité : {count} mois",
+        "nextPayment": "Suivant : Mode de Paiement",
+        "choosePayment": "Sélectionnez le mode de paiement pour compléter l'achat :",
+        "baridimobDesc": "Paiement électronique rapide via l'application BaridiMob",
+        "bankTransferOfficial": "Virement Bancaire Officiel",
+        "bankTransferDesc": "Virement bancaire direct sur le compte de la plateforme",
+        "paymentAccountInfo": "Compte de Paiement Officiel Aafiya",
+        "officialPlatformAdmin": "Gestion Officielle de la Plateforme",
+        "amountToTransfer": "Montant exact à transférer :",
+        "back": "Précédent",
+        "nextUpload": "Suivant : Télécharger la Preuve",
+        "step3Title": "3ème : Télécharger la Preuve & ID de Référence",
+        "dragDrop": "Glissez-déposez l'image ou le reçu PDF ici",
+        "acceptedFormats": "Acceptés : JPG, PNG, PDF (Max 10Mo)",
+        "browseFiles": "Parcourir les Fichiers",
+        "attachedFile": "Fichier Joint : {name}",
+        "transactionRefLabel": "Référence de Transaction / ID (*) :",
+        "transactionRefPlaceholder": "ex: BRD-98421057 ou TXN-8820412",
+        "additionalNotesLabel": "Notes Additionnelles pour l'Admin (Optionnel) :",
+        "additionalNotesPlaceholder": "Toute précision concernant le virement...",
+        "confirmAndSend": "Confirmer & Envoyer la Demande d'Activation",
+        "successTitle": "Demande d'activation du forfait enregistrée !",
+        "pendingReviewStep": "4ème : En attente de révision Admin",
+        "requestedPackage": "Forfait Demandé :",
+        "successNote": "Vous recevrez une notification dès que l'Admin aura approuvé et ajouté le quota.",
+        "backToDashboard": "Retour au Tableau de Bord"
+      },
+      "mockData": {
+        "silverName": "Forfait Startup Argent",
+        "silverDesc": "Convient aux centres de santé moyens et aux cliniques multi-spécialités nouvellement rejointes.",
+        "goldName": "Forfait Opérationnel Or",
+        "goldDesc": "Le forfait idéal pour les centres de réservation moyens et en croissance.",
+        "goldTag": "Le plus demandé (Remise 15%)",
+        "diamondName": "Forfait Complet Diamant",
+        "diamondDesc": "Conçu pour les grands centres et les réseaux de santé à haut flux quotidien.",
+        "diamondTag": "Meilleure valeur opérationnelle",
+        "manager": "Gestionnaire du Centre de Réservation",
+        "financeManager": "Gestionnaire de Plateforme - Dép. Finance",
+        "auditDept": "Dép. Audit Financier",
+        "buyAction": "Soumettre une demande d'achat pour forfait opérationnel",
+        "buyDetails": "Demande d'achat pour {name} ({quota} ops) d'une valeur de {price} DZD via {method}.",
+        "rejectedReason": "L'image du reçu n'est pas claire et la référence de transaction ne correspond pas au relevé bancaire.",
+        "autoApproval": "Admin Plateforme - Auto-approbation simulée"
+      },
+      "successTitle": "Opération réussie",
+      "list": {
+        "status": {
+          "completed": "Terminé"
+        }
+      }
+    }
+  },
+  "auth": {
+    "invalidCredentials": "Les identifiants fournis ne correspondent pas à nos enregistrements.",
+    "loginFailed": "Échec de la connexion. Veuillez réessayer.",
+    "login": "Connexion",
+    "register": "Créer un nouveau compte",
+    "loginSubtitle": "Accès unifié aux services de santé numériques",
+    "registerSubtitle": "Rejoignez la plateforme nationale de santé unifiée",
+    "submittedTitleLogin": "Vérification réussie",
+    "submittedTitleRegister": "Demande reçue !",
+    "submittedDescLogin": "Bienvenue. Redirection vers votre tableau de bord...",
+    "submittedDescRegister": "Les justificatifs professionnels sont en cours d'examen. Vous recevrez bientôt une notification d'activation.",
+    "patientPortal": "Portail Patient",
+    "practitionerPortal": "Portail Praticien",
+    "chooseAccountType": "Choisissez le type de compte :",
+    "patient": "Patient",
+    "doctor": "Médecin / Clinique",
+    "bookingCenter": "Centre de réservation",
+    "lab": "Laboratoire Médical",
+    "radiology": "Centre de Radiologie",
+    "fullName": "Nom complet",
+    "facilityName": "Nom officiel de l'établissement",
+    "email": "Adresse e-mail",
+    "password": "Mot de passe",
+    "phone": "Numéro de téléphone",
+    "doctorFullName": "Nom complet du médecin",
+    "agencyName": "Nom de l'agence / centre",
+    "laboratoryName": "Nom du laboratoire",
+    "centerName": "Nom du centre de radiologie",
+    "clinicName": "Nom de la clinique",
+    "specialty": "Spécialité médicale",
+    "licenseNumber": "Numéro d'agrément / licence",
+    "commercialRegister": "Numéro de registre du commerce",
+    "managerName": "Nom du gérant / manager",
+    "directorName": "Nom du directeur technique",
+    "wilaya": "Wilaya",
+    "rememberMe": "Se souvenir de moi",
+    "forgotPassword": "Mot de passe oublié ?",
+    "submitLogin": "Connexion système sécurisée",
+    "submitRegister": "Créer un nouveau compte",
+    "toggleRegister": "Vous n'avez pas de compte ? Rejoignez-nous",
+    "toggleLogin": "Vous avez déjà un compte ? Connectez-vous",
+    "encryption": "Cryptage AES-256",
+    "compliance": "Conformité GDPR",
+    "placeholderName": "Entrez le nom ici...",
+    "placeholderEmail": "nom@exemple.com",
+    "placeholderPassword": "••••••••",
+    "placeholderClinic": "ex: Clinique Al-Amal",
+    "placeholderSpecialty": "ex: Pédiatrie",
+    "placeholderWilaya": "Sélectionnez la wilaya...",
+    "exactAddress": "Adresse exacte (Rue, Quartier, Étage)",
+    "googleMapsLink": "Lien Google Maps",
+    "placeholderAddress": "ex: 12 Rue Didouche Mourad, Alger Centre",
+    "placeholderMaps": "https://goo.gl/maps/..."
+  },
+  "laboratory": {
+    "title": "Portail de Laboratoire Clinique & Micro-Analyses",
+    "sidebarTitle": "Opérations Laboratoire",
+    "userName": "Ali Bouallam",
+    "userRole": "Technicien de Laboratoire Senior",
+    "assistantBanner": {
+      "title": "Gestion du personnel et assistants de laboratoire",
+      "description": "Ajouter, gérer et habiliter les comptes des assistants et techniciens de laboratoire.",
+      "openButton": "Gérer les assistants"
+    },
+    "tabs": {
+      "orders": "Traiter Demande",
+      "history": "Demandes du Jour",
+      "reports": "Métriques & Rapports",
+      "auditLog": "Journal d'Audit",
+      "settings": "Équipement & Sceau",
+      "inventory": "Inventaire & Catalogue",
+      "noHistory": "Aucune commande précédente dans cette vue pour le moment."
+    },
+    "orderProcessing": {
+      "title": "Traitement de la Demande de Labo",
+      "description": "Saisissez le numéro du document ou scannez le QR Code pour une correspondance instantanée avec le système clinique.",
+      "scanButton": "Lancer Scanner QR",
+      "placeholder": "ex: LAB-ORD-XXXX",
+      "searchButton": "Voir Demande Médicale",
+      "notFoundError": "Le numéro de document \"{num}\" n'a pas été trouvé ou n'a été émis par aucun médecin de la plateforme."
+    },
+    "orderStatus": {
+      "pending": "Échantillon en Attente",
+      "inProgress": "En Cours",
+      "completed": "Résultats Approuvés"
+    },
+    "sampleInfo": {
+      "title": "Statut de l'Échantillon de Labo",
+      "type": "Type d'Échantillon",
+      "bloodSerum": "Sang (Sérum)",
+      "receivedDate": "Date de Réception"
+    },
+    "testStatus": {
+      "abnormal": "Anormal",
+      "normal": "Normal"
+    },
+    "orderInfo": {
+      "orderPriority": "Priorité de la Demande",
+      "treatingDoctor": "Médecin Traitant Prescripteur",
+      "patientInfo": "Données Patient & Dossier Médical",
+      "orderDate": "Date d'Émission de la Demande",
+      "clinicalInstructions": "Instructions Cliniques du Médecin",
+      "labOnly": "Usage Laboratoire Uniquement",
+      "age": "Âge",
+      "years": "ans"
+    },
+    "resultsEntry": {
+      "title": "Saisie des Résultats d'Analyse",
+      "description": "Saisissez les valeurs mesurées et les notes cliniques pour chaque analyse.",
+      "testName": "Nom de l'Analyse",
+      "unit": "Unité",
+      "refRange": "Plage de Réf",
+      "measuredValue": "Valeur Mesurée",
+      "notes": "Notes",
+      "placeholderValue": "Saisir valeur",
+      "placeholderNotes": "Notes d'analyse",
+      "pdfUploadTitle": "Téléchargement du Rapport PDF Officiel",
+      "pdfUploadDescription": "Glissez-déposez le rapport PDF officiel ici ou cliquez pour parcourir.",
+      "pdfUploadLimit": "Prend en charge les formats PDF approuvés jusqu'à 10 Mo",
+      "attachReport": "Joindre Modèle de Rapport PDF",
+      "remove": "Supprimer",
+      "sealPreview": "Aperçu de l'En-tête & du Sceau Numérique du Rapport",
+      "labName": "Laboratoire Clinique Al-Amal",
+      "certifiedTech": "Technicien Certifié",
+      "releaseDate": "Date de Délivrance",
+      "sealVerified": "Sceau Numérique Certifié Vérifié",
+      "confirmTitle": "Confirmer & Certifier les Résultats d'Analyse",
+      "confirmDescription": "Après confirmation, les résultats seront instantanément disponibles pour le médecin, le patient et dans l'EHR.",
+      "sendButton": "Envoyer les Résultats",
+      "sending": "Envoi & Synchronisation...",
+      "successApproved": "Les résultats d'analyse pour la demande {num} ont été approuvés avec succès et envoyés à l'EHR Unifié.",
+      "resultLabel": "Résultat",
+      "statusLabel": "Statut",
+      "medicalDirector": "Directeur Médical du Laboratoire",
+      "approving": "Approbation en cours...",
+      "approveButton": "Approuver les Résultats"
+    },
+    "mockData": {
+      "ui": {
+        "inventoryTab": "Inventaire & Catalogue",
+        "result": "Résultat",
+        "status": "Statut",
+        "medicalDirector": "المدير الطبي للمخبر",
+        "approving": "Approbation en cours...",
+        "approveResults": "Approuver les Résultats"
+      }
+    },
+    "table": {
+      "docNumber": "N° Commande",
+      "patient": "Patient",
+      "doctor": "Médecin prescripteur",
+      "priority": "Priorité",
+      "status": "Statut",
+      "action": "Action"
+    },
+    "priority": {
+      "stat": "Urgence absolue (STAT)",
+      "urgent": "Urgent",
+      "normal": "Routine"
+    }
+  },
+  "radiology": {
+    "title": "Portail de Radiologie Diagnostique & Imagerie Médicale Avancée",
+    "sidebarTitle": "Admin Centre de Radiologie",
+    "userName": "Dr. Sami Al-Jaber",
+    "userRole": "Radiologue Senior",
+    "assistantBanner": {
+      "title": "Gestion du personnel et assistants de radiologie",
+      "description": "Ajouter, gérer et habiliter les comptes des assistants et techniciens d'imagerie.",
+      "openButton": "Gérer les assistants"
+    },
+    "tabs": {
+      "orders": "Traiter Demande",
+      "history": "Liste de Travail du Jour",
+      "reports": "Stats de Performance",
+      "auditLog": "Journal des Opérations",
+      "settings": "Gestion des Équipements"
+    },
+    "caseEntry": {
+      "title": "Saisie de Dossier Radiologique",
+      "description": "Saisissez le numéro de dossier ou scannez le QR pour une correspondance instantanée avec les images PACS.",
+      "scanButton": "Scanner Code-barres / QR",
+      "placeholder": "ex: RAD-2026-000512",
+      "fetchButton": "Récupérer Dossier Médical",
+      "notFoundError": "Le numéro de document \"{num}\" n'a pas été trouvé dans la base de données de radiologie."
+    },
+    "orderStatus": {
+      "pending": "En Attente",
+      "inProgress": "En Cours",
+      "completed": "Terminé"
+    },
+    "caseInfo": {
+      "scanType": "Type d'Examen",
+      "referringDoctor": "Médecin Prescripteur",
+      "patient": "Patient",
+      "clinicalData": "Données Cliniques (12.3)",
+      "age": "Âge",
+      "years": "ans"
+    },
+    "pacsPreview": {
+      "title": "Aperçu PACS DICOM",
+      "available": "Disponible",
+      "openViewer": "Ouvrir Visionneuse PACS Interactive"
+    },
+    "reporting": {
+      "title": "Compte-rendu de Radiologie (12.4)",
+      "description": "Notez les résultats détaillés et l'impression diagnostique finale.",
+      "findings": "Résultats",
+      "findingsHint": "Utilisez un langage médical précis",
+      "findingsPlaceholder": "Écrivez vos notes diagnostiques sur les images...",
+      "impression": "Impression Diagnostique Finale",
+      "impressionPlaceholder": "Résumé et diagnostic probable...",
+      "attachPdf": "Joindre Rapport PDF Externe (Optionnel)",
+      "pdfHint": "Glissez-déposez ici le fichier du rapport signé manuellement pour le télécharger",
+      "sealPreview": "Aperçu de l'Approbation & du Sceau Numérique",
+      "centerName": "Centre de Radiologie Avancée • Système Aafiya",
+      "radiologist": "Radiologue",
+      "approvalDate": "Date d'Approbation",
+      "sealVerified": "Certifié Numériquement & Vérifié via le Portail de Radiologie",
+      "confirmTitle": "Confirmer & Certifier le Rapport de Radiologie",
+      "confirmDescription": "Le rapport sera instantanément envoyé au Dossier Médical Unifié (EHR).",
+      "confirmButton": "Certifier le Rapport Final",
+      "confirming": "Certification & Synchronisation...",
+      "successApproved": "Le rapport de radiologie {num} a été approuvé avec succès et envoyé à l'EHR Unifié."
+    }
+  },
+  "radiologyAssistant": {
+    "title": "Centre d'Imagerie Médicale & Radiologie",
+    "sidebarTitle": "Gestion Station Radio",
+    "defaultUser": "Assistant de Radiologie",
+    "userRole": "Technicien Assistant d'Imagerie Médicale",
+    "operationalStatus": "RAD ASSISTANT v1.0",
+    "clinicName": "Centre d'Imagerie Médicale & Radiologie",
+    "permissionsButton": "Matrice de Comparaison des Rôles",
+    "managerDashboard": "Tableau de Bord Gestionnaire",
+    "mainPlatform": "Plateforme Principale",
+    "home": "Accueil",
+    "tabs": {
+      "dashboard": "1. Tableau de Bord",
+      "orders": "2. Demandes Entrantes",
+      "process": "3. Traitement Imagerie",
+      "reception": "4. Réception Patients",
+      "tasks": "5. Mes Tâches",
+      "notifications": "6. Alertes",
+      "reports": "7. Rapports Opérationnels",
+      "profile": "8. Profil",
+      "settings": "9. Paramètres"
+    },
+    "kpi": {
+      "newOrders": "Nouvelles Demandes Entrantes",
+      "statOrders": "Demandes Urgentes STAT",
+      "completedToday": "Examens Réalisés Aujourd'hui",
+      "processing": "Examens en Cours",
+      "tat": "Délai Moyen d'Exécution (TAT)",
+      "pendingProcess": "En Attente de Traitement",
+      "requireImmediate": "Nécessite une Réalisation Immédiate",
+      "filesUploaded": "Fichiers Imagerie Téléversés",
+      "inRooms": "En Salle d'Examen",
+      "highResponse": "Haute Vitesse de Réponse",
+      "noTat": "N/D"
+    },
+    "directives": {
+      "title": "Dernières Directives du Gestionnaire du Centre",
+      "managerName": "Gestionnaire du Centre",
+      "updateTime": "Mis à jour aujourd'hui",
+      "noDirectives": "Aucune directive émise actuellement"
+    },
+    "table": {
+      "title": "Liste des Demandes d'Imagerie Entrantes",
+      "description": "Classées par priorité et heure d'arrivée",
+      "viewAll": "Voir Toutes les Demandes",
+      "docNumber": "N° Document",
+      "patientMrn": "Patient / IPP",
+      "modality": "Modalité",
+      "scanType": "Type d'Examen",
+      "priority": "Priorité",
+      "action": "Action",
+      "startProcess": "Traiter & Téléverser",
+      "noOrders": "Aucune demande d'imagerie reçue actuellement",
+      "newOrdersAppear": "Les nouvelles demandes apparaîtront ici dès soumission"
+    },
+    "process": {
+      "title": "Traitement & Réalisation de l'Examen",
+      "description": "Téléverser les fichiers et rédiger le brouillon du compte-rendu",
+      "clinicalIndications": "Indication Clinique & Instructions du Prescripteur",
+      "findings": "Constats Radiologiques (Findings)",
+      "findingsPlaceholder": "Noter les observations anatomiques et radiologiques...",
+      "impression": "Conclusion & Diagnostic Préliminaire (Impression)",
+      "impressionPlaceholder": "Diagnostic radiologique préliminaire...",
+      "recommendations": "Recommandations",
+      "recommendationsPlaceholder": "Recommandations ou suivis suggérés...",
+      "uploadSection": "Téléversement des Fichiers Numériques",
+      "uploadHelp": "Glissez-déposez des fichiers DICOM (.dcm), images HD (PNG, JPG) ou PDF",
+      "uploadedFiles": "Fichiers Téléversés pour cet Examen",
+      "noFiles": "Aucun fichier téléversé pour cet examen",
+      "saveDraft": "Enregistrer le Brouillon",
+      "forwardToDoctor": "Transmettre au Radiologue pour Validation",
+      "forwardSuccess": "Compte-rendu enregistré et transmis au radiologue avec succès",
+      "saveSuccess": "Brouillon enregistré avec succès",
+      "selectOrderPrompt": "Veuillez sélectionner une demande pour commencer le traitement",
+      "patientDetails": "Détails Patient & Médecin",
+      "room": "Salle d'Examen"
+    },
+    "reception": {
+      "title": "Réception des Patients & Contrôle Préparatoire",
+      "description": "Enregistrer l'arrivée des patients et vérifier les protocoles",
+      "formTitle": "Enregistrer l'Arrivée d'un Patient",
+      "selectOrder": "Sélectionner la Demande",
+      "selectOrderPlaceholder": "Choisir une demande ou rechercher par numéro...",
+      "modality": "Modalité Demandée",
+      "room": "Salle d'Examen Attribuée",
+      "checklist": "Liste de Contrôle et Sécurité Pré-Examen",
+      "metalFree": "Absence de Métal Vérifiée",
+      "fasting": "À Jeun Confirmé",
+      "contrastReady": "Produit de Contraste Prêt",
+      "consentSigned": "Consentement Signé",
+      "notes": "Notes de Réception",
+      "notesPlaceholder": "ex: Détecteur passé avec succès, patient prêt...",
+      "submit": "Enregistrer l'Arrivée & Confirmer la Préparation",
+      "success": "Arrivée du patient confirmée avec succès",
+      "logTitle": "Registre des Réceptions du Jour",
+      "noRecords": "Aucun enregistrement de réception actuellement",
+      "noRecordsHelp": "Les patients enregistrés apparaîtront ici",
+      "safeVerified": "Vérifié & Conforme",
+      "docNumber": "N° Doc",
+      "patient": "Patient / IPP",
+      "arrivalTime": "Heure d'Arrivée",
+      "status": "Contrôle Sécurité"
+    },
+    "tasks": {
+      "title": "Tâches Quotidiennes de l'Assistant",
+      "description": "Examens en attente de réalisation et téléversement",
+      "noTasks": "Aucune tâche opérationnelle en attente actuellement"
+    },
+    "notifications": {
+      "title": "Centre de Notifications & Directives",
+      "markAllRead": "Tout marquer comme lu",
+      "allMarkedRead": "Toutes les notifications ont été marquées comme lues",
+      "noNotifications": "Aucune notification ou alerte opérationnelle actuellement",
+      "statAlert": "🔴 Alerte Urgente STAT",
+      "managerDirective": "📣 Directive de la Direction",
+      "info": "Information Opérationnelle"
+    },
+    "reports": {
+      "title": "Indicateurs Opérationnels & KPIs",
+      "description": "Examens réalisés, répartition des modalités et délai moyen d'exécution",
+      "securityTitle": "Rapports Opérationnels Uniquement — Volumes et Délais",
+      "securityDesc": "Conformément aux permissions du rôle d'Assistant en Radiologie, cet écran est restreint aux indicateurs opérationnels. Les données financières et facturations sont réservées au Directeur.",
+      "totalScans": "Total des Examens Réalisés",
+      "totalScansCount": "{count} Examens",
+      "uploadedImages": "Images Radiologiques Téléversées",
+      "uploadedImagesCount": "{count} Images",
+      "avgTat": "Délai Moyen d'Exécution (TAT)",
+      "minutes": "Min",
+      "noTat": "N/D",
+      "acceptanceRate": "Taux d'Acceptation de Qualité d'Image",
+      "modalityTitle": "Répartition des Examens par Modalité",
+      "noModality": "Aucun examen terminé à catégoriser pour le moment",
+      "noAnalytics": "Aucune donnée opérationnelle disponible pour calculer les métriques",
+      "allDocumented": "Documentés avec fichiers joints",
+      "highestDpi": "Téléversés en résolution diagnostique",
+      "fromReceptionToUpload": "De la réception au téléversement"
+    },
+    "profile": {
+      "title": "Profil Collaborateur",
+      "jobTitle": "Technicien Assistant en Radiologie",
+      "employeeId": "Identifiant Collaborateur",
+      "department": "Département d'Imagerie Médicale & Radiologie",
+      "manager": "Directeur / Responsable Direct",
+      "shift": "Période de Travail Enregistrée",
+      "shiftDefault": "Selon le planning de garde approuvé",
+      "license": "N° Licence Professionnelle",
+      "notAvailable": "Non renseigné dans le système",
+      "accountStatus": "Statut du Compte & Système",
+      "activeAccount": "Compte Actif & Officiel",
+      "suspendedAccount": "Temporairement Suspendu",
+      "permissionsTitle": "Permissions Opérationnelles Accordées à ce Compte",
+      "permReception": "Réception des patients et préparation de sécurité",
+      "permAdmin": "Modifier paramètres et données du centre (Interdit)",
+      "permBrowseOrders": "Consulter les demandes par numéro de document",
+      "permEquipment": "Gestion et étalonnage des appareils (Interdit)",
+      "permUploadImages": "Téléverser fichiers DICOM, PNG/JPG et PDF",
+      "permStamp": "Modifier le cachet numérique officiel (Interdit)",
+      "permDraftReport": "Rédiger le brouillon et soumettre pour révision",
+      "permDeleteReport": "Supprimer examens et rapports validés (Interdit)",
+      "permGranted": "Déléguée & Active",
+      "permForbidden": "Interdite (Réservée à la direction)"
+    },
+    "settings": {
+      "title": "Paramètres du Compte Personnel",
+      "description": "Gérer mot de passe, langue et préférences d'alertes",
+      "uiPreferences": "Préférences d'Interface",
+      "interfaceLanguage": "Langue de l'Interface",
+      "audioAlerts": "Alertes Sonores pour Demandes Urgentes STAT",
+      "audioEnabled": "Activée (Alerte sonore à l'arrivée)",
+      "audioDisabled": "Désactivée (Notification visuelle seule)",
+      "restrictedNotice": "Paramètres d'établissement et gestion du personnel réservés au Directeur."
+    },
+    "userName": "Assistant de Radiologie"
+  },
+  "labAssistant": {
+    "title": "Console d'Assistant de Laboratoire",
+    "sidebarTitle": "Gestion des Opérations de Terrain",
+    "userName": "Technicien Assistant Labo",
+    "userRole": "Technicien Assistant Labo",
+    "operationalStatus": "Opérationnel Exécutif",
+    "clinicName": "Centre de Diagnostic Biologique",
+    "morningShift": "Équipe du Matin",
+    "managerTitle": "Gestionnaire Labo",
+    "managerDashboard": "Tableau de Bord Gestionnaire",
+    "permissionsButton": "Permissions Gestionnaire vs Assistant",
+    "home": "Accueil",
+    "tabs": {
+      "dashboard": "1. Tableau de Bord",
+      "orders": "2. Demandes Entrantes",
+      "orderDetails": "3. Détails Demande & Finalisation",
+      "reception": "4. Réception Échantillons",
+      "tasks": "5. Mes Tâches Quotidiennes",
+      "notifications": "6. Notifications",
+      "reports": "7. Rapports Opérationnels",
+      "profile": "8. Profil",
+      "settings": "9. Paramètres Personnels"
+    },
+    "directives": {
+      "title": "Dernières Directives du Gestionnaire de Labo",
+      "source": "Source"
+    },
+    "kpi": {
+      "newOrders": "Nouvelles Demandes",
+      "urgentOrders": "Demandes Urgentes",
+      "samplesReceived": "Échantillons Reçus",
+      "processing": "En cours de traitement",
+      "completed": "Terminées Aujourd'hui",
+      "pendingProcessing": "En Attente de Traitement Opérationnel",
+      "statUrgent": "STAT & Urgent Nécessite Priorité",
+      "readyForAnalysis": "Conforme & Prêt pour Analyse",
+      "recordingResults": "Enregistrement des Résultats",
+      "readyResults": "Résultats Préparés avec Succès"
+    },
+    "search": {
+      "title": "Recherche Instantanée de Demande Médicale par ID Doc ou Code QR",
+      "description": "Saisissez le numéro de demande émis par le médecin ou scannez le code directement.",
+      "scanButton": "Scanner Code QR",
+      "placeholder": "Saisir ID Doc LAB-2026-XXXX ou Nom du Patient...",
+      "cancel": "Annuler",
+      "searchButton": "Rechercher"
+    },
+    "priority": {
+      "today": "Aujourd'hui",
+      "stat": "URGENT STAT",
+      "urgent": "Urgent",
+      "normal": "Normal"
+    },
+    "condition": {
+      "good": "Conforme"
+    },
+    "status": {
+      "pending": "En Attente de Résultats",
+      "inProgress": "En Cours de Saisie",
+      "completed": "Terminé"
+    },
+    "actions": {
+      "complete": "Finaliser la Demande"
+    },
+    "orders": {
+      "title": "Demandes Médicales Entrantes (Incoming Lab Orders)",
+      "description": "L'assistant peut rechercher par numéro de document ou parcourir tous les tests de labo requis par priorité et statut.",
+      "filterDoc": "Rechercher par N° Document / Nom du Patient",
+      "filterPriority": "Priorité Opérationnelle",
+      "filterStatus": "Statut de la Demande",
+      "allPriorities": "Toutes les Priorités",
+      "allStatuses": "Tous les Statuts",
+      "noMatch": "Aucune demande ne correspond à la recherche spécifiée.",
+      "testsCount": "{count} Analyses",
+      "openButton": "Ouvrir & Saisir Résultats"
+    },
+    "table": {
+      "docNumber": "N° Document",
+      "patient": "Patient / MRN",
+      "doctor": "Médecin Traitant",
+      "priority": "Priorité",
+      "sampleCondition": "État de l'Échantillon",
+      "operationalStatus": "Statut Opérationnel",
+      "action": "Action",
+      "testsCount": "Nombre d'Analyses"
+    },
+    "alerts": {
+      "resultsSaved": "Résultats d'analyse enregistrés et terminés avec succès ! L'approbation du gestionnaire peut être requise selon la politique.",
+      "draftSaved": "Brouillon enregistré avec succès.",
+      "fillRequired": "Veuillez remplir le nom du patient et le numéro de document",
+      "sampleLogged": "Réception de l'échantillon enregistrée avec succès !"
+    },
+    "orderDetails": {
+      "patientLabel": "Demande de Labo pour le Patient",
+      "doctorLabel": "Médecin",
+      "ageLabel": "Ans",
+      "phoneLabel": "Téléphone",
+      "orderDateLabel": "Date de Commande",
+      "policyTitle": "Politique Opérationnelle",
+      "policyDescription": "En tant qu'assistant de laboratoire, vous pouvez saisir les valeurs de résultats, télécharger des rapports/fichiers et enregistrer des brouillons. L'approbation du rapport final avec le sceau institutionnel peut nécessiter une révision par le gestionnaire de laboratoire selon la politique.",
+      "tableTitle": "Tableau de Saisie des Résultats (Manual Value Inputs)",
+      "tableDescription": "Alertes automatiques pour les valeurs hors plage de référence",
+      "testName": "Nom de l'Analyse (Ar / En)",
+      "refRange": "Plage de Référence",
+      "unit": "Unité",
+      "resultValue": "Résultat Saisi (Result Value)",
+      "aiAlert": "Alerte Auto",
+      "abnormal": "Anormal",
+      "normal": "Normal",
+      "waiting": "En attente de valeur",
+      "pdfUploadTitle": "Joindre le Rapport PDF Officiel",
+      "pdfUploadDesc": "L'assistant peut télécharger des fichiers PDF depuis les équipements de labo automatisés",
+      "pdfUploadLimit": "Limite : 15 Mo • Format PDF",
+      "attached": "Joint",
+      "imageUploadTitle": "Joindre Images Microscopie / Équipement",
+      "imageUploadDesc": "Joindre des images de frottis sanguin ou résultats de tests parasitaires",
+      "microscopeTitle": "Télécharger Image Microscope (PNG / JPG)",
+      "microscopeDesc": "Images de lames et tests histologiques",
+      "restrictions": "Restrictions du rôle d'Assistant : L'assistant ne peut pas supprimer les résultats saisis ni modifier le sceau institutionnel.",
+      "saveDraft": "Enregistrer Brouillon",
+      "completeAction": "Enregistrer & Finaliser les Résultats",
+      "enterValue": "Entrer Valeur..."
+    },
+    "reception": {
+      "title": "Station de Réception & Enregistrement des Échantillons",
+      "description": "Enregistrer la réception des échantillons, documenter l'heure d'arrivée et évaluer la qualité avant analyse",
+      "formTitle": "Enregistrer une Nouvelle Réception d'Échantillon",
+      "docLabel": "N° Doc Demande *",
+      "patientPlaceholder": "Entrez le nom du patient...",
+      "conditionLabel": "État & Qualité de l'Échantillon *",
+      "collectorLabel": "Collecteur / Infirmier",
+      "notesLabel": "Notes sur l'Échantillon",
+      "notesPlaceholder": "Conservation, temp, notes tubes...",
+      "patientNameLabel": "Nom du Patient *",
+      "mrnLabel": "Dossier Médical MRN",
+      "mrnPlaceholder": "Dossier MRN-XXXX",
+      "docPlaceholder": "Demande LAB-2026-XXXX...",
+      "nurseLabel": "Nom de l'Infirmier ou Collecteur...",
+      "nursePlaceholder": "Nom de l'Infirmier ou Collecteur...",
+      "collectorHeader": "Collecteur",
+      "notesHeader": "Notes",
+      "statusGood": "Bon État",
+      "statusClotted": "Coagulé",
+      "statusHemolyzed": "Hémolysé",
+      "statusInsufficient": "Insuffisant",
+      "submitButton": "Enregistrer l'Échantillon dans le Système",
+      "logTitle": "Échantillons Reçus Aujourd'hui",
+      "receivedTime": "Heure d'Arrivée",
+      "defaultCollector": "Technicien de Réception",
+      "defaultNotes": "Reçu et état opérationnel enregistré.",
+      "conditionGood": "Bon État",
+      "conditionClotted": "Coagulé - Nécessite nouveau prélèvement",
+      "conditionHemolyzed": "Hémolysé",
+      "conditionInsufficient": "Volume Insuffisant"
+    },
+    "tasks": {
+      "title": "Mes Tâches Opérationnelles",
+      "description": "Ordonnées par priorité : STAT 🔴 puis Urgent 🟠 puis Normal 🟢",
+      "testsNeeded": "Analyses à saisir",
+      "patientPrefix": "Patient",
+      "doctorPrefix": "Médecin",
+      "processButton": "Démarrer le Traitement & Saisir Valeurs"
+    },
+    "notifications": {
+      "title": "Centre de Notifications & Directives",
+      "markAllRead": "Tout marquer comme lu",
+      "allMarkedRead": "Toutes les notifications ont été marquées comme lues",
+      "urgentStat": "🔴 Demande urgente STAT",
+      "managerDirectives": "📣 Directives de la Direction",
+      "directive": "Directive opérationnelle",
+      "retestRequest": "🔄 Demande de réanalyse",
+      "noNotifications": "Aucune notification ou alerte opérationnelle actuellement"
+    },
+    "reports": {
+      "title": "Analyses Opérationnelles & Performance",
+      "description": "Statistiques pour le débit d'échantillons, les tests terminés et le délai d'exécution moyen",
+      "securityTitle": "Rapports Opérationnels Uniquement — Limités aux Volumes et Délais",
+      "securityDescription": "Selon les autorisations du rôle d'Assistant de Laboratoire, cet écran est limité aux indicateurs opérationnels (nombre d'échantillons, tests, délai moyen). Les données financières et les rapports de revenus sont exclusivement réservés au gestionnaire de laboratoire.",
+      "totalSamplesWeek": "Total Échantillons Reçus cette Semaine",
+      "totalSamplesCount": "{count} Échantillons",
+      "totalTestsCompleted": "Nombre de Tests Terminés",
+      "totalTestsCount": "{count} Tests",
+      "avgTAT": "Délai d'Exécution Moyen (TAT)",
+      "receptionMetric": "100% documenté dans le registre de réception",
+      "distributionMetric": "Réparti sur tous les analyseurs",
+      "tatMetric": "De la réception à l'archivage",
+      "qualityMetric": "Conforme aux normes de qualité",
+      "testsSuffix": "analyses",
+      "minutes": "min",
+      "acceptedSamplesRate": "Taux d'Échantillons Bons Acceptés",
+      "distributionTitle": "Répartition des Tests Terminés par Spécialité Médicale",
+      "biochemistry": "Biochimie",
+      "hematology": "Hématologie",
+      "hormonesSerology": "Hormones & Sérologie",
+      "noTat": "Non disponible actuellement",
+      "noAcceptanceRate": "Non disponible actuellement",
+      "noDistribution": "Aucun test terminé à catégoriser pour le moment",
+      "noAnalytics": "Aucune donnée opérationnelle disponible pour calculer les métriques"
+    },
+    "profile": {
+      "title": "Profil",
+      "jobTitle": "Assistant de Laboratoire",
+      "employeeID": "ID Employé",
+      "department": "Dépt. Biochimie & Hématologie",
+      "directManager": "Gestionnaire de Labo Direct",
+      "managerName": "Directeur du Laboratoire",
+      "shift": "Quart de Travail Enregistré",
+      "license": "Numéro de Licence Professionnelle",
+      "accountStatus": "Statut du Compte & Système",
+      "activeAccount": "Compte Actif & Officiel",
+      "permissionsTitle": "Résumé des Autorisations Opérationnelles Accordées",
+      "permReception": "Réception & Enregistrement des Échantillons",
+      "permAdmin": "Modifier Paramètres Labo & Établissement (Refusé)",
+      "permBrowseOrders": "Ouvrir & Parcourir les Commandes Médecins par Numéro",
+      "permEquipment": "Modifier Liste Équipement & Calibrage (Refusé)",
+      "permEnterResults": "Saisir les Résultats & Enregistrer Brouillons",
+      "permStamp": "Modifier ou Accéder au Tampon Numérique (Refusé)",
+      "permAttach": "Joindre Fichiers PDF & Images Microscopiques",
+      "permDelete": "Supprimer Résultats ou Rapports Enregistrés (Refusé)",
+      "notAvailable": "Non enregistré dans le système",
+      "shiftDefault": "Selon le planning de garde approuvé",
+      "licenseNotSet": "Non renseigné dans le dossier numérique",
+      "permGranted": "Déléguée & Active",
+      "permForbidden": "Interdite (Réservée à la direction)",
+      "suspendedAccount": "Temporairement Suspendu"
+    },
+    "settings": {
+      "title": "Paramètres du Compte Personnel",
+      "description": "Paramètres du compte assistant (Mot de passe, Langue, Notifications)",
+      "passwordTitle": "Changer le Mot de Passe de l'Assistant",
+      "currentPassword": "Mot de Passe Actuel",
+      "newPassword": "Nouveau Mot de Passe",
+      "confirmPassword": "Confirmer le Mot de Passe",
+      "savePassword": "Enregistrer Nouveau Mot de Passe",
+      "uiPreferences": "Préférences d'Interface Utilisateur",
+      "interfaceLanguage": "Langue d'Interface",
+      "arabic": "Arabe (Original)",
+      "french": "Français",
+      "english": "Anglais",
+      "passwordUpdated": "Mot de passe mis à jour avec succès !",
+      "audioAlerts": "Alertes Sonores pour Commandes STAT",
+      "audioEnabled": "Activé (Alerte sonore lors d'une demande urgente)",
+      "audioDisabled": "Désactivé (Notification visuelle uniquement)",
+      "restrictedBoxTitle": "Paramètres Établissement, Équipement & Sceau (Restreint pour l'Assistant)",
+      "restrictedBoxDesc": "Les paramètres d'environnement labo, le calibrage des équipements, le sceau numérique, l'en-tête officiel et la gestion du personnel sont exclusivement réservés au gestionnaire de laboratoire depuis son tableau de bord principal."
+    },
+    "comparisonModal": {
+      "title": "Philosophie du Rôle : Matrice des Différences Gestionnaire vs Assistant",
+      "taskColumn": "Tâche / Fonction Opérationnelle",
+      "managerColumn": "Gestionnaire Labo (Lab Manager)",
+      "assistantColumn": "Assistant Labo (Lab Assistant)",
+      "understandButton": "J'ai Compris",
+      "available": "✅ Disponible",
+      "availableFull": "✅ Entièrement Disponible",
+      "denied": "❌ Refusé",
+      "prohibited": "❌ Interdit",
+      "finalApproval": "✅ Approbation Finale",
+      "policyDependent": "Optionnel selon Politique Labo",
+      "adminPowers": "✅ Pouvoirs Admin",
+      "financialReports": "✅ Rapports Financiers Complets",
+      "operationalOnly": "❌ Opérationnel Uniquement (Sans chiffres)",
+      "tasks": {
+        "generalSettings": "Gestion Établissement & Paramètres Généraux",
+        "equipment": "Gestion Liste Équipement & Calibrage",
+        "staff": "Gestion Personnel & Licences",
+        "stamp": "Modification Sceau & En-tête",
+        "reception": "Réception Échantillons & État",
+        "browseOrders": "Ouvrir Demande & Lire Directives Médecin",
+        "enterResults": "Saisir Résultats & Valeurs d'Analyse",
+        "attachFiles": "Joindre Fichiers PDF & Images Microscopie",
+        "approval": "Approbation des Résultats Finaux",
+        "deleteReports": "Supprimer Rapports ou Renvoyer",
+        "financialReports": "Rapports Administratifs & Financiers"
+      }
+    },
+    "statusLabel": "Statut",
+    "resultLabel": "Résultat",
+    "defaultUser": "Technicien Assistant Labo",
+    "defaultCenter": "Centre de Diagnostic Biologique",
+    "notAvailable": "Non renseigné",
+    "emptyOrders": "Aucune demande d'analyses entrante actuellement",
+    "emptySamples": "Aucun échantillon enregistré actuellement",
+    "emptyTasks": "Aucune tâche opérationnelle en attente actuellement"
+  },
+  "assistant": {
+    "title": "Tableau de Bord de l'Assistant Admin",
+    "sidebarTitle": "Portail Assistant",
+    "userName": "Assistant Opérationnel",
+    "userRole": "AST-7701",
+    "scannerBtn": "Vérifier Document (Scanner)",
+    "tabs": {
+      "dashboard": "Tableau de Bord",
+      "requests": "Demandes d'Inscription",
+      "verification": "Centre de Vérification",
+      "support": "Support Technique",
+      "notifications": "Notifications Générales",
+      "reports": "Rapports Opérationnels",
+      "activity": "Journaux d'Activité",
+      "profile": "Mon Profil",
+      "settings": "Paramètres Personnels"
+    },
+    "dashboard": {
+      "title": "Aperçu du Tableau de Bord",
+      "accessDenied": {
+        "title": "Accès Refusé",
+        "description": "Vous n'avez pas la permission de consulter le tableau de bord [viewDashboard]. Veuillez contacter l'administrateur.",
+        "cta": "Journaliser la tentative d'accès et tester l'alerte 🔒"
+      },
+      "kpis": {
+        "pendingTasks": "Tâches en Attente",
+        "reviewedRequests": "Demandes Révisées Aujourd'hui",
+        "supportTickets": "Tickets de Support Ouverts",
+        "dailyActivity": "Activité Quotidienne"
+      }
+    }
+  },
+  "diagnostic": {
+    "staff": {
+      "title": "Gestion du personnel diagnostique",
+      "staffDetailsTitle": "Détails et profil de l'employé",
+      "staffDetailsSubtitle": "Consulter le profil professionnel, les permissions déléguées et les actions du compte",
+      "employee": "Employé",
+      "jobPosition": "Poste de travail",
+      "roleType": "Type de rôle",
+      "assistant": "Assistant administratif",
+      "technician": "Technicien de laboratoire / radiologie",
+      "validator": "Validateur diagnostique",
+      "active": "Actif",
+      "suspended": "Suspendu",
+      "removed": "Retiré",
+      "statusActive": "Compte actif",
+      "statusSuspended": "Compte suspendu",
+      "statusRemoved": "Affiliation terminée",
+      "permissions": "Permissions déléguées",
+      "editPermissions": "Modifier les permissions déléguées",
+      "savePermissions": "Enregistrer les permissions",
+      "savingPermissions": "Enregistrement en cours...",
+      "suspend": "Suspendre l'employé",
+      "reactivate": "Réactiver l'employé",
+      "remove": "Retirer l'employé",
+      "confirmSuspendTitle": "Confirmer la suspension de l'employé",
+      "confirmSuspendDesc": "Êtes-vous sûr de vouloir suspendre cet employé ? Il perdra immédiatement l'accès à tous les ordres diagnostiques et dossiers du centre.",
+      "confirmReactivateTitle": "Confirmer la réactivation de l'employé",
+      "confirmReactivateDesc": "Êtes-vous sûr de vouloir réactiver cet employé ? Ses permissions précédemment déléguées seront rétablies immédiatement.",
+      "confirmRemoveTitle": "Confirmer le retrait de l'employé",
+      "confirmRemoveDesc": "Êtes-vous sûr de vouloir retirer cet employé du centre ? Son accès actif sera révoqué tout en préservant définitivement l'historique et la traçabilité de ses travaux.",
+      "historicalRecordsNotice": "Avis système : Le retrait d'un employé préserve son identité utilisateur et la responsabilité légale de tous les échantillons et rapports historiques.",
+      "managerOnly": "Gestionnaire uniquement",
+      "permissionNotDelegable": "Permission non délégable au personnel",
+      "unauthorizedStaffList": "Vous n'êtes pas autorisé à consulter le personnel de ce centre diagnostique.",
+      "loadStaffError": "Échec du chargement des détails de l'employé. Veuillez réessayer.",
+      "actionSuccess": "Opération effectuée avec succès.",
+      "actionFailed": "Échec de l'opération. Veuillez réessayer ultérieurement.",
+      "close": "Fermer",
+      "cancel": "Annuler",
+      "confirmAction": "Confirmer l'action",
+      "permLabManageOrders": "Gérer les analyses de laboratoire",
+      "permLabManageOrdersDesc": "Réceptionner et gérer les demandes d'analyses et les échantillons physiques",
+      "permLabEnterResults": "Saisir les résultats d'analyses",
+      "permLabEnterResultsDesc": "Saisir les résultats quantitatifs et qualitatifs en brouillon avant validation finale",
+      "permRadManageOrders": "Gérer les examens de radiologie",
+      "permRadManageOrdersDesc": "Réceptionner et gérer les demandes d'imagerie et les rendez-vous",
+      "permRadUploadImages": "Téléverser les clichés radiologiques",
+      "permRadUploadImagesDesc": "Téléverser les fichiers et images radiologiques associés aux examens"
+    }
+  }
+}

@@ -1,0 +1,8 @@
+# ==============================================================================
+# AAFIYA PLATFORM — SYSTEM CRONTAB SCHEDULE ENTRY
+# Project: Aafiya — Unified National Digital Health Platform
+# Workstream: P20-O5 Production Infrastructure
+# ==============================================================================
+
+# Execute Laravel Scheduled Tasks every minute under www-data user
+* * * * * cd /var/www/aafiya/backend && php artisan schedule:run >> /var/log/cron-aafiya-scheduler.log 2>&1

@@ -1,0 +1,1 @@
+Do not stretch, rotate, distort, recolor outside the palette, alter the ع+A geometry, alter the diamond, change spacing, add effects, or create unofficial lockups.

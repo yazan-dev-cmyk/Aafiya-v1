@@ -1,0 +1,27 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+backend/.env*
+!backend/.env.example
+storage/backups/
+
+
+# Next.js build artifacts
+.next/
+# Local database / backup artifacts
+backend/database/*.sqlite
+backend/database/*.sqlite3
+backend/storage/backups/
+backend/storage/app/backups/
+
+
+# Local audit / temporary artifacts
+tsconfig.tsbuildinfo
+diag_tmp/
+scratch/
+legacy_archive/*.bak

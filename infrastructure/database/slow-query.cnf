@@ -1,0 +1,20 @@
+# ==============================================================================
+# AAFIYA PLATFORM — MYSQL PRODUCTION SLOW QUERY CONFIGURATION BLUEPRINT
+# Project: Aafiya — Unified National Digital Health Platform
+# Workstream: P20-O7 Telemetry, Logging & Observability
+# ==============================================================================
+
+[mysqld]
+# Enable Slow Query Log in Production
+slow_query_log = 1
+slow_query_log_file = /var/log/mysql/aafiya-slow.log
+
+# Threshold: 0.500000 seconds = 500 milliseconds
+long_query_time = 0.500000
+
+# Do not log administrative statements to prevent noise
+log_slow_admin_statements = 0
+
+# Limit logging rate for non-indexed queries to prevent disk exhaustion
+log_queries_not_using_indexes = 0
+min_examined_row_limit = 1000

@@ -1,0 +1,41 @@
+{
+  "name": "react-example",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@google/genai": "^2.4.0",
+    "@tailwindcss/postcss": "^4.0.0",
+    "bcryptjs": "^3.0.3",
+    "clsx": "^2.1.1",
+    "dotenv": "^17.4.2",
+    "jsqr": "^1.4.0",
+    "lucide-react": "0.454.0",
+    "motion": "^11.11.17",
+    "next": "15.1.0",
+    "next-intl": "^4.13.6",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "react-qr-code": "^2.2.0",
+    "tailwind-merge": "^3.6.0",
+    "uuid": "^14.0.1"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^3.0.0",
+    "@types/node": "^20.17.6",
+    "@types/react": "19.0.1",
+    "@types/react-dom": "19.0.1",
+    "@types/uuid": "^11.0.0",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "15.1.0",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.6.3"
+  }
+}

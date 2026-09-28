@@ -1,0 +1,12 @@
+name: aafiya_workspace
+description: AAFIYA Mobile Dart Pub Workspace root
+publish_to: none
+
+environment:
+  sdk: ^3.6.0
+
+workspace:
+  - packages/aafiya_core
+  - packages/aafiya_ui
+  - apps/aafiya_patient
+  - apps/aafiya_pro

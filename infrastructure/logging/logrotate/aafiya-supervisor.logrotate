@@ -1,0 +1,19 @@
+# ==============================================================================
+# AAFIYA PLATFORM — SUPERVISOR QUEUE WORKER LOG ROTATION BLUEPRINT
+# Project: Aafiya — Unified National Digital Health Platform
+# Workstream: P20-O7 Telemetry, Logging & Observability
+# ==============================================================================
+
+/var/log/supervisor/aafiya-*.log {
+    daily
+    missingok
+    rotate 14
+    compress
+    delaycompress
+    notifempty
+    create 0640 www-data adm
+    sharedscripts
+    postrotate
+        /usr/bin/supervisorctl update > /dev/null 2>&1 || true
+    endscript
+}

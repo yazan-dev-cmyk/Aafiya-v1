@@ -1,0 +1,136 @@
+@import "tailwindcss";
+@import url('https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css');
+
+@theme {
+  /* Colors */
+  --color-primary: #0077B6;
+  --color-primary-foreground: #FFFFFF;
+  --color-secondary: #48C774;
+  --color-secondary-foreground: #FFFFFF;
+  
+  --color-health-blue: #0077B6;
+  --color-healing-green: #48C774;
+  
+  /* Neutral scale */
+  --color-slate-50: #F8FAFC;
+  --color-slate-100: #F1F5F9;
+  --color-slate-200: #E2E8F0;
+  --color-slate-300: #CBD5E1;
+  --color-slate-400: #94A3B8;
+  --color-slate-500: #64748B;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1E293B;
+  --color-slate-900: #0F172A;
+  --color-slate-950: #020617;
+
+  /* Typography */
+  --font-amiri: var(--font-amiri);
+  --font-satisfy: var(--font-satisfy);
+  --font-sans: var(--font-amiri), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+
+  /* Radius */
+  --radius-sm: 0.25rem; /* 4px */
+  --radius-md: 0.5rem;  /* 8px */
+  --radius-lg: 0.75rem; /* 12px */
+  --radius-xl: 1rem;    /* 16px */
+  --radius-2xl: 1.5rem; /* 24px */
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+@utility font-amiri {
+  font-family: var(--font-amiri);
+}
+
+@utility font-katex {
+  font-family: 'KaTeX_Main', serif;
+}
+
+@utility font-satisfy {
+  font-family: var(--font-satisfy);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom Utilities */
+@utility glass-effect {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+@utility gradient-mesh {
+  background-color: #f8fafc;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(0, 119, 182, 0.08) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(72, 199, 116, 0.08) 0px, transparent 50%),
+    radial-gradient(at 50% 100%, rgba(15, 23, 42, 0.04) 0px, transparent 50%);
+}
+
+/* Print Styles */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  
+  /* Target the preview modal specifically if it's open */
+  .fixed.inset-0.z-50, 
+  .fixed.inset-0.z-50 * {
+    visibility: visible;
+  }
+  
+  .fixed.inset-0.z-50 {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: white !important;
+  }
+  
+  /* Hide UI buttons and non-printable elements in modal */
+  .print\:hidden,
+  button,
+  .border-t.bg-slate-50\/50,
+  .modal-header-actions {
+    display: none !important;
+  }
+
+  /* Ensure the main printable container is clean */
+  .p-6.space-y-6.flex-1 {
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+  }
+
+  /* Reset layout for print */
+  .max-w-lg {
+    max-width: none !important;
+    width: 100% !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+}

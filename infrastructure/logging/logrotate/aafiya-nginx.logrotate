@@ -1,0 +1,24 @@
+# ==============================================================================
+# AAFIYA PLATFORM — NGINX ACCESS & ERROR LOG ROTATION BLUEPRINT
+# Project: Aafiya — Unified National Digital Health Platform
+# Workstream: P20-O7 Telemetry, Logging & Observability
+# ==============================================================================
+
+/var/log/nginx/aafiya-*.log {
+    daily
+    missingok
+    rotate 14
+    compress
+    delaycompress
+    notifempty
+    create 0640 www-data adm
+    sharedscripts
+    prerotate
+        if [ -d /etc/logrotate.d/httpd-prerotate ]; then \
+            run-parts /etc/logrotate.d/httpd-prerotate; \
+        fi \
+    endscript
+    postrotate
+        [ -s /run/nginx.pid ] && kill -USR1 `cat /run/nginx.pid`
+    endscript
+}
