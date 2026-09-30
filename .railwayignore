@@ -1,0 +1,8 @@
+mobile/
+backend/
+.git/
+.next/
+node_modules/
+legacy_archive/
+scratch/
+diag_tmp/
