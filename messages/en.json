@@ -799,7 +799,26 @@
     "centers": {
       "title": "Booking Centers Management",
       "description": "Connecting call center staff and hospital booking centers with doctor clinics",
-      "activeCount": "There are currently {count} active booking centers linked to the system."
+      "activeCount": "There are currently {count} active booking centers linked to the system.",
+      "grantQuotaBtn": "Grant Quota",
+      "grantQuotaModalTitle": "Admin Direct Quota Grant",
+      "grantQuotaModalSubtitle": "Directly credit booking quota units to the center and record in ledger",
+      "grantQuotaTargetCenter": "Target Booking Center:",
+      "grantQuotaCurrentBalance": "Current Balance:",
+      "grantQuotaUnitsLabel": "Quota Units to Grant *",
+      "grantQuotaUnitsPlaceholder": "Enter positive integer (1, 2, 5...)",
+      "grantQuotaUnitsHelp": "Must be a positive integer of at least 1 unit",
+      "grantQuotaNoteLabel": "Reference Note / Reason (Optional)",
+      "grantQuotaNotePlaceholder": "e.g. Exceptional administrative grant, balance adjustment...",
+      "grantQuotaSummaryHeading": "Review Summary Before Confirmation:",
+      "grantQuotaGrantAmount": "Grant Amount:",
+      "grantQuotaBalanceAfter": "Expected Balance After Grant:",
+      "grantQuotaDisclaimer": "Notice: This transaction will be permanently recorded in the booking transactions ledger upon confirmation.",
+      "grantQuotaConfirmBtn": "Confirm & Grant Quota",
+      "grantQuotaSubmitting": "Recording grant in ledger...",
+      "grantQuotaCancel": "Cancel",
+      "grantQuotaSuccess": "Successfully granted {units} units! Authoritative balance: {balance} slots.",
+      "grantQuotaErrorInvalid": "Please enter a valid positive integer (1 or more)."
     },
     "labs": {
       "title": "Laboratories Network Management",

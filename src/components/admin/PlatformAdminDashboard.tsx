@@ -65,7 +65,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useRouter, usePathname } from '@/i18n/routing';
 import { useSearchParams } from 'next/navigation';
 import { adminService, AdminDoctorItem, AdminCenterItem, AdminBookingCenterItem, AdminPackageItem, AdminAuditLogItem, PlatformFinancialSummary, PlatformDashboardStats } from '@/services/adminService';
-import { PackagePurchaseRequestItem } from '@/services/bookingCenterService';
+import { bookingCenterService, PackagePurchaseRequestItem } from '@/services/bookingCenterService';
 import { authService, UserProfile } from '@/services/authService';
 
 interface PlatformAdminDashboardProps {
@@ -149,6 +149,14 @@ export function PlatformAdminDashboard({ onBackToMainPlatform, onOpenAssistantDa
   const [rejectionReasonInput, setRejectionReasonInput] = useState('');
   const [isSubmittingApproval, setIsSubmittingApproval] = useState(false);
   const [approvalAlert, setApprovalAlert] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Direct Quota Grant State (QUOTA-02)
+  const [grantModalCenter, setGrantModalCenter] = useState<AdminBookingCenterItem | null>(null);
+  const [grantUnitsInput, setGrantUnitsInput] = useState<string>('1');
+  const [grantReferenceNoteInput, setGrantReferenceNoteInput] = useState<string>('');
+  const [isSubmittingGrant, setIsSubmittingGrant] = useState<boolean>(false);
+  const [grantErrorFeedback, setGrantErrorFeedback] = useState<string | null>(null);
+  const [grantSuccessFeedback, setGrantSuccessFeedback] = useState<string | null>(null);
 
   // Authoritative Platform Overview Statistics (P20 Backend-Authoritative)
   const [dashboardStats, setDashboardStats] = useState<PlatformDashboardStats | null>(null);
@@ -437,6 +445,82 @@ export function PlatformAdminDashboard({ onBackToMainPlatform, onOpenAssistantDa
       if (res.data) setBookingCenters(res.data);
     } catch (err: any) {
       alert(err?.response?.data?.message || err?.message || (isRtl ? 'حدث خطأ أثناء رفض مركز الحجز.' : 'Failed to reject booking center.'));
+    }
+  };
+
+  // QUOTA-02: Permission check aligned with backend:
+  // $user->hasRole('admin') || ($user->hasRole('admin_assistant') && $user->has4DAccess('platform.approve_requests'))
+  const canGrantQuota = !!(
+    currentUser?.roles?.includes('admin') ||
+    (currentUser?.roles?.includes('admin_assistant') &&
+      (currentUser?.permissions?.includes('platform.approve_requests') ||
+        currentUser?.scoped_permissions?.includes('platform.approve_requests')))
+  );
+
+  const handleOpenGrantQuota = (center: AdminBookingCenterItem) => {
+    setGrantModalCenter(center);
+    setGrantUnitsInput('1');
+    setGrantReferenceNoteInput('');
+    setGrantErrorFeedback(null);
+  };
+
+  const handleCloseGrantQuota = () => {
+    if (isSubmittingGrant) return;
+    setGrantModalCenter(null);
+    setGrantUnitsInput('1');
+    setGrantReferenceNoteInput('');
+    setGrantErrorFeedback(null);
+  };
+
+  const handleConfirmGrant = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (isSubmittingGrant || !grantModalCenter) return;
+
+    const trimmedUnits = grantUnitsInput.trim();
+    const parsedUnits = parseInt(trimmedUnits, 10);
+
+    // Strict validation: positive integer >= 1, no decimals or extraneous characters
+    if (!trimmedUnits || !Number.isInteger(parsedUnits) || parsedUnits < 1 || trimmedUnits !== String(parsedUnits)) {
+      setGrantErrorFeedback(t('centers.grantQuotaErrorInvalid'));
+      return;
+    }
+
+    if (grantReferenceNoteInput.length > 255) {
+      setGrantErrorFeedback(isRtl ? 'الملاحظة يجب ألا تتجاوز 255 حرفاً.' : 'Reference note must not exceed 255 characters.');
+      return;
+    }
+
+    setIsSubmittingGrant(true);
+    setGrantErrorFeedback(null);
+
+    try {
+      const res = await bookingCenterService.grantQuota(
+        grantModalCenter.id,
+        parsedUnits,
+        grantReferenceNoteInput.trim() || undefined
+      );
+
+      const authoritativeBalance = res?.data?.quota_balance;
+      const successMessage = t('centers.grantQuotaSuccess', {
+        units: parsedUnits,
+        balance: authoritativeBalance !== undefined ? authoritativeBalance : (grantModalCenter.quota_balance + parsedUnits),
+      });
+
+      // Update local state and trigger authoritative fetch
+      setGrantSuccessFeedback(successMessage);
+      setGrantModalCenter(null);
+      await fetchBookingCenters(bookingCenterStatusFilter);
+      setTimeout(() => setGrantSuccessFeedback(null), 8000);
+    } catch (err: any) {
+      console.error('Grant quota error:', err);
+      const serverMessage =
+        err?.errors?.units?.[0] ||
+        err?.errors?.reference_note?.[0] ||
+        err?.message ||
+        (isRtl ? 'فشلت عملية منح الحصص. يرجى المحاولة مرة أخرى.' : 'Failed to grant quota. Please try again.');
+      setGrantErrorFeedback(serverMessage);
+    } finally {
+      setIsSubmittingGrant(false);
     }
   };
 
@@ -1138,6 +1222,22 @@ export function PlatformAdminDashboard({ onBackToMainPlatform, onOpenAssistantDa
                 ))}
               </div>
             </div>
+
+            {grantSuccessFeedback && (
+              <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-bold flex items-center justify-between gap-2 animate-in fade-in">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>{grantSuccessFeedback}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setGrantSuccessFeedback(null)}
+                  className="text-emerald-700 hover:text-emerald-900 cursor-pointer text-xs"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
             
             {bookingCenters.length === 0 ? (
               <div className="py-12 text-center text-slate-500 bg-slate-50 rounded-2xl border border-slate-100">
@@ -1197,24 +1297,38 @@ export function PlatformAdminDashboard({ onBackToMainPlatform, onOpenAssistantDa
                         {isRtl ? 'رصيد الحصص:' : 'Quota Balance:'} {center.quota_balance} {isRtl ? 'حجز' : 'slots'}
                       </p>
 
-                      {center.verification_status === 'pending' && (
-                        <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2">
+                        {canGrantQuota && (
                           <button
                             type="button"
-                            onClick={() => handleApproveBookingCenter(center)}
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3 py-1.5 rounded-lg cursor-pointer transition-colors shadow-xs"
+                            onClick={() => handleOpenGrantQuota(center)}
+                            className="bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs px-2.5 py-1.5 rounded-lg cursor-pointer transition-colors shadow-xs flex items-center gap-1.5"
+                            title={t('centers.grantQuotaBtn')}
                           >
-                            {isRtl ? 'اعتماد وتوثيق' : 'Approve'}
+                            <Zap className="w-3.5 h-3.5" />
+                            <span>{t('centers.grantQuotaBtn')}</span>
                           </button>
-                          <button
-                            type="button"
-                            onClick={() => handleRejectBookingCenter(center)}
-                            className="bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 font-bold text-xs px-3 py-1.5 rounded-lg cursor-pointer transition-colors"
-                          >
-                            {isRtl ? 'رفض الطلب' : 'Reject'}
-                          </button>
-                        </div>
-                      )}
+                        )}
+
+                        {center.verification_status === 'pending' && (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => handleApproveBookingCenter(center)}
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3 py-1.5 rounded-lg cursor-pointer transition-colors shadow-xs"
+                            >
+                              {isRtl ? 'اعتماد وتوثيق' : 'Approve'}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleRejectBookingCenter(center)}
+                              className="bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 font-bold text-xs px-3 py-1.5 rounded-lg cursor-pointer transition-colors"
+                            >
+                              {isRtl ? 'رفض الطلب' : 'Reject'}
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -2391,6 +2505,180 @@ export function PlatformAdminDashboard({ onBackToMainPlatform, onOpenAssistantDa
         onClose={() => setIsScannerOpen(false)}
         onScanSuccess={handleScanSuccess}
       />
+
+      {/* DIRECT QUOTA GRANT MODAL (QUOTA-02) */}
+      {grantModalCenter && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
+          <div
+            className="bg-white rounded-3xl max-w-lg w-full p-6 space-y-5 text-start shadow-2xl border border-slate-100"
+            dir={isRtl ? 'rtl' : 'ltr'}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center">
+                  <Zap className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-900 text-base">
+                    {t('centers.grantQuotaModalTitle')}
+                  </h3>
+                  <p className="text-[11px] text-slate-500">
+                    {t('centers.grantQuotaModalSubtitle')}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleCloseGrantQuota}
+                disabled={isSubmittingGrant}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Target Center Context Box */}
+            <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-3.5 space-y-1.5 text-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-slate-500 font-medium">{t('centers.grantQuotaTargetCenter')}</span>
+                <span className="font-bold text-slate-900">{grantModalCenter.name}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-slate-500 font-medium">{t('centers.grantQuotaCurrentBalance')}</span>
+                <span className="font-mono font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
+                  {grantModalCenter.quota_balance} {isRtl ? 'حجز' : 'slots'}
+                </span>
+              </div>
+            </div>
+
+            {/* Error Banner */}
+            {grantErrorFeedback && (
+              <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-medium flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+                <span>{grantErrorFeedback}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleConfirmGrant} className="space-y-4 text-xs">
+              {/* Units Input */}
+              <div className="space-y-1">
+                <label className="block text-slate-700 font-bold">
+                  {t('centers.grantQuotaUnitsLabel')}
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  step="1"
+                  required
+                  disabled={isSubmittingGrant}
+                  placeholder={t('centers.grantQuotaUnitsPlaceholder')}
+                  value={grantUnitsInput}
+                  onChange={(e) => {
+                    setGrantUnitsInput(e.target.value);
+                    if (grantErrorFeedback) setGrantErrorFeedback(null);
+                  }}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-900 font-mono text-sm font-bold focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white disabled:opacity-50"
+                />
+                <p className="text-[11px] text-slate-400">
+                  {t('centers.grantQuotaUnitsHelp')}
+                </p>
+              </div>
+
+              {/* Reference Note Input */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <label className="block text-slate-700 font-bold">
+                    {t('centers.grantQuotaNoteLabel')}
+                  </label>
+                  <span className="text-[10px] text-slate-400 font-mono">
+                    {grantReferenceNoteInput.length}/255
+                  </span>
+                </div>
+                <textarea
+                  rows={2}
+                  maxLength={255}
+                  disabled={isSubmittingGrant}
+                  placeholder={t('centers.grantQuotaNotePlaceholder')}
+                  value={grantReferenceNoteInput}
+                  onChange={(e) => setGrantReferenceNoteInput(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-teal-500 focus:bg-white disabled:opacity-50"
+                />
+              </div>
+
+              {/* Live Review Summary Box */}
+              {(() => {
+                const parsed = parseInt(grantUnitsInput, 10);
+                const isValid = Number.isInteger(parsed) && parsed >= 1 && grantUnitsInput.trim() === String(parsed);
+                const previewBalance = isValid ? grantModalCenter.quota_balance + parsed : null;
+
+                return (
+                  <div className="bg-teal-50/60 border border-teal-200 rounded-2xl p-3.5 space-y-2">
+                    <div className="font-bold text-teal-950 flex items-center gap-1.5 text-[11px]">
+                      <FileCheck className="w-3.5 h-3.5 text-teal-600" />
+                      <span>{t('centers.grantQuotaSummaryHeading')}</span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 text-[11px] pt-1 border-t border-teal-200/60">
+                      <div>
+                        <span className="text-teal-700">{t('centers.grantQuotaGrantAmount')} </span>
+                        <span className="font-mono font-bold text-teal-900">
+                          {isValid ? `+${parsed}` : '--'}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-teal-700">{t('centers.grantQuotaBalanceAfter')} </span>
+                        <span className="font-mono font-bold text-teal-900">
+                          {previewBalance !== null ? previewBalance : '--'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <p className="text-[10px] text-teal-800/80 leading-relaxed pt-1 border-t border-teal-200/40">
+                      {t('centers.grantQuotaDisclaimer')}
+                    </p>
+                  </div>
+                );
+              })()}
+
+              {/* Action Buttons */}
+              <div className="pt-2 flex items-center justify-between gap-3">
+                <button
+                  type="button"
+                  onClick={handleCloseGrantQuota}
+                  disabled={isSubmittingGrant}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  {t('centers.grantQuotaCancel')}
+                </button>
+                <button
+                  type="submit"
+                  disabled={
+                    isSubmittingGrant ||
+                    !grantUnitsInput.trim() ||
+                    !Number.isInteger(parseInt(grantUnitsInput, 10)) ||
+                    parseInt(grantUnitsInput, 10) < 1 ||
+                    grantUnitsInput.trim() !== String(parseInt(grantUnitsInput, 10))
+                  }
+                  className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-black transition-colors cursor-pointer shadow-md disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  {isSubmittingGrant ? (
+                    <>
+                      <Clock className="w-4 h-4 animate-spin" />
+                      <span>{t('centers.grantQuotaSubmitting')}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="w-4 h-4" />
+                      <span>{t('centers.grantQuotaConfirmBtn')}</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* PACKAGE ADD / EDIT MODAL */}
       {isPackageModalOpen && (

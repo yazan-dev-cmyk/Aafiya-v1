@@ -799,7 +799,26 @@
     "centers": {
       "title": "Gestion des Centres de Réservation",
       "description": "Connexion entre le personnel des centres et les cliniques",
-      "activeCount": "Il y a actuellement {count} centres de réservation actifs liés au système."
+      "activeCount": "Il y a actuellement {count} centres de réservation actifs liés au système.",
+      "grantQuotaBtn": "Accorder des quotas",
+      "grantQuotaModalTitle": "Attribution directe de quota administratif",
+      "grantQuotaModalSubtitle": "Créditer directement les quotas au centre et enregistrer l'opération dans le grand livre",
+      "grantQuotaTargetCenter": "Centre de réservation cible :",
+      "grantQuotaCurrentBalance": "Solde actuel :",
+      "grantQuotaUnitsLabel": "Unités de quota à accorder *",
+      "grantQuotaUnitsPlaceholder": "Entrez un entier positif (1, 2, 5...)",
+      "grantQuotaUnitsHelp": "Doit être un entier positif d'au moins 1 unité",
+      "grantQuotaNoteLabel": "Note de référence / Motif (Optionnel)",
+      "grantQuotaNotePlaceholder": "Ex : Attribution administrative exceptionnelle, régularisation...",
+      "grantQuotaSummaryHeading": "Récapitulatif avant confirmation :",
+      "grantQuotaGrantAmount": "Montant accordé :",
+      "grantQuotaBalanceAfter": "Solde attendu après attribution :",
+      "grantQuotaDisclaimer": "Avertissement : Cette opération sera définitivement enregistrée dans le grand livre des réservations après confirmation.",
+      "grantQuotaConfirmBtn": "Confirmer et accorder le quota",
+      "grantQuotaSubmitting": "Enregistrement dans le grand livre...",
+      "grantQuotaCancel": "Annuler",
+      "grantQuotaSuccess": "{units} unités accordées avec succès ! Nouveau solde vérifié : {balance} réservations.",
+      "grantQuotaErrorInvalid": "Veuillez saisir un entier positif valide (1 ou plus)."
     },
     "labs": {
       "title": "Gestion du Réseau de Laboratoires",

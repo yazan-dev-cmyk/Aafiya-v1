@@ -799,7 +799,26 @@
     "centers": {
       "title": "إدارة مراكز الحجز والاتصال (Booking Centers)",
       "description": "ربط موظفي الكول سنتر ومراكز الحجز التابعة للمستشفيات مع عيادات الأطباء",
-      "activeCount": "يوجد حالياً {count} مركز حجز نشط مرتبط بالنظام."
+      "activeCount": "يوجد حالياً {count} مركز حجز نشط مرتبط بالنظام.",
+      "grantQuotaBtn": "منح حصص إضافية",
+      "grantQuotaModalTitle": "منح رصيد حجز إداري مباشر",
+      "grantQuotaModalSubtitle": "إضافة حصص حجز مباشرة لمركز الحجز وتوثيق العملية في دفتر الأستاذ",
+      "grantQuotaTargetCenter": "مركز الحجز المستهدف:",
+      "grantQuotaCurrentBalance": "الرصيد الحالي:",
+      "grantQuotaUnitsLabel": "عدد الحصص المطلوب منحها *",
+      "grantQuotaUnitsPlaceholder": "أدخل عدداً صحيحاً (1، 2، 5...)",
+      "grantQuotaUnitsHelp": "يجب أن يكون رقماً صحيحاً لا يقل عن 1 وحدة",
+      "grantQuotaNoteLabel": "ملاحظة / سبب المنح (اختياري)",
+      "grantQuotaNotePlaceholder": "مثال: منحة إدارية استثنائية، تسوية رصيد...",
+      "grantQuotaSummaryHeading": "مراجعة ملخص العملية قبل التأكيد:",
+      "grantQuotaGrantAmount": "مقدار الإضافة:",
+      "grantQuotaBalanceAfter": "الرصيد المتوقع بعد المنح:",
+      "grantQuotaDisclaimer": "تنبيه: سيتم تسجيل هذه العملية كحركة شراء إدارية رسمية في دفتر أستاذ الحصص فور التأكيد.",
+      "grantQuotaConfirmBtn": "تأكيد ومنح الرصيد",
+      "grantQuotaSubmitting": "جاري تسجيل المنحة في دفتر الأستاذ...",
+      "grantQuotaCancel": "إلغاء",
+      "grantQuotaSuccess": "تم منح {units} حصة بنجاح! الرصيد المعتمد الجديد: {balance} حجز.",
+      "grantQuotaErrorInvalid": "يرجى إدخال عدد صحيح موجب (1 أو أكثر)."
     },
     "labs": {
       "title": "إدارة شبكة المختبرات (Laboratories)",
