@@ -82,18 +82,11 @@ class WilayaCommuneMasterDataSeeder extends Seeder
      */
     protected function resolvePath(string $filename): string
     {
-        $candidatePaths = [
-            base_path("../docs/aafiya_v1/master_data/wilaya_commune/{$filename}"),
-            base_path("docs/aafiya_v1/master_data/wilaya_commune/{$filename}"),
-            "/home/yazan/Downloads/Medi/mediservices/docs/aafiya_v1/master_data/wilaya_commune/{$filename}",
-        ];
-
-        foreach ($candidatePaths as $path) {
-            if (file_exists($path)) {
-                return $path;
-            }
+        $path = database_path("seeders/data/{$filename}");
+        if (file_exists($path)) {
+            return $path;
         }
 
-        return $candidatePaths[0];
+        return $path;
     }
 }
