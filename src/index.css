@@ -6,10 +6,14 @@
   --color-primary: #0077B6;
   --color-primary-foreground: #FFFFFF;
   --color-secondary: #48C774;
-  --color-secondary-foreground: #FFFFFF;
+  --color-secondary-foreground: #0F172A;
   
   --color-health-blue: #0077B6;
   --color-healing-green: #48C774;
+  --color-healing-green-surface: #E8F8EE;
+  --color-on-healing-green: #0F172A;
+  --color-action-green: #15803D;
+  --color-link-blue: #005F92;
   
   /* Neutral scale */
   --color-slate-50: #F8FAFC;
@@ -25,9 +29,11 @@
   --color-slate-950: #020617;
 
   /* Typography */
+  --font-ibm-plex-arabic: var(--font-ibm-plex-arabic);
+  --font-plus-jakarta: var(--font-plus-jakarta);
   --font-amiri: var(--font-amiri);
   --font-satisfy: var(--font-satisfy);
-  --font-sans: var(--font-amiri), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --font-sans: var(--font-ibm-plex-arabic), var(--font-plus-jakarta), var(--font-amiri), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
 
   /* Radius */
   --radius-sm: 0.25rem; /* 4px */
@@ -41,6 +47,14 @@
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+@utility font-ibm-plex {
+  font-family: var(--font-ibm-plex-arabic);
+}
+
+@utility font-jakarta {
+  font-family: var(--font-plus-jakarta);
 }
 
 @utility font-amiri {

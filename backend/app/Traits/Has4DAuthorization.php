@@ -133,6 +133,7 @@ trait Has4DAuthorization
                 'platform.edit_users',
                 'platform.suspend_users',
                 'platform.delete_users',
+                'platform.manage_master_data',
             ];
 
             return in_array($permission, $allowedDelegations, true);

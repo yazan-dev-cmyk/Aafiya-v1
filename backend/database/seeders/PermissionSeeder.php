@@ -320,6 +320,12 @@ class PermissionSeeder extends Seeder
                 'category' => 'platform',
                 'description' => 'Soft-delete non-compliant or terminated accounts.',
             ],
+            [
+                'name' => 'platform.manage_master_data',
+                'display_name' => 'Manage Master Data',
+                'category' => 'platform',
+                'description' => 'Create, edit, activate, and deactivate Medical Specialties and Wilayas.',
+            ],
         ];
 
         foreach ($permissions as $permissionData) {

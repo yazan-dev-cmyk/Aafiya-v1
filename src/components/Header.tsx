@@ -94,7 +94,7 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Logo */}
           <a href="#hero" className="flex items-center gap-2.5 sm:gap-3 group shrink-0">
             <img 
-              src="/logo/Aafiya_Master_Logo.svg" 
+              src="/logo/Aafiya_Logo_No_Tagline.png" 
               alt="Aafiya" 
               className="h-10 sm:h-11 md:h-12 w-auto object-contain group-hover:scale-105 transition-transform" 
             />

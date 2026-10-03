@@ -237,48 +237,7 @@ class _DoctorDashboardViewState extends State<DoctorDashboardView> {
 
                   // 2. Operational KPI Statistics Cards
                   if (_stats != null) ...[
-                    Row(
-                      children: [
-                        DoctorMetricCard(
-                          label: strings.todayTotalLabel,
-                          count: _stats!.todayTotal,
-                          icon: Icons.calendar_today_rounded,
-                          color: AafiyaColors.healthBlue,
-                        ),
-                        const SizedBox(width: AafiyaSpacing.sm),
-                        DoctorMetricCard(
-                          label: strings.inWaitingRoomLabel,
-                          count: _stats!.inWaitingRoom,
-                          icon: Icons.meeting_room_rounded,
-                          color: AafiyaColors.healingGreen,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AafiyaSpacing.sm),
-                    Row(
-                      children: [
-                        DoctorMetricCard(
-                          label: strings.pendingCheckInLabel,
-                          count: _stats!.pendingCheckIn,
-                          icon: Icons.schedule_rounded,
-                          color: AafiyaColors.warning,
-                        ),
-                        const SizedBox(width: AafiyaSpacing.sm),
-                        DoctorMetricCard(
-                          label: strings.completedTodayLabel,
-                          count: _stats!.completedToday,
-                          icon: Icons.check_circle_outline_rounded,
-                          color: AafiyaColors.success,
-                        ),
-                        const SizedBox(width: AafiyaSpacing.sm),
-                        DoctorMetricCard(
-                          label: strings.noShowTodayLabel,
-                          count: _stats!.noShowToday,
-                          icon: Icons.person_off_outlined,
-                          color: AafiyaColors.error,
-                        ),
-                      ],
-                    ),
+                    _buildKpiCards(context, strings, _stats!),
                     const SizedBox(height: AafiyaSpacing.lg),
                   ],
 
@@ -368,6 +327,123 @@ class _DoctorDashboardViewState extends State<DoctorDashboardView> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildKpiCards(
+    BuildContext context,
+    LocalizedStrings strings,
+    DoctorStats stats,
+  ) {
+    final totalCard = DoctorMetricCard(
+      label: strings.todayTotalLabel,
+      count: stats.todayTotal,
+      icon: Icons.calendar_today_rounded,
+      color: AafiyaColors.healthBlue,
+    );
+    final waitingCard = DoctorMetricCard(
+      label: strings.inWaitingRoomLabel,
+      count: stats.inWaitingRoom,
+      icon: Icons.meeting_room_rounded,
+      color: AafiyaColors.healingGreen,
+    );
+    final pendingCard = DoctorMetricCard(
+      label: strings.pendingCheckInLabel,
+      count: stats.pendingCheckIn,
+      icon: Icons.schedule_rounded,
+      color: AafiyaColors.warning,
+    );
+    final completedCard = DoctorMetricCard(
+      label: strings.completedTodayLabel,
+      count: stats.completedToday,
+      icon: Icons.check_circle_outline_rounded,
+      color: AafiyaColors.success,
+    );
+    final noShowCard = DoctorMetricCard(
+      label: strings.noShowTodayLabel,
+      count: stats.noShowToday,
+      icon: Icons.person_off_outlined,
+      color: AafiyaColors.error,
+    );
+
+    return AafiyaResponsiveBuilder(
+      builder: (context, screenType) {
+        if (screenType == AafiyaScreenType.compact) {
+          // Compact (< 400dp, e.g. 360dp, 375dp, 390dp): 2 + 2 + 1 adaptive layout
+          // Prevents cramped 3-card horizontal packing and label truncation
+          return Column(
+            key: const Key('compact_kpi_layout'),
+            children: [
+              Row(
+                key: const Key('compact_kpi_row_0'),
+                children: [
+                  totalCard,
+                  const SizedBox(width: AafiyaSpacing.sm),
+                  waitingCard,
+                ],
+              ),
+              const SizedBox(height: AafiyaSpacing.sm),
+              Row(
+                key: const Key('compact_kpi_row_1'),
+                children: [
+                  pendingCard,
+                  const SizedBox(width: AafiyaSpacing.sm),
+                  completedCard,
+                ],
+              ),
+              const SizedBox(height: AafiyaSpacing.sm),
+              Row(
+                key: const Key('compact_kpi_row_2'),
+                children: [
+                  noShowCard,
+                ],
+              ),
+            ],
+          );
+        } else if (screenType == AafiyaScreenType.expanded) {
+          // Expanded (>= 600dp): single row of 5 metric cards across tablets/desktops
+          return Row(
+            key: const Key('expanded_kpi_layout'),
+            children: [
+              totalCard,
+              const SizedBox(width: AafiyaSpacing.sm),
+              waitingCard,
+              const SizedBox(width: AafiyaSpacing.sm),
+              pendingCard,
+              const SizedBox(width: AafiyaSpacing.sm),
+              completedCard,
+              const SizedBox(width: AafiyaSpacing.sm),
+              noShowCard,
+            ],
+          );
+        } else {
+          // Medium (400dp - 599dp): standard 2 + 3 row layout
+          return Column(
+            key: const Key('medium_kpi_layout'),
+            children: [
+              Row(
+                key: const Key('medium_kpi_row_0'),
+                children: [
+                  totalCard,
+                  const SizedBox(width: AafiyaSpacing.sm),
+                  waitingCard,
+                ],
+              ),
+              const SizedBox(height: AafiyaSpacing.sm),
+              Row(
+                key: const Key('medium_kpi_row_1'),
+                children: [
+                  pendingCard,
+                  const SizedBox(width: AafiyaSpacing.sm),
+                  completedCard,
+                  const SizedBox(width: AafiyaSpacing.sm),
+                  noShowCard,
+                ],
+              ),
+            ],
+          );
+        }
+      },
     );
   }
 

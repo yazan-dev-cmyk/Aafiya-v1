@@ -25,7 +25,13 @@ class OnboardDoctorRequest extends FormRequest
         $existingDoctorId = $this->user()?->doctor?->id;
 
         return [
-            'specialty' => ['required', 'string', 'max:255'],
+            'specialty_id' => [
+                'required_without:specialty',
+                'nullable',
+                'integer',
+                Rule::exists('medical_specialties', 'id')->where('is_active', true),
+            ],
+            'specialty' => ['required_without:specialty_id', 'nullable', 'string', 'max:255'],
             'license_number' => [
                 'required',
                 'string',

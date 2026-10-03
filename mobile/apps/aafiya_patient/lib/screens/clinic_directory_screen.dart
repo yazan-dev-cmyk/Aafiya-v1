@@ -13,15 +13,24 @@ class ClinicDirectoryScreen extends StatefulWidget {
   const ClinicDirectoryScreen({
     super.key,
     required this.apiClient,
+    this.masterDataService,
   });
 
   final ApiClient apiClient;
+  final MasterDataService? masterDataService;
 
   /// Helper route to present this screen.
-  static Future<void> show(BuildContext context, {required ApiClient apiClient}) {
+  static Future<void> show(
+    BuildContext context, {
+    required ApiClient apiClient,
+    MasterDataService? masterDataService,
+  }) {
     return Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => ClinicDirectoryScreen(apiClient: apiClient),
+        builder: (_) => ClinicDirectoryScreen(
+          apiClient: apiClient,
+          masterDataService: masterDataService,
+        ),
       ),
     );
   }
@@ -31,6 +40,7 @@ class ClinicDirectoryScreen extends StatefulWidget {
 }
 
 class _ClinicDirectoryScreenState extends State<ClinicDirectoryScreen> {
+  late final MasterDataService _masterDataService;
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounceTimer;
@@ -47,19 +57,10 @@ class _ClinicDirectoryScreenState extends State<ClinicDirectoryScreen> {
   String _searchQuery = '';
   String? _selectedWilaya;
 
-  static const List<String> _wilayas = [
-    'الجزائر',
-    'البليدة',
-    'وهران',
-    'قسنطينة',
-    'سطيف',
-    'عنابة',
-    'تلمسان',
-  ];
-
   @override
   void initState() {
     super.initState();
+    _masterDataService = widget.masterDataService ?? MasterDataService(widget.apiClient);
     _scrollController.addListener(_onScroll);
     _fetchClinics(page: 1, reset: true);
   }
@@ -260,30 +261,12 @@ class _ClinicDirectoryScreenState extends State<ClinicDirectoryScreen> {
           ),
           const SizedBox(height: 8),
 
-          // Horizontal Wilaya Filter Chips
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                FilterChip(
-                  label: Text(strings.allWilayas),
-                  selected: _selectedWilaya == null,
-                  onSelected: (selected) {
-                    if (selected) _onWilayaSelected(null);
-                  },
-                ),
-                for (final wilaya in _wilayas) ...[
-                  const SizedBox(width: 8),
-                  FilterChip(
-                    label: Text(wilaya),
-                    selected: _selectedWilaya == wilaya,
-                    onSelected: (selected) {
-                      _onWilayaSelected(selected ? wilaya : null);
-                    },
-                  ),
-                ],
-              ],
-            ),
+          // Horizontal Dynamic Wilaya Filter Chips
+          AafiyaWilayaFilterChips(
+            masterDataService: _masterDataService,
+            selectedWilaya: _selectedWilaya,
+            useArabicNamesForQuery: true,
+            onWilayaSelected: _onWilayaSelected,
           ),
         ],
       ),

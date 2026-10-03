@@ -62,7 +62,7 @@ class PrescriptionDetailScreen extends StatelessWidget {
 
     final qrData = prescription.qrVerificationUrl.isNotEmpty
         ? prescription.qrVerificationUrl
-        : 'https://api.aafiya.dz/v/${prescription.secureToken}';
+        : 'https://api.aafiya.site/v/${prescription.secureToken}';
 
     return Scaffold(
       appBar: AafiyaAppBar(
@@ -203,7 +203,7 @@ class PrescriptionDetailScreen extends StatelessWidget {
                 padding: AafiyaSpacing.insetAllMd,
                 child: Center(
                   child: Text(
-                    strings.noDoctorsFound,
+                    strings.noPrescriptionItems,
                     style: AafiyaTypography.bodyMedium,
                   ),
                 ),

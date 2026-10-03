@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { 
   Search, 
@@ -20,6 +20,8 @@ import { Card } from './ui/Card';
 import { Badge } from './ui/Badge';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
+import { WilayaSelect, SpecialtySelect } from './master-data';
+import { masterDataService, MedicalSpecialty } from '../services/masterDataService';
 
 export interface HealthcareProvider {
   id: string;
@@ -27,7 +29,9 @@ export interface HealthcareProvider {
   role: RoleType;
   roleTitle: string;
   specialty: string;
+  specialty_id?: number;
   city: string;
+  wilaya_code?: string;
   address: string;
   mapsUrl: string;
   phone: string;
@@ -46,7 +50,9 @@ export const PROVIDERS_DATA: HealthcareProvider[] = [
     role: 'doctor',
     roleTitle: 'طبيب استشاري',
     specialty: 'أمراض القلب والشرايين والقسطرة العلاجية',
+    specialty_id: 2,
     city: 'الجزائر العاصمة',
+    wilaya_code: '16',
     address: 'شارع ديدوش مراد، بناية 42، الطابق 3، الجزائر العاصمة',
     mapsUrl: 'https://maps.google.com/?q=36.7753,3.0601',
     phone: '+213 21 63 45 10',
@@ -63,7 +69,9 @@ export const PROVIDERS_DATA: HealthcareProvider[] = [
     role: 'doctor',
     roleTitle: 'طبيبة أخصائية',
     specialty: 'أمراض الباطنية والجهاز الهضمي والمنظار',
+    specialty_id: 11,
     city: 'وهران',
+    wilaya_code: '31',
     address: 'حي العقيد لطفي، المجمع الطبي الشفاء، وهران',
     mapsUrl: 'https://maps.google.com/?q=35.6971,-0.6308',
     phone: '+213 41 53 12 90',
@@ -81,6 +89,7 @@ export const PROVIDERS_DATA: HealthcareProvider[] = [
     roleTitle: 'مركز حجز معتمد',
     specialty: 'تنسيق وحجز المواعيد الطبية لجميع التخصصات',
     city: 'الجزائر العاصمة',
+    wilaya_code: '16',
     address: 'حي باب الزوار، مقابل محطة الترامواي، الجزائر العاصمة',
     mapsUrl: 'https://maps.google.com/?q=36.7167,3.1833',
     phone: '+213 23 83 20 00',
@@ -98,6 +107,7 @@ export const PROVIDERS_DATA: HealthcareProvider[] = [
     roleTitle: 'مخبر تحاليل طبية',
     specialty: 'تحاليل الدم، البيوكيمياء، والهرمونات والجينات',
     city: 'قسنطينة',
+    wilaya_code: '25',
     address: 'حي سيدي مبروك، شارع الاستقلال، قسنطينة',
     mapsUrl: 'https://maps.google.com/?q=36.3650,6.6147',
     phone: '+213 31 92 40 11',
@@ -115,6 +125,7 @@ export const PROVIDERS_DATA: HealthcareProvider[] = [
     roleTitle: 'مركز تصوير وإشعاع',
     specialty: 'أشعة سكانر (CT)، رنين مغناطيسي (MRI)، وإيكوغرافيا',
     city: 'البليدة',
+    wilaya_code: '09',
     address: 'شارع أول نوفمبر، مقابل المستشفى الجامعي، البليدة',
     mapsUrl: 'https://maps.google.com/?q=36.4700,2.8300',
     phone: '+213 25 39 88 77',
@@ -131,7 +142,9 @@ export const PROVIDERS_DATA: HealthcareProvider[] = [
     role: 'doctor',
     roleTitle: 'طبيب أخصائي',
     specialty: 'جراحة العظام والمفاصل والإصابات الرياضية',
+    specialty_id: 9,
     city: 'سطيف',
+    wilaya_code: '19',
     address: 'شارع 8 ماي 1945، مجمع الأطباء، سطيف',
     mapsUrl: 'https://maps.google.com/?q=36.1900,5.4100',
     phone: '+213 36 84 10 20',
@@ -149,6 +162,7 @@ export const PROVIDERS_DATA: HealthcareProvider[] = [
     roleTitle: 'مركز حجز معتمد',
     specialty: 'استقبال وحجز المواعيد للمواطنين والزوار',
     city: 'عنابة',
+    wilaya_code: '23',
     address: 'حي الكورنيش، مقابل مقر الولاية القديم، عنابة',
     mapsUrl: 'https://maps.google.com/?q=36.9000,7.7667',
     phone: '+213 38 45 90 00',
@@ -165,7 +179,9 @@ export const PROVIDERS_DATA: HealthcareProvider[] = [
     role: 'doctor',
     roleTitle: 'طبيبة استشارية',
     specialty: 'طب الأطفال والحديثي الولادة والنمو',
+    specialty_id: 3,
     city: 'تلمسان',
+    wilaya_code: '13',
     address: 'شارع امبارك الميلي، حومة الجامع، تلمسان',
     mapsUrl: 'https://maps.google.com/?q=34.8828,-1.3167',
     phone: '+213 43 27 60 50',
@@ -187,9 +203,36 @@ export const DoctorSearchSection: React.FC<DoctorSearchSectionProps> = ({ onOpen
   const locale = useLocale();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRoleCategory, setSelectedRoleCategory] = useState<string>('all');
-  const [selectedCity, setSelectedCity] = useState<string>('all');
+  const [selectedWilaya, setSelectedWilaya] = useState<string>('all');
+  const [selectedSpecialty, setSelectedSpecialty] = useState<string>('all');
+  const [specialtiesMap, setSpecialtiesMap] = useState<Record<number, MedicalSpecialty>>({});
 
-  const cityKeys = ['all', 'algiers', 'oran', 'constantine', 'annaba', 'blida', 'setif', 'tlemcen'];
+  useEffect(() => {
+    let isMounted = true;
+    masterDataService.getSpecialties().then((specs) => {
+      if (!isMounted) return;
+      const map: Record<number, MedicalSpecialty> = {};
+      specs.forEach((s) => {
+        map[s.id] = s;
+      });
+      setSpecialtiesMap(map);
+    }).catch((err) => {
+      console.warn('Failed to preload master specialties for physician card localization:', err);
+    });
+    return () => { isMounted = false; };
+  }, []);
+
+  const getProviderSpecialty = (provider: HealthcareProvider): string => {
+    if (provider.specialty_id && specialtiesMap[provider.specialty_id]) {
+      const spec = specialtiesMap[provider.specialty_id];
+      if (locale === 'ar') return spec.name_ar;
+      if (locale === 'fr') return spec.name_fr;
+      if (locale === 'en') return spec.name_en;
+      return spec.name_en || spec.name_fr || spec.name_ar;
+    }
+    // Fallback for non-physician providers (e.g. booking centers, labs) that lack a doctor specialty_id
+    return t(`providers.${provider.id}.specialty`);
+  };
 
   const categoryTabs = [
     { id: 'all', label: t('tabs.all'), icon: Search },
@@ -201,17 +244,15 @@ export const DoctorSearchSection: React.FC<DoctorSearchSectionProps> = ({ onOpen
 
   const filteredProviders = PROVIDERS_DATA.filter((provider) => {
     const matchesRole = selectedRoleCategory === 'all' || provider.role === selectedRoleCategory;
-    
-    // City match is trickier because we use keys now. 
-    // PROVIDERS_DATA city is still Arabic/Hardcoded. 
-    // I should match by provider.city (hardcoded) against t(`cities.${cityKey}`)
-    const matchesCity = selectedCity === 'all' || provider.city === t(`cities.${selectedCity}`);
+    const matchesCity = selectedWilaya === 'all' || provider.wilaya_code === selectedWilaya;
+    const matchesSpecialty = selectedSpecialty === 'all' || 
+      (provider.specialty_id !== undefined && String(provider.specialty_id) === selectedSpecialty);
 
     const query = searchTerm.trim().toLowerCase();
     
-    // For search, we should ideally search translated content
+    // For search, match translated content as well as canonical specialty name
     const pName = t(`providers.${provider.id}.name`).toLowerCase();
-    const pSpec = t(`providers.${provider.id}.specialty`).toLowerCase();
+    const pSpec = getProviderSpecialty(provider).toLowerCase();
     const pAddr = t(`providers.${provider.id}.address`).toLowerCase();
     const pCity = t(`providers.${provider.id}.city`).toLowerCase();
     
@@ -223,7 +264,7 @@ export const DoctorSearchSection: React.FC<DoctorSearchSectionProps> = ({ onOpen
       pCity.includes(query) ||
       provider.tags.some((_, i) => t(`providers.${provider.id}.tags.${i}`).toLowerCase().includes(query));
 
-    return matchesRole && matchesCity && matchesQuery;
+    return matchesRole && matchesCity && matchesSpecialty && matchesQuery;
   });
 
   return (
@@ -246,7 +287,7 @@ export const DoctorSearchSection: React.FC<DoctorSearchSectionProps> = ({ onOpen
           <Card variant="elevated" padding="md" className="border-transparent shadow-2xl shadow-slate-900/5">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
               
-              <div className="lg:col-span-7 relative group">
+              <div className="lg:col-span-4 relative group">
                 <div className="absolute inset-y-0 start-0 ps-5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary transition-colors">
                   <Search className="w-5 h-5" />
                 </div>
@@ -260,19 +301,25 @@ export const DoctorSearchSection: React.FC<DoctorSearchSectionProps> = ({ onOpen
               </div>
 
               <div className="lg:col-span-3 relative">
-                <div className="absolute inset-y-0 start-0 ps-5 flex items-center pointer-events-none text-primary">
-                  <MapPin className="w-5 h-5" />
-                </div>
-                <select
-                  value={selectedCity}
-                  onChange={(e) => setSelectedCity(e.target.value)}
-                  className="w-full ps-14 pe-6 py-4 bg-slate-50 border-2 border-transparent rounded-[24px] text-slate-900 font-bold focus:outline-none focus:border-primary/20 focus:bg-white text-sm transition-all cursor-pointer appearance-none"
-                >
-                  <option value="all">{t('all_provinces')}</option>
-                  {cityKeys.filter(c => c !== 'all').map(cityKey => (
-                    <option key={cityKey} value={cityKey}>{t(`cities.${cityKey}`)}</option>
-                  ))}
-                </select>
+                <SpecialtySelect
+                  value={selectedSpecialty}
+                  onChange={(id) => setSelectedSpecialty(id)}
+                  includeAllOption={true}
+                  allOptionLabel={t('all_specialties')}
+                  icon={<Stethoscope className="w-5 h-5 text-primary" />}
+                  className="ps-14 pe-6 py-4 h-[58px] bg-slate-50 border-2 border-transparent rounded-[24px] text-slate-900 font-bold focus:outline-none focus:border-primary/20 focus:bg-white text-sm transition-all cursor-pointer appearance-none"
+                />
+              </div>
+
+              <div className="lg:col-span-3 relative">
+                <WilayaSelect
+                  value={selectedWilaya}
+                  onChange={(code) => setSelectedWilaya(code)}
+                  includeAllOption={true}
+                  allOptionLabel={t('all_provinces')}
+                  icon={<MapPin className="w-5 h-5 text-primary" />}
+                  className="ps-14 pe-6 py-4 h-[58px] bg-slate-50 border-2 border-transparent rounded-[24px] text-slate-900 font-bold focus:outline-none focus:border-primary/20 focus:bg-white text-sm transition-all cursor-pointer appearance-none"
+                />
               </div>
 
               <div className="lg:col-span-2">
@@ -310,8 +357,8 @@ export const DoctorSearchSection: React.FC<DoctorSearchSectionProps> = ({ onOpen
           <Badge variant="neutral" className="px-4 py-2 bg-white border-slate-100 font-black">
             {t('results_found', { count: filteredProviders.length })}
           </Badge>
-          {(searchTerm || selectedRoleCategory !== 'all' || selectedCity !== 'all') && (
-            <Button variant="ghost" size="sm" onClick={() => { setSearchTerm(''); setSelectedRoleCategory('all'); setSelectedCity('all'); }} className="text-primary hover:bg-primary/5 font-black">
+          {(searchTerm || selectedRoleCategory !== 'all' || selectedWilaya !== 'all' || selectedSpecialty !== 'all') && (
+            <Button variant="ghost" size="sm" onClick={() => { setSearchTerm(''); setSelectedRoleCategory('all'); setSelectedWilaya('all'); setSelectedSpecialty('all'); }} className="text-primary hover:bg-primary/5 font-black">
               {t('clear_filters')}
             </Button>
           )}
@@ -358,7 +405,7 @@ export const DoctorSearchSection: React.FC<DoctorSearchSectionProps> = ({ onOpen
                       <div className="space-y-4 flex-1 text-start">
                         <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100/80">
                           <div className="text-[10px] font-black text-slate-400 uppercase mb-1">{t('specialty_label')}</div>
-                          <div className="text-xs font-bold text-slate-700 line-clamp-2">{t(`providers.${provider.id}.specialty`)}</div>
+                          <div className="text-xs font-bold text-slate-700 line-clamp-2">{getProviderSpecialty(provider)}</div>
                         </div>
 
                         <div className="space-y-2">
@@ -415,7 +462,7 @@ export const DoctorSearchSection: React.FC<DoctorSearchSectionProps> = ({ onOpen
               </div>
               <h3 className="text-2xl font-black text-slate-900 mb-2">{t('no_results_title')}</h3>
               <p className="text-slate-500 font-bold mb-8 max-w-md mx-auto">{t('no_results_desc')}</p>
-              <Button onClick={() => { setSearchTerm(''); setSelectedRoleCategory('all'); setSelectedCity('all'); }}>{t('view_all')}</Button>
+              <Button onClick={() => { setSearchTerm(''); setSelectedRoleCategory('all'); setSelectedWilaya('all'); }}>{t('view_all')}</Button>
             </motion.div>
           )}
         </AnimatePresence>

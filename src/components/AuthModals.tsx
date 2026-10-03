@@ -31,6 +31,7 @@ import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
 
 import { useAuth } from '../auth/AuthProvider';
+import { WilayaSelect, CommuneSelect, SpecialtySelect } from './master-data';
 
 const getDashboardPathForRole = (role: string, loc: string): string => {
   switch (role) {
@@ -103,11 +104,13 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
   
   // Specific Fields
   const [specialty, setSpecialty] = useState('');
+  const [specialtyId, setSpecialtyId] = useState('');
   const [licenseNumber, setLicenseNumber] = useState('');
   const [facilityName, setFacilityName] = useState('');
   const [directorName, setDirectorName] = useState('');
   const [address, setAddress] = useState('');
   const [wilaya, setWilaya] = useState('');
+  const [commune, setCommune] = useState('');
   const [mapsLink, setMapsLink] = useState('');
   const [commercialRegister, setCommercialRegister] = useState('');
 
@@ -122,11 +125,13 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
     setName('');
     setPhone('');
     setSpecialty('');
+    setSpecialtyId('');
     setLicenseNumber('');
     setFacilityName('');
     setDirectorName('');
     setAddress('');
     setWilaya('');
+    setCommune('');
     setMapsLink('');
     setCommercialRegister('');
   };
@@ -171,12 +176,14 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
           password,
           password_confirmation: password,
           role: selectedRole,
-          specialty: specialty || (selectedRole === 'doctor' ? 'طب عام (General Medicine)' : undefined),
+          specialty_id: selectedRole === 'doctor' && specialtyId ? parseInt(specialtyId, 10) : undefined,
+          specialty: specialty || undefined,
           license_number: licenseNumber || (selectedRole === 'doctor' ? `DZ-ALG-2026-DOC-001` : undefined),
           clinic_name: facilityName || (selectedRole === 'doctor' ? `عيادة ${name}` : undefined),
           commercial_register: commercialRegister || undefined,
           manager_name: directorName || undefined,
-          wilaya: wilaya || 'الجزائر العاصمة',
+          wilaya: wilaya || '16',
+          commune: commune || undefined,
           address: address || 'الجزائر',
         });
         const userRoles = response?.user?.roles || [];
@@ -319,11 +326,18 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
                         onChange={(e) => setFacilityName(e.target.value)}
                         placeholder={t('placeholderClinic')}
                       />
-                      <Input
+                      <SpecialtySelect
                         label={t('specialty')}
                         required
-                        value={specialty}
-                        onChange={(e) => setSpecialty(e.target.value)}
+                        value={specialtyId}
+                        onChange={(idStr, selectedSpec) => {
+                          setSpecialtyId(idStr);
+                          if (selectedSpec) {
+                            setSpecialty(selectedSpec.name_ar);
+                          } else {
+                            setSpecialty('');
+                          }
+                        }}
                         placeholder={t('placeholderSpecialty')}
                       />
                       <Input
@@ -384,13 +398,22 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
                     placeholder="+213 --- -- -- --"
                   />
                   
-                  <Input
+                  <WilayaSelect
                     label={t('wilaya')}
                     required
                     value={wilaya}
-                    onChange={(e) => setWilaya(e.target.value)}
-                    icon={<MapPin className="w-5 h-5" />}
+                    onChange={(code) => {
+                      setWilaya(code);
+                      setCommune('');
+                    }}
                     placeholder={t('placeholderWilaya')}
+                  />
+
+                  <CommuneSelect
+                    label={t('commune')}
+                    wilayaCode={wilaya}
+                    value={commune}
+                    onChange={setCommune}
                   />
 
                   {selectedRole !== 'patient_registered' && (

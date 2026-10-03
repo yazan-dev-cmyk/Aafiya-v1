@@ -5,13 +5,23 @@ namespace App\Services;
 use App\Models\Clinic;
 use App\Models\Doctor;
 use App\Models\DoctorClinic;
+use App\Models\MedicalSpecialty;
 use App\Models\User;
+use App\Services\LegacySpecialtyResolutionService;
+use App\Services\LegacyWilayaMigrationService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class DoctorProvisioningService
 {
+    public function __construct(
+        protected ?LegacyWilayaMigrationService $wilayaResolver = null,
+        protected ?LegacySpecialtyResolutionService $specialtyResolver = null
+    ) {
+        $this->wilayaResolver = $this->wilayaResolver ?? app(LegacyWilayaMigrationService::class);
+        $this->specialtyResolver = $this->specialtyResolver ?? app(LegacySpecialtyResolutionService::class);
+    }
     /**
      * Atomically provision a self-registered Doctor Owner / Clinic Director.
      *
@@ -44,9 +54,11 @@ class DoctorProvisioningService
             $user->assignRole('doctor');
 
             // 3. Create Doctor Domain Profile (Pending Verification for Self-Registered Directors)
+            $specData = $this->resolveSpecialtyData($doctorData);
             $doctor = Doctor::create([
                 'user_id' => $user->id,
-                'specialty' => $doctorData['specialty'],
+                'specialty' => $specData['specialty'],
+                'specialty_id' => $specData['specialty_id'],
                 'license_number' => $doctorData['license_number'],
                 'bio' => $doctorData['bio'] ?? null,
                 'is_verified' => $doctorData['is_verified'] ?? false,
@@ -54,10 +66,13 @@ class DoctorProvisioningService
 
             // 4. Provision Clinic for Founding Director (Pending until Director is verified)
             $clinicName = $clinicData['name'] ?? ('عيادة ' . $userData['name']);
+            $wilayaStr = $clinicData['wilaya'] ?? 'الجزائر العاصمة';
+            $wilayaId = $clinicData['wilaya_id'] ?? ($wilayaStr !== null ? $this->wilayaResolver->resolveWilaya($wilayaStr)?->id : null);
             $clinic = Clinic::create([
                 'name' => $clinicName,
                 'address' => $clinicData['address'] ?? 'الجزائر',
-                'wilaya' => $clinicData['wilaya'] ?? 'الجزائر العاصمة',
+                'wilaya' => $wilayaStr,
+                'wilaya_id' => $wilayaId,
                 'phone' => $clinicData['phone'] ?? $userData['phone'],
                 'director_doctor_id' => $doctor->id,
                 'max_patients_per_slot' => $clinicData['max_patients_per_slot'] ?? 1,
@@ -116,9 +131,11 @@ class DoctorProvisioningService
             $user->assignRole('doctor');
 
             // 3. Create Doctor Domain Profile
+            $specData = $this->resolveSpecialtyData($data);
             $doctor = Doctor::create([
                 'user_id' => $user->id,
-                'specialty' => $data['specialty'],
+                'specialty' => $specData['specialty'],
+                'specialty_id' => $specData['specialty_id'],
                 'license_number' => $data['license_number'],
                 'bio' => $data['bio'] ?? null,
                 'is_verified' => true,
@@ -161,10 +178,12 @@ class DoctorProvisioningService
                 $user->assignRole('doctor');
             }
 
+            $specData = $this->resolveSpecialtyData($doctorData);
             $doctor = Doctor::updateOrCreate(
                 ['user_id' => $user->id],
                 [
-                    'specialty' => $doctorData['specialty'],
+                    'specialty' => $specData['specialty'],
+                    'specialty_id' => $specData['specialty_id'],
                     'license_number' => $doctorData['license_number'],
                     'bio' => $doctorData['bio'] ?? null,
                     'is_verified' => $doctorData['is_verified'] ?? true,
@@ -174,10 +193,13 @@ class DoctorProvisioningService
             $clinic = null;
 
             if (! empty($clinicData['name'])) {
+                $wilayaStr = $clinicData['wilaya'] ?? 'الجزائر العاصمة';
+                $wilayaId = $clinicData['wilaya_id'] ?? ($wilayaStr !== null ? $this->wilayaResolver->resolveWilaya($wilayaStr)?->id : null);
                 $clinic = Clinic::create([
                     'name' => $clinicData['name'],
                     'address' => $clinicData['address'] ?? 'الجزائر',
-                    'wilaya' => $clinicData['wilaya'] ?? 'الجزائر العاصمة',
+                    'wilaya' => $wilayaStr,
+                    'wilaya_id' => $wilayaId,
                     'phone' => $clinicData['phone'] ?? $user->phone,
                     'director_doctor_id' => $doctor->id,
                     'max_patients_per_slot' => $clinicData['max_patients_per_slot'] ?? 1,
@@ -240,6 +262,7 @@ class DoctorProvisioningService
                 $user->assignRole('doctor');
             }
 
+            $specData = $this->resolveSpecialtyData($doctorData);
             $doctor = Doctor::where('user_id', $user->id)->first();
             if (! $doctor) {
                 $existingByLicense = Doctor::where('license_number', $doctorData['license_number'])->first();
@@ -251,14 +274,16 @@ class DoctorProvisioningService
 
                 $doctor = Doctor::create([
                     'user_id' => $user->id,
-                    'specialty' => $doctorData['specialty'],
+                    'specialty' => $specData['specialty'],
+                    'specialty_id' => $specData['specialty_id'],
                     'license_number' => $doctorData['license_number'],
                     'bio' => $doctorData['bio'] ?? null,
                     'is_verified' => $doctorData['is_verified'] ?? true,
                 ]);
             } else {
                 $doctor->update([
-                    'specialty' => $doctorData['specialty'] ?? $doctor->specialty,
+                    'specialty' => $specData['specialty'] ?? $doctor->specialty,
+                    'specialty_id' => $specData['specialty_id'] ?? $doctor->specialty_id,
                     'license_number' => $doctorData['license_number'] ?? $doctor->license_number,
                     'bio' => $doctorData['bio'] ?? $doctor->bio,
                     'is_verified' => $doctorData['is_verified'] ?? $doctor->is_verified,
@@ -270,10 +295,13 @@ class DoctorProvisioningService
             if (! empty($clinicData['name'])) {
                 $clinic = Clinic::where('name', $clinicData['name'])->first();
                 if (! $clinic) {
+                    $wilayaStr = $clinicData['wilaya'] ?? 'الجزائر العاصمة';
+                    $wilayaId = $clinicData['wilaya_id'] ?? ($wilayaStr !== null ? $this->wilayaResolver->resolveWilaya($wilayaStr)?->id : null);
                     $clinic = Clinic::create([
                         'name' => $clinicData['name'],
                         'address' => $clinicData['address'] ?? 'الجزائر',
-                        'wilaya' => $clinicData['wilaya'] ?? 'الجزائر العاصمة',
+                        'wilaya' => $wilayaStr,
+                        'wilaya_id' => $wilayaId,
                         'phone' => $clinicData['phone'] ?? $user->phone,
                         'director_doctor_id' => $doctor->id,
                         'is_active' => true,
@@ -348,6 +376,14 @@ class DoctorProvisioningService
             'doctor_profile' => $doctor ? [
                 'id' => $doctor->id,
                 'specialty' => $doctor->specialty,
+                'specialty_id' => $doctor->specialty_id,
+                'medical_specialty' => $doctor->medicalSpecialty ? [
+                    'id' => $doctor->medicalSpecialty->id,
+                    'code' => $doctor->medicalSpecialty->code,
+                    'name_ar' => $doctor->medicalSpecialty->name_ar,
+                    'name_fr' => $doctor->medicalSpecialty->name_fr,
+                    'name_en' => $doctor->medicalSpecialty->name_en,
+                ] : null,
                 'license_number' => $doctor->license_number,
                 'bio' => $doctor->bio,
             ] : null,
@@ -360,5 +396,52 @@ class DoctorProvisioningService
                 'is_director' => (bool) $isDirector,
             ] : null,
         ];
+    }
+
+    /**
+     * Resolve specialty_id and ensure dual-write specialty string is populated.
+     *
+     * @param array<string, mixed> $doctorData
+     * @return array{specialty_id: ?int, specialty: string}
+     * @throws ValidationException
+     */
+    protected function resolveSpecialtyData(array $doctorData): array
+    {
+        $specialtyId = isset($doctorData['specialty_id']) ? (int) $doctorData['specialty_id'] : null;
+        $specialtyStr = isset($doctorData['specialty']) ? trim((string) $doctorData['specialty']) : null;
+
+        if ($specialtyId !== null) {
+            $model = MedicalSpecialty::find($specialtyId);
+            if (! $model || ! $model->is_active) {
+                throw ValidationException::withMessages([
+                    'specialty_id' => ['التخصص الطبي المحدد غير صالح أو غير نشط.'],
+                ]);
+            }
+            $specialtyStr = ($specialtyStr !== null && $specialtyStr !== '') ? $specialtyStr : $model->name_ar;
+            return [
+                'specialty_id' => $model->id,
+                'specialty' => $specialtyStr,
+            ];
+        }
+
+        if ($specialtyStr !== null && $specialtyStr !== '') {
+            $res = $this->specialtyResolver->resolve($specialtyStr);
+            if ($res['status'] === 'RESOLVED' && $res['specialty_id'] !== null) {
+                return [
+                    'specialty_id' => $res['specialty_id'],
+                    'specialty' => $specialtyStr,
+                ];
+            }
+
+            // Legacy backward compatibility: return string with null specialty_id
+            return [
+                'specialty_id' => null,
+                'specialty' => $specialtyStr,
+            ];
+        }
+
+        throw ValidationException::withMessages([
+            'specialty_id' => ['التخصص الطبي مطلوب.'],
+        ]);
     }
 }

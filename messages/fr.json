@@ -650,7 +650,8 @@
           "Suivi de Croissance"
         ]
       }
-    }
+    },
+    "all_specialties": "Toutes les spécialités"
   },
   "news": {
     "section_badge": "Latest Updates and Research",
@@ -3197,5 +3198,24 @@
       "permRadUploadImages": "Téléverser les clichés radiologiques",
       "permRadUploadImagesDesc": "Téléverser les fichiers et images radiologiques associés aux examens"
     }
+  },
+  "masterData": {
+    "wilaya": "Wilaya",
+    "commune": "Commune",
+    "selectWilaya": "Sélectionnez la wilaya...",
+    "selectCommune": "Sélectionnez la commune...",
+    "selectWilayaFirst": "Veuillez d'abord sélectionner une wilaya",
+    "loadingWilayas": "Chargement des wilayas...",
+    "loadingCommunes": "Chargement des communes...",
+    "errorWilayas": "Impossible de charger les wilayas",
+    "errorCommunes": "Impossible de charger les communes",
+    "noCommunes": "Aucune commune enregistrée",
+    "allWilayas": "Toutes les wilayas",
+    "allCommunes": "Toutes les communes",
+    "specialty": "Spécialité médicale",
+    "selectSpecialty": "Sélectionnez la spécialité...",
+    "loadingSpecialties": "Chargement des spécialités...",
+    "errorSpecialties": "Échec du chargement des spécialités",
+    "allSpecialties": "Toutes les spécialités"
   }
 }

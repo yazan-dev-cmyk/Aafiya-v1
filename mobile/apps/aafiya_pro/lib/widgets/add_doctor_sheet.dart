@@ -11,17 +11,20 @@ class AddDoctorSheet extends StatefulWidget {
     required this.staffService,
     required this.clinicId,
     required this.onDoctorAdded,
+    this.masterDataService,
   });
 
   final ClinicStaffService staffService;
   final String clinicId;
   final VoidCallback onDoctorAdded;
+  final MasterDataService? masterDataService;
 
   static Future<void> show(
     BuildContext context, {
     required ClinicStaffService staffService,
     required String clinicId,
     required VoidCallback onDoctorAdded,
+    MasterDataService? masterDataService,
   }) {
     return showModalBottomSheet<void>(
       context: context,
@@ -31,6 +34,7 @@ class AddDoctorSheet extends StatefulWidget {
         staffService: staffService,
         clinicId: clinicId,
         onDoctorAdded: onDoctorAdded,
+        masterDataService: masterDataService,
       ),
     );
   }
@@ -42,6 +46,7 @@ class AddDoctorSheet extends StatefulWidget {
 class _AddDoctorSheetState extends State<AddDoctorSheet>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
+  late final MasterDataService _masterDataService;
 
   // Lookup & Invite state
   final _searchController = TextEditingController();
@@ -59,12 +64,14 @@ class _AddDoctorSheetState extends State<AddDoctorSheet>
   final _specialtyController = TextEditingController();
   final _licenseController = TextEditingController();
   final _bioController = TextEditingController();
+  MedicalSpecialty? _selectedSpecialty;
   bool _isCreating = false;
   String? _createError;
 
   @override
   void initState() {
     super.initState();
+    _masterDataService = widget.masterDataService ?? MasterDataService(widget.staffService.apiClient);
     _tabController = TabController(length: 2, vsync: this);
   }
 
@@ -166,7 +173,8 @@ class _AddDoctorSheetState extends State<AddDoctorSheet>
       email: _emailController.text.trim(),
       phone: _phoneController.text.trim(),
       password: _passwordController.text,
-      specialty: _specialtyController.text.trim(),
+      specialty: _selectedSpecialty?.nameAr ?? _specialtyController.text.trim(),
+      specialtyId: _selectedSpecialty?.id,
       licenseNumber: _licenseController.text.trim(),
       bio: _bioController.text.trim().isNotEmpty ? _bioController.text.trim() : null,
     );
@@ -611,13 +619,23 @@ class _AddDoctorSheetState extends State<AddDoctorSheet>
             ),
             const SizedBox(height: AafiyaSpacing.sm),
 
-            // Specialty
-            AafiyaTextField(
+            // Specialty Selector (Canonical Master Data, RAD/PATH excluded)
+            AafiyaSpecialtySelector(
+              masterDataService: _masterDataService,
+              selectedSpecialtyId: _selectedSpecialty?.id,
               label: strings.specialtyLabel,
-              controller: _specialtyController,
-              prefixIcon: const Icon(Icons.medical_services_outlined),
+              onChanged: (specialty) {
+                setState(() {
+                  _selectedSpecialty = specialty;
+                  if (specialty != null) {
+                    _specialtyController.text = specialty.nameAr;
+                  } else {
+                    _specialtyController.clear();
+                  }
+                });
+              },
               validator: (val) {
-                if (val == null || val.trim().isEmpty) {
+                if (_selectedSpecialty == null && _specialtyController.text.trim().isEmpty) {
                   return strings.fieldRequired;
                 }
                 return null;

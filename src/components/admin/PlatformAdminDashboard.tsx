@@ -52,6 +52,7 @@ import {
 import { DocumentScanner } from '../shared/DocumentScanner';
 import { MedicalDocumentCode } from '../shared/MedicalDocumentCode';
 import { AssistantPermissionsManager } from './AssistantPermissionsManager';
+import { MasterDataManagement } from './MasterDataManagement';
 import { AdvertisementManagement } from './AdvertisementManagement';
 import { AdminBookingPoliciesCard } from './AdminBookingPoliciesCard';
 import { ChangePasswordCard } from '../shared/ChangePasswordCard';
@@ -88,6 +89,7 @@ export type AdminTab =
   | 'audit_logs'
   | 'roles_permissions'
   | 'assistant_permissions'
+  | 'master_data'
   | 'system_settings'
   | 'notifications_center';
 
@@ -813,6 +815,7 @@ export function PlatformAdminDashboard({ onBackToMainPlatform, onOpenAssistantDa
     { id: 'audit_logs', label: t('tabs.audit_logs'), icon: ShieldCheck },
     { id: 'roles_permissions', label: t('tabs.roles_permissions'), icon: KeyRound },
     { id: 'assistant_permissions', label: isRtl ? 'صلاحيات المساعد' : 'Assistant RBAC', icon: Sliders },
+    { id: 'master_data', label: isRtl ? 'البيانات المرجعية' : 'Master Data', icon: Stethoscope },
     { id: 'system_settings', label: t('tabs.system_settings'), icon: Settings },
     { id: 'notifications_center', label: t('tabs.notifications_center'), icon: Bell },
   ];
@@ -2496,6 +2499,11 @@ export function PlatformAdminDashboard({ onBackToMainPlatform, onOpenAssistantDa
               </button>
             </div>
           </div>
+        )}
+
+        {/* SECTION: MASTER DATA ADMINISTRATION */}
+        {activeTab === 'master_data' && (
+          <MasterDataManagement isRtl={isRtl} />
         )}
 
       </div>

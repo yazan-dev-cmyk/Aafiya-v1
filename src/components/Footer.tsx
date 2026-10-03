@@ -28,7 +28,7 @@ export const Footer: React.FC<FooterProps> = ({ viewMode, onViewModeChange }) =>
           <div className="lg:col-span-5 space-y-8 text-start">
             <div className="inline-flex items-center p-3 px-5 rounded-2xl bg-white/95 shadow-sm border border-white/10">
               <img 
-                src="/logo/Aafiya_Master_Logo.svg" 
+                src="/logo/Aafiya_Logo_Full.png" 
                 alt="Aafiya — Your Gateway to Aafiya / بوابتك إلى العافية" 
                 className="h-12 w-auto object-contain" 
               />

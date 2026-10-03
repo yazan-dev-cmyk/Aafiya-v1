@@ -10,6 +10,7 @@ use App\Http\Resources\DiagnosticStaffResource;
 use App\Models\DiagnosticCenter;
 use App\Models\DiagnosticStaff;
 use App\Services\DiagnosticStaffService;
+use App\Services\LegacyWilayaMigrationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -45,8 +46,13 @@ class DiagnosticCenterController extends Controller
      */
     public function store(RegisterDiagnosticCenterRequest $request): JsonResponse
     {
-        $center = DiagnosticCenter::create(array_merge($request->validated(), [
+        $validated = $request->validated();
+        $wilayaStr = $validated['wilaya'] ?? null;
+        $wilayaId = $validated['wilaya_id'] ?? ($wilayaStr !== null ? app(LegacyWilayaMigrationService::class)->resolveWilaya($wilayaStr)?->id : null);
+
+        $center = DiagnosticCenter::create(array_merge($validated, [
             'user_id' => $request->user()->id,
+            'wilaya_id' => $wilayaId,
             'is_active' => true,
         ]));
 

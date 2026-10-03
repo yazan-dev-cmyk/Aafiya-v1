@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocale } from 'next-intl';
 import { Search, Stethoscope, PackageCheck, MapPin, ExternalLink } from 'lucide-react';
 import { FEATURES_LIST } from '../data/content';
 import { PROVIDERS_DATA } from './DoctorSearchSection';
 import { Modal } from './ui/Modal';
 import { Input } from './ui/Input';
 import { Badge } from './ui/Badge';
+import { masterDataService, MedicalSpecialty } from '../services/masterDataService';
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -13,11 +15,34 @@ interface SearchModalProps {
 }
 
 export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onViewSpec }) => {
+  const locale = useLocale();
   const [query, setQuery] = useState('');
+  const [specialtiesMap, setSpecialtiesMap] = useState<Record<number, MedicalSpecialty>>({});
+
+  useEffect(() => {
+    let isMounted = true;
+    masterDataService.getSpecialties().then((specs) => {
+      if (!isMounted) return;
+      const map: Record<number, MedicalSpecialty> = {};
+      specs.forEach((s) => { map[s.id] = s; });
+      setSpecialtiesMap(map);
+    }).catch(() => {});
+    return () => { isMounted = false; };
+  }, []);
+
+  const getProviderSpecialty = (p: typeof PROVIDERS_DATA[0]) => {
+    if (p.specialty_id && specialtiesMap[p.specialty_id]) {
+      const s = specialtiesMap[p.specialty_id];
+      if (locale === 'ar') return s.name_ar;
+      if (locale === 'fr') return s.name_fr;
+      return s.name_en || s.name_fr;
+    }
+    return p.specialty;
+  };
 
   const filteredProviders = PROVIDERS_DATA.filter(p => 
     p.name.toLowerCase().includes(query.toLowerCase()) || 
-    p.specialty.toLowerCase().includes(query.toLowerCase()) ||
+    getProviderSpecialty(p).toLowerCase().includes(query.toLowerCase()) ||
     p.city.toLowerCase().includes(query.toLowerCase()) ||
     p.address.toLowerCase().includes(query.toLowerCase())
   );
@@ -89,7 +114,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, onVie
                       </div>
                       <div className="flex items-center gap-4 text-[11px] text-slate-500 font-bold">
                         <span className="flex items-center gap-1.5">
-                          {provider.specialty}
+                          {getProviderSpecialty(provider)}
                         </span>
                         <span className="flex items-center gap-1 text-slate-400 font-medium">
                           <MapPin className="w-3.5 h-3.5 text-primary/60" />

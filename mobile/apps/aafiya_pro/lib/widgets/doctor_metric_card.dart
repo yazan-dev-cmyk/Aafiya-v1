@@ -10,6 +10,7 @@ class DoctorMetricCard extends StatelessWidget {
     required this.icon,
     this.color = AafiyaColors.healthBlue,
     this.onTap,
+    this.maxLines = 2,
   });
 
   final String label;
@@ -17,6 +18,7 @@ class DoctorMetricCard extends StatelessWidget {
   final IconData icon;
   final Color color;
   final VoidCallback? onTap;
+  final int maxLines;
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +29,7 @@ class DoctorMetricCard extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(AafiyaRadius.md),
           child: Container(
+            constraints: const BoxConstraints(minHeight: 74),
             padding: const EdgeInsets.all(AafiyaSpacing.sm + 2),
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.08),
@@ -64,7 +67,7 @@ class DoctorMetricCard extends StatelessWidget {
                     color: AafiyaColors.primaryText,
                     fontWeight: FontWeight.w600,
                   ),
-                  maxLines: 1,
+                  maxLines: maxLines,
                   overflow: TextOverflow.ellipsis,
                 ),
               ],

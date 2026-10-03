@@ -22,6 +22,7 @@ class DiagnosticCenter extends Model
         'email',
         'address',
         'wilaya',
+        'wilaya_id',
         'is_active',
     ];
 
@@ -30,6 +31,14 @@ class DiagnosticCenter extends Model
         return [
             'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * Authoritative Wilaya relationship.
+     */
+    public function wilaya(): BelongsTo
+    {
+        return $this->belongsTo(Wilaya::class, 'wilaya_id');
     }
 
     public function manager(): BelongsTo

@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
     'national_id',
     'address',
     'wilaya',
+    'wilaya_id',
     'is_active',
 ])]
 class Patient extends Model
@@ -35,6 +36,14 @@ class Patient extends Model
             'date_of_birth' => 'date:Y-m-d',
             'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * Authoritative Wilaya relationship.
+     */
+    public function wilaya(): BelongsTo
+    {
+        return $this->belongsTo(Wilaya::class, 'wilaya_id');
     }
 
     /**

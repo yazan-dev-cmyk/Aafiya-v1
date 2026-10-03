@@ -33,7 +33,7 @@ class AppConfig {
 
   /// Canonical production configuration.
   static const AppConfig production = AppConfig(
-    apiBaseUrl: 'https://api.aafiya.dz/api/v1',
+    apiBaseUrl: 'https://api.aafiya.site/api/v1',
     environment: 'production',
   );
 

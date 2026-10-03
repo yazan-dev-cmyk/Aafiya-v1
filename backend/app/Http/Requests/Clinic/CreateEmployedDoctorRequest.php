@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Clinic;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CreateEmployedDoctorRequest extends FormRequest
 {
@@ -34,7 +35,13 @@ class CreateEmployedDoctorRequest extends FormRequest
             'password' => ['required', 'string', 'min:8'],
 
             // Doctor clinical profile
-            'specialty' => ['required', 'string', 'max:255'],
+            'specialty_id' => [
+                'required_without:specialty',
+                'nullable',
+                'integer',
+                Rule::exists('medical_specialties', 'id')->where('is_active', true),
+            ],
+            'specialty' => ['required_without:specialty_id', 'nullable', 'string', 'max:255'],
             'license_number' => ['required', 'string', 'max:100', 'unique:doctors,license_number'],
             'bio' => ['nullable', 'string', 'max:2000'],
         ];

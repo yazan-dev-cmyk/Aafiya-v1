@@ -258,7 +258,71 @@ export const adminService = {
   }): Promise<ApiResponse<import('./bookingCenterService').BookingPoliciesData>> => {
     return api.put<import('./bookingCenterService').BookingPoliciesData>('/admin/booking-policies', data);
   },
+
+  // Master Data: Medical Specialties
+  getMasterSpecialties: async (params?: Record<string, any>): Promise<ApiResponse<AdminMasterSpecialtyItem[]>> => {
+    const query = new URLSearchParams(params).toString();
+    return api.get<AdminMasterSpecialtyItem[]>(`/admin/master/specialties${query ? `?${query}` : ''}`);
+  },
+
+  createMasterSpecialty: async (data: Partial<AdminMasterSpecialtyItem>): Promise<ApiResponse<AdminMasterSpecialtyItem>> => {
+    return api.post<AdminMasterSpecialtyItem>('/admin/master/specialties', data);
+  },
+
+  updateMasterSpecialty: async (id: number, data: Partial<AdminMasterSpecialtyItem>): Promise<ApiResponse<AdminMasterSpecialtyItem>> => {
+    return api.put<AdminMasterSpecialtyItem>(`/admin/master/specialties/${id}`, data);
+  },
+
+  toggleMasterSpecialtyStatus: async (id: number, isActive?: boolean): Promise<ApiResponse<AdminMasterSpecialtyItem>> => {
+    return api.put<AdminMasterSpecialtyItem>(`/admin/master/specialties/${id}/status`, isActive !== undefined ? { is_active: isActive } : {});
+  },
+
+  deleteMasterSpecialty: async (id: number): Promise<ApiResponse<{ message: string }>> => {
+    return api.delete<{ message: string }>(`/admin/master/specialties/${id}`);
+  },
+
+  // Master Data: Wilayas
+  getMasterWilayas: async (params?: Record<string, any>): Promise<ApiResponse<AdminMasterWilayaItem[]>> => {
+    const query = new URLSearchParams(params).toString();
+    return api.get<AdminMasterWilayaItem[]>(`/admin/master/wilayas${query ? `?${query}` : ''}`);
+  },
+
+  createMasterWilaya: async (data: Partial<AdminMasterWilayaItem>): Promise<ApiResponse<AdminMasterWilayaItem>> => {
+    return api.post<AdminMasterWilayaItem>('/admin/master/wilayas', data);
+  },
+
+  updateMasterWilaya: async (id: number, data: Partial<AdminMasterWilayaItem>): Promise<ApiResponse<AdminMasterWilayaItem>> => {
+    return api.put<AdminMasterWilayaItem>(`/admin/master/wilayas/${id}`, data);
+  },
+
+  toggleMasterWilayaStatus: async (id: number, isActive?: boolean): Promise<ApiResponse<AdminMasterWilayaItem>> => {
+    return api.put<AdminMasterWilayaItem>(`/admin/master/wilayas/${id}/status`, isActive !== undefined ? { is_active: isActive } : {});
+  },
+
+  deleteMasterWilaya: async (id: number): Promise<ApiResponse<{ message: string }>> => {
+    return api.delete<{ message: string }>(`/admin/master/wilayas/${id}`);
+  },
 };
+
+export interface AdminMasterSpecialtyItem {
+  id: number;
+  code: string;
+  name_ar: string;
+  name_fr: string;
+  name_en: string;
+  is_active: boolean;
+  display_order: number;
+}
+
+export interface AdminMasterWilayaItem {
+  id: number;
+  code: string;
+  name_ar: string;
+  name_fr: string;
+  name_en: string;
+  is_active: boolean;
+  display_order: number;
+}
 
 export interface PlatformFinancialSummary {
   total_revenue_dzd: number;

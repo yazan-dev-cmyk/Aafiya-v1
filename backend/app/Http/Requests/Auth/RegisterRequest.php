@@ -28,6 +28,7 @@ class RegisterRequest extends FormRequest
             'password' => ['required', 'string', 'min:8'],
             'role' => ['nullable', 'string', 'exists:roles,name'],
             'specialty' => ['nullable', 'string', 'max:255'],
+            'specialty_id' => ['nullable', 'integer', 'exists:medical_specialties,id'],
             'license_number' => ['nullable', 'string', 'max:100'],
             'bio' => ['nullable', 'string', 'max:2000'],
             'clinic_name' => ['nullable', 'string', 'max:255'],

@@ -18,6 +18,14 @@ class DoctorPublicResource extends JsonResource
             'id' => $this->id,
             'name' => $this->user?->name,
             'specialty' => $this->specialty,
+            'specialty_id' => $this->specialty_id,
+            'medical_specialty' => ($this->medicalSpecialty ?? null) ? [
+                'id' => (int) $this->medicalSpecialty->id,
+                'code' => (string) $this->medicalSpecialty->code,
+                'name_ar' => (string) $this->medicalSpecialty->name_ar,
+                'name_fr' => (string) $this->medicalSpecialty->name_fr,
+                'name_en' => (string) $this->medicalSpecialty->name_en,
+            ] : null,
             'bio' => $this->bio,
             'is_verified' => (bool) $this->is_verified,
             'clinics' => $this->whenLoaded('clinics', function () {

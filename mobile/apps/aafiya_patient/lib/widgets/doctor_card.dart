@@ -19,6 +19,9 @@ class DoctorCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final strings = LocalizedStrings.of(context);
+    final specialtyText = doctor.medicalSpecialty != null
+        ? doctor.localizedSpecialty(strings.locale.languageCode)
+        : (doctor.specialty.isNotEmpty ? strings.specialtyName(doctor.specialty) : strings.doctor);
 
     return AafiyaCard(
       padding: AafiyaSpacing.insetAllMd,
@@ -55,7 +58,7 @@ class DoctorCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        doctor.specialty.isNotEmpty ? doctor.specialty : strings.doctor,
+                        specialtyText.isNotEmpty ? specialtyText : strings.doctor,
                         style: AafiyaTypography.bodyMedium.copyWith(
                           color: AafiyaColors.secondaryText,
                           fontSize: 13,
@@ -177,7 +180,7 @@ class DoctorCard extends StatelessWidget {
                                 child: Text(
                                   [
                                     if (clinic.wilaya != null && clinic.wilaya!.isNotEmpty)
-                                      clinic.wilaya!,
+                                      strings.wilayaName(clinic.wilaya!),
                                     if (clinic.address != null && clinic.address!.isNotEmpty)
                                       clinic.address!,
                                   ].join(' - '),

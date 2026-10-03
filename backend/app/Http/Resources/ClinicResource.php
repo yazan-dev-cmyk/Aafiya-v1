@@ -28,6 +28,14 @@ class ClinicResource extends JsonResource
                     'id' => $this->director->id,
                     'name' => $this->director->user?->name,
                     'specialty' => $this->director->specialty,
+                    'specialty_id' => $this->director->specialty_id,
+                    'medical_specialty' => $this->director->relationLoaded('medicalSpecialty') && $this->director->medicalSpecialty ? [
+                        'id' => $this->director->medicalSpecialty->id,
+                        'code' => $this->director->medicalSpecialty->code,
+                        'name_ar' => $this->director->medicalSpecialty->name_ar,
+                        'name_fr' => $this->director->medicalSpecialty->name_fr,
+                        'name_en' => $this->director->medicalSpecialty->name_en,
+                    ] : null,
                 ] : null;
             }),
             'doctors' => $this->whenLoaded('doctors', function () {
@@ -38,6 +46,14 @@ class ClinicResource extends JsonResource
                     'email' => $doc->user?->email,
                     'phone' => $doc->user?->phone,
                     'specialty' => $doc->specialty,
+                    'specialty_id' => $doc->specialty_id,
+                    'medical_specialty' => $doc->relationLoaded('medicalSpecialty') && $doc->medicalSpecialty ? [
+                        'id' => $doc->medicalSpecialty->id,
+                        'code' => $doc->medicalSpecialty->code,
+                        'name_ar' => $doc->medicalSpecialty->name_ar,
+                        'name_fr' => $doc->medicalSpecialty->name_fr,
+                        'name_en' => $doc->medicalSpecialty->name_en,
+                    ] : null,
                     'license_number' => $doc->license_number,
                     'position' => $doc->pivot?->position ?? 'doctor',
                     'is_primary' => (bool) ($doc->pivot?->is_primary ?? false),

@@ -650,7 +650,8 @@
           "Growth Follow-up"
         ]
       }
-    }
+    },
+    "all_specialties": "All Specialties"
   },
   "news": {
     "section_badge": "Latest Updates and Research",
@@ -3197,5 +3198,24 @@
       "permRadUploadImages": "Upload Radiology Scans",
       "permRadUploadImagesDesc": "Upload radiological scans and associate them with diagnostic studies"
     }
+  },
+  "masterData": {
+    "wilaya": "Province (Wilaya)",
+    "commune": "Municipality (Commune)",
+    "selectWilaya": "Select province...",
+    "selectCommune": "Select commune...",
+    "selectWilayaFirst": "Please select a province first",
+    "loadingWilayas": "Loading provinces...",
+    "loadingCommunes": "Loading communes...",
+    "errorWilayas": "Unable to load provinces",
+    "errorCommunes": "Unable to load communes",
+    "noCommunes": "No communes registered",
+    "allWilayas": "All provinces",
+    "allCommunes": "All communes",
+    "specialty": "Medical Specialty",
+    "selectSpecialty": "Select medical specialty...",
+    "loadingSpecialties": "Loading medical specialties...",
+    "errorSpecialties": "Failed to load medical specialties",
+    "allSpecialties": "All Specialties"
   }
 }

@@ -19,6 +19,11 @@ abstract final class ApiEndpoints {
   static const String doctors = '/doctors';
   static const String clinics = '/clinics';
 
+  // Master Data (TASK-MD-09 & TASK-MD-12)
+  static const String masterWilayas = '/master/wilayas';
+  static String masterCommunes(String wilayaCode) => '/master/wilayas/$wilayaCode/communes';
+  static const String masterSpecialties = '/master/specialties';
+
   // Prescriptions & Verification
   static const String prescriptions = '/prescriptions';
   static const String verifyToken = '/v';

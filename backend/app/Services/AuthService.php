@@ -63,7 +63,7 @@ class AuthService
         }
 
         if ($roleName === 'doctor') {
-            if (empty($data['specialty']) || empty($data['license_number'])) {
+            if ((empty($data['specialty']) && empty($data['specialty_id'])) || empty($data['license_number'])) {
                 throw ValidationException::withMessages([
                     'doctor_profile' => ['يتطلب تسجيل حساب الطبيب إدخال التخصص ورقم الترخيص الطبي.'],
                 ]);
@@ -77,7 +77,8 @@ class AuthService
             ];
 
             $doctorData = [
-                'specialty' => $data['specialty'],
+                'specialty' => $data['specialty'] ?? null,
+                'specialty_id' => $data['specialty_id'] ?? null,
                 'license_number' => $data['license_number'],
                 'bio' => $data['bio'] ?? null,
                 'is_verified' => $data['is_verified'] ?? false,

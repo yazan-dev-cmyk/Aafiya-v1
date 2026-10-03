@@ -11,6 +11,7 @@ import 'package:aafiya_ui/aafiya_ui.dart';
 import 'package:aafiya_pro/shells/auth_shell.dart';
 import 'package:aafiya_pro/shells/doctor_shell.dart';
 import 'package:aafiya_pro/shells/role_resolution_shell.dart';
+import 'package:aafiya_pro/screens/doctor_queue_screen.dart';
 
 Widget createTestApp({
   required Widget child,
@@ -553,6 +554,120 @@ void main() {
           expect(find.text('Change'), findsOneWidget);
           expect(find.text('Medical Director'), findsOneWidget);
         }
+      }
+    });
+
+    testWidgets('DoctorShell renders corrected navigation labels across AR, EN, FR (DEF-03)', (tester) async {
+      final clinicData = [
+        {
+          'id': 'cln-1',
+          'name': 'Clinique El Chifa',
+          'wilaya': 'Alger',
+          'address': 'Didouche Mourad',
+          'is_medical_director': false,
+          'is_active': true,
+          'is_primary': true,
+        },
+      ];
+
+      for (final locale in [const Locale('ar'), const Locale('en'), const Locale('fr')]) {
+        final mockClient = MockClient((request) async {
+          if (request.url.path.endsWith('/doctor/clinics')) {
+            return http.Response(
+              jsonEncode({'status': 'success', 'data': clinicData}),
+              200,
+              headers: {'content-type': 'application/json'},
+            );
+          }
+          if (request.url.path.endsWith('/doctor/stats')) {
+            return http.Response(
+              jsonEncode({
+                'status': 'success',
+                'data': {
+                  'today_total': 0,
+                  'pending_check_in': 0,
+                  'in_waiting_room': 0,
+                  'completed_today': 0,
+                  'no_show_today': 0,
+                  'active_clinic_id': 'cln-1',
+                  'active_clinic_name': 'Clinique El Chifa',
+                  'date': '2026-10-02',
+                },
+              }),
+              200,
+              headers: {'content-type': 'application/json'},
+            );
+          }
+          if (request.url.path.endsWith('/appointments')) {
+            return http.Response(
+              jsonEncode({
+                'status': 'success',
+                'data': [],
+                'meta': {'current_page': 1, 'per_page': 15, 'total': 0, 'total_pages': 0},
+              }),
+              200,
+              headers: {'content-type': 'application/json'},
+            );
+          }
+          return http.Response(jsonEncode({'status': 'success', 'data': []}), 200);
+        });
+
+        final mockApiClient = ApiClient(
+          tokenStorage: tokenStorage,
+          httpClient: mockClient,
+        );
+        final sessionManager = AuthSessionManager(
+          tokenStorage: tokenStorage,
+          apiClient: mockApiClient,
+        );
+
+        await sessionManager.setAuthenticatedUser(
+          token: 'doc_token',
+          user: doctorUser,
+        );
+
+        await tester.pumpWidget(
+          createTestApp(
+            locale: locale,
+            child: DoctorShell(
+              key: ValueKey('nav_${locale.languageCode}'),
+              user: doctorUser,
+              sessionManager: sessionManager,
+              apiClient: mockApiClient,
+              onSignOut: () {},
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+
+        // Verify Tab 1 (Waiting Room) and Tab 2 (My Clinics) labels
+        final navBar = tester.widget<NavigationBar>(find.byType(NavigationBar));
+        final labels = navBar.destinations.map((d) => (d as NavigationDestination).label).toList();
+
+        if (locale.languageCode == 'ar') {
+          expect(labels.contains('قاعة الانتظار'), isTrue);
+          expect(labels.contains('عياداتي'), isTrue);
+          expect(labels.contains('مواعيد المرضى'), isFalse);
+        } else if (locale.languageCode == 'en') {
+          expect(labels.contains('Waiting Room'), isTrue);
+          expect(labels.contains('My Clinics'), isTrue);
+          expect(labels.contains('Patient Appointments'), isFalse);
+        } else if (locale.languageCode == 'fr') {
+          expect(labels.contains("Salle d'attente"), isTrue);
+          expect(labels.contains('Mes Cabinets'), isTrue);
+          expect(labels.contains('Rendez-vous patients'), isFalse);
+        }
+
+        // Tap Tab 1 to switch to waiting room / queue view
+        await tester.tap(find.byIcon(Icons.people_alt_outlined));
+        await tester.pumpAndSettle();
+        expect(find.byType(DoctorQueueScreen), findsOneWidget);
+
+        // Tap Tab 2 to switch to my clinics view
+        await tester.tap(find.byIcon(Icons.local_hospital_outlined));
+        await tester.pumpAndSettle();
+        expect(find.text('Clinique El Chifa'), findsWidgets);
       }
     });
   });

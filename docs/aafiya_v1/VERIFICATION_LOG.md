@@ -2,10 +2,10 @@
 Document: AAFIYA V1 Verification Log
 Status: ACTIVE
 Created At: 2026-09-11 09:15
-Updated At: 2026-09-28 11:25
+Updated At: 2026-10-03 01:15
 Source/Basis: AAFIYA V1 Master Plan + Repository Forensic Audit
-Scope: Phase 1 (4/4 Complete) + Phase 2 (4/4 Complete) + Phase 3 (4/4 Complete) + Phase 4 (4/4 Complete) + Phase 5 (4/4 Complete) + Phase 6 (3/3 Complete) + Phase 7 (4/4 Complete: TASK-07-01 Closed, TASK-07-02 Closed, TASK-07-04 Closed, TASK-07-03 Closed) = 27/27 verified (100%)
-Implementation Authorized: TASK-07-03 FORMALLY CLOSED / VERIFIED (PHASE 7 TECHNICAL EXIT GATE SATISFIED)
+Scope: Phase 1-7 (27/27 Complete) + Phase A (4/4 Complete) + Phase B (5/5 Complete) + Master Data (TASK-MD-01 to TASK-MD-09 Verified)
+Implementation Authorized: TASK-MD-09 VERIFIED (AWAITING HUMAN MOBILE VERIFICATION)
 ---
 
 # AAFIYA / عافية — V1 Verification Log
@@ -33,6 +33,602 @@ Notes: <observations, edge case findings, follow-up items>
 ---
 
 ## Historical Verification Records
+
+### TASK-MD-09: Mobile Master Data Consumption & Wilaya → Commune Integration
+- **Task ID**: `TASK-MD-09`
+- **Task Name**: Mobile Master Data Consumption & Wilaya → Commune Integration
+- **Phase**: `MASTER DATA — AUTHORITATIVE GEOGRAPHIC ARCHITECTURE`
+- **Workstream**: Mobile Master Data Architecture (`aafiya_core`, `aafiya_ui`, `aafiya_patient`, `aafiya_pro`)
+- **Date/Time**: 2026-10-03 01:15 CET
+- **Automated Verification**: PASSED
+  - Command 1: `flutter test` (in `mobile/packages/aafiya_core`) -> Exited 0 (163/163 passed, including 11/11 in `master_data_service_test.dart`).
+  - Command 2: `flutter test` (in `mobile/packages/aafiya_ui`) -> Exited 0 (55/55 passed, including 5/5 in `aafiya_master_data_selectors_test.dart`).
+  - Command 3: `flutter test` (in `mobile/apps/aafiya_patient`) -> Exited 0 (120/120 passed, including 22/22 in `patient_directory_test.dart`).
+  - Command 4: `flutter test` (in `mobile/apps/aafiya_pro`) -> Exited 0 (130/130 passed).
+  - Command 5: `flutter analyze mobile/` -> 0 new issues (retains exact 6 pre-existing baseline test issues).
+  - Static Data Prohibition Audit: Confirmed 0 static/hardcoded 69-wilaya or 1541-commune datasets in Dart code.
+- **Human Verification**: PENDING HUMAN MOBILE VERIFICATION (Checklists provided in MD-09 report)
+- **Result**: `VERIFIED — AWAITING HUMAN MOBILE VERIFICATION`
+- **Files Created/Modified**:
+  - `mobile/packages/aafiya_core/lib/models/wilaya.dart` [NEW]
+  - `mobile/packages/aafiya_core/lib/models/commune.dart` [NEW]
+  - `mobile/packages/aafiya_core/lib/services/master_data_service.dart` [NEW]
+  - `mobile/packages/aafiya_core/test/master_data_service_test.dart` [NEW]
+  - `mobile/packages/aafiya_ui/lib/widgets/aafiya_wilaya_selector.dart` [NEW]
+  - `mobile/packages/aafiya_ui/lib/widgets/aafiya_commune_selector.dart` [NEW]
+  - `mobile/packages/aafiya_ui/lib/widgets/aafiya_wilaya_filter_chips.dart` [NEW]
+  - `mobile/packages/aafiya_ui/test/aafiya_master_data_selectors_test.dart` [NEW]
+  - `mobile/packages/aafiya_core/lib/aafiya_core.dart` [MODIFIED]
+  - `mobile/packages/aafiya_core/lib/network/api_endpoints.dart` [MODIFIED]
+  - `mobile/packages/aafiya_core/lib/localization/localized_strings.dart` [MODIFIED]
+  - `mobile/packages/aafiya_ui/lib/aafiya_ui.dart` [MODIFIED]
+  - `mobile/apps/aafiya_patient/lib/screens/doctor_directory_screen.dart` [MODIFIED]
+  - `mobile/apps/aafiya_patient/lib/screens/clinic_directory_screen.dart` [MODIFIED]
+  - `mobile/apps/aafiya_patient/test/patient_directory_test.dart` [MODIFIED]
+  - `docs/aafiya_v1/master_data/MD-09_MOBILE_CONSUMPTION_VERIFICATION_REPORT.md` [NEW]
+
+### TASK-MD-08: Web Integration & Human Verification of Wilaya & Commune Master Data
+- **Task ID**: `TASK-MD-08`
+- **Task Name**: Web Integration & Verification
+- **Phase**: `MASTER DATA — AUTHORITATIVE GEOGRAPHIC ARCHITECTURE`
+- **Workstream**: Web Frontend Integration & UI Selectors
+- **Date/Time**: 2026-10-02 23:45 CET
+- **Automated Verification**: PASSED
+  - Command 1: `node --test scratch/test_web_master_data.mjs` -> Exited 0 (5/5 passed: 69 Wilayas API contract, Communes API contract & wilaya isolation, Master Data Service caching & localized naming, Web target components code audit, Localization messages audit in ar/fr/en).
+  - Command 2: `npx tsc --noEmit --incremental false` -> Exited 0 (0 errors across entire Next.js application).
+  - Command 3: `npm run lint` -> Exited 0 (0 errors).
+  - Command 4: `npm run build` -> Exited 0 (54/54 static and dynamic routes compiled cleanly).
+- **Human Verification**: PENDING HUMAN WEB VERIFICATION (Checklists provided in report)
+- **Result**: `VERIFIED — AWAITING HUMAN WEB VERIFICATION`
+- **Files Created/Modified**:
+  - `src/services/masterDataService.ts` [NEW]
+  - `src/components/master-data/WilayaSelect.tsx` [NEW]
+  - `src/components/master-data/CommuneSelect.tsx` [NEW]
+  - `src/components/master-data/index.ts` [NEW]
+  - `src/components/DoctorSearchSection.tsx` [MODIFIED]
+  - `src/components/AuthModals.tsx` [MODIFIED]
+  - `src/components/booking-center/tabs/NewBookingWizardTab.tsx` [MODIFIED]
+  - `src/components/booking-center/tabs/ProfileSettingsTab.tsx` [MODIFIED]
+  - `messages/ar.json`, `messages/fr.json`, `messages/en.json` [MODIFIED]
+  - `docs/aafiya_v1/master_data/MD-08_WEB_INTEGRATION_VERIFICATION_REPORT.md` [NEW]
+- **Notes**: All hardcoded lists and free-text inputs for Wilaya/Commune replaced with authoritative master data selectors. Zero modifications to `mobile/`, backend API, or database migrations. Stopped at Human Approval Gate for TASK-MD-09.
+
+---
+
+### TASK-MD-07: Backend Test Suite & Comprehensive Verification
+- **Task ID**: `TASK-MD-07`
+- **Task Name**: Backend Test Suite & Comprehensive Verification
+- **Phase**: `MASTER DATA — AUTHORITATIVE GEOGRAPHIC ARCHITECTURE`
+- **Workstream**: Backend Test Engineering & Comprehensive Verification
+- **Date/Time**: 2026-10-02 23:15 CET
+- **Automated Verification**: PASSED
+  - Command 1: `php artisan test tests/Feature/MasterDataComprehensiveVerificationTest.php` -> Exited 0 (25/25 passed, 970 assertions passed).
+    - Group 1 (Master Dataset Integrity): 69 Wilayas, 01–69 zero-padded, active, complete trilingual coverage, deterministic ordering, 1,541 Communes, unique ONS codes, 0 orphan communes, trilingual coverage, 136 null / 1,405 valid postal codes, 2026 Reform commune counts (59: 12, 60: 8, 61: 5, 62: 4, 63: 4, 64: 6, 65: 10, 66: 8, 67: 21, 68: 23, 69: 7).
+    - Group 2 (Domain Models & Relationships): Wilaya::communes HasMany, Commune::wilaya BelongsTo, Clinic::wilaya, BookingCenter::wilaya, Patient::wilaya, DiagnosticCenter::wilaya, Advertisement::targetWilaya BelongsTo relationships.
+    - Group 3 (API Regression): GET /api/v1/master/wilayas 200 OK 69 records, privacy preserved, search indexing (16, Alger, الجزائر, Algiers), GET /api/v1/master/wilayas/{wilaya}/communes (16: 57, 59: 12, 68: 23, 69: 7), 404 for 999, ZZ, and inactive wilayas.
+    - Group 4 (Caching & Isolation): Wilaya list cache creation and reuse, search cache isolation, commune cross-wilaya cache isolation (16 ≠ 31, 59 ≠ 68, 68 ≠ 69), 24h TTL.
+    - Group 5 (Legacy Linkage Regression): 10 audited distinct values mapped (Alger->16, Oran->31, Constantine->25, Blida->09, Annaba->23, Setif->19, Batna->05, Tlemcen->13, تيارت->14, Sidi Bel Abbes->22), 0 orphan foreign keys, 0 unresolved values, legacy text columns preserved.
+    - Group 6 (Query Efficiency & Zero N+1): Wilayas list executes 1 query on miss / 0 on hit; communes list executes 1 query on miss / 0 on hit; eager loading executes fixed 2 queries for 10 entities.
+  - Command 2: Full Master Data Test Suite Execution:
+    - `php artisan test tests/Unit/WilayaCommuneModelTest.php tests/Feature/WilayaCommuneSeederTest.php tests/Feature/MasterDataApiTest.php tests/Feature/LegacyWilayaMigrationTest.php tests/Feature/MasterDataComprehensiveVerificationTest.php`
+    - Exited 0 (69/69 tests passed, 2,727 assertions passed, 0 failures, 0 errors).
+  - Command 3: Syntax check `php -l` across all 22 backend files -> 100% clean (0 syntax errors).
+  - Command 4: Code style `./vendor/bin/pint --test tests/Feature/MasterDataComprehensiveVerificationTest.php` -> Exited 0 (passed).
+  - Command 5: Database row counts on `medical_db`: `wilayas`: 69, `communes`: 1,541, `clinics`: 9, `booking_centers`: 6, `patients`: 101, `diagnostic_centers`: 12, `advertisements`: 0.
+- **Human Verification**: PENDING REVIEW (STOPPED AT HUMAN APPROVAL GATE)
+- **Result**: `COMPLETED / VERIFIED`
+- **Notes**: Zero regression introduced into backend codebase. Pre-existing issues documented in verification report (ClinicTest slot_duration_min=60 constraint, DoctorStatsTest missing mrn constraint). Zero mutations to Railway, SmartEdu, Web, or Mobile.
+
+---
+
+### TASK-MD-06: Existing Data Migration & Safe Legacy Wilaya Linking
+- **Task ID**: `TASK-MD-06`
+- **Task Name**: Existing Data Migration & Safe Legacy Wilaya Linking
+- **Phase**: `MASTER DATA — AUTHORITATIVE GEOGRAPHIC ARCHITECTURE`
+- **Workstream**: Backend Database & Master Data Architecture
+- **Date/Time**: 2026-10-02 22:10 CET
+- **Automated Verification**: PASSED
+  - Command 1: `php artisan test tests/Feature/LegacyWilayaMigrationTest.php` -> Exited 0 (10/10 passed, 33 assertions passed).
+    - Test 1 (Deterministic legacy value mapping: Arabic, French, aliases, diacritics, codes): PASSED.
+    - Test 2 (Successful FK backfill on clinics, booking centers, patients, diagnostic centers): PASSED.
+    - Test 3 (Unresolved value preservation: unmapped text retained as NULL FK without failure): PASSED.
+    - Test 4 (NULL and empty string preservation: non-error handling): PASSED.
+    - Test 5 (Idempotent backfill: successive executions produce identical state): PASSED.
+    - Test 6 (No duplicate records created during or after migration): PASSED.
+    - Test 7 (Foreign key integrity: zero orphan wilaya_ids): PASSED.
+    - Test 8 (Legacy record count preservation: zero entity records deleted): PASSED.
+    - Test 9 (Migration rollback: clearing foreign keys restores clean pre-backfill state): PASSED.
+    - Test 10 (Reconciliation totals: audit ledger totals verified): PASSED.
+  - Command 2: `php artisan master-data:migrate-legacy-wilayas --audit` -> Exited 0 (128 legacy rows audited: 128 mapped, 0 unresolved, 0 null/empty, 10 distinct values).
+  - Command 3: `php artisan migrate:status` -> Exited 0 (`2026_10_02_220000_add_wilaya_id_to_legacy_tables` Ran, `2026_10_02_220001_backfill_legacy_wilaya_ids` Ran).
+  - Command 4: Rollback and Re-migration verification:
+    - `php artisan migrate:rollback --step=1` executed in 166ms (backfill FKs cleared to NULL, legacy text preserved).
+    - `php artisan migrate:rollback --step=1` executed in 2,000ms (FK columns dropped cleanly).
+    - `php artisan migrate` re-applied both cleanly (DDL 2,000ms, backfill 926ms).
+  - Database Record Counts: `wilayas`: 69, `communes`: 1,541, `clinics`: 9, `booking_centers`: 6, `patients`: 101, `diagnostic_centers`: 12, `advertisements`: 0 (100% record count preservation).
+  - Orphan Check: `whereNotNull('wilaya_id')->whereNotIn('wilaya_id', Wilaya::pluck('id'))` count is 0 across all tables.
+- **Human Verification**: APPROVED (TASK-MD-06 Authorized by Human Project Authority)
+  - Reviewer: Human Project Authority
+  - Timestamp: 2026-10-02 22:00 CET
+- **Result**: `VERIFIED`
+- **Files Created / Modified**:
+  - `backend/app/Services/LegacyWilayaMigrationService.php` [NEW]
+  - `backend/app/Console/Commands/MigrateLegacyWilayasCommand.php` [NEW]
+  - `backend/database/migrations/2026_10_02_220000_add_wilaya_id_to_legacy_tables.php` [NEW]
+  - `backend/database/migrations/2026_10_02_220001_backfill_legacy_wilaya_ids.php` [NEW]
+  - `backend/app/Models/Clinic.php` [MODIFIED]
+  - `backend/app/Models/BookingCenter.php` [MODIFIED]
+  - `backend/app/Models/Patient.php` [MODIFIED]
+  - `backend/app/Models/DiagnosticCenter.php` [MODIFIED]
+  - `backend/app/Models/Advertisement.php` [MODIFIED]
+  - `backend/tests/Feature/LegacyWilayaMigrationTest.php` [NEW]
+  - `docs/aafiya_v1/master_data/MD-06_EXISTING_DATA_MIGRATION_REPORT.md` [NEW]
+  - `docs/aafiya_v1/EXECUTION_PLAN.md` [MODIFIED]
+  - `docs/aafiya_v1/VERIFICATION_LOG.md` [MODIFIED]
+  - `docs/aafiya_v1/CHANGELOG.md` [MODIFIED]
+  - `docs/aafiya_v1/master_data/README.md` [MODIFIED]
+- **Notes**: Completed additive, non-destructive legacy data migration linking all 128 existing business records to authoritative Wilayas. Zero legacy text columns dropped or renamed. Zero data loss. Railway, SmartEdu, Web, and Mobile untouched. Next tasks (TASK-MD-07 through TASK-MD-09) remain strictly unauthorized.
+
+---
+
+### TASK-MD-05: Backend Master Data API, Resources & HTTP Caching
+- **Task ID**: `TASK-MD-05`
+- **Task Name**: Backend Master Data API, Resources & HTTP Caching
+- **Phase**: `MASTER DATA — AUTHORITATIVE GEOGRAPHIC ARCHITECTURE`
+- **Workstream**: Backend API Architecture
+- **Date/Time**: 2026-10-02 21:45 CET
+- **Automated Verification**: PASSED
+  - Command 1: `php artisan test tests/Feature/MasterDataApiTest.php` -> Exited 0 (15/15 passed, 1,298 assertions passed).
+    - Test 1 (Wilaya endpoint exists & returns 200 with schema): PASSED.
+    - Test 2 (Wilaya count is exactly 69): PASSED.
+    - Test 3 (Wilaya code integrity: 01 to 69 preserved): PASSED.
+    - Test 4 (Trilingual coverage across AR/FR/EN): PASSED.
+    - Test 5 (Deterministic Wilaya display order): PASSED.
+    - Test 6 (Search functionality across code, AR, FR, EN): PASSED.
+    - Test 7 (Commune endpoint for Wilaya 16 returns 57 communes): PASSED.
+    - Test 8 (2026 territorial reform reconciliation: Wilaya 59 = 12, Wilaya 68 = 23, Wilaya 69 = 7): PASSED.
+    - Test 9 (Commune referential relationship: `wilaya_code` integrity): PASSED.
+    - Test 10 (Unknown Wilaya returns 404 for numeric and alpha codes): PASSED.
+    - Test 11 (Inactive records excluded from public responses): PASSED.
+    - Test 12 (Read-only behavior: POST, PUT, DELETE rejected with 404/405): PASSED.
+    - Test 13 (HTTP cache behavior: cache entries populated and reused): PASSED.
+    - Test 14 (Cache isolation: Wilaya 16 and Wilaya 31 caches isolated): PASSED.
+    - Test 15 (Canonical DB reconciliation against Wilaya models): PASSED.
+  - Command 2: `php artisan test tests/Unit/WilayaCommuneModelTest.php` -> Exited 0 (9/9 passed, 30 assertions passed).
+  - Command 3: `php artisan test tests/Feature/WilayaCommuneSeederTest.php` -> Exited 0 (10/10 passed, 372 assertions passed).
+  - Command 4: `php artisan route:list --path=master` -> Exited 0 (`GET api/v1/master/wilayas` and `GET api/v1/master/wilayas/{wilaya}/communes` active).
+  - Database Inspection: `wilayas` count = 69, `communes` count = 1541.
+  - Legacy Tables Inspection: `clinics`: 9, `booking_centers`: 6, `patients`: 101, `diagnostic_centers`: 12, `advertisements`: 0 (zero modifications to existing records).
+- **Human Verification**: APPROVED (TASK-MD-05 Authorized by Human Project Authority)
+  - Reviewer: Human Project Authority
+  - Timestamp: 2026-10-02 21:40 CET
+- **Result**: `VERIFIED`
+- **Files Created / Modified**:
+  - `backend/app/Http/Controllers/Api/V1/MasterDataController.php` [NEW]
+  - `backend/app/Http/Resources/WilayaResource.php` [NEW]
+  - `backend/app/Http/Resources/CommuneResource.php` [NEW]
+  - `backend/routes/api.php` [MODIFIED]
+  - `backend/tests/Feature/MasterDataApiTest.php` [NEW]
+  - `docs/aafiya_v1/EXECUTION_PLAN.md` [MODIFIED]
+  - `docs/aafiya_v1/VERIFICATION_LOG.md` [MODIFIED]
+  - `docs/aafiya_v1/CHANGELOG.md` [MODIFIED]
+  - `docs/aafiya_v1/master_data/README.md` [MODIFIED]
+- **Notes**: Read-only public master data endpoints exposed and fully cached (24h TTL) under `/api/v1/master`. All 69 Wilayas and 1,541 Communes accessible with trilingual names. Strict read-only boundary enforced. Zero mutation to legacy business tables or columns. Next tasks (TASK-MD-06 through TASK-MD-09) remain strictly unauthorized.
+
+---
+
+### TASK-MD-04: Database Seeding & Safe Master Data Population
+- **Task ID**: `TASK-MD-04`
+- **Task Name**: Database Seeding & Safe Master Data Population
+- **Phase**: `MASTER DATA — AUTHORITATIVE GEOGRAPHIC ARCHITECTURE`
+- **Workstream**: Backend Database Architecture
+- **Date/Time**: 2026-10-02 21:35 CET
+- **Automated Verification**: PASSED
+  - Command 1: `python3 docs/aafiya_v1/master_data/wilaya_commune/validate.py` -> Exited 0 (All 7 canonical integrity suites passed before seeding).
+  - Command 2: `php artisan db:seed --class=WilayaCommuneMasterDataSeeder` -> Exited 0 (Seeded 69 Wilayas and 1,541 Communes in 8,715ms).
+  - Command 3: `php artisan db:seed --class=WilayaCommuneMasterDataSeeder` -> Exited 0 (Idempotency verified: re-executed in 4,283ms with 0 duplicate rows created).
+  - Command 4: `php artisan test tests/Feature/WilayaCommuneSeederTest.php` -> Exited 0 (10/10 passed, 372 assertions passed).
+    - Test 1 (Full Wilaya count = 69): PASSED.
+    - Test 2 (Full Commune count = 1,541): PASSED.
+    - Test 3 (Wilaya code uniqueness and sequence 01–69): PASSED.
+    - Test 4 (Commune code uniqueness = 1,541 unique ONS codes): PASSED.
+    - Test 5 (Referential integrity: 0 orphan communes): PASSED.
+    - Test 6 (Multilingual completeness: AR/FR/EN names 100% populated): PASSED.
+    - Test 7 (Postal code reconciliation: 1,405 populated, 136 null): PASSED.
+    - Test 8 (Idempotency: duplicate-free re-run): PASSED.
+    - Test 9 (Legacy protection: clinics, booking_centers, patients, diagnostic_centers, advertisements untouched): PASSED.
+    - Test 10 (Canonical reconciliation against MD-01 JSON files, including 108 transferred communes across Wilayas 59–69): PASSED.
+  - Command 5: `php artisan test tests/Unit/WilayaCommuneModelTest.php` -> Exited 0 (9/9 passed, 30 assertions passed).
+  - Database Inspection: `wilayas` count = 69, `communes` count = 1541.
+  - Legacy Tables Inspection: `clinics`: 9, `booking_centers`: 6, `patients`: 101, `diagnostic_centers`: 12, `advertisements`: 0 (zero modifications to existing records).
+- **Human Verification**: APPROVED (TASK-MD-04 Authorized by Human Project Authority)
+  - Reviewer: Human Project Authority
+  - Timestamp: 2026-10-02 21:26 CET
+- **Result**: `VERIFIED`
+- **Files Created**:
+  - `backend/database/seeders/WilayaCommuneMasterDataSeeder.php` [NEW]
+  - `backend/tests/Feature/WilayaCommuneSeederTest.php` [NEW]
+  - `docs/aafiya_v1/EXECUTION_PLAN.md` [MODIFIED]
+  - `docs/aafiya_v1/VERIFICATION_LOG.md` [MODIFIED]
+  - `docs/aafiya_v1/CHANGELOG.md` [MODIFIED]
+  - `docs/aafiya_v1/master_data/README.md` [MODIFIED]
+- **Notes**: Master data seeded deterministically and idempotently from verified JSON into local MySQL (`medical_db`). Zero legacy business records mutated. Zero backfill performed. Railway and production untouched. Next task (TASK-MD-05: Backend API Endpoints & Caching) remains strictly unauthorized.
+
+---
+
+### TASK-MD-03: Eloquent Domain Models & Relationships (Wilaya & Commune)
+- **Task ID**: `TASK-MD-03`
+- **Task Name**: Eloquent Domain Models & Relationships (Wilaya & Commune)
+- **Phase**: `MASTER DATA — AUTHORITATIVE GEOGRAPHIC ARCHITECTURE`
+- **Workstream**: Backend Domain Architecture
+- **Date/Time**: 2026-10-02 21:25 CET
+- **Automated Verification**: PASSED
+  - Command 1: `php artisan test tests/Unit/WilayaCommuneModelTest.php` -> Exited 0 (9/9 passed, 30 assertions passed in 924ms).
+    - Test 1 (Wilaya model exists & resolves `wilayas` table): PASSED.
+    - Test 2 (Commune model exists & resolves `communes` table): PASSED.
+    - Test 3 (Wilaya `hasMany` Commune relationship): PASSED.
+    - Test 4 (Commune `belongsTo` Wilaya relationship): PASSED.
+    - Test 5 (Attribute casting: `is_active` bool, `display_order` integer): PASSED.
+    - Test 6 (Code preservation: `"01"` and `"0101"` retained as strings with leading zeros): PASSED.
+    - Test 7 (Nullable postal code: accepts and preserves `null`): PASSED.
+    - Test 8 (Mass assignment safety: `id`, `created_at`, `updated_at` excluded from `$fillable`): PASSED.
+    - Test 9 (Zero production master data seeded during/after task): PASSED.
+  - Command 2: `php artisan test tests/Unit` -> Exited 0 (17/17 tests passed, 70 assertions passed).
+  - Table Record Count: `wilayas` count = 0, `communes` count = 0 (no data seeded into `medical_db`).
+- **Human Verification**: APPROVED (TASK-MD-03 Authorized by Human Project Authority)
+  - Reviewer: Human Project Authority
+  - Timestamp: 2026-10-02 21:16 CET
+- **Result**: `VERIFIED`
+- **Files Created**:
+  - `backend/app/Models/Wilaya.php` [NEW]
+  - `backend/app/Models/Commune.php` [NEW]
+  - `backend/tests/Unit/WilayaCommuneModelTest.php` [NEW]
+  - `docs/aafiya_v1/EXECUTION_PLAN.md` [MODIFIED]
+  - `docs/aafiya_v1/VERIFICATION_LOG.md` [MODIFIED]
+  - `docs/aafiya_v1/CHANGELOG.md` [MODIFIED]
+  - `docs/aafiya_v1/master_data/README.md` [MODIFIED]
+- **Notes**: Created clean, reusable, generic Eloquent models without UI or hardcoded list logic. Preserves single-source-of-truth requirement for upcoming Web and Mobile layers. Database remains 100% unseeded (wilayas = 0, communes = 0). Next task (TASK-MD-04: Database Seeding & Safe Legacy Data Backfill) remains strictly unauthorized.
+
+---
+
+### TASK-MD-02: Database Schema Migrations (Wilayas & Communes Tables)
+- **Task ID**: `TASK-MD-02`
+- **Task Name**: Database Schema Migrations (Wilayas & Communes Tables)
+- **Phase**: `MASTER DATA — AUTHORITATIVE GEOGRAPHIC ARCHITECTURE`
+- **Workstream**: Backend Database Architecture
+- **Date/Time**: 2026-10-02 21:10 CET
+- **Automated Verification**: PASSED
+  - Command: `php artisan migrate` -> Exited 0 (`2026_10_02_210000_create_wilayas_table` DONE 162.83ms, `2026_10_02_210001_create_communes_table` DONE 312.67ms).
+  - Schema Inspection: Verified via MySQL Information Schema & Schema Builder: `wilayas` table has `id` (bigint unsigned PK), `code` (varchar(10) unique), `name_ar` (varchar(255)), `name_fr` (varchar(255)), `name_en` (varchar(255)), `is_active` (boolean default true), `display_order` (unsigned integer default 0), timestamps, and index on `(is_active, display_order)`. `communes` table has `id` (bigint unsigned PK), `wilaya_id` (bigint unsigned FK -> `wilayas.id`, `ON DELETE RESTRICT`), `code` (varchar(20) unique), `name_ar`, `name_fr`, `name_en`, `postal_code` (varchar(10) nullable), `is_active`, `display_order`, timestamps, and composite index on `(wilaya_id, is_active)`.
+  - Transactional Constraint & Integrity Tests:
+    - Test 1 (Wilaya Insertion): PASSED (ID: 1).
+    - Test 2 (Commune Insertion): PASSED (ID: 1).
+    - Test 3 (Nullable Postal Code): PASSED (null accepted).
+    - Test 4 (Duplicate Wilaya Code Rejected): PASSED (QueryException duplicate key).
+    - Test 5 (Duplicate Commune Code Rejected): PASSED (QueryException duplicate key).
+    - Test 6 (Orphan Commune Insertion Rejected): PASSED (QueryException FK failure).
+    - Test 7 (ON DELETE RESTRICT Protection): PASSED (Parent deletion blocked while child commune exists).
+  - Rollback & Re-migration Test: `php artisan migrate:rollback --step=2` executed safely in dependency order (`communes` dropped first, `wilayas` dropped second) without affecting earlier migrations; `php artisan migrate` re-applied both cleanly.
+  - Test Suite Compatibility: `php artisan test tests/Unit` executed: 8/8 tests passed, 40 assertions passed.
+  - Table Record Count: `wilayas` count = 0, `communes` count = 0 (no data seeded).
+- **Human Verification**: APPROVED (TASK-MD-02 Authorized by Human Project Authority)
+  - Reviewer: Human Project Authority
+  - Timestamp: 2026-10-02 21:02 CET
+- **Result**: `VERIFIED`
+- **Files Created**:
+  - `backend/database/migrations/2026_10_02_210000_create_wilayas_table.php` [NEW]
+  - `backend/database/migrations/2026_10_02_210001_create_communes_table.php` [NEW]
+  - `docs/aafiya_v1/EXECUTION_PLAN.md` [MODIFIED]
+  - `docs/aafiya_v1/VERIFICATION_LOG.md` [MODIFIED]
+  - `docs/aafiya_v1/CHANGELOG.md` [MODIFIED]
+  - `docs/aafiya_v1/master_data/README.md` [MODIFIED]
+- **Notes**: Master data schema established cleanly on local MySQL. No existing entity tables (`clinics`, `patients`, etc.) modified. No models, controllers, API routes, or Web/Mobile files touched. Railway and production untouched. Next task (TASK-MD-03: Eloquent Domain Models) remains strictly unauthorized.
+
+---
+
+### TASK-MD-01: Authoritative Wilaya & Commune Reference Dataset Preparation
+- **Task ID**: `TASK-MD-01`
+- **Task Name**: Authoritative Wilaya & Commune Reference Dataset Preparation
+- **Phase**: `MASTER DATA — AUTHORITATIVE GEOGRAPHIC ARCHITECTURE`
+- **Workstream**: Geographic Master Data Architecture
+- **Date/Time**: 2026-10-02 20:55 CET
+- **Automated Verification**: PASSED
+  - Command: `python3 docs/aafiya_v1/master_data/wilaya_commune/validate.py` -> Exited 0 (All 7 automated test suites passed: 69 Wilayas verified with sequential '01'..'69' codes, 69 unique Arabic/French/English names; 1,541 Communes verified with unique ONS codes; zero orphan communes; 100% trilingual coverage; 2026 territorial reform verified with 11 new Wilayas containing exactly 108 transferred communes completely detached from mother wilayas; postal code quality audited).
+- **Human Verification**: APPROVED (TASK-MD-01 Authorized by Human Project Authority)
+  - Reviewer: Human Project Authority
+  - Timestamp: 2026-10-02 20:38 CET
+- **Result**: `VERIFIED`
+- **Files Created**:
+  - `docs/aafiya_v1/master_data/wilaya_commune/wilayas.json` [NEW - 69 Wilayas canonical dataset]
+  - `docs/aafiya_v1/master_data/wilaya_commune/communes.json` [NEW - 1,541 Communes canonical dataset]
+  - `docs/aafiya_v1/master_data/wilaya_commune/SOURCE_AUDIT.md` [NEW - Forensic legal reconciliation against Loi 26-06 and Décrets 26-206 / 26-253]
+  - `docs/aafiya_v1/master_data/wilaya_commune/DATA_VALIDATION_REPORT.md` [NEW - Detailed validation evidence ledger]
+  - `docs/aafiya_v1/master_data/wilaya_commune/validate.py` [NEW - Deterministic automated test suite]
+  - `docs/aafiya_v1/master_data/README.md` [NEW - Master Data index]
+  - `docs/aafiya_v1/EXECUTION_PLAN.md` [MODIFIED]
+  - `docs/aafiya_v1/VERIFICATION_LOG.md` [MODIFIED]
+  - `docs/aafiya_v1/CHANGELOG.md` [MODIFIED]
+- **Notes**: Established the single canonical project source of truth for Algerian geographic master data adhering to the 2026 reform (Loi n° 26-06 du 4 avril 2026, JORA n° 25 du 5 avril 2026). Zero mutations to Laravel backend, MySQL database, Next.js Web, Flutter apps, or Railway configuration. Next implementation tasks (TASK-MD-02 through TASK-MD-09) remain strictly un-authorized pending human review.
+
+---
+
+### TASK-B-05: DEF-05 — Doctor Dashboard KPI Responsive Layout
+- **Task ID**: `TASK-B-05`
+- **Task Name**: DEF-05 — Doctor Dashboard KPI Responsive Layout
+- **Phase**: `PHASE B — CLIENT DEFECT FIXES (MOBILE-ONLY)`
+- **Workstream**: Pro Mobile UX
+- **Date/Time**: 2026-10-02 15:50 CET
+- **Automated Verification**: PASSED
+  - Command: `flutter test test/doctor_responsive_dashboard_test.dart` in `mobile/apps/aafiya_pro` -> Exited 0 (12/12 tests passed, verifying compact viewports 360dp, 375dp, 390dp in Arabic, French, and English render adaptive 2+2+1 layout with zero RenderFlex overflow, medium viewports render 2+3 layout, expanded viewports render 1 single row of 5 cards, and `DoctorMetricCard` supports `maxLines: 2` with 74dp minimum height constraint).
+  - Command: `flutter test` in `mobile/apps/aafiya_pro` -> Exited 0 (130/130 tests passed across pro app).
+  - Command: `flutter analyze lib/` in `mobile/apps/aafiya_pro` -> Exited 0 (No issues found).
+- **Human Verification**: PENDING (Human Visual Verification)
+  - Reviewer: Human Project Authority
+  - Timestamp: Pending
+- **Result**: `IMPLEMENTED / VERIFIED`
+- **Files Modified**:
+  - `mobile/apps/aafiya_pro/lib/widgets/doctor_metric_card.dart`
+  - `mobile/apps/aafiya_pro/lib/widgets/doctor_dashboard_view.dart`
+  - `mobile/apps/aafiya_pro/test/doctor_responsive_dashboard_test.dart`
+  - `docs/aafiya_v1/EXECUTION_PLAN.md`
+  - `docs/aafiya_v1/VERIFICATION_LOG.md`
+  - `docs/aafiya_v1/CHANGELOG.md`
+  - `docs/aafiya_v1/PHASE_B/README.md`
+- **Notes**: Resolved DEF-05 doctor KPI metric card squish and label truncation on compact screens (< 400dp) by integrating Phase A `AafiyaBreakpoints` / `AafiyaResponsiveBuilder` to render an adaptive 2+2+1 layout, allowing 2-line label wrapping and imposing a minimum height constraint. Zero backend, database, or infrastructure mutations.
+
+---
+
+### TASK-B-04: DEF-04 — Safe Locale-Aware Appointment Date Formatting
+- **Task ID**: `TASK-B-04`
+- **Task Name**: DEF-04 — Safe Locale-Aware Appointment Date Formatting
+- **Phase**: `PHASE B — CLIENT DEFECT FIXES (MOBILE-ONLY)`
+- **Workstream**: Patient Mobile UX
+- **Date/Time**: 2026-10-02 15:38 CET
+- **Automated Verification**: PASSED
+  - Command: `flutter test test/patient_app_test.dart test/patient_home_test.dart` in `mobile/apps/aafiya_patient` -> Exited 0 (23/23 tests passed, including dedicated test group verifying safe locale-aware formatting across AR, EN, FR, safe fallback for short [<10 chars], malformed, and null strings without RangeError crashes).
+  - Command: `flutter test` in `mobile/apps/aafiya_patient` -> Exited 0 (120/120 tests passed across patient app).
+  - Command: `flutter analyze lib/` in `mobile/apps/aafiya_patient` -> Exited 0 (No issues found).
+  - Command: `flutter analyze lib/` in `mobile/packages/aafiya_core` -> Exited 0 (No issues found).
+- **Human Verification**: PENDING (Human Visual Verification)
+  - Reviewer: Human Project Authority
+  - Timestamp: Pending
+- **Result**: `IMPLEMENTED / VERIFIED`
+- **Files Modified**:
+  - `mobile/packages/aafiya_core/lib/localization/localized_strings.dart`
+  - `mobile/apps/aafiya_patient/lib/screens/appointment_detail_screen.dart`
+  - `mobile/apps/aafiya_patient/test/patient_app_test.dart`
+  - `mobile/apps/aafiya_patient/test/patient_home_test.dart`
+  - `docs/aafiya_v1/EXECUTION_PLAN.md`
+  - `docs/aafiya_v1/VERIFICATION_LOG.md`
+  - `docs/aafiya_v1/CHANGELOG.md`
+  - `docs/aafiya_v1/PHASE_B/README.md`
+- **Notes**: Replaced fragile `substring(0, 10)` slicing in `AppointmentDetailScreen` with safe, locale-aware `strings.formatDate` helper in `LocalizedStrings`. Zero crashes on edge case strings, clean multilingual month representations across AR, EN, FR. Zero backend, database, or infrastructure mutations.
+
+---
+
+### TASK-B-03: DEF-03 — Doctor Shell Navigation Label Correction
+- **Task ID**: `TASK-B-03`
+- **Task Name**: DEF-03 — Doctor Shell Navigation Label Correction
+- **Phase**: `PHASE B — CLIENT DEFECT FIXES (MOBILE-ONLY)`
+- **Workstream**: Pro Mobile UX
+- **Date/Time**: 2026-10-02 15:25 CET
+- **Automated Verification**: PASSED
+  - Command: `flutter test test/doctor_context_test.dart` in `mobile/apps/aafiya_pro` -> Exited 0 (9/9 tests passed, including dedicated test verifying bottom navigation Tab 1 displays "قاعة الانتظار" / "Waiting Room" / "Salle d'attente" and Tab 2 displays "عياداتي" / "My Clinics" / "Mes Cabinets", obsolete/misleading labels are absent, and tab switching routes correctly).
+  - Command: `flutter test` in `mobile/apps/aafiya_pro` -> Exited 0 (118/118 tests passed across pro app).
+  - Command: `flutter analyze lib/` in `mobile/apps/aafiya_pro` -> Exited 0 (No issues found).
+  - Command: `flutter analyze lib/` in `mobile/packages/aafiya_core` -> Exited 0 (No issues found).
+- **Human Verification**: PENDING (Human Visual Verification)
+  - Reviewer: Human Project Authority
+  - Timestamp: Pending
+- **Result**: `IMPLEMENTED / VERIFIED`
+- **Files Modified**:
+  - `mobile/packages/aafiya_core/lib/localization/localized_strings.dart`
+  - `mobile/apps/aafiya_pro/lib/shells/doctor_shell.dart`
+  - `mobile/apps/aafiya_pro/test/doctor_context_test.dart`
+  - `docs/aafiya_v1/EXECUTION_PLAN.md`
+  - `docs/aafiya_v1/VERIFICATION_LOG.md`
+  - `docs/aafiya_v1/CHANGELOG.md`
+  - `docs/aafiya_v1/PHASE_B/README.md`
+- **Notes**: Corrected doctor navigation destinations in `DoctorShell`. Tab 1 is now accurately labeled Waiting Room and Tab 2 is accurately labeled My Clinics in AR, EN, FR. Zero backend, database, or infrastructure mutations.
+
+---
+
+### TASK-B-02: DEF-02 Stage A — Doctor Directory Filter Localization & Client Preparation
+- **Task ID**: `TASK-B-02`
+- **Task Name**: DEF-02 Stage A — Doctor Directory Filter Localization & Client Preparation
+- **Phase**: `PHASE B — CLIENT DEFECT FIXES (MOBILE-ONLY)`
+- **Workstream**: Patient Mobile UX
+- **Date/Time**: 2026-10-02 15:15 CET
+- **Automated Verification**: PASSED
+  - Command: `flutter test test/patient_directory_test.dart` in `mobile/apps/aafiya_patient` -> Exited 0 (22/22 tests passed, including dedicated test verifying specialty and wilaya filter chips display in English and French, tap interactions query backend with correct canonical parameters, and `DoctorCard` / `ClinicCard` localize specialties and wilayas).
+  - Command: `flutter test` in `mobile/apps/aafiya_patient` -> Exited 0 (116/116 tests passed across patient app).
+  - Command: `flutter test` in `mobile/packages/aafiya_core` -> Exited 0 (152/152 tests passed).
+  - Command: `flutter analyze lib/` in `mobile/apps/aafiya_patient` -> Exited 0 (No issues found).
+  - Command: `flutter analyze lib/` in `mobile/packages/aafiya_core` -> Exited 0 (No issues found).
+- **Human Verification**: PENDING (Human Visual Verification)
+  - Reviewer: Human Project Authority
+  - Timestamp: Pending
+- **Result**: `IMPLEMENTED / VERIFIED`
+- **Files Modified**:
+  - `mobile/packages/aafiya_core/lib/localization/localized_strings.dart`
+  - `mobile/apps/aafiya_patient/lib/screens/doctor_directory_screen.dart`
+  - `mobile/apps/aafiya_patient/lib/screens/clinic_directory_screen.dart`
+  - `mobile/apps/aafiya_patient/lib/widgets/doctor_card.dart`
+  - `mobile/apps/aafiya_patient/lib/widgets/clinic_card.dart`
+  - `mobile/apps/aafiya_patient/test/patient_directory_test.dart`
+  - `docs/aafiya_v1/EXECUTION_PLAN.md`
+  - `docs/aafiya_v1/VERIFICATION_LOG.md`
+  - `docs/aafiya_v1/CHANGELOG.md`
+  - `docs/aafiya_v1/PHASE_B/README.md`
+- **Evidence**:
+  - Replaced hardcoded Arabic filter chips with `DirectoryFilterOption` architecture decoupling display label from API query parameter.
+  - Specialty filter chips and Wilaya filter chips now render in active locale (AR, EN, FR).
+  - Zero 69-Wilaya artificial client dataset added (Stage B deferred to future backend phase).
+  - Existing search and filtering functionality preserved with 100% test pass rate.
+  - Zero backend/database/Railway mutations.
+- **Notes**: Next task is `TASK-B-03` (DEF-03 — Doctor Shell Bottom Navigation Tab Label Inversion).
+
+---
+
+### TASK-B-01: DEF-01 — Prescription Empty-State String Correction
+- **Task ID**: `TASK-B-01`
+- **Task Name**: DEF-01 — Prescription Empty-State String Correction
+- **Phase**: `PHASE B — CLIENT DEFECT FIXES (MOBILE-ONLY)`
+- **Workstream**: Patient Mobile UX
+- **Date/Time**: 2026-10-02 15:00 CET
+- **Automated Verification**: PASSED
+  - Command: `flutter test test/patient_prescription_test.dart` in `mobile/apps/aafiya_patient` -> Exited 0 (11/11 tests passed, including dedicated test verifying empty prescription items list displays `strings.noPrescriptionItems` across AR, EN, FR, and does not display `strings.noDoctorsFound`).
+  - Command: `flutter test` in `mobile/apps/aafiya_patient` -> Exited 0 (114/114 tests passed across patient app).
+  - Command: `flutter test` in `mobile/packages/aafiya_core` -> Exited 0 (152/152 tests passed).
+  - Command: `flutter analyze lib/` in `mobile/apps/aafiya_patient` -> Exited 0 (No issues found).
+  - Command: `flutter analyze lib/` in `mobile/packages/aafiya_core` -> Exited 0 (No issues found).
+- **Human Verification**: PENDING (Human Visual Verification)
+  - Reviewer: Human Project Authority
+  - Timestamp: Pending
+- **Result**: `IMPLEMENTED / VERIFIED`
+- **Files Modified**:
+  - `mobile/packages/aafiya_core/lib/localization/localized_strings.dart`
+  - `mobile/apps/aafiya_patient/lib/screens/prescription_detail_screen.dart`
+  - `mobile/apps/aafiya_patient/test/patient_prescription_test.dart`
+  - `docs/aafiya_v1/EXECUTION_PLAN.md`
+  - `docs/aafiya_v1/VERIFICATION_LOG.md`
+  - `docs/aafiya_v1/CHANGELOG.md`
+  - `docs/aafiya_v1/PHASE_B/README.md`
+- **Evidence**:
+  - Corrected empty prescription items display from "لم يتم العثور على أطباء" to "لا توجد أدوية مدرجة في هذه الوصفة" (AR) / "Aucun médicament inscrit sur cette ordonnance" (FR) / "No medications listed in this prescription" (EN).
+  - Zero changes to prescription business logic or API contracts.
+  - Zero backend/database/Railway mutations.
+- **Notes**: Next task is `TASK-B-02` (DEF-02 Stage A — Doctor Directory Filter Localization & Client Preparation).
+
+---
+
+### TASK-A-04: Responsive / Visual Foundation
+- **Task ID**: `TASK-A-04`
+- **Task Name**: Responsive / Visual Foundation
+- **Phase**: `PHASE A — CLIENT-ONLY DESIGN SYSTEM & UI FOUNDATION`
+- **Workstream**: Design System & Client UI Foundation
+- **Date/Time**: 2026-10-02 13:35 CET
+- **Automated Verification**: PASSED
+  - Command: `flutter test test/aafiya_responsive_test.dart` in `mobile/packages/aafiya_ui` -> Exited 0 (8/8 tests passed: breakpoint threshold logic across 320dp-1024dp, compact layout rendering at 360dp, medium layout rendering at 480dp, expanded layout rendering at 720dp, fallback cascade when medium/expanded omitted, responsive builder context extensions `isCompact`, `isMedium`, `isExpanded`, numeric elevation token scale, box shadow definitions).
+  - Command: `flutter test` in `mobile/packages/aafiya_ui` -> Exited 0 (50/50 tests passed across the package).
+  - Command: `flutter analyze mobile/packages/aafiya_ui` -> Exited 0 (No issues found, 0 errors, 0 warnings, 0 info).
+  - Command: `npm run lint` & `npx tsc --noEmit` -> Exited 0 (Web TypeScript and Next.js linting clean).
+- **Human Verification**: PENDING (Final Phase A Human Verification Gate)
+  - Reviewer: Human Project Authority
+  - Timestamp: Pending
+- **Result**: `IMPLEMENTED / VERIFIED`
+- **Files Modified / Created**:
+  - `mobile/packages/aafiya_ui/lib/tokens/aafiya_breakpoints.dart` [NEW]
+  - `mobile/packages/aafiya_ui/lib/tokens/aafiya_elevation.dart` [NEW]
+  - `mobile/packages/aafiya_ui/lib/aafiya_ui.dart` [MODIFIED - exported breakpoints and elevation]
+  - `mobile/packages/aafiya_ui/test/aafiya_responsive_test.dart` [NEW]
+  - `docs/aafiya_v1/EXECUTION_PLAN.md` [MODIFIED]
+  - `docs/aafiya_v1/VERIFICATION_LOG.md` [MODIFIED]
+- **Evidence**:
+  - Establishes standardized screen categories (`compact < 400dp`, `medium 400-599dp`, `expanded >= 600dp`).
+  - Prepares the design system for subsequent DEF-05 fix in Phase B.
+  - Aligns surface depth shadows across mobile and web.
+- **Notes**: All 4 Phase A tasks are now implemented and verified. Proceeding to Phase A integration verification.
+
+---
+
+### TASK-A-03: Reusable Loading / Skeleton Foundation
+- **Task ID**: `TASK-A-03`
+- **Task Name**: Reusable Loading / Skeleton Foundation
+- **Phase**: `PHASE A — CLIENT-ONLY DESIGN SYSTEM & UI FOUNDATION`
+- **Workstream**: Design System & Client UI Foundation
+- **Date/Time**: 2026-10-02 13:30 CET
+- **Automated Verification**: PASSED
+  - Command: `flutter test test/aafiya_skeleton_test.dart` in `mobile/packages/aafiya_ui` -> Exited 0 (7/7 tests passed: base widget dimensions and animation frames, line placeholder, circular avatar placeholder, card placeholder with nested skeleton elements, dark mode surface theme adaptation, listTile layout placeholder, clean AnimationController disposal on unmount).
+  - Command: `flutter test` in `mobile/packages/aafiya_ui` -> Exited 0 (42/42 tests passed across the package).
+  - Command: `flutter analyze mobile/packages/aafiya_ui` -> Exited 0 (No issues found, 0 errors, 0 warnings, 0 info).
+- **Human Verification**: PENDING (Final Phase A Human Verification Gate)
+  - Reviewer: Human Project Authority
+  - Timestamp: Pending
+- **Result**: `IMPLEMENTED / VERIFIED`
+- **Files Modified / Created**:
+  - `mobile/packages/aafiya_ui/lib/widgets/aafiya_skeleton.dart` [NEW]
+  - `mobile/packages/aafiya_ui/lib/aafiya_ui.dart` [MODIFIED - exported skeleton]
+  - `mobile/packages/aafiya_ui/test/aafiya_skeleton_test.dart` [NEW]
+  - `docs/aafiya_v1/EXECUTION_PLAN.md` [MODIFIED]
+  - `docs/aafiya_v1/VERIFICATION_LOG.md` [MODIFIED]
+- **Evidence**:
+  - Implements lightweight native Flutter shimmer animation using `SingleTickerProviderStateMixin`, `LinearGradient`, and `AnimatedBuilder`.
+  - Zero external package dependencies (no heavy third-party shimmer libraries).
+  - Clean lifecycle management: verified 0 memory leaks or unmanaged ticker warnings on widget disposal.
+  - Automatically derives surface and highlight colors from `Theme.of(context).brightness`.
+- **Notes**: Next task is `TASK-A-04` (Responsive / Visual Foundation).
+
+---
+
+### TASK-A-02: Typography Foundation & Local Font Integration
+- **Task ID**: `TASK-A-02`
+- **Task Name**: Typography Foundation & Local Font Integration
+- **Phase**: `PHASE A — CLIENT-ONLY DESIGN SYSTEM & UI FOUNDATION`
+- **Workstream**: Design System & Client UI Foundation
+- **Date/Time**: 2026-10-02 13:26 CET
+- **Automated Verification**: PASSED
+  - Command: Controlled font evaluation script -> Option B (`IBM Plex Sans Arabic` + `Plus Jakarta Sans`) chosen. Measured metrics: UPEM 1000, hhea ratio 1.50 (vs 2.112 in Noto), total bundled size 1.1 MB (235.9 KB Regular, 242.1 KB Medium, 244.6 KB SemiBold, 246.9 KB Bold, 176.2 KB Plus Jakarta Sans variable).
+  - Command: `flutter test` in `mobile/packages/aafiya_ui` -> Exited 0 (35/35 tests passed; verified `AafiyaTypography.fontFamily` is `IBMPlexSansArabic`, all text styles bind to `IBMPlexSansArabic` with local package asset resolution, and Material 3 textTheme in light and dark modes binds to local fonts; 0 runtime network font fetching exceptions logged).
+  - Command: `flutter analyze mobile/packages/aafiya_ui` -> Exited 0 (No issues found, 0 errors, 0 warnings, 0 info).
+  - Command: `npx tsc --noEmit` -> Exited 0 (TypeScript compile clean).
+  - Command: `npm run lint` -> Exited 0 (Web lint clean).
+- **Human Verification**: PENDING (Final Phase A Human Verification Gate)
+  - Reviewer: Human Project Authority
+  - Timestamp: Pending
+- **Result**: `IMPLEMENTED / VERIFIED`
+- **Files Modified**:
+  - `mobile/packages/aafiya_ui/assets/fonts/IBMPlexSansArabic-Regular.ttf` [NEW]
+  - `mobile/packages/aafiya_ui/assets/fonts/IBMPlexSansArabic-Medium.ttf` [NEW]
+  - `mobile/packages/aafiya_ui/assets/fonts/IBMPlexSansArabic-SemiBold.ttf` [NEW]
+  - `mobile/packages/aafiya_ui/assets/fonts/IBMPlexSansArabic-Bold.ttf` [NEW]
+  - `mobile/packages/aafiya_ui/assets/fonts/PlusJakartaSans.ttf` [NEW]
+  - `mobile/packages/aafiya_ui/assets/fonts/OFL-IBMPlexSansArabic.txt` [NEW]
+  - `mobile/packages/aafiya_ui/assets/fonts/OFL-PlusJakartaSans.txt` [NEW]
+  - `mobile/packages/aafiya_ui/pubspec.yaml`
+  - `mobile/packages/aafiya_ui/lib/tokens/aafiya_typography.dart`
+  - `mobile/packages/aafiya_ui/lib/theme/aafiya_theme.dart`
+  - `mobile/packages/aafiya_ui/lib/widgets/aafiya_offline_banner.dart`
+  - `mobile/packages/aafiya_ui/test/aafiya_ui_test.dart`
+  - `src/index.css`
+  - `src/app/[locale]/layout.tsx`
+  - `docs/aafiya_v1/EXECUTION_PLAN.md`
+- **Evidence**:
+  - Eliminates runtime GoogleFonts network fetching exceptions entirely.
+  - 100% offline font availability across Flutter and Web.
+  - Native Latin glyphs in IBM Plex prevent mixed-script baseline jitter in bilingual healthcare cards.
+- **Notes**: Next task is `TASK-A-03` (Reusable Loading / Skeleton Foundation).
+
+---
+
+### TASK-A-01: Accessible Color Foundation
+- **Task ID**: `TASK-A-01`
+- **Task Name**: Accessible Color Foundation
+- **Phase**: `PHASE A — CLIENT-ONLY DESIGN SYSTEM & UI FOUNDATION`
+- **Workstream**: Design System & Client UI Foundation
+- **Date/Time**: 2026-10-02 13:14 CET
+- **Automated Verification**: PASSED
+  - Command: `python3 contrast_math` -> 13/13 token pairs checked. `#0F172A` on `#48C774` passes WCAG AAA (8.24:1). `#FFFFFF` on `#15803D` passes WCAG AA (5.02:1). `#FFFFFF` on `#0077B6` passes WCAG AA (4.87:1).
+  - Command: `flutter test` in `mobile/packages/aafiya_ui` -> Exited 0 (35/35 tests passed; verified `actionGreen`, `linkBlue`, `healingGreenSurface`, `onHealingGreen`, `lightTheme.colorScheme.onSecondary`, `darkTheme.colorScheme.onSecondary`, `AafiyaButton` secondary variant `onHealingGreen` foreground, and action variant `actionGreen` background).
+  - Command: `npx tsc --noEmit` -> Exited 0 (TypeScript compilation clean).
+- **Human Verification**: PENDING (Final Phase A Human Verification Gate)
+  - Reviewer: Human Project Authority
+  - Timestamp: Pending
+- **Result**: `IMPLEMENTED / VERIFIED`
+- **Files Modified**:
+  - `mobile/packages/aafiya_ui/lib/tokens/aafiya_colors.dart`
+  - `mobile/packages/aafiya_ui/lib/theme/aafiya_theme.dart`
+  - `mobile/packages/aafiya_ui/lib/widgets/aafiya_button.dart`
+  - `mobile/packages/aafiya_ui/test/aafiya_ui_test.dart`
+  - `src/index.css`
+  - `docs/aafiya_v1/EXECUTION_PLAN.md`
+- **Evidence**:
+  - Official brand colors `#0077B6` and `#48C774` preserved with zero degradation.
+  - Eliminated 2.18:1 contrast failure by enforcing dark `#0F172A` on `#48C774` (8.24:1, WCAG AAA).
+  - Added accessible action green `#15803D` (5.02:1, WCAG AA) for white-text buttons.
+- **Notes**: Next task is `TASK-A-02` (Typography Foundation & Local Font Integration).
+
+---
 
 ### TASK-07-03: Final Human Verification Gate & Master Plan Sign-Off
 - **Task ID**: `TASK-07-03`

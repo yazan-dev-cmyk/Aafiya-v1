@@ -56,7 +56,7 @@ class ClinicCard extends StatelessWidget {
                       if (clinic.wilaya != null && clinic.wilaya!.isNotEmpty) ...[
                         const SizedBox(height: 2),
                         Text(
-                          clinic.wilaya!,
+                          strings.wilayaName(clinic.wilaya!),
                           style: AafiyaTypography.bodyMedium.copyWith(
                             color: AafiyaColors.secondaryText,
                             fontSize: 13,
@@ -78,7 +78,7 @@ class ClinicCard extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      clinic.wilaya!,
+                      strings.wilayaName(clinic.wilaya!),
                       style: AafiyaTypography.caption.copyWith(
                         color: AafiyaColors.healthBlue,
                         fontWeight: FontWeight.bold,
@@ -161,7 +161,7 @@ class ClinicCard extends StatelessWidget {
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
-                      '${strings.director}: ${clinic.director!.name}${clinic.director!.specialty != null && clinic.director!.specialty!.isNotEmpty ? ' (${clinic.director!.specialty})' : ''}',
+                      '${strings.director}: ${clinic.director!.name}${clinic.director!.specialty != null && clinic.director!.specialty!.isNotEmpty ? ' (${strings.specialtyName(clinic.director!.specialty!)})' : ''}',
                       style: AafiyaTypography.caption.copyWith(
                         color: AafiyaColors.secondaryText,
                         fontSize: 12,

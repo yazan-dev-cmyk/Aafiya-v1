@@ -37,11 +37,19 @@ class ClinicController extends Controller
     {
         $perPage = min(max((int) $request->query('per_page', 20), 1), 100);
 
-        $query = Clinic::with(['director.user', 'doctors.user'])
+        $query = Clinic::with(['director.user', 'director.medicalSpecialty', 'doctors.user', 'doctors.medicalSpecialty'])
             ->where('is_active', true);
 
         if ($request->has('wilaya')) {
             $query->where('wilaya', $request->query('wilaya'));
+        }
+
+        if ($request->has('specialty_id') && ! empty($request->query('specialty_id'))) {
+            $specialtyId = (int) $request->query('specialty_id');
+            $query->where(function ($q) use ($specialtyId) {
+                $q->whereHas('director', fn ($dQ) => $dQ->where('specialty_id', $specialtyId))
+                  ->orWhereHas('doctors', fn ($dQ) => $dQ->where('specialty_id', $specialtyId)->where('doctor_clinic.is_active', true));
+            });
         }
 
         $clinics = $query->orderBy('created_at', 'desc')->orderBy('id', 'desc')->paginate($perPage);

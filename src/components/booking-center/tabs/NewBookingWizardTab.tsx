@@ -29,6 +29,7 @@ import {
 import { adminService, AdminDoctorItem } from '@/services/adminService';
 import { appointmentService } from '@/services/appointmentService';
 import { ehrService } from '@/services/ehrService';
+import { WilayaSelect, CommuneSelect } from '../../master-data';
 
 interface DoctorSearchItem {
   id: string;
@@ -90,7 +91,8 @@ export const NewBookingWizardTab: React.FC<NewBookingWizardTabProps> = ({
   // Guest Patient Details
   const [guestName, setGuestName] = useState('');
   const [guestPhone, setGuestPhone] = useState('');
-  const [guestWilaya, setGuestWilaya] = useState('الجزائر العاصمة');
+  const [guestWilaya, setGuestWilaya] = useState('');
+  const [guestCommune, setGuestCommune] = useState('');
   const [guestAge, setGuestAge] = useState<number>(30);
 
   // Doctor & Slot Selection
@@ -638,21 +640,23 @@ export const NewBookingWizardTab: React.FC<NewBookingWizardTabProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    الولاية / المدينة
-                  </label>
-                  <select
+                  <WilayaSelect
+                    label="الولاية"
                     value={guestWilaya}
-                    onChange={(e) => setGuestWilaya(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="الجزائر العاصمة">الجزائر العاصمة</option>
-                    <option value="وهران">وهران</option>
-                    <option value="قسنطينة">قسنطينة</option>
-                    <option value="عنابة">عنابة</option>
-                    <option value="البليدة">البليدة</option>
-                    <option value="سطيف">سطيف</option>
-                  </select>
+                    onChange={(code) => {
+                      setGuestWilaya(code);
+                      setGuestCommune('');
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <CommuneSelect
+                    label="البلدية"
+                    wilayaCode={guestWilaya}
+                    value={guestCommune}
+                    onChange={setGuestCommune}
+                  />
                 </div>
 
                 <div>

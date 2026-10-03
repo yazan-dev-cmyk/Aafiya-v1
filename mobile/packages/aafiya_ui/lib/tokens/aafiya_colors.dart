@@ -15,6 +15,19 @@ abstract final class AafiyaColors {
   static const Color primaryBlue = healthBlue;
   static const Color primaryGreen = healingGreen;
 
+  // Accessible Role-Based Action & Surface Tokens (WCAG 2.1 AA Compliant)
+  /// Accessible high-contrast green for filled action CTAs with white text (Contrast 5.02:1).
+  static const Color actionGreen = Color(0xFF15803D);
+
+  /// Accessible link blue for text links on light background (Contrast 6.31:1).
+  static const Color linkBlue = Color(0xFF005F92);
+
+  /// Surface tint for healingGreen chips, tags, and badge backgrounds.
+  static const Color healingGreenSurface = Color(0xFFE8F8EE);
+
+  /// Foreground text/icon color on healingGreen surfaces (Contrast 8.24:1, WCAG AAA).
+  static const Color onHealingGreen = Color(0xFF0F172A);
+
   // Surface & Text (Light Mode)
   static const Color primaryText = Color(0xFF0F172A);
   static const Color secondaryText = Color(0xFF475569);

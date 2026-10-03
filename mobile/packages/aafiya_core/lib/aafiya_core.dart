@@ -38,4 +38,8 @@ export 'models/booking_package.dart';
 export 'models/package_purchase_request.dart';
 export 'models/booking_transaction.dart';
 export 'services/booking_center_service.dart';
+export 'models/wilaya.dart';
+export 'models/commune.dart';
+export 'models/medical_specialty.dart';
+export 'services/master_data_service.dart';
 

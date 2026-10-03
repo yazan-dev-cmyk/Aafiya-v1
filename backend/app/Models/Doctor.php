@@ -29,6 +29,7 @@ class Doctor extends Model
     protected $fillable = [
         'user_id',
         'specialty',
+        'specialty_id',
         'license_number',
         'bio',
         'is_verified',
@@ -42,8 +43,17 @@ class Doctor extends Model
     protected function casts(): array
     {
         return [
+            'specialty_id' => 'integer',
             'is_verified' => 'boolean',
         ];
+    }
+
+    /**
+     * The medical specialty assigned to this doctor.
+     */
+    public function medicalSpecialty(): BelongsTo
+    {
+        return $this->belongsTo(MedicalSpecialty::class, 'specialty_id');
     }
 
     /**

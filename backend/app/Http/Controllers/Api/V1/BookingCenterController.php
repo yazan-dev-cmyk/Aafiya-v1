@@ -14,6 +14,7 @@ use App\Models\BookingCenter;
 use App\Models\BookingPackage;
 use App\Models\BookingTransaction;
 use App\Services\BookingCenterService;
+use App\Services\LegacyWilayaMigrationService;
 use App\Services\PackagePurchaseRequestService;
 use App\Services\QuotaService;
 use Illuminate\Http\JsonResponse;
@@ -183,6 +184,11 @@ class BookingCenterController extends Controller
         $validated = $request->validated();
         $allowed = ['name', 'phone', 'email', 'wilaya', 'address'];
         $updateData = array_intersect_key($validated, array_flip($allowed));
+
+        if (isset($updateData['wilaya'])) {
+            $wilayaModel = app(LegacyWilayaMigrationService::class)->resolveWilaya($updateData['wilaya']);
+            $updateData['wilaya_id'] = $wilayaModel?->id;
+        }
 
         $center->update($updateData);
 

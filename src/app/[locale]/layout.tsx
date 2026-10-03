@@ -1,12 +1,23 @@
 import React from 'react';
 import type { Metadata } from 'next';
-import { Amiri, Satisfy, Inter } from 'next/font/google';
+import { Amiri, Satisfy, Inter, IBM_Plex_Sans_Arabic, Plus_Jakarta_Sans } from 'next/font/google';
 import '../../index.css';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, setRequestLocale, getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { AuthProvider } from '@/auth';
+
+const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({
+  subsets: ['arabic'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-ibm-plex-arabic',
+});
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  variable: '--font-plus-jakarta',
+});
 
 const amiri = Amiri({
   subsets: ['arabic'],
@@ -65,11 +76,28 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
         'max-snippet': -1,
       },
     },
+    icons: {
+      icon: [
+        { url: '/favicon.ico', sizes: 'any' },
+        { url: '/favicon-32.png', type: 'image/png', sizes: '32x32' },
+      ],
+      apple: [
+        { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+      ],
+    },
     openGraph: {
       title: t('title'),
       description: t('description'),
       url: `${cleanBaseUrl}/${locale}`,
       siteName: 'Aafiya',
+      images: [
+        {
+          url: `${cleanBaseUrl}/og/aafiya-opengraph.png`,
+          width: 1200,
+          height: 630,
+          alt: 'AAFIYA — Digital Healthcare Platform',
+        },
+      ],
       type: 'website',
       locale: locale === 'ar' ? 'ar_DZ' : locale === 'fr' ? 'fr_FR' : 'en_US',
     },
@@ -77,6 +105,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
       card: 'summary_large_image',
       title: t('title'),
       description: t('description'),
+      images: [`${cleanBaseUrl}/og/aafiya-opengraph.png`],
     },
   };
 }
@@ -120,14 +149,14 @@ export default async function LocaleLayout({
   };
 
   return (
-    <html lang={locale} dir={isRtl ? 'rtl' : 'ltr'} className={`${amiri.variable} ${satisfy.variable} ${inter.variable}`} suppressHydrationWarning>
+    <html lang={locale} dir={isRtl ? 'rtl' : 'ltr'} className={`${ibmPlexSansArabic.variable} ${plusJakartaSans.variable} ${amiri.variable} ${satisfy.variable} ${inter.variable}`} suppressHydrationWarning>
       <head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className={`${isRtl ? amiri.className : inter.className} bg-slate-50 text-slate-900 antialiased selection:bg-teal-500 selection:text-white`} suppressHydrationWarning>
+      <body className={`${isRtl ? ibmPlexSansArabic.className : plusJakartaSans.className} bg-slate-50 text-slate-900 antialiased selection:bg-teal-500 selection:text-white`} suppressHydrationWarning>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <AuthProvider>
             {children}

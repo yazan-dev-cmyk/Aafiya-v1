@@ -8,11 +8,18 @@ use App\Models\PatientAllergy;
 use App\Models\PatientChronicCondition;
 use App\Models\PatientCurrentMedication;
 use App\Models\User;
+use App\Services\LegacyWilayaMigrationService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class EhrService
 {
+    public function __construct(
+        protected ?LegacyWilayaMigrationService $wilayaResolver = null
+    ) {
+        $this->wilayaResolver = $this->wilayaResolver ?? app(LegacyWilayaMigrationService::class);
+    }
+
     /**
      * Register a new patient and assign a sequential unique MRN.
      *
@@ -22,6 +29,9 @@ class EhrService
     {
         return DB::transaction(function () use ($data) {
             $mrn = $this->generateMrn();
+
+            $wilayaStr = $data['wilaya'] ?? null;
+            $wilayaId = $data['wilaya_id'] ?? ($wilayaStr !== null ? $this->wilayaResolver->resolveWilaya($wilayaStr)?->id : null);
 
             return Patient::create([
                 'user_id' => $data['user_id'] ?? null,
@@ -35,7 +45,8 @@ class EhrService
                 'email' => $data['email'] ?? null,
                 'national_id' => $data['national_id'] ?? null,
                 'address' => $data['address'] ?? null,
-                'wilaya' => $data['wilaya'] ?? null,
+                'wilaya' => $wilayaStr,
+                'wilaya_id' => $wilayaId,
                 'is_active' => true,
             ]);
         }, 5);
@@ -48,7 +59,7 @@ class EhrService
      */
     public function updatePatient(Patient $patient, array $data): Patient
     {
-        $patient->update(array_filter([
+        $updateData = [
             'first_name' => $data['first_name'] ?? $patient->first_name,
             'last_name' => $data['last_name'] ?? $patient->last_name,
             'gender' => $data['gender'] ?? $patient->gender,
@@ -58,9 +69,19 @@ class EhrService
             'email' => $data['email'] ?? $patient->email,
             'national_id' => $data['national_id'] ?? $patient->national_id,
             'address' => $data['address'] ?? $patient->address,
-            'wilaya' => $data['wilaya'] ?? $patient->wilaya,
             'is_active' => isset($data['is_active']) ? (bool) $data['is_active'] : $patient->is_active,
-        ], fn ($val) => $val !== null));
+        ];
+
+        if (array_key_exists('wilaya', $data)) {
+            $wilayaStr = $data['wilaya'];
+            $wilayaId = $data['wilaya_id'] ?? ($wilayaStr !== null ? $this->wilayaResolver->resolveWilaya($wilayaStr)?->id : null);
+            $updateData['wilaya'] = $wilayaStr;
+            $updateData['wilaya_id'] = $wilayaId;
+        } elseif (array_key_exists('wilaya_id', $data)) {
+            $updateData['wilaya_id'] = $data['wilaya_id'];
+        }
+
+        $patient->update(array_filter($updateData, fn ($val) => $val !== null));
 
         return $patient->fresh();
     }

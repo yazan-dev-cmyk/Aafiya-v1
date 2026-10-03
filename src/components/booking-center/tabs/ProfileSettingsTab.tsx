@@ -18,6 +18,7 @@ import {
 import { useAuth } from '@/auth';
 import { bookingCenterService, BookingPoliciesData } from '@/services/bookingCenterService';
 import { ChangePasswordCard } from '../../shared/ChangePasswordCard';
+import { WilayaSelect } from '../../master-data';
 
 export const ProfileSettingsTab: React.FC = () => {
   const { user, refreshUser } = useAuth();
@@ -213,12 +214,11 @@ export const ProfileSettingsTab: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">الولاية المقر</label>
-            <input
-              type="text"
+            <WilayaSelect
+              label="الولاية المقر"
               value={wilaya}
-              onChange={(e) => setWilaya(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(code) => setWilaya(code)}
+              required
             />
           </div>
 

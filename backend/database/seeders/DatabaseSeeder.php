@@ -19,6 +19,8 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             RolePermissionSeeder::class,
             BookingPackageSeeder::class,
+            WilayaCommuneMasterDataSeeder::class,
+            MedicalSpecialtyMasterDataSeeder::class,
         ]);
     }
 }

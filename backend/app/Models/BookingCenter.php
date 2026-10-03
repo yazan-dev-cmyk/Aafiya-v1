@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
     'email',
     'address',
     'wilaya',
+    'wilaya_id',
     'quota_balance',
     'verification_status',
     'verified_at',
@@ -55,6 +56,14 @@ class BookingCenter extends Model
     public function isOperational(): bool
     {
         return $this->verification_status === self::STATUS_VERIFIED && (bool) $this->is_active;
+    }
+
+    /**
+     * Authoritative Wilaya relationship.
+     */
+    public function wilaya(): BelongsTo
+    {
+        return $this->belongsTo(Wilaya::class, 'wilaya_id');
     }
 
     /**

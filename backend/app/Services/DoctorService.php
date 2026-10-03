@@ -4,10 +4,17 @@ namespace App\Services;
 
 use App\Models\Doctor;
 use App\Models\User;
+use App\Services\LegacySpecialtyResolutionService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class DoctorService
 {
+    public function __construct(
+        protected ?LegacySpecialtyResolutionService $specialtyResolver = null
+    ) {
+        $this->specialtyResolver = $this->specialtyResolver ?? app(LegacySpecialtyResolutionService::class);
+    }
+
     /**
      * Get paginated public directory of verified/active doctors.
      */
@@ -17,6 +24,7 @@ class DoctorService
 
         $query = Doctor::with([
             'user:id,name',
+            'medicalSpecialty:id,code,name_ar,name_fr,name_en,is_active',
             'clinics' => fn ($q) => $q->where('clinics.is_active', true)
                 ->where('doctor_clinic.is_active', true)
                 ->select(['clinics.id', 'clinics.name', 'clinics.wilaya', 'clinics.address', 'clinics.phone']),
@@ -26,7 +34,13 @@ class DoctorService
             $s = trim($filters['search']);
             if ($s !== '') {
                 $query->where(function ($sub) use ($s) {
-                    $sub->where('specialty', 'like', "%{$s}%")
+                    $sub->where('doctors.specialty', 'like', "%{$s}%")
+                        ->orWhereHas('medicalSpecialty', function ($mQ) use ($s) {
+                            $mQ->where('name_ar', 'like', "%{$s}%")
+                               ->orWhere('name_fr', 'like', "%{$s}%")
+                               ->orWhere('name_en', 'like', "%{$s}%")
+                               ->orWhere('code', 'like', "%{$s}%");
+                        })
                         ->orWhereHas('user', fn ($uQ) => $uQ->where('name', 'like', "%{$s}%"))
                         ->orWhereHas('clinics', fn ($cQ) => 
                             $cQ->where('clinics.is_active', true)
@@ -40,8 +54,18 @@ class DoctorService
             }
         }
 
-        if (! empty($filters['specialty'])) {
-            $query->where('specialty', 'like', '%' . $filters['specialty'] . '%');
+        if (! empty($filters['specialty_id'])) {
+            $query->where('doctors.specialty_id', (int) $filters['specialty_id']);
+        } elseif (! empty($filters['specialty'])) {
+            $resolved = $this->specialtyResolver->resolveSpecialtyModel($filters['specialty']);
+            if ($resolved) {
+                $query->where(function ($sub) use ($resolved, $filters) {
+                    $sub->where('doctors.specialty_id', $resolved->id)
+                        ->orWhere('doctors.specialty', 'like', '%' . $filters['specialty'] . '%');
+                });
+            } else {
+                $query->where('doctors.specialty', 'like', '%' . $filters['specialty'] . '%');
+            }
         }
 
         if (! empty($filters['wilaya'])) {
@@ -66,7 +90,7 @@ class DoctorService
      */
     public function getDoctorProfile(string $doctorId): Doctor
     {
-        return Doctor::with(['user:id,name', 'clinics:id,name,wilaya,address,phone'])
+        return Doctor::with(['user:id,name', 'medicalSpecialty', 'clinics:id,name,wilaya,address,phone'])
             ->findOrFail($doctorId);
     }
 
@@ -75,10 +99,16 @@ class DoctorService
      */
     public function createDoctorProfile(User $user, array $data): Doctor
     {
+        $specialtyId = $data['specialty_id'] ?? null;
+        if (! $specialtyId && ! empty($data['specialty'])) {
+            $specialtyId = $this->specialtyResolver->resolveSpecialtyModel($data['specialty'])?->id;
+        }
+
         $doctor = Doctor::updateOrCreate(
             ['user_id' => $user->id],
             [
                 'specialty' => $data['specialty'],
+                'specialty_id' => $specialtyId,
                 'license_number' => $data['license_number'],
                 'bio' => $data['bio'] ?? null,
                 'is_verified' => $data['is_verified'] ?? false,

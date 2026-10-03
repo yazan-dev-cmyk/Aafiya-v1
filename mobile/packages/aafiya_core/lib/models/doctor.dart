@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'medical_specialty.dart';
 
 /// Affiliated clinic where a doctor practices.
 @immutable
@@ -38,6 +39,8 @@ class Doctor {
     required this.id,
     required this.name,
     required this.specialty,
+    this.specialtyId,
+    this.medicalSpecialty,
     this.bio,
     this.isVerified = false,
     this.clinics = const [],
@@ -47,6 +50,8 @@ class Doctor {
   final String id;
   final String name;
   final String specialty;
+  final int? specialtyId;
+  final MedicalSpecialty? medicalSpecialty;
   final String? bio;
   final bool isVerified;
   final List<DoctorClinicAffiliation> clinics;
@@ -63,14 +68,36 @@ class Doctor {
       }
     }
 
+    final rawSpecialtyId = json['specialty_id'];
+    final parsedSpecialtyId = rawSpecialtyId is num
+        ? rawSpecialtyId.toInt()
+        : int.tryParse(rawSpecialtyId?.toString() ?? '');
+
+    MedicalSpecialty? parsedMedicalSpecialty;
+    if (json['medical_specialty'] is Map<String, dynamic>) {
+      parsedMedicalSpecialty = MedicalSpecialty.fromJson(json['medical_specialty'] as Map<String, dynamic>);
+    }
+
     return Doctor(
       id: json['id']?.toString() ?? '',
       name: (json['name'] as String?) ?? '',
       specialty: (json['specialty'] as String?) ?? '',
+      specialtyId: parsedSpecialtyId,
+      medicalSpecialty: parsedMedicalSpecialty,
       bio: json['bio'] as String?,
       isVerified: json['is_verified'] == true,
       clinics: clinicsList,
       createdAt: json['created_at'] as String?,
     );
+  }
+
+  /// Returns the localized specialty label based on languageCode (`ar`, `fr`, `en`).
+  /// Priority: Canonical medicalSpecialty localized name -> legacy specialty text -> empty string.
+  String localizedSpecialty(String languageCode) {
+    if (medicalSpecialty != null) {
+      final loc = medicalSpecialty!.localizedName(languageCode);
+      if (loc.isNotEmpty) return loc;
+    }
+    return specialty;
   }
 }

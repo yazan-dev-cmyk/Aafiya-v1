@@ -52,7 +52,7 @@ export default function TestAppsClient({ locale }: TestAppsClientProps) {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img 
-              src="/logo/Aafiya_Master_Logo.svg" 
+              src="/logo/Aafiya_Logo_No_Tagline.png" 
               alt="AAFIYA Logo" 
               className="h-10 w-auto object-contain" 
             />

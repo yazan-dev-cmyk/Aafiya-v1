@@ -7,6 +7,7 @@ use App\Models\ClinicAssistant;
 use App\Models\Doctor;
 use App\Models\DoctorClinic;
 use App\Models\User;
+use App\Services\LegacyWilayaMigrationService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -15,8 +16,11 @@ use Illuminate\Validation\ValidationException;
 class ClinicService
 {
     public function __construct(
-        protected AuthorizationService $authorizationService
-    ) {}
+        protected AuthorizationService $authorizationService,
+        protected ?LegacyWilayaMigrationService $wilayaResolver = null
+    ) {
+        $this->wilayaResolver = $this->wilayaResolver ?? app(LegacyWilayaMigrationService::class);
+    }
 
     /**
      * Create a new clinic entity and bind the creator doctor as Director.
@@ -41,10 +45,14 @@ class ClinicService
         return DB::transaction(function () use ($creator, $data) {
             $directorDoctor = $creator->doctor;
 
+            $wilayaStr = $data['wilaya'] ?? null;
+            $wilayaId = $data['wilaya_id'] ?? ($wilayaStr !== null ? $this->wilayaResolver->resolveWilaya($wilayaStr)?->id : null);
+
             $clinic = Clinic::create([
                 'name' => $data['name'],
                 'address' => $data['address'],
-                'wilaya' => $data['wilaya'],
+                'wilaya' => $wilayaStr,
+                'wilaya_id' => $wilayaId,
                 'phone' => $data['phone'],
                 'director_doctor_id' => $directorDoctor?->id,
                 'max_patients_per_slot' => isset($data['max_patients_per_slot']) ? max(1, min(10, (int) $data['max_patients_per_slot'])) : 10,
@@ -81,15 +89,25 @@ class ClinicService
             throw new AuthorizationException('Forbidden: Only the Clinic Director can update clinic operational settings.');
         }
 
-        $clinic->update(array_filter([
+        $updateData = [
             'name' => $data['name'] ?? null,
             'address' => $data['address'] ?? null,
-            'wilaya' => $data['wilaya'] ?? null,
             'phone' => $data['phone'] ?? null,
             'max_patients_per_slot' => $data['max_patients_per_slot'] ?? null,
             'slot_duration_min' => $data['slot_duration_min'] ?? null,
             'is_active' => $data['is_active'] ?? null,
-        ], fn ($val) => $val !== null));
+        ];
+
+        if (array_key_exists('wilaya', $data)) {
+            $wilayaStr = $data['wilaya'];
+            $wilayaId = $data['wilaya_id'] ?? ($wilayaStr !== null ? $this->wilayaResolver->resolveWilaya($wilayaStr)?->id : null);
+            $updateData['wilaya'] = $wilayaStr;
+            $updateData['wilaya_id'] = $wilayaId;
+        } elseif (array_key_exists('wilaya_id', $data)) {
+            $updateData['wilaya_id'] = $data['wilaya_id'];
+        }
+
+        $clinic->update(array_filter($updateData, fn ($val) => $val !== null));
 
         return $clinic->fresh(['director.user', 'doctors']);
     }

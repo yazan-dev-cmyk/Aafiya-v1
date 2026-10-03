@@ -21,7 +21,20 @@ class DoctorController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $filters = $request->only(['specialty', 'wilaya', 'is_verified', 'search']);
+        $filters = $request->only(['specialty', 'specialty_id', 'wilaya', 'is_verified', 'search']);
+
+        if ($request->has('specialty_id') && ! empty($request->query('specialty_id'))) {
+            $specialtyId = $request->query('specialty_id');
+            if (! is_numeric($specialtyId) || ! \App\Models\MedicalSpecialty::where('id', (int) $specialtyId)->where('is_active', true)->exists()) {
+                return response()->json([
+                    'status' => 'error',
+                    'code' => 422,
+                    'message' => 'التخصص الطبي المحدد غير صالح أو غير نشط.',
+                ], 422);
+            }
+            $filters['specialty_id'] = (int) $specialtyId;
+        }
+
         $perPage = (int) $request->input('per_page', 15);
         $doctors = $this->doctorService->getPublicDoctors($filters, $perPage);
 

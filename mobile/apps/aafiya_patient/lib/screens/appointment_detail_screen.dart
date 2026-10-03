@@ -111,7 +111,7 @@ class AppointmentDetailScreen extends StatelessWidget {
                     if (appointment.doctor.specialty?.isNotEmpty == true) ...[
                       const SizedBox(height: 4),
                       Text(
-                        appointment.doctor.specialty!,
+                        strings.specialtyName(appointment.doctor.specialty!),
                         style: AafiyaTypography.bodyMedium.copyWith(
                           color: AafiyaColors.healthBlue,
                           fontWeight: FontWeight.w600,
@@ -167,7 +167,7 @@ class AppointmentDetailScreen extends StatelessWidget {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            appointment.clinic.wilaya!,
+                            strings.wilayaName(appointment.clinic.wilaya!),
                             style: AafiyaTypography.bodyMedium.copyWith(
                               color: AafiyaColors.secondaryText,
                             ),
@@ -230,7 +230,7 @@ class AppointmentDetailScreen extends StatelessWidget {
                               const SizedBox(height: 6),
                               Text(
                                 appointment.appointmentDate?.isNotEmpty == true
-                                    ? appointment.appointmentDate!
+                                    ? strings.formatDate(appointment.appointmentDate)
                                     : '-',
                                 style: AafiyaTypography.titleMedium.copyWith(
                                   fontWeight: FontWeight.bold,
@@ -331,7 +331,7 @@ class AppointmentDetailScreen extends StatelessWidget {
                             const SizedBox(width: 6),
                             Expanded(
                               child: Text(
-                                '${strings.appointmentConfirmedAt}: ${appointment.confirmedAt!.substring(0, 10)}',
+                                '${strings.appointmentConfirmedAt}: ${strings.formatDate(appointment.confirmedAt)}',
                                 style: AafiyaTypography.caption.copyWith(
                                   color: AafiyaColors.secondaryText,
                                 ),
@@ -353,7 +353,7 @@ class AppointmentDetailScreen extends StatelessWidget {
                             const SizedBox(width: 6),
                             Expanded(
                               child: Text(
-                                '${strings.appointmentCheckedInAt}: ${appointment.checkedInAt!.substring(0, 10)}',
+                                '${strings.appointmentCheckedInAt}: ${strings.formatDate(appointment.checkedInAt)}',
                                 style: AafiyaTypography.caption.copyWith(
                                   color: AafiyaColors.secondaryText,
                                 ),

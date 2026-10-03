@@ -650,7 +650,8 @@
           "متابعة النمو"
         ]
       }
-    }
+    },
+    "all_specialties": "جميع التخصصات"
   },
   "news": {
     "section_badge": "آخر المستجدات والأبحاث",
@@ -3198,5 +3199,24 @@
       "permRadUploadImages": "رفع صور وفحوصات الأشعة",
       "permRadUploadImagesDesc": "رفع ملفات وصور الأشعة وربطها بالدراسات الطبية"
     }
+  },
+  "masterData": {
+    "wilaya": "الولاية",
+    "commune": "البلدية",
+    "selectWilaya": "اختر الولاية...",
+    "selectCommune": "اختر البلدية...",
+    "selectWilayaFirst": "يرجى اختيار الولاية أولاً",
+    "loadingWilayas": "جاري تحميل الولايات...",
+    "loadingCommunes": "جاري تحميل البلديات...",
+    "errorWilayas": "تعذر تحميل الولايات",
+    "errorCommunes": "تعذر تحميل البلديات",
+    "noCommunes": "لا توجد بلديات مسجلة",
+    "allWilayas": "جميع الولايات",
+    "allCommunes": "جميع البلديات",
+    "specialty": "التخصص الطبي",
+    "selectSpecialty": "اختر التخصص الطبي...",
+    "loadingSpecialties": "جاري تحميل التخصصات الطبية...",
+    "errorSpecialties": "تعذر تحميل التخصصات الطبية",
+    "allSpecialties": "جميع التخصصات"
   }
 }

@@ -4,11 +4,18 @@ namespace App\Services;
 
 use App\Models\BookingCenter;
 use App\Models\User;
+use App\Services\LegacyWilayaMigrationService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class BookingCenterService
 {
+    public function __construct(
+        protected ?LegacyWilayaMigrationService $wilayaResolver = null
+    ) {
+        $this->wilayaResolver = $this->wilayaResolver ?? app(LegacyWilayaMigrationService::class);
+    }
+
     /**
      * Atomically provision a Booking Center for a user.
      * Guarantees 1:1 invariant between User and BookingCenter.
@@ -26,6 +33,9 @@ class BookingCenterService
             ]);
         }
 
+        $wilayaStr = $data['wilaya'] ?? 'الجزائر العاصمة';
+        $wilayaId = $data['wilaya_id'] ?? ($wilayaStr !== null ? $this->wilayaResolver->resolveWilaya($wilayaStr)?->id : null);
+
         return BookingCenter::create([
             'user_id'             => $user->id,
             'name'                => $data['name'],
@@ -34,7 +44,8 @@ class BookingCenterService
             'phone'               => $data['phone'] ?? $user->phone,
             'email'               => $data['email'] ?? $user->email,
             'address'             => $data['address'] ?? 'الجزائر',
-            'wilaya'              => $data['wilaya'] ?? 'الجزائر العاصمة',
+            'wilaya'              => $wilayaStr,
+            'wilaya_id'           => $wilayaId,
             'quota_balance'       => 0,
             'verification_status' => BookingCenter::STATUS_PENDING,
             'is_active'           => false,
@@ -166,7 +177,11 @@ class BookingCenterService
                 $updateData['phone'] = $data['phone'];
             }
             if (isset($data['wilaya'])) {
-                $updateData['wilaya'] = $data['wilaya'];
+                $wilayaStr = $data['wilaya'];
+                $updateData['wilaya'] = $wilayaStr;
+                $updateData['wilaya_id'] = $data['wilaya_id'] ?? ($wilayaStr !== null ? $this->wilayaResolver->resolveWilaya($wilayaStr)?->id : null);
+            } elseif (isset($data['wilaya_id'])) {
+                $updateData['wilaya_id'] = $data['wilaya_id'];
             }
             if (isset($data['address'])) {
                 $updateData['address'] = $data['address'];

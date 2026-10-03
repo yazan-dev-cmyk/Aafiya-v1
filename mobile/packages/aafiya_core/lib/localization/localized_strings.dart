@@ -207,6 +207,45 @@ class LocalizedStrings {
   String get appointmentCheckedInAt =>
       isArabic ? 'تم تسجيل الحضور بتاريخ' : isFrench ? 'Présence enregistrée le' : 'Checked in on';
 
+  static const List<String> _arMonths = [
+    'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+    'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+  ];
+
+  static const List<String> _frMonths = [
+    'janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin',
+    'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'
+  ];
+
+  static const List<String> _enMonths = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+  ];
+
+  /// Safely formats an ISO date or timestamp string into a localized date representation.
+  /// Handles full timestamps, short dates, malformed inputs, and null safely without throwing exceptions.
+  String formatDate(String? raw) {
+    if (raw == null || raw.trim().isEmpty) return '-';
+    final trimmed = raw.trim();
+    final parsed = DateTime.tryParse(trimmed)?.toLocal();
+    if (parsed == null) {
+      return trimmed;
+    }
+    final day = parsed.day;
+    final month = parsed.month;
+    final year = parsed.year;
+
+    if (month < 1 || month > 12) return '$year-$month-$day';
+
+    if (isArabic) {
+      return '$day ${_arMonths[month - 1]} $year';
+    } else if (isFrench) {
+      return '$day ${_frMonths[month - 1]} $year';
+    } else {
+      return '${_enMonths[month - 1]} $day, $year';
+    }
+  }
+
   // Appointment Statuses
   String get statusPending => isArabic ? 'قيد الانتظار' : isFrench ? 'En attente' : 'Pending';
   String get statusConfirmed => isArabic ? 'مؤكد' : isFrench ? 'Confirmé' : 'Confirmed';
@@ -287,6 +326,119 @@ class LocalizedStrings {
   String get filterByWilaya => isArabic ? 'تصفية بالولاية' : isFrench ? 'Filtrer par wilaya' : 'Filter by Wilaya';
   String get allSpecialties => isArabic ? 'جميع التخصصات' : isFrench ? 'Toutes les spécialités' : 'All Specialties';
   String get allWilayas => isArabic ? 'جميع الولايات' : isFrench ? 'Toutes les wilayas' : 'All Wilayas';
+
+  // Master Data (TASK-MD-09 & TASK-MD-12)
+  String get selectSpecialty => isArabic ? 'اختر التخصص' : isFrench ? 'Sélectionner la spécialité' : 'Select Specialty';
+  String get loadingSpecialties => isArabic ? 'جاري تحميل التخصصات...' : isFrench ? 'Chargement des spécialités...' : 'Loading specialties...';
+  String get errorLoadingSpecialties => isArabic ? 'تعذر تحميل التخصصات' : isFrench ? 'Échec du chargement des spécialités' : 'Failed to load specialties';
+  String get noSpecialtiesFound => isArabic ? 'لا توجد تخصصات متاحة' : isFrench ? 'Aucune spécialité disponible' : 'No specialties available';
+  String get selectWilaya => isArabic ? 'اختر الولاية' : isFrench ? 'Sélectionner la wilaya' : 'Select Wilaya';
+  String get selectCommune => isArabic ? 'اختر البلدية' : isFrench ? 'Sélectionner la commune' : 'Select Commune';
+  String get selectWilayaFirst => isArabic ? 'اختر الولاية أولاً' : isFrench ? 'Sélectionnez d\'abord la wilaya' : 'Select Wilaya first';
+  String get loadingWilayas => isArabic ? 'جاري تحميل الولايات...' : isFrench ? 'Chargement des wilayas...' : 'Loading wilayas...';
+  String get loadingCommunes => isArabic ? 'جاري تحميل البلديات...' : isFrench ? 'Chargement des communes...' : 'Loading communes...';
+  String get errorLoadingWilayas => isArabic ? 'تعذر تحميل الولايات' : isFrench ? 'Échec du chargement des wilayas' : 'Failed to load wilayas';
+  String get errorLoadingCommunes => isArabic ? 'تعذر تحميل البلديات' : isFrench ? 'Échec du chargement des communes' : 'Failed to load communes';
+  String get noCommunesFound => isArabic ? 'لا توجد بلديات متاحة' : isFrench ? 'Aucune commune disponible' : 'No communes available';
+  String get allCommunes => isArabic ? 'جميع البلديات' : isFrench ? 'Toutes les communes' : 'All Communes';
+  String get communeLabel => isArabic ? 'البلدية' : isFrench ? 'Commune' : 'Commune';
+  String get wilayaLabel => isArabic ? 'الولاية' : isFrench ? 'Wilaya' : 'Wilaya';
+  String get postalCodeLabel => isArabic ? 'الرمز البريدي' : isFrench ? 'Code postal' : 'Postal Code';
+
+  // Specialties (DEF-02 Stage A)
+  String get specialtyCardiology => isArabic ? 'أمراض القلب' : isFrench ? 'Cardiologie' : 'Cardiology';
+  String get specialtyPediatrics => isArabic ? 'طب الأطفال' : isFrench ? 'Pédiatrie' : 'Pediatrics';
+  String get specialtyOphthalmology => isArabic ? 'طب العيون' : isFrench ? 'Ophtalmologie' : 'Ophthalmology';
+  String get specialtyDentistry => isArabic ? 'طب وجراحة الأسنان' : isFrench ? 'Dentisterie' : 'Dentistry';
+  String get specialtyGeneralPractice => isArabic ? 'الطب العام' : isFrench ? 'Médecine générale' : 'General Practice';
+  String get specialtyOrthopedics => isArabic ? 'جراحة العظام' : isFrench ? 'Orthopédie' : 'Orthopedics';
+  String get specialtyDermatology => isArabic ? 'الأمراض الجلدية' : isFrench ? 'Dermatologie' : 'Dermatology';
+
+  /// Resolves localized specialty label from raw key or Arabic string.
+  String specialtyName(String raw) {
+    final trimmed = raw.trim();
+    switch (trimmed) {
+      case 'cardiology':
+      case 'Cardiology':
+      case 'أمراض القلب':
+        return specialtyCardiology;
+      case 'pediatrics':
+      case 'Pediatrics':
+      case 'طب الأطفال':
+        return specialtyPediatrics;
+      case 'ophthalmology':
+      case 'Ophthalmology':
+      case 'طب العيون':
+        return specialtyOphthalmology;
+      case 'dentistry':
+      case 'Dentistry':
+      case 'طب وجراحة الأسنان':
+        return specialtyDentistry;
+      case 'general_practice':
+      case 'General Practice':
+      case 'الطب العام':
+      case 'طب عام':
+        return specialtyGeneralPractice;
+      case 'orthopedics':
+      case 'Orthopedics':
+      case 'جراحة العظام':
+        return specialtyOrthopedics;
+      case 'dermatology':
+      case 'Dermatology':
+      case 'الأمراض الجلدية':
+        return specialtyDermatology;
+      default:
+        return raw;
+    }
+  }
+
+  // Supported Wilayas (DEF-02 Stage A)
+  String get wilayaAlgiers => isArabic ? 'الجزائر' : isFrench ? 'Alger' : 'Algiers';
+  String get wilayaBlida => isArabic ? 'البليدة' : isFrench ? 'Blida' : 'Blida';
+  String get wilayaOran => isArabic ? 'وهران' : isFrench ? 'Oran' : 'Oran';
+  String get wilayaConstantine => isArabic ? 'قسنطينة' : isFrench ? 'Constantine' : 'Constantine';
+  String get wilayaSetif => isArabic ? 'سطيف' : isFrench ? 'Sétif' : 'Setif';
+  String get wilayaAnnaba => isArabic ? 'عنابة' : isFrench ? 'Annaba' : 'Annaba';
+  String get wilayaTlemcen => isArabic ? 'تلمسان' : isFrench ? 'Tlemcen' : 'Tlemcen';
+
+  /// Resolves localized Wilaya label from raw key or Arabic string.
+  String wilayaName(String raw) {
+    final trimmed = raw.trim();
+    switch (trimmed) {
+      case 'algiers':
+      case 'Algiers':
+      case 'Alger':
+      case 'الجزائر':
+        return wilayaAlgiers;
+      case 'blida':
+      case 'Blida':
+      case 'البليدة':
+        return wilayaBlida;
+      case 'oran':
+      case 'Oran':
+      case 'وهران':
+        return wilayaOran;
+      case 'constantine':
+      case 'Constantine':
+      case 'قسنطينة':
+        return wilayaConstantine;
+      case 'setif':
+      case 'Setif':
+      case 'Sétif':
+      case 'سطيف':
+        return wilayaSetif;
+      case 'annaba':
+      case 'Annaba':
+      case 'عنابة':
+        return wilayaAnnaba;
+      case 'tlemcen':
+      case 'Tlemcen':
+      case 'تلمسان':
+        return wilayaTlemcen;
+      default:
+        return raw;
+    }
+  }
   String get callClinic => isArabic ? 'الاتصال بالعيادة' : isFrench ? 'Appeler la clinique' : 'Call Clinic';
   String get director => isArabic ? 'المدير الطبي' : isFrench ? 'Directeur médical' : 'Medical Director';
   String get doctorsCount => isArabic ? 'عدد الأطباء' : isFrench ? 'Médecins' : 'Doctors';
@@ -344,6 +496,11 @@ class LocalizedStrings {
       isArabic ? 'تفاصيل الوصفة الطبية' : isFrench ? "Détails de l'ordonnance" : 'Prescription Details';
   String get medications =>
       isArabic ? 'الأدوية الموصوفة' : isFrench ? 'Médicaments prescrits' : 'Prescribed Medications';
+  String get noPrescriptionItems => isArabic
+      ? 'لا توجد أدوية مدرجة في هذه الوصفة'
+      : isFrench
+          ? 'Aucun médicament inscrit sur cette ordonnance'
+          : 'No medications listed in this prescription';
   String get dosage =>
       isArabic ? 'الجرعة' : isFrench ? 'Dosage' : 'Dosage';
   String get frequency =>
@@ -434,6 +591,18 @@ class LocalizedStrings {
       isArabic ? 'استعراض الوصفات الطبية' : isFrench ? 'Voir les ordonnances' : 'View Prescriptions';
   String get viewEmergencyProfile =>
       isArabic ? 'استعراض ملف الطوارئ' : isFrench ? 'Voir le profil d’urgence' : 'View Emergency Profile';
+
+  // Doctor Navigation Labels (DEF-03 / TASK-B-03)
+  String get waitingRoomTitle => isArabic
+      ? 'قاعة الانتظار'
+      : isFrench
+          ? "Salle d'attente"
+          : 'Waiting Room';
+  String get myClinicsTitle => isArabic
+      ? 'عياداتي'
+      : isFrench
+          ? 'Mes Cabinets'
+          : 'My Clinics';
 
   // Doctor Operational & Clinic Context (TASK-04-01)
   String get activeClinic =>

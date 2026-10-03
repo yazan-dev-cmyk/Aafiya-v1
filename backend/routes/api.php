@@ -39,6 +39,13 @@ Route::get('/booking-packages/{bookingPackage}', [\App\Http\Controllers\Api\V1\B
 Route::get('/appointments/slots', [\App\Http\Controllers\Api\V1\AppointmentController::class, 'slots']);
 Route::get('/shared-records/{token}', [\App\Http\Controllers\Api\V1\PatientController::class, 'viewSharedRecord']);
 
+// Master Data Routes (Authoritative Reference Data)
+Route::prefix('master')->group(function () {
+    Route::get('/wilayas', [\App\Http\Controllers\Api\V1\MasterDataController::class, 'wilayas']);
+    Route::get('/wilayas/{wilaya}/communes', [\App\Http\Controllers\Api\V1\MasterDataController::class, 'communes']);
+    Route::get('/specialties', [\App\Http\Controllers\Api\V1\MasterDataController::class, 'specialties']);
+});
+
 // Protected Clinical & Booking Routes
 Route::middleware(['auth:sanctum', 'throttle:api.general', 'active.clinic'])->group(function () {
     // Doctor Multi-Clinic Context & Affiliations
@@ -210,6 +217,25 @@ Route::middleware(['auth:sanctum', 'throttle:api.general', 'active.clinic'])->gr
 
     // Platform Admin Dashboard Overview Statistics (Admin & Authorized Assistant)
     Route::get('/admin/dashboard/stats', [\App\Http\Controllers\Api\V1\AdminDashboardController::class, 'stats']);
+
+    // Admin Master Data Management (Admin & Authorized Assistant with platform.manage_master_data)
+    Route::prefix('admin/master')->group(function () {
+        // Medical Specialties
+        Route::get('/specialties', [\App\Http\Controllers\Api\V1\AdminMasterDataController::class, 'indexSpecialties']);
+        Route::post('/specialties', [\App\Http\Controllers\Api\V1\AdminMasterDataController::class, 'storeSpecialty']);
+        Route::get('/specialties/{id}', [\App\Http\Controllers\Api\V1\AdminMasterDataController::class, 'showSpecialty']);
+        Route::put('/specialties/{id}', [\App\Http\Controllers\Api\V1\AdminMasterDataController::class, 'updateSpecialty']);
+        Route::put('/specialties/{id}/status', [\App\Http\Controllers\Api\V1\AdminMasterDataController::class, 'toggleSpecialtyStatus']);
+        Route::delete('/specialties/{id}', [\App\Http\Controllers\Api\V1\AdminMasterDataController::class, 'deleteSpecialty']);
+
+        // Wilayas
+        Route::get('/wilayas', [\App\Http\Controllers\Api\V1\AdminMasterDataController::class, 'indexWilayas']);
+        Route::post('/wilayas', [\App\Http\Controllers\Api\V1\AdminMasterDataController::class, 'storeWilaya']);
+        Route::get('/wilayas/{id}', [\App\Http\Controllers\Api\V1\AdminMasterDataController::class, 'showWilaya']);
+        Route::put('/wilayas/{id}', [\App\Http\Controllers\Api\V1\AdminMasterDataController::class, 'updateWilaya']);
+        Route::put('/wilayas/{id}/status', [\App\Http\Controllers\Api\V1\AdminMasterDataController::class, 'toggleWilayaStatus']);
+        Route::delete('/wilayas/{id}', [\App\Http\Controllers\Api\V1\AdminMasterDataController::class, 'deleteWilaya']);
+    });
 });
 
 // Public Routes

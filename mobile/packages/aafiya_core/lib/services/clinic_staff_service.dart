@@ -27,6 +27,8 @@ class ClinicStaffService {
 
   final ApiClient _apiClient;
 
+  ApiClient get apiClient => _apiClient;
+
   /// 1. Fetches clinic details with populated doctors and assistants.
   Future<ApiResult<ClinicStaffData>> fetchClinicStaff(String clinicId) async {
     final result = await _apiClient.get(ApiEndpoints.clinic(clinicId));
@@ -45,6 +47,7 @@ class ClinicStaffService {
     required String phone,
     required String password,
     required String specialty,
+    int? specialtyId,
     required String licenseNumber,
     String? bio,
   }) async {
@@ -54,6 +57,7 @@ class ClinicStaffService {
       'phone': phone.trim(),
       'password': password,
       'specialty': specialty.trim(),
+      if (specialtyId != null) 'specialty_id': specialtyId,
       'license_number': licenseNumber.trim(),
       if (bio != null && bio.trim().isNotEmpty) 'bio': bio.trim(),
     };

@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
     'target_role',
     'target_specialty',
     'target_wilaya',
+    'target_wilaya_id',
     'is_welcome_offer',
     'status',
     'rejection_reason',
@@ -57,6 +58,22 @@ class Advertisement extends Model
     public function doctor(): BelongsTo
     {
         return $this->belongsTo(Doctor::class, 'doctor_id');
+    }
+
+    /**
+     * Authoritative target Wilaya relationship.
+     */
+    public function targetWilaya(): BelongsTo
+    {
+        return $this->belongsTo(Wilaya::class, 'target_wilaya_id');
+    }
+
+    /**
+     * Alias for targetWilaya relationship.
+     */
+    public function wilaya(): BelongsTo
+    {
+        return $this->targetWilaya();
     }
 
     public function isActive(): bool

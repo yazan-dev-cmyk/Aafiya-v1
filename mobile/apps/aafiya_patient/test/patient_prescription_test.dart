@@ -233,6 +233,44 @@ void main() {
         expect(find.text('Vérification QR'), findsOneWidget);
         expect(find.text('Copier le lien'), findsOneWidget);
       });
+
+      testWidgets('DEF-01: empty prescription items list displays dedicated localized empty-state string (not noDoctorsFound)', (tester) async {
+        // Arabic (default)
+        await tester.pumpWidget(
+          createTestableWidget(
+            locale: const Locale('ar'),
+            child: const PrescriptionDetailScreen(prescription: mockPrescriptionVoided),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('لا توجد أدوية مدرجة في هذه الوصفة'), findsOneWidget);
+        expect(find.text('لم يتم العثور على أطباء مطابقين للبحث.'), findsNothing);
+
+        // English
+        await tester.pumpWidget(
+          createTestableWidget(
+            locale: const Locale('en'),
+            child: const PrescriptionDetailScreen(prescription: mockPrescriptionVoided),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('No medications listed in this prescription'), findsOneWidget);
+        expect(find.text('No doctors found matching search.'), findsNothing);
+
+        // French
+        await tester.pumpWidget(
+          createTestableWidget(
+            locale: const Locale('fr'),
+            child: const PrescriptionDetailScreen(prescription: mockPrescriptionVoided),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Aucun médicament inscrit sur cette ordonnance'), findsOneWidget);
+        expect(find.text('Aucun médecin trouvé.'), findsNothing);
+      });
     });
 
     // =========================================================================

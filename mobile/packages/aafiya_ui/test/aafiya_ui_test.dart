@@ -33,6 +33,13 @@ void main() {
       expect(AafiyaColors.info.toARGB32(), equals(0xFF2563EB));
     });
 
+    test('accessible role tokens match WCAG 2.1 AA specifications', () {
+      expect(AafiyaColors.actionGreen.toARGB32(), equals(0xFF15803D));
+      expect(AafiyaColors.linkBlue.toARGB32(), equals(0xFF005F92));
+      expect(AafiyaColors.healingGreenSurface.toARGB32(), equals(0xFFE8F8EE));
+      expect(AafiyaColors.onHealingGreen.toARGB32(), equals(0xFF0F172A));
+    });
+
     test('dark theme tokens match dark-mode specifications', () {
       expect(AafiyaColors.darkBackground.toARGB32(), equals(0xFF0F172A));
       expect(AafiyaColors.darkSurface.toARGB32(), equals(0xFF1E293B));
@@ -132,12 +139,13 @@ void main() {
     });
   });
 
-  group('AafiyaTypography & Amiri Tokens', () {
-    test('fontFamily is Amiri', () {
-      expect(AafiyaTypography.fontFamily.contains('Amiri'), isTrue);
+  group('AafiyaTypography & IBM Plex Sans Arabic Tokens', () {
+    test('fontFamily is IBMPlexSansArabic', () {
+      expect(AafiyaTypography.fontFamily, equals('IBMPlexSansArabic'));
+      expect(AafiyaTypography.package, equals('aafiya_ui'));
     });
 
-    test('all text styles bind to Amiri font family', () {
+    test('all text styles bind to IBMPlexSansArabic font family and aafiya_ui package', () {
       final styles = [
         AafiyaTypography.displayLarge,
         AafiyaTypography.displayMedium,
@@ -157,7 +165,7 @@ void main() {
       ];
 
       for (final style in styles) {
-        expect(style.fontFamily?.contains('Amiri'), isTrue);
+        expect(style.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
       }
     });
 
@@ -208,27 +216,27 @@ void main() {
       expect(AafiyaTypography.caption.fontWeight, equals(FontWeight.normal));
     });
 
-    test('textTheme getter produces full Material 3 text theme with Amiri', () {
+    test('textTheme getter produces full Material 3 text theme with IBMPlexSansArabic', () {
       final textTheme = AafiyaTypography.textTheme;
-      expect(textTheme.displayLarge?.fontFamily?.contains('Amiri'), isTrue);
-      expect(textTheme.displayMedium?.fontFamily?.contains('Amiri'), isTrue);
-      expect(textTheme.headlineLarge?.fontFamily?.contains('Amiri'), isTrue);
-      expect(textTheme.headlineMedium?.fontFamily?.contains('Amiri'), isTrue);
-      expect(textTheme.headlineSmall?.fontFamily?.contains('Amiri'), isTrue);
-      expect(textTheme.titleLarge?.fontFamily?.contains('Amiri'), isTrue);
-      expect(textTheme.titleMedium?.fontFamily?.contains('Amiri'), isTrue);
-      expect(textTheme.titleSmall?.fontFamily?.contains('Amiri'), isTrue);
-      expect(textTheme.bodyLarge?.fontFamily?.contains('Amiri'), isTrue);
-      expect(textTheme.bodyMedium?.fontFamily?.contains('Amiri'), isTrue);
-      expect(textTheme.bodySmall?.fontFamily?.contains('Amiri'), isTrue);
-      expect(textTheme.labelLarge?.fontFamily?.contains('Amiri'), isTrue);
-      expect(textTheme.labelMedium?.fontFamily?.contains('Amiri'), isTrue);
-      expect(textTheme.labelSmall?.fontFamily?.contains('Amiri'), isTrue);
+      expect(textTheme.displayLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(textTheme.displayMedium?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(textTheme.headlineLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(textTheme.headlineMedium?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(textTheme.headlineSmall?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(textTheme.titleLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(textTheme.titleMedium?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(textTheme.titleSmall?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(textTheme.bodyLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(textTheme.bodyMedium?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(textTheme.bodySmall?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(textTheme.labelLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(textTheme.labelMedium?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(textTheme.labelSmall?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
     });
 
-    test('darkTextTheme getter produces text theme with dark-mode colors and Amiri', () {
+    test('darkTextTheme getter produces text theme with dark-mode colors and IBMPlexSansArabic', () {
       final darkTextTheme = AafiyaTypography.darkTextTheme;
-      expect(darkTextTheme.displayLarge?.fontFamily?.contains('Amiri'), isTrue);
+      expect(darkTextTheme.displayLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
       expect(darkTextTheme.displayLarge?.color, equals(AafiyaColors.darkPrimaryText));
       expect(darkTextTheme.titleLarge?.color, equals(AafiyaColors.darkPrimaryText));
       expect(darkTextTheme.bodyLarge?.color, equals(AafiyaColors.darkPrimaryText));
@@ -237,22 +245,24 @@ void main() {
   });
 
   group('AafiyaTheme Configuration', () {
-    test('lightTheme contains official brand colors, Amiri font, and textTheme', () {
+    test('lightTheme contains official brand colors, IBMPlexSansArabic font, and textTheme', () {
       final theme = AafiyaTheme.lightTheme;
-      expect(theme.textTheme.bodyLarge?.fontFamily?.contains('Amiri'), isTrue);
-      expect(theme.textTheme.titleLarge?.fontFamily?.contains('Amiri'), isTrue);
+      expect(theme.textTheme.bodyLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(theme.textTheme.titleLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
       expect(theme.colorScheme.primary, equals(AafiyaColors.healthBlue));
       expect(theme.colorScheme.secondary, equals(AafiyaColors.healingGreen));
+      expect(theme.colorScheme.onSecondary, equals(AafiyaColors.onHealingGreen));
       expect(theme.scaffoldBackgroundColor, equals(AafiyaColors.lightBackground));
       expect(theme.inputDecorationTheme.contentPadding, equals(const EdgeInsetsDirectional.symmetric(horizontal: 16, vertical: 14)));
     });
 
-    test('darkTheme contains dark surfaces, Amiri font, and dark textTheme', () {
+    test('darkTheme contains dark surfaces, IBMPlexSansArabic font, and dark textTheme', () {
       final theme = AafiyaTheme.darkTheme;
-      expect(theme.textTheme.bodyLarge?.fontFamily?.contains('Amiri'), isTrue);
-      expect(theme.textTheme.titleLarge?.fontFamily?.contains('Amiri'), isTrue);
+      expect(theme.textTheme.bodyLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(theme.textTheme.titleLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
       expect(theme.colorScheme.primary, equals(AafiyaColors.healthBlue));
       expect(theme.colorScheme.secondary, equals(AafiyaColors.healingGreen));
+      expect(theme.colorScheme.onSecondary, equals(AafiyaColors.onHealingGreen));
       expect(theme.scaffoldBackgroundColor, equals(AafiyaColors.darkBackground));
       expect(theme.colorScheme.surface, equals(AafiyaColors.darkSurface));
       expect(theme.textTheme.titleLarge?.color, equals(AafiyaColors.darkPrimaryText));
@@ -335,6 +345,46 @@ void main() {
       await tester.tap(find.text('تسجيل الدخول'));
       await tester.pump();
       expect(tapped, isTrue);
+    });
+
+    testWidgets('AafiyaButton secondary variant uses accessible onHealingGreen foreground', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AafiyaTheme.lightTheme,
+          home: Scaffold(
+            body: AafiyaButton(
+              label: 'تأكيد الحضور',
+              variant: AafiyaButtonVariant.secondary,
+              onPressed: () {},
+            ),
+          ),
+        ),
+      );
+
+      final button = tester.widget<ElevatedButton>(find.byType(ElevatedButton));
+      final style = button.style!;
+      expect(style.backgroundColor?.resolve({}), equals(AafiyaColors.healingGreen));
+      expect(style.foregroundColor?.resolve({}), equals(AafiyaColors.onHealingGreen));
+    });
+
+    testWidgets('AafiyaButton action variant uses accessible actionGreen background with pureWhite foreground', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AafiyaTheme.lightTheme,
+          home: Scaffold(
+            body: AafiyaButton(
+              label: 'حفظ التغييرات',
+              variant: AafiyaButtonVariant.action,
+              onPressed: () {},
+            ),
+          ),
+        ),
+      );
+
+      final button = tester.widget<ElevatedButton>(find.byType(ElevatedButton));
+      final style = button.style!;
+      expect(style.backgroundColor?.resolve({}), equals(AafiyaColors.actionGreen));
+      expect(style.foregroundColor?.resolve({}), equals(AafiyaColors.pureWhite));
     });
 
     testWidgets('AafiyaCard renders child content with border', (tester) async {

@@ -30,6 +30,7 @@ class Clinic extends Model
         'name',
         'address',
         'wilaya',
+        'wilaya_id',
         'phone',
         'director_doctor_id',
         'max_patients_per_slot',
@@ -49,6 +50,14 @@ class Clinic extends Model
             'max_patients_per_slot' => 'integer',
             'slot_duration_min' => 'integer',
         ];
+    }
+
+    /**
+     * The authoritative Wilaya of the clinic.
+     */
+    public function wilaya(): BelongsTo
+    {
+        return $this->belongsTo(Wilaya::class, 'wilaya_id');
     }
 
     /**

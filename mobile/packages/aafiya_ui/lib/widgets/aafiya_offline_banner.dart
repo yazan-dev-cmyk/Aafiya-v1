@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:aafiya_core/aafiya_core.dart';
 
 import '../tokens/aafiya_colors.dart';
-import '../tokens/aafiya_spacing.dart';
 import '../tokens/aafiya_typography.dart';
 
 /// Reusable offline status banner with animated transitions and auto-dismiss on reconnection.

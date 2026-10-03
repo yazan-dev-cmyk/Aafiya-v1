@@ -13,15 +13,28 @@ class DoctorDirectoryScreen extends StatefulWidget {
   const DoctorDirectoryScreen({
     super.key,
     required this.apiClient,
+    this.masterDataService,
+    this.initialSpecialtyId,
   });
 
   final ApiClient apiClient;
+  final MasterDataService? masterDataService;
+  final int? initialSpecialtyId;
 
   /// Helper route to present this screen.
-  static Future<void> show(BuildContext context, {required ApiClient apiClient}) {
+  static Future<void> show(
+    BuildContext context, {
+    required ApiClient apiClient,
+    MasterDataService? masterDataService,
+    int? initialSpecialtyId,
+  }) {
     return Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => DoctorDirectoryScreen(apiClient: apiClient),
+        builder: (_) => DoctorDirectoryScreen(
+          apiClient: apiClient,
+          masterDataService: masterDataService,
+          initialSpecialtyId: initialSpecialtyId,
+        ),
       ),
     );
   }
@@ -31,6 +44,7 @@ class DoctorDirectoryScreen extends StatefulWidget {
 }
 
 class _DoctorDirectoryScreenState extends State<DoctorDirectoryScreen> {
+  late final MasterDataService _masterDataService;
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounceTimer;
@@ -45,32 +59,14 @@ class _DoctorDirectoryScreenState extends State<DoctorDirectoryScreen> {
   int _lastPage = 1;
 
   String _searchQuery = '';
-  String? _selectedSpecialty;
+  int? _selectedSpecialtyId;
   String? _selectedWilaya;
-
-  static const List<String> _specialties = [
-    'أمراض القلب',
-    'طب الأطفال',
-    'طب العيون',
-    'طب وجراحة الأسنان',
-    'الطب العام',
-    'جراحة العظام',
-    'الأمراض الجلدية',
-  ];
-
-  static const List<String> _wilayas = [
-    'الجزائر',
-    'البليدة',
-    'وهران',
-    'قسنطينة',
-    'سطيف',
-    'عنابة',
-    'تلمسان',
-  ];
 
   @override
   void initState() {
     super.initState();
+    _masterDataService = widget.masterDataService ?? MasterDataService(widget.apiClient);
+    _selectedSpecialtyId = widget.initialSpecialtyId;
     _scrollController.addListener(_onScroll);
     _fetchDoctors(page: 1, reset: true);
   }
@@ -109,9 +105,9 @@ class _DoctorDirectoryScreenState extends State<DoctorDirectoryScreen> {
     });
   }
 
-  void _onSpecialtySelected(String? specialty) {
+  void _onSpecialtySelected(int? specialtyId) {
     setState(() {
-      _selectedSpecialty = specialty;
+      _selectedSpecialtyId = specialtyId;
     });
     _fetchDoctors(page: 1, reset: true);
   }
@@ -145,8 +141,8 @@ class _DoctorDirectoryScreenState extends State<DoctorDirectoryScreen> {
     if (_searchQuery.isNotEmpty) {
       queryParams['search'] = _searchQuery;
     }
-    if (_selectedSpecialty != null && _selectedSpecialty!.isNotEmpty) {
-      queryParams['specialty'] = _selectedSpecialty!;
+    if (_selectedSpecialtyId != null) {
+      queryParams['specialty_id'] = _selectedSpecialtyId.toString();
     }
     if (_selectedWilaya != null && _selectedWilaya!.isNotEmpty) {
       queryParams['wilaya'] = _selectedWilaya!;
@@ -272,57 +268,20 @@ class _DoctorDirectoryScreenState extends State<DoctorDirectoryScreen> {
           ),
           const SizedBox(height: 8),
 
-          // Horizontal Specialty Filter Chips
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                ChoiceChip(
-                  label: Text(strings.allSpecialties),
-                  selected: _selectedSpecialty == null,
-                  onSelected: (selected) {
-                    if (selected) _onSpecialtySelected(null);
-                  },
-                ),
-                for (final spec in _specialties) ...[
-                  const SizedBox(width: 8),
-                  ChoiceChip(
-                    label: Text(spec),
-                    selected: _selectedSpecialty == spec,
-                    onSelected: (selected) {
-                      _onSpecialtySelected(selected ? spec : null);
-                    },
-                  ),
-                ],
-              ],
-            ),
+          // Horizontal Canonical Specialty Filter Chips
+          AafiyaSpecialtyFilterChips(
+            masterDataService: _masterDataService,
+            selectedSpecialtyId: _selectedSpecialtyId,
+            onSpecialtySelected: _onSpecialtySelected,
           ),
           const SizedBox(height: 6),
 
-          // Horizontal Wilaya Filter Chips
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                FilterChip(
-                  label: Text(strings.allWilayas),
-                  selected: _selectedWilaya == null,
-                  onSelected: (selected) {
-                    if (selected) _onWilayaSelected(null);
-                  },
-                ),
-                for (final wilaya in _wilayas) ...[
-                  const SizedBox(width: 8),
-                  FilterChip(
-                    label: Text(wilaya),
-                    selected: _selectedWilaya == wilaya,
-                    onSelected: (selected) {
-                      _onWilayaSelected(selected ? wilaya : null);
-                    },
-                  ),
-                ],
-              ],
-            ),
+          // Horizontal Dynamic Wilaya Filter Chips
+          AafiyaWilayaFilterChips(
+            masterDataService: _masterDataService,
+            selectedWilaya: _selectedWilaya,
+            useArabicNamesForQuery: true,
+            onWilayaSelected: _onWilayaSelected,
           ),
         ],
       ),

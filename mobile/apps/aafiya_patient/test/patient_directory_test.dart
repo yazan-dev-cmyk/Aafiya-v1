@@ -145,6 +145,82 @@ void main() {
         expect(find.textContaining('Book'), findsNothing);
         expect(find.byType(ElevatedButton), findsNothing);
       });
+
+      testWidgets('DEF-02 Stage A: DoctorCard renders localized specialty and wilaya in English and French', (tester) async {
+        // English
+        await tester.pumpWidget(
+          createTestableWidget(
+            locale: const Locale('en'),
+            child: const DoctorCard(doctor: mockDoctor1),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Cardiology'), findsOneWidget);
+        expect(find.textContaining('Algiers'), findsOneWidget);
+
+        // French
+        await tester.pumpWidget(
+          createTestableWidget(
+            locale: const Locale('fr'),
+            child: const DoctorCard(doctor: mockDoctor1),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Cardiologie'), findsOneWidget);
+        expect(find.textContaining('Alger'), findsOneWidget);
+      });
+
+      testWidgets('TASK-MD-12: DoctorCard renders canonical MedicalSpecialty across AR, FR, EN', (tester) async {
+        const canonicalDoctor = Doctor(
+          id: 'doc-canonical',
+          name: 'د. سامي دراجي',
+          specialty: 'أمراض القلب',
+          specialtyId: 1,
+          medicalSpecialty: MedicalSpecialty(
+            id: 1,
+            code: 'CARD',
+            nameAr: 'أمراض القلب',
+            nameFr: 'Cardiologie',
+            nameEn: 'Cardiology',
+            isActive: true,
+            displayOrder: 1,
+          ),
+          isVerified: true,
+          clinics: [],
+        );
+
+        // Arabic
+        await tester.pumpWidget(
+          createTestableWidget(
+            locale: const Locale('ar'),
+            child: const DoctorCard(doctor: canonicalDoctor),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(find.text('أمراض القلب'), findsOneWidget);
+
+        // French
+        await tester.pumpWidget(
+          createTestableWidget(
+            locale: const Locale('fr'),
+            child: const DoctorCard(doctor: canonicalDoctor),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(find.text('Cardiologie'), findsOneWidget);
+
+        // English
+        await tester.pumpWidget(
+          createTestableWidget(
+            locale: const Locale('en'),
+            child: const DoctorCard(doctor: canonicalDoctor),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(find.text('Cardiology'), findsOneWidget);
+      });
     });
 
     // =========================================================================
@@ -484,10 +560,31 @@ void main() {
         expect(lastSearchQuery, 'كريم');
       });
 
-      testWidgets('specialty filter chip resets page to 1 and passes specialty query param', (tester) async {
-        String? lastSpecialty;
+      testWidgets('specialty filter chip resets page to 1 and passes canonical specialty_id query param', (tester) async {
+        String? lastSpecialtyId;
         final mockClient = MockClient((request) async {
-          lastSpecialty = request.url.queryParameters['specialty'];
+          if (request.url.path.contains('/master/specialties')) {
+            return http.Response(
+              jsonEncode({
+                'status': 'success',
+                'data': [
+                  {'id': 1, 'code': 'CARD', 'name_ar': 'أمراض القلب', 'name_fr': 'Cardiologie', 'name_en': 'Cardiology', 'is_active': true, 'display_order': 1},
+                  {'id': 2, 'code': 'PED', 'name_ar': 'طب الأطفال', 'name_fr': 'Pédiatrie', 'name_en': 'Pediatrics', 'is_active': true, 'display_order': 2},
+                  {'id': 3, 'code': 'RAD', 'name_ar': 'الأشعة والتصوير الطبي', 'name_fr': 'Radiologie', 'name_en': 'Radiology', 'is_active': true, 'display_order': 3},
+                ],
+              }),
+              200,
+              headers: {'content-type': 'application/json; charset=utf-8'},
+            );
+          }
+          if (request.url.path.contains('/master/wilayas')) {
+            return http.Response(
+              jsonEncode({'status': 'success', 'data': []}),
+              200,
+              headers: {'content-type': 'application/json; charset=utf-8'},
+            );
+          }
+          lastSpecialtyId = request.url.queryParameters['specialty_id'];
           return http.Response(
             jsonEncode({
               'status': 'success',
@@ -509,11 +606,88 @@ void main() {
 
         await tester.pumpAndSettle();
 
+        // RAD must NOT be rendered in physician specialty filter
+        expect(find.text('الأشعة والتصوير الطبي'), findsNothing);
+
         // Tap specialty chip 'أمراض القلب'
         await tester.tap(find.text('أمراض القلب'));
         await tester.pumpAndSettle();
 
-        expect(lastSpecialty, 'أمراض القلب');
+        expect(lastSpecialtyId, '1');
+      });
+
+      testWidgets('DEF-02 Stage A / TASK-MD-12: filter chips render in English and French and preserve canonical ID query parameter binding', (tester) async {
+        String? lastSpecialtyId;
+        String? lastWilaya;
+        final mockClient = MockClient((request) async {
+          if (request.url.path.contains('/master/specialties')) {
+            return http.Response(
+              jsonEncode({
+                'status': 'success',
+                'data': [
+                  {'id': 1, 'code': 'CARD', 'name_ar': 'أمراض القلب', 'name_fr': 'Cardiologie', 'name_en': 'Cardiology', 'is_active': true, 'display_order': 1},
+                  {'id': 2, 'code': 'PED', 'name_ar': 'طب الأطفال', 'name_fr': 'Pédiatrie', 'name_en': 'Pediatrics', 'is_active': true, 'display_order': 2},
+                  {'id': 3, 'code': 'RAD', 'name_ar': 'الأشعة والتصوير الطبي', 'name_fr': 'Radiologie', 'name_en': 'Radiology', 'is_active': true, 'display_order': 3},
+                ],
+              }),
+              200,
+              headers: {'content-type': 'application/json; charset=utf-8'},
+            );
+          }
+          if (request.url.path.contains('/master/wilayas')) {
+            return http.Response(
+              jsonEncode({
+                'status': 'success',
+                'data': [
+                  {'code': '16', 'name_ar': 'الجزائر', 'name_fr': 'Alger', 'name_en': 'Algiers', 'is_active': true, 'display_order': 16},
+                  {'code': '31', 'name_ar': 'وهران', 'name_fr': 'Oran', 'name_en': 'Oran', 'is_active': true, 'display_order': 31},
+                ],
+              }),
+              200,
+              headers: {'content-type': 'application/json; charset=utf-8'},
+            );
+          }
+          lastSpecialtyId = request.url.queryParameters['specialty_id'];
+          lastWilaya = request.url.queryParameters['wilaya'];
+          return http.Response(
+            jsonEncode({
+              'status': 'success',
+              'data': [],
+              'meta': {'current_page': 1, 'last_page': 1, 'per_page': 10, 'total': 0},
+            }),
+            200,
+            headers: {'content-type': 'application/json; charset=utf-8'},
+          );
+        });
+
+        final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+
+        // English
+        await tester.pumpWidget(
+          createTestableWidget(
+            locale: const Locale('en'),
+            child: DoctorDirectoryScreen(apiClient: apiClient),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('All Specialties'), findsOneWidget);
+        expect(find.text('Cardiology'), findsOneWidget);
+        expect(find.text('Pediatrics'), findsOneWidget);
+        expect(find.text('Radiology'), findsNothing);
+        expect(find.text('All Wilayas'), findsOneWidget);
+        expect(find.text('Algiers'), findsOneWidget);
+        expect(find.text('Oran'), findsOneWidget);
+
+        // Tap 'Cardiology' in English -> ID invariant: binds to canonical '1'
+        await tester.tap(find.text('Cardiology'));
+        await tester.pumpAndSettle();
+        expect(lastSpecialtyId, '1');
+
+        // Tap 'Algiers' in English
+        await tester.tap(find.text('Algiers'));
+        await tester.pumpAndSettle();
+        expect(lastWilaya, 'الجزائر');
       });
 
       testWidgets('empty results view is rendered when zero doctors found', (tester) async {
@@ -546,6 +720,16 @@ void main() {
       testWidgets('initial error displays AafiyaErrorView and retry works', (tester) async {
         int callCount = 0;
         final mockClient = MockClient((request) async {
+          if (request.url.path.contains('/master/')) {
+            return http.Response(
+              jsonEncode({
+                'status': 'success',
+                'data': [],
+              }),
+              200,
+              headers: {'content-type': 'application/json; charset=utf-8'},
+            );
+          }
           callCount++;
           if (callCount <= 3) {
             return http.Response(
@@ -605,6 +789,18 @@ void main() {
       testWidgets('renders clinics and supports wilaya filter', (tester) async {
         String? lastWilaya;
         final mockClient = MockClient((request) async {
+          if (request.url.path.contains('/master/wilayas')) {
+            return http.Response(
+              jsonEncode({
+                'status': 'success',
+                'data': [
+                  {'code': '16', 'name_ar': 'الجزائر', 'name_fr': 'Alger', 'name_en': 'Algiers', 'is_active': true, 'display_order': 16},
+                ],
+              }),
+              200,
+              headers: {'content-type': 'application/json; charset=utf-8'},
+            );
+          }
           lastWilaya = request.url.queryParameters['wilaya'];
           return http.Response(
             jsonEncode({

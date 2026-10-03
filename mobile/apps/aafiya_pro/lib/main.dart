@@ -7,7 +7,7 @@ import 'app.dart';
 /// Resolves the runtime [AppConfig] based on the active platform and build mode.
 ///
 /// Compile-time override supported via `--dart-define=API_URL=https://...`.
-/// In release mode, defaults to [AppConfig.production] (https://api.aafiya.dz/api/v1).
+/// In release mode, defaults to [AppConfig.production] (https://api.aafiya.site/api/v1).
 /// In development/debug mode, Android emulator accesses host machine through 10.0.2.2,
 /// and other platforms connect via localhost:8000.
 AppConfig resolveAppConfig({

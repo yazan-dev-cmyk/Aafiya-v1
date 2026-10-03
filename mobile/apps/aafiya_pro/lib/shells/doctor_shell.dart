@@ -131,12 +131,12 @@ class _DoctorShellState extends State<DoctorShell> {
       NavigationDestination(
         icon: const Icon(Icons.people_alt_outlined),
         selectedIcon: const Icon(Icons.people_alt),
-        label: strings.patientAppointmentsTitle,
+        label: strings.waitingRoomTitle,
       ),
       NavigationDestination(
         icon: const Icon(Icons.local_hospital_outlined),
         selectedIcon: const Icon(Icons.local_hospital),
-        label: strings.doctorRoleTitle,
+        label: strings.myClinicsTitle,
       ),
       if (hasClinicStats)
         NavigationDestination(

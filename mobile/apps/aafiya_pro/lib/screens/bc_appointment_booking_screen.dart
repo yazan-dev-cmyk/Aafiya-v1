@@ -850,6 +850,8 @@ class _BcAppointmentBookingScreenState extends State<BcAppointmentBookingScreen>
           itemBuilder: (context, index) {
             final doc = _doctors[index];
             final isSelected = _selectedDoctor?.id == doc.id;
+            final strings = LocalizedStrings.of(context);
+            final docSpecialty = doc.localizedSpecialty(strings.locale.languageCode);
 
             return AafiyaCard(
               backgroundColor: isSelected
@@ -890,7 +892,7 @@ class _BcAppointmentBookingScreenState extends State<BcAppointmentBookingScreen>
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                doc.specialty,
+                                docSpecialty.isNotEmpty ? docSpecialty : doc.specialty,
                                 style: AafiyaTypography.caption.copyWith(
                                     color: AafiyaColors.secondaryText),
                               ),
@@ -1170,7 +1172,11 @@ class _BcAppointmentBookingScreenState extends State<BcAppointmentBookingScreen>
                 icon: Icons.medical_services_rounded,
                 label: 'الطبيب المعالج',
                 value: _selectedDoctor?.name ?? '',
-                extra: _selectedDoctor?.specialty,
+                extra: _selectedDoctor != null
+                    ? (_selectedDoctor!.localizedSpecialty(strings.locale.languageCode).isNotEmpty
+                        ? _selectedDoctor!.localizedSpecialty(strings.locale.languageCode)
+                        : _selectedDoctor!.specialty)
+                    : null,
               ),
               const Divider(height: 16),
               _buildSummaryRow(

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:aafiya_core/aafiya_core.dart';
+import 'package:aafiya_ui/aafiya_ui.dart';
 import 'package:aafiya_patient/app.dart';
 import 'package:aafiya_patient/main.dart';
+import 'package:aafiya_patient/screens/appointment_detail_screen.dart';
 
 void main() {
   group('AafiyaPatientApp Tests', () {
@@ -213,6 +216,135 @@ void main() {
         final webConfig = resolveAppConfig(platform: TargetPlatform.android, isWeb: true);
         expect(webConfig, equals(AppConfig.devLocal));
         expect(webConfig.apiBaseUrl, equals('http://localhost:8000/api/v1'));
+      });
+    });
+
+    group('Appointment Date Formatting Tests (DEF-04 / TASK-B-04)', () {
+      Widget createTestApp({required Widget child, Locale locale = const Locale('ar')}) {
+        return MaterialApp(
+          locale: locale,
+          theme: AafiyaTheme.lightTheme,
+          supportedLocales: AafiyaSupportedLocale.supportedLocales,
+          localizationsDelegates: const [
+            AafiyaLocalizationsDelegate(),
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          home: child,
+        );
+      }
+
+      test('formatDate safely formats ISO timestamps across locales', () {
+        final arStrings = LocalizedStrings(const Locale('ar'));
+        final enStrings = LocalizedStrings(const Locale('en'));
+        final frStrings = LocalizedStrings(const Locale('fr'));
+
+        const isoTimestamp = '2026-09-01T10:00:00.000Z';
+        expect(arStrings.formatDate(isoTimestamp), equals('1 سبتمبر 2026'));
+        expect(enStrings.formatDate(isoTimestamp), equals('Sep 1, 2026'));
+        expect(frStrings.formatDate(isoTimestamp), equals('1 sept. 2026'));
+
+        const dateOnly = '2026-10-15';
+        expect(arStrings.formatDate(dateOnly), equals('15 أكتوبر 2026'));
+        expect(enStrings.formatDate(dateOnly), equals('Oct 15, 2026'));
+        expect(frStrings.formatDate(dateOnly), equals('15 oct. 2026'));
+      });
+
+      test('formatDate handles null, empty, short, and malformed strings without throwing', () {
+        final strings = LocalizedStrings(const Locale('en'));
+
+        expect(strings.formatDate(null), equals('-'));
+        expect(strings.formatDate(''), equals('-'));
+        expect(strings.formatDate('   '), equals('-'));
+        // Short strings (< 10 chars) that caused substring(0, 10) crashes
+        expect(strings.formatDate('short'), equals('short'));
+        expect(strings.formatDate('a'), equals('a'));
+        expect(strings.formatDate('bad-date'), equals('bad-date'));
+      });
+
+      testWidgets('AppointmentDetailScreen renders localized dates without substring crash on short dates', (tester) async {
+        const dangerousAppointment = Appointment(
+          id: 'app-danger',
+          bookingReference: 'BK-SHORT-001',
+          appointmentDate: '2026-10-15',
+          timeSlot: '09:00',
+          status: AppointmentStatus.confirmed,
+          confirmedAt: 'short', // 5 chars — would crash substring(0, 10)
+          checkedInAt: 'bad',   // 3 chars — would crash substring(0, 10)
+          doctor: AppointmentDoctor(id: 'doc-1', name: 'Dr. Benali', specialty: 'أمراض القلب'),
+          clinic: AppointmentClinic(id: 'cln-1', name: 'Clinique El Chifa', wilaya: 'الجزائر'),
+          patient: AppointmentPatient(id: 'pat-1', name: 'Amine'),
+        );
+
+        await tester.pumpWidget(
+          createTestApp(
+            child: const AppointmentDetailScreen(appointment: dangerousAppointment),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Must render cleanly without throwing RangeError
+        expect(find.byType(AppointmentDetailScreen), findsOneWidget);
+        expect(find.text('تم التأكيد بتاريخ: short'), findsOneWidget);
+        expect(find.text('تم تسجيل الحضور بتاريخ: bad'), findsOneWidget);
+      });
+
+      testWidgets('AppointmentDetailScreen renders localized dates across AR, EN, FR', (tester) async {
+        const appointment = Appointment(
+          id: 'app-valid',
+          bookingReference: 'BK-VALID-001',
+          appointmentDate: '2026-10-15',
+          timeSlot: '10:30',
+          status: AppointmentStatus.confirmed,
+          confirmedAt: '2026-09-01T10:00:00.000Z',
+          checkedInAt: '2026-10-15T08:50:00.000Z',
+          doctor: AppointmentDoctor(id: 'doc-1', name: 'Dr. Benali', specialty: 'أمراض القلب'),
+          clinic: AppointmentClinic(id: 'cln-1', name: 'Clinique El Chifa', wilaya: 'الجزائر'),
+          patient: AppointmentPatient(id: 'pat-1', name: 'Amine'),
+        );
+
+        // Test Arabic
+        await tester.pumpWidget(
+          createTestApp(
+            locale: const Locale('ar'),
+            child: const AppointmentDetailScreen(appointment: appointment),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(find.text('تم التأكيد بتاريخ: 1 سبتمبر 2026'), findsOneWidget);
+        expect(find.text('تم تسجيل الحضور بتاريخ: 15 أكتوبر 2026'), findsOneWidget);
+        expect(find.text('15 أكتوبر 2026'), findsOneWidget);
+        expect(find.text('أمراض القلب'), findsOneWidget);
+        expect(find.text('الجزائر'), findsOneWidget);
+
+        // Test English
+        await tester.pumpWidget(
+          createTestApp(
+            locale: const Locale('en'),
+            child: const AppointmentDetailScreen(appointment: appointment),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(find.text('Confirmed on: Sep 1, 2026'), findsOneWidget);
+        expect(find.text('Checked in on: Oct 15, 2026'), findsOneWidget);
+        expect(find.text('Oct 15, 2026'), findsOneWidget);
+        expect(find.text('Cardiology'), findsOneWidget);
+        expect(find.text('Algiers'), findsOneWidget);
+
+        // Test French
+        await tester.pumpWidget(
+          createTestApp(
+            locale: const Locale('fr'),
+            child: const AppointmentDetailScreen(appointment: appointment),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(find.text('Confirmé le: 1 sept. 2026'), findsOneWidget);
+        expect(find.text('Présence enregistrée le: 15 oct. 2026'), findsOneWidget);
+        expect(find.text('15 oct. 2026'), findsOneWidget);
+        expect(find.text('Cardiologie'), findsOneWidget);
+        expect(find.text('Alger'), findsOneWidget);
       });
     });
   });

@@ -357,7 +357,7 @@ void main() {
       expect(find.byType(AppointmentDetailScreen), findsOneWidget);
       expect(find.text('تفاصيل الموعد'), findsOneWidget);
       expect(find.text('يرجى إحضار التحاليل السابقة'), findsOneWidget);
-      expect(find.text('تم التأكيد بتاريخ: 2026-09-01'), findsOneWidget);
+      expect(find.text('تم التأكيد بتاريخ: 1 سبتمبر 2026'), findsOneWidget);
 
       // Tap close icon in app bar
       await tester.tap(find.byIcon(Icons.close_rounded));
