@@ -1,6 +1,6 @@
 name: aafiya_patient
 description: AAFIYA Patient mobile application foundation.
-version: 0.1.0
+version: 0.1.0+2
 publish_to: none
 resolution: workspace
 

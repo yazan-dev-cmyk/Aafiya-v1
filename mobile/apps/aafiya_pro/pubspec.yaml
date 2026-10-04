@@ -1,6 +1,6 @@
 name: aafiya_pro
 description: AAFIYA Pro mobile application foundation for Doctors, Assistants, and Booking Centers.
-version: 0.1.0
+version: 0.1.0+2
 publish_to: none
 resolution: workspace
 
