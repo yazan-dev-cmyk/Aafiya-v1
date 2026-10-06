@@ -445,7 +445,7 @@ class _PatientAuthShellState extends State<PatientAuthShell> {
                         icon: Icon(
                           _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
                         ),
-                        tooltip: _obscurePassword ? 'إظهار كلمة المرور' : 'إخفاء كلمة المرور',
+                        tooltip: _obscurePassword ? strings.showPassword : strings.hidePassword,
                         onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                       ),
                     ),
@@ -463,7 +463,7 @@ class _PatientAuthShellState extends State<PatientAuthShell> {
                           icon: Icon(
                             _obscureConfirmPassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
                           ),
-                          tooltip: _obscureConfirmPassword ? 'إظهار كلمة المرور' : 'إخفاء كلمة المرور',
+                          tooltip: _obscureConfirmPassword ? strings.showPassword : strings.hidePassword,
                           onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
                         ),
                       ),

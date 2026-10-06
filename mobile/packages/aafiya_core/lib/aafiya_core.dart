@@ -1,4 +1,5 @@
 export 'auth/auth_session_manager.dart';
+export 'auth/secure_token_storage.dart';
 export 'auth/token_storage.dart';
 export 'config/app_config.dart';
 export 'errors/api_error_response.dart';

@@ -39,6 +39,16 @@ class LocalizedStrings {
   String get phoneLabel => isArabic ? 'رقم الهاتف' : isFrench ? 'Numéro de téléphone' : 'Phone Number';
   String get confirmPasswordLabel =>
       isArabic ? 'تأكيد كلمة المرور' : isFrench ? 'Confirmer le mot de passe' : 'Confirm Password';
+  String get showPassword => isArabic
+      ? 'إظهار كلمة المرور'
+      : isFrench
+          ? 'Afficher le mot de passe'
+          : 'Show password';
+  String get hidePassword => isArabic
+      ? 'إخفاء كلمة المرور'
+      : isFrench
+          ? 'Masquer le mot de passe'
+          : 'Hide password';
   String get alreadyHaveAccount => isArabic
       ? 'لديك حساب بالفعل؟ تسجيل الدخول'
       : isFrench

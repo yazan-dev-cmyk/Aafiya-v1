@@ -50,7 +50,7 @@ void main() {
 
   AppConfig.current = resolveAppConfig();
 
-  final tokenStorage = InMemoryTokenStorage();
+  final tokenStorage = SecureTokenStorage();
   final apiClient = ApiClient(
     tokenStorage: tokenStorage,
     config: AppConfig.current,

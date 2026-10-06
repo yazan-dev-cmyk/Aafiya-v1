@@ -170,11 +170,15 @@ class _AafiyaProAppState extends State<AafiyaProApp> {
             sessionManager: widget.sessionManager,
             onAuthenticated: () => setState(() => _navState = ProNavState.roleResolution),
             onUnauthenticated: () => setState(() => _navState = ProNavState.auth),
+            onLocaleChanged: setLocale,
+            currentLocale: _locale,
           ),
         ProNavState.auth => ProAuthShell(
             sessionManager: widget.sessionManager,
             apiClient: widget.apiClient,
             onLoginSuccess: () => setState(() => _navState = ProNavState.roleResolution),
+            onLocaleChanged: setLocale,
+            currentLocale: _locale,
           ),
         ProNavState.roleResolution => RoleResolutionShell(
             sessionManager: widget.sessionManager,

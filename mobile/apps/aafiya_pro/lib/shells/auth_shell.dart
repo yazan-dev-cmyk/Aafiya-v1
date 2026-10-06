@@ -9,11 +9,15 @@ class ProAuthShell extends StatefulWidget {
     required this.sessionManager,
     required this.apiClient,
     required this.onLoginSuccess,
+    this.onLocaleChanged,
+    this.currentLocale,
   });
 
   final AuthSessionManager sessionManager;
   final ApiClient apiClient;
   final VoidCallback onLoginSuccess;
+  final ValueChanged<Locale>? onLocaleChanged;
+  final Locale? currentLocale;
 
   @override
   State<ProAuthShell> createState() => _ProAuthShellState();
@@ -22,6 +26,7 @@ class ProAuthShell extends StatefulWidget {
 class _ProAuthShellState extends State<ProAuthShell> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _obscurePassword = true;
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -97,9 +102,36 @@ class _ProAuthShellState extends State<ProAuthShell> {
   @override
   Widget build(BuildContext context) {
     final strings = LocalizedStrings.of(context);
+    final activeLocale = widget.currentLocale ?? Localizations.localeOf(context);
 
     return Scaffold(
-      appBar: AafiyaAppBar(title: strings.proAppTitle),
+      appBar: AafiyaAppBar(
+        title: strings.proAppTitle,
+        actions: widget.onLocaleChanged != null
+            ? [
+                PopupMenuButton<Locale>(
+                  icon: const Icon(Icons.language_rounded, color: AafiyaColors.healthBlue),
+                  tooltip: strings.language,
+                  initialValue: activeLocale,
+                  onSelected: widget.onLocaleChanged,
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: const Locale('ar'),
+                      child: Text(strings.languageArabic),
+                    ),
+                    PopupMenuItem(
+                      value: const Locale('en'),
+                      child: Text(strings.languageEnglish),
+                    ),
+                    PopupMenuItem(
+                      value: const Locale('fr'),
+                      child: Text(strings.languageFrench),
+                    ),
+                  ],
+                ),
+              ]
+            : null,
+      ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -151,8 +183,15 @@ class _ProAuthShellState extends State<ProAuthShell> {
                     AafiyaTextField(
                       label: strings.passwordLabel,
                       controller: _passwordController,
-                      obscureText: true,
+                      obscureText: _obscurePassword,
                       prefixIcon: const Icon(Icons.lock_outline),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                        ),
+                        tooltip: _obscurePassword ? strings.showPassword : strings.hidePassword,
+                        onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                      ),
                     ),
                     const SizedBox(height: 24),
                     AafiyaButton(
