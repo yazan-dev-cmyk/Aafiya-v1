@@ -78,7 +78,7 @@ class PatientShareTokenController extends Controller
             'expires_at' => $expiresAt,
         ]);
 
-        $frontendUrl = rtrim((string) config('app.frontend_url', env('FRONTEND_URL', 'http://localhost:3000')), '/');
+        $frontendUrl = $this->resolveFrontendUrl($request);
         $shareUrl = "{$frontendUrl}/records/view#token={$rawToken}";
 
         return response()->json([
@@ -359,4 +359,52 @@ class PatientShareTokenController extends Controller
             'require_pin' => true,
         ], 422);
     }
+
+    /**
+     * Resolve the canonical public frontend URL for shared medical records.
+     * Guaranteed never to emit localhost in production environments.
+     */
+    protected function resolveFrontendUrl(Request $request): string
+    {
+        $configured = config('app.frontend_url');
+        if (! empty($configured) && $configured !== 'http://localhost:3000') {
+            return rtrim((string) $configured, '/');
+        }
+
+        $envFrontend = env('FRONTEND_URL');
+        if (! empty($envFrontend) && $envFrontend !== 'http://localhost:3000') {
+            return rtrim((string) $envFrontend, '/');
+        }
+
+        // Check Railway service link variable if present
+        $railwayV1Url = env('RAILWAY_SERVICE_AAFIYA_V1_URL');
+        if (! empty($railwayV1Url)) {
+            return 'https://' . rtrim((string) $railwayV1Url, '/');
+        }
+
+        // Check request Origin if from allowed CORS origins
+        $origin = $request->header('Origin') ?: $request->header('Referer');
+        if (! empty($origin)) {
+            $parsed = parse_url($origin);
+            if (isset($parsed['scheme'], $parsed['host'])) {
+                $host = strtolower($parsed['host']);
+                $port = isset($parsed['port']) ? ':' . $parsed['port'] : '';
+                if ($host === 'aafiya.site' || $host === 'www.aafiya.site') {
+                    return $parsed['scheme'] . '://' . $parsed['host'] . $port;
+                }
+                if (app()->environment(['local', 'testing']) && ($host === 'localhost' || $host === '127.0.0.1')) {
+                    return $parsed['scheme'] . '://' . $parsed['host'] . $port;
+                }
+            }
+        }
+
+        // If local development or testing environment, allow localhost:3000
+        if (app()->environment(['local', 'testing'])) {
+            return 'http://localhost:3000';
+        }
+
+        // Production default
+        return 'https://aafiya.site';
+    }
 }
+

@@ -54,7 +54,7 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
-    'frontend_url' => env('FRONTEND_URL', 'http://localhost:3000'),
+    'frontend_url' => env('FRONTEND_URL', env('RAILWAY_SERVICE_AAFIYA_V1_URL') ? 'https://' . env('RAILWAY_SERVICE_AAFIYA_V1_URL') : (env('APP_ENV') === 'production' ? 'https://aafiya.site' : 'http://localhost:3000')),
 
     /*
     |--------------------------------------------------------------------------

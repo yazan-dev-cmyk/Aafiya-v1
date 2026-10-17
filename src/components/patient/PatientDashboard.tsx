@@ -57,6 +57,7 @@ import QRCode from 'react-qr-code';
 import { MedicalDocumentCode } from '../shared/MedicalDocumentCode';
 import { ChangePasswordCard } from '../shared/ChangePasswordCard';
 import { MedicalTimelineHeader, MedicalTimelineValue } from '../shared/MedicalTimelineHeader';
+import { resolveCanonicalShareUrl } from '@/lib/utils';
 
 interface PatientDashboardProps {
   onBackToMainPlatform: () => void;
@@ -728,13 +729,18 @@ export function PatientDashboard({
         pin: cleanPin,
       });
 
-      if (res.data?.share_url) {
+      if (res.data?.share_url || res.data?.token) {
+        const canonicalUrl = resolveCanonicalShareUrl(res.data.share_url, res.data.token);
+        const shareDataWithCanonicalUrl: PatientShareTokenCreated = {
+          ...res.data,
+          share_url: canonicalUrl,
+        };
         setCreatedPin(cleanPin);
-        setCreatedShareData(res.data);
-        setGeneratedShareUrl(res.data.share_url);
+        setCreatedShareData(shareDataWithCanonicalUrl);
+        setGeneratedShareUrl(canonicalUrl);
         if (typeof navigator !== 'undefined' && navigator.clipboard) {
           try {
-            await navigator.clipboard.writeText(res.data.share_url);
+            await navigator.clipboard.writeText(canonicalUrl);
             setCopiedLink(true);
             setTimeout(() => setCopiedLink(false), 3000);
           } catch {
@@ -753,9 +759,17 @@ export function PatientDashboard({
   };
 
   const handleCopyField = async (text: string, type: 'url' | 'token' | 'pin') => {
+    let textToCopy = text;
+    if (type === 'url') {
+      try {
+        textToCopy = resolveCanonicalShareUrl(text, createdShareData?.token);
+      } catch {
+        textToCopy = text;
+      }
+    }
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
       try {
-        await navigator.clipboard.writeText(text);
+        await navigator.clipboard.writeText(textToCopy);
         if (type === 'url') {
           setCopiedLink(true);
           setTimeout(() => setCopiedLink(false), 3000);
