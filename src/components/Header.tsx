@@ -82,17 +82,17 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header 
       className={cn(
-        "sticky top-0 z-40 transition-all duration-300",
+        "sticky top-0 z-40 transition-all duration-300 w-full max-w-full overflow-hidden [contain:paint]",
         isScrolled 
           ? 'bg-white/90 backdrop-blur-md shadow-lg shadow-slate-900/5 border-b border-slate-100 py-3' 
           : 'bg-slate-50/80 backdrop-blur-sm py-5 border-b border-transparent'
       )}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between gap-4 xl:gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full overflow-hidden">
+        <div className="flex items-center justify-between gap-3 xl:gap-5 min-w-0">
           
           {/* Logo */}
-          <a href="#hero" className="flex items-center gap-2.5 sm:gap-3 group shrink-0">
+          <a href="#hero" className="flex items-center gap-2 sm:gap-2.5 group shrink-0">
             <img 
               src="/logo/Aafiya_Logo_No_Tagline.png" 
               alt="Aafiya" 
@@ -109,12 +109,12 @@ export const Header: React.FC<HeaderProps> = ({
           </a>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-3 xl:gap-6 shrink-0">
+          <nav className="hidden xl:flex items-center gap-2.5 2xl:gap-5 shrink min-w-0">
             {navLinks.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
-                className="text-xs font-black text-slate-500 hover:text-primary transition-colors tracking-tight"
+                className="text-[11px] 2xl:text-xs font-black text-slate-500 hover:text-primary transition-colors tracking-tight whitespace-nowrap"
               >
                 {link.label}
               </a>
@@ -122,7 +122,7 @@ export const Header: React.FC<HeaderProps> = ({
           </nav>
 
           {/* Desktop Right Action Buttons */}
-          <div className="hidden lg:flex items-center gap-2 xl:gap-4 shrink-0">
+          <div className="hidden xl:flex items-center gap-2 xl:gap-3 shrink min-w-0">
             {/* Search Trigger */}
             <Button
               variant="ghost"
@@ -280,7 +280,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Mobile Hamburger Button */}
-          <div className="flex items-center gap-3 lg:hidden">
+          <div className="flex items-center gap-3 xl:hidden">
             <Button
               variant="ghost"
               size="icon"
@@ -304,7 +304,7 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Mobile Menu Drawer */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-white border-b border-slate-100 px-6 pt-4 pb-10 space-y-6 shadow-xl animate-in slide-in-from-top-full duration-300">
+        <div className="xl:hidden bg-white border-b border-slate-100 px-6 pt-4 pb-10 space-y-6 shadow-xl animate-in slide-in-from-top-full duration-300">
           <nav className="flex flex-col space-y-4">
             {navLinks.map((link) => (
               <a

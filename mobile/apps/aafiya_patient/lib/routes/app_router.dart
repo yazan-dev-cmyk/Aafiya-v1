@@ -48,6 +48,27 @@ final class AppointmentDetailsDestination extends DeepLinkDestination {
   String toString() => 'AppointmentDetailsDestination(appointmentId: $appointmentId)';
 }
 
+/// Destination for encrypted shared medical record viewing.
+@immutable
+final class SharedRecordDestination extends DeepLinkDestination {
+  const SharedRecordDestination(this.token);
+
+  final String token;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SharedRecordDestination &&
+          runtimeType == other.runtimeType &&
+          token == other.token;
+
+  @override
+  int get hashCode => token.hashCode;
+
+  @override
+  String toString() => 'SharedRecordDestination(token: $token)';
+}
+
 /// Destination for invalid, malformed, or unrecognized deep links.
 @immutable
 final class UnknownDestination extends DeepLinkDestination {
@@ -69,8 +90,8 @@ final class UnknownDestination extends DeepLinkDestination {
 ///
 /// Implements the architectural contract approved in ADR-06-03-01 Revision 2.1:
 /// - Accepts scheme: `aafiya` only
-/// - Accepts paths: `/prescription/{token}` and `/appointment/{uuid}`
-/// - Accepts plural aliases: `/prescriptions/{token}` and `/appointments/{uuid}`
+/// - Accepts paths: `/prescription/{token}`, `/appointment/{uuid}`, and `/record/{token}`
+/// - Accepts plural aliases: `/prescriptions/{token}`, `/appointments/{uuid}`, and `/records/{token}`
 /// - Supports both host-based (`aafiya://prescription/{token}`) and path-based (`aafiya:///prescription/{token}`)
 /// - Case-insensitive scheme and path matching
 /// - Strict whitelist: Rejects queries and fragments
@@ -142,6 +163,13 @@ abstract final class PatientDeepLinkRouter {
           return const UnknownDestination();
         }
         return AppointmentDetailsDestination(identifier);
+
+      case 'record':
+      case 'records':
+        if (identifier.isEmpty || !_tokenRegex.hasMatch(identifier)) {
+          return const UnknownDestination();
+        }
+        return SharedRecordDestination(identifier);
 
       default:
         return const UnknownDestination();

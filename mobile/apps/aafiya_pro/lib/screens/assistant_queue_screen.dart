@@ -5,6 +5,7 @@ import 'package:aafiya_ui/aafiya_ui.dart';
 import '../widgets/check_in_sheet.dart';
 import '../widgets/assistant_patient_search_sheet.dart';
 import '../widgets/queue_patient_tile.dart';
+import '../widgets/slot_selection_grid.dart';
 import 'patient_summary_sheet.dart';
 import 'assistant_booking_screen.dart';
 
@@ -559,6 +560,130 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
           ),
         );
     }
+  }
+
+  Future<void> _handleCancel(Appointment app) async {
+    final strings = LocalizedStrings.of(context);
+
+    final reason = await showDialog<String>(
+      context: context,
+      builder: (ctx) => _CancelAppointmentDialog(
+        strings: strings,
+        patientName: app.patient.name ?? '',
+      ),
+    );
+
+    if (reason == null || !mounted) return;
+
+    setState(() {
+      _processingAppointmentId = app.id;
+    });
+
+    final result = await _queueService.cancelAppointment(
+      app.id,
+      reason: reason.isNotEmpty ? reason : null,
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      _processingAppointmentId = null;
+    });
+
+    switch (result) {
+      case ApiSuccess():
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(strings.cancelSuccessMessage),
+            backgroundColor: AafiyaColors.secondaryText,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        setState(() {
+          _pendingItems.removeWhere((item) => item.id == app.id);
+          _expectedItems.removeWhere((item) => item.id == app.id);
+        });
+
+      case ApiFailure(:final exception):
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(exception.message),
+            backgroundColor: AafiyaColors.error,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+    }
+  }
+
+  bool _isAppointmentCancellable(Appointment appointment) {
+    return switch (appointment.status) {
+      AppointmentStatus.attended ||
+      AppointmentStatus.cancelled ||
+      AppointmentStatus.rejected ||
+      AppointmentStatus.expired ||
+      AppointmentStatus.rescheduled ||
+      AppointmentStatus.noShow => false,
+      AppointmentStatus.confirmed ||
+      AppointmentStatus.pending => true,
+      _ => false,
+    };
+  }
+
+  bool _isAppointmentReschedulable(Appointment appointment) {
+    return switch (appointment.status) {
+      AppointmentStatus.attended ||
+      AppointmentStatus.cancelled ||
+      AppointmentStatus.rejected ||
+      AppointmentStatus.expired ||
+      AppointmentStatus.rescheduled ||
+      AppointmentStatus.noShow => false,
+      AppointmentStatus.confirmed ||
+      AppointmentStatus.pending => true,
+      _ => false,
+    };
+  }
+
+  void _openRescheduleSheet(Appointment appointment) {
+    final strings = LocalizedStrings.of(context);
+    final clinicId = (appointment.clinic.id != null && appointment.clinic.id!.trim().isNotEmpty)
+        ? appointment.clinic.id!.trim()
+        : _getEffectiveClinicId();
+    final doctorId = (appointment.doctor.id != null && appointment.doctor.id!.trim().isNotEmpty)
+        ? appointment.doctor.id!.trim()
+        : (_selectedDoctorId != null && _selectedDoctorId != _allDoctorsSentinel
+            ? _selectedDoctorId!
+            : (_clinicDoctors.isNotEmpty ? _clinicDoctors.first.id : ''));
+
+    if (clinicId.isEmpty || doctorId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(strings.errorTitle),
+          backgroundColor: AafiyaColors.error,
+        ),
+      );
+      return;
+    }
+
+    final initialDate = appointment.appointmentDate != null
+        ? DateTime.tryParse(appointment.appointmentDate!) ?? DateTime.now()
+        : DateTime.now();
+
+    final bookingService = AssistantBookingService(apiClient: _apiClient);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _AssistantRescheduleSheet(
+        appointment: appointment,
+        service: bookingService,
+        strings: strings,
+        initialDate: initialDate,
+        clinicId: clinicId,
+        doctorId: doctorId,
+        onRescheduled: () => _loadQueueData(),
+      ),
+    );
   }
 
   Future<void> _pickSpecificDate() async {
@@ -1243,16 +1368,74 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
 
           final app = _expectedItems[index];
           final isProcessingThis = _processingAppointmentId == app.id;
+          final canReschedule = !isProcessingThis && _isAppointmentReschedulable(app);
+          final canCancel = !isProcessingThis && _isAppointmentCancellable(app);
 
-          return QueuePatientTile(
-            key: ValueKey('assistant_expected_${app.id}'),
-            appointment: app,
-            onAttend: canConfirmAttendance ? () => _handleAttend(app) : null,
-            onNoShow: canConfirmAttendance ? () => _handleNoShow(app) : null,
-            onViewSummary: app.patient.id != null
-                ? () => _openPatientSummary(app)
-                : null,
-            isProcessing: isProcessingThis,
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              QueuePatientTile(
+                key: ValueKey('assistant_expected_${app.id}'),
+                appointment: app,
+                onAttend: canConfirmAttendance ? () => _handleAttend(app) : null,
+                onNoShow: canConfirmAttendance ? () => _handleNoShow(app) : null,
+                onViewSummary: app.patient.id != null
+                    ? () => _openPatientSummary(app)
+                    : null,
+                isProcessing: isProcessingThis,
+              ),
+              if (canReschedule || canCancel)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: AafiyaSpacing.xs, left: 4, right: 4),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      if (canReschedule)
+                        OutlinedButton.icon(
+                          icon: const Icon(Icons.edit_calendar_outlined, size: 15, color: AafiyaColors.healthBlue),
+                          label: Text(
+                            strings.rescheduleAppointmentTitle,
+                            style: AafiyaTypography.caption.copyWith(
+                              color: AafiyaColors.healthBlue,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: AafiyaColors.healthBlue),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(AafiyaRadius.sm),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: AafiyaSpacing.sm, vertical: 4),
+                          ),
+                          onPressed: () => _openRescheduleSheet(app),
+                        ),
+                      if (canReschedule && canCancel)
+                        const SizedBox(width: 8),
+                      if (canCancel)
+                        OutlinedButton.icon(
+                          key: ValueKey('assistant_cancel_expected_${app.id}'),
+                          icon: const Icon(Icons.cancel_outlined, size: 15, color: AafiyaColors.error),
+                          label: Text(
+                            strings.cancelAppointmentTitle,
+                            style: AafiyaTypography.caption.copyWith(
+                              color: AafiyaColors.error,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: AafiyaColors.error),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(AafiyaRadius.sm),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: AafiyaSpacing.sm, vertical: 4),
+                          ),
+                          onPressed: isProcessingThis ? null : () => _handleCancel(app),
+                        ),
+                    ],
+                  ),
+                ),
+            ],
           );
         },
       );
@@ -1301,15 +1484,73 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
 
           final app = _pendingItems[index];
           final isProcessingThis = _processingAppointmentId == app.id;
+          final canReschedule = !isProcessingThis && _isAppointmentReschedulable(app);
+          final canCancel = !isProcessingThis && _isAppointmentCancellable(app);
 
-          return QueuePatientTile(
-            key: ValueKey('assistant_pending_${app.id}'),
-            appointment: app,
-            onConfirm: canConfirmBooking ? () => _handleConfirm(app) : null,
-            onViewSummary: app.patient.id != null
-                ? () => _openPatientSummary(app)
-                : null,
-            isProcessing: isProcessingThis,
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              QueuePatientTile(
+                key: ValueKey('assistant_pending_${app.id}'),
+                appointment: app,
+                onConfirm: canConfirmBooking ? () => _handleConfirm(app) : null,
+                onViewSummary: app.patient.id != null
+                    ? () => _openPatientSummary(app)
+                    : null,
+                isProcessing: isProcessingThis,
+              ),
+              if (canReschedule || canCancel)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: AafiyaSpacing.xs, left: 4, right: 4),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      if (canReschedule)
+                        OutlinedButton.icon(
+                          icon: const Icon(Icons.edit_calendar_outlined, size: 15, color: AafiyaColors.healthBlue),
+                          label: Text(
+                            strings.rescheduleAppointmentTitle,
+                            style: AafiyaTypography.caption.copyWith(
+                              color: AafiyaColors.healthBlue,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: AafiyaColors.healthBlue),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(AafiyaRadius.sm),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: AafiyaSpacing.sm, vertical: 4),
+                          ),
+                          onPressed: () => _openRescheduleSheet(app),
+                        ),
+                      if (canReschedule && canCancel)
+                        const SizedBox(width: 8),
+                      if (canCancel)
+                        OutlinedButton.icon(
+                          key: ValueKey('assistant_cancel_pending_${app.id}'),
+                          icon: const Icon(Icons.cancel_outlined, size: 15, color: AafiyaColors.error),
+                          label: Text(
+                            strings.cancelAppointmentTitle,
+                            style: AafiyaTypography.caption.copyWith(
+                              color: AafiyaColors.error,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: AafiyaColors.error),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(AafiyaRadius.sm),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: AafiyaSpacing.sm, vertical: 4),
+                          ),
+                          onPressed: isProcessingThis ? null : () => _handleCancel(app),
+                        ),
+                    ],
+                  ),
+                ),
+            ],
           );
         },
       );
@@ -1386,3 +1627,496 @@ class _NoShowDialogState extends State<_NoShowDialog> {
     );
   }
 }
+
+class _CancelAppointmentDialog extends StatefulWidget {
+  const _CancelAppointmentDialog({
+    required this.strings,
+    required this.patientName,
+  });
+
+  final LocalizedStrings strings;
+  final String patientName;
+
+  @override
+  State<_CancelAppointmentDialog> createState() => _CancelAppointmentDialogState();
+}
+
+class _CancelAppointmentDialogState extends State<_CancelAppointmentDialog> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(widget.strings.cancelAppointmentTitle),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '${widget.strings.cancelAppointmentConfirmPrompt}\n\n${widget.strings.patientNameLabel}: ${widget.patientName}',
+          ),
+          const SizedBox(height: AafiyaSpacing.md),
+          TextField(
+            controller: _controller,
+            decoration: InputDecoration(
+              labelText: widget.strings.cancellationReasonPrompt,
+              hintText: widget.strings.cancellationReasonPrompt,
+              border: const OutlineInputBorder(),
+              isDense: true,
+            ),
+            maxLines: 2,
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(null),
+          child: Text(widget.strings.cancel),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AafiyaColors.error,
+            foregroundColor: AafiyaColors.pureWhite,
+          ),
+          onPressed: () => Navigator.of(context).pop(_controller.text.trim()),
+          child: Text(widget.strings.confirmCancelAction),
+        ),
+      ],
+    );
+  }
+}
+
+/// Operational Reschedule Sheet for Doctor Assistants.
+/// Reuses the Booking Center live-slot selection pattern with AssistantBookingService.
+class _AssistantRescheduleSheet extends StatefulWidget {
+  const _AssistantRescheduleSheet({
+    required this.appointment,
+    required this.service,
+    required this.strings,
+    required this.initialDate,
+    required this.clinicId,
+    required this.doctorId,
+    required this.onRescheduled,
+  });
+
+  final Appointment appointment;
+  final AssistantBookingService service;
+  final LocalizedStrings strings;
+  final DateTime initialDate;
+  final String clinicId;
+  final String doctorId;
+  final VoidCallback onRescheduled;
+
+  @override
+  State<_AssistantRescheduleSheet> createState() =>
+      _AssistantRescheduleSheetState();
+}
+
+class _AssistantRescheduleSheetState extends State<_AssistantRescheduleSheet> {
+  late DateTime _selectedDate;
+  bool _isLoadingSlots = false;
+  List<AppointmentSlot> _slots = [];
+  AppointmentSlot? _selectedSlot;
+  String? _slotsError;
+  final _notesController = TextEditingController();
+  bool _isSubmitting = false;
+
+  String get _formattedDate =>
+      '${_selectedDate.year.toString().padLeft(4, '0')}-${_selectedDate.month.toString().padLeft(2, '0')}-${_selectedDate.day.toString().padLeft(2, '0')}';
+
+  bool get _isSameAsCurrent {
+    if (_selectedSlot == null) return false;
+    final origDate = widget.appointment.appointmentDate;
+    final origSlot = widget.appointment.timeSlot;
+    if (origDate == null || origSlot == null) return false;
+
+    final isSameDate = _formattedDate == origDate.trim();
+    final slotNorm = _selectedSlot!.timeSlot.trim().substring(
+        0,
+        _selectedSlot!.timeSlot.trim().length >= 5
+            ? 5
+            : _selectedSlot!.timeSlot.trim().length);
+    final origNorm = origSlot.trim().substring(
+        0, origSlot.trim().length >= 5 ? 5 : origSlot.trim().length);
+    return isSameDate && slotNorm == origNorm;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    _selectedDate =
+        widget.initialDate.isBefore(today) ? today : widget.initialDate;
+    _loadSlots();
+  }
+
+  @override
+  void dispose() {
+    _notesController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadSlots() async {
+    setState(() {
+      _isLoadingSlots = true;
+      _slotsError = null;
+      _selectedSlot = null;
+    });
+
+    final result = await widget.service.getAvailableSlots(
+      clinicId: widget.clinicId,
+      doctorId: widget.doctorId,
+      date: _formattedDate,
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      _isLoadingSlots = false;
+      switch (result) {
+        case ApiSuccess(:final data):
+          _slots = data;
+          _slotsError = null;
+        case ApiFailure(:final exception):
+          _slotsError = exception.message;
+          _slots = [];
+      }
+    });
+  }
+
+  Future<void> _pickDate() async {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate.isBefore(today) ? today : _selectedDate,
+      firstDate: today,
+      lastDate: today.add(const Duration(days: 90)),
+    );
+
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+      });
+      _loadSlots();
+    }
+  }
+
+  Future<void> _handleReschedule() async {
+    if (_isSubmitting) return;
+
+    if (_selectedSlot == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(widget.strings.selectSlotPrompt),
+          backgroundColor: AafiyaColors.error,
+        ),
+      );
+      return;
+    }
+
+    if (_isSameAsCurrent) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('يرجى اختيار تاريخ أو فترة زمنية مختلفة عن الموعد الحالي.'),
+          backgroundColor: AafiyaColors.error,
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    final result = await widget.service.rescheduleAppointment(
+      appointmentId: widget.appointment.id,
+      appointmentDate: _formattedDate,
+      timeSlot: _selectedSlot!.timeSlot,
+      notes: _notesController.text.trim().isNotEmpty
+          ? _notesController.text.trim()
+          : null,
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      _isSubmitting = false;
+    });
+
+    switch (result) {
+      case ApiSuccess():
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(widget.strings.rescheduleSuccessMessage),
+            backgroundColor: AafiyaColors.healingGreen,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        widget.onRescheduled();
+      case ApiFailure(:final exception):
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(exception.message),
+            backgroundColor: AafiyaColors.error,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+      initialChildSize: 0.85,
+      minChildSize: 0.5,
+      maxChildSize: 0.95,
+      builder: (context, scrollController) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: AafiyaColors.pureWhite,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            children: [
+              Center(
+                child: Container(
+                  margin: const EdgeInsets.only(top: 12, bottom: 8),
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AafiyaColors.border,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  children: [
+                    const Icon(Icons.schedule_rounded,
+                        color: AafiyaColors.healthBlue),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        widget.strings.rescheduleAppointmentTitle,
+                        style: AafiyaTypography.titleLarge
+                            .copyWith(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close_rounded),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(height: 1),
+              Expanded(
+                child: SingleChildScrollView(
+                  controller: scrollController,
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Current appointment card
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AafiyaColors.lightBackground,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: AafiyaColors.border),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(Icons.info_outline,
+                                    size: 16, color: AafiyaColors.secondaryText),
+                                const SizedBox(width: 6),
+                                Text(
+                                  'الموعد الحالي',
+                                  style: AafiyaTypography.caption
+                                      .copyWith(fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '${widget.appointment.appointmentDate ?? '—'} • ${widget.appointment.timeSlot ?? '—'}',
+                              style: AafiyaTypography.bodyMedium
+                                  .copyWith(fontWeight: FontWeight.bold),
+                            ),
+                            if (widget.appointment.doctor.name != null) ...[
+                              const SizedBox(height: 2),
+                              Text(
+                                'الطبيب: ${widget.appointment.doctor.name!}',
+                                style: AafiyaTypography.caption
+                                    .copyWith(color: AafiyaColors.secondaryText),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Date picker bar
+                      AafiyaCard(
+                        padding: const EdgeInsets.all(12),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  widget.strings.selectDatePrompt,
+                                  style: AafiyaTypography.caption.copyWith(
+                                      color: AafiyaColors.secondaryText),
+                                ),
+                                Text(
+                                  _formattedDate,
+                                  style: AafiyaTypography.titleMedium
+                                      .copyWith(fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            OutlinedButton(
+                              onPressed: _pickDate,
+                              child: const Text('تغيير التاريخ'),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      Text(
+                        widget.strings.selectSlotPrompt,
+                        style: AafiyaTypography.titleMedium
+                            .copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+
+                      if (_slotsError != null) ...[
+                        Text(
+                          _slotsError!,
+                          style: AafiyaTypography.caption
+                              .copyWith(color: AafiyaColors.error),
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+
+                      SlotSelectionGrid(
+                        slots: _slots,
+                        selectedSlot: _selectedSlot?.timeSlot,
+                        isLoading: _isLoadingSlots,
+                        onSlotSelected: (slot) {
+                          setState(() {
+                            _selectedSlot = slot;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Inline alert for no-op selection (same date + same slot)
+                      if (_isSameAsCurrent) ...[
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: AafiyaColors.warning.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                                color: AafiyaColors.warning
+                                    .withValues(alpha: 0.4)),
+                          ),
+                          child: const Row(
+                            children: [
+                              Icon(Icons.warning_amber_rounded,
+                                  size: 18, color: AafiyaColors.warning),
+                              SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'يرجى اختيار تاريخ أو فترة زمنية مختلفة عن الموعد الحالي.',
+                                  style: TextStyle(
+                                    color: AafiyaColors.warning,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+
+                      TextField(
+                        controller: _notesController,
+                        maxLines: 2,
+                        decoration: InputDecoration(
+                          labelText: widget.strings.optionalNotes,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+
+                      ElevatedButton(
+                        onPressed: (_isSubmitting ||
+                                _selectedSlot == null ||
+                                _isSameAsCurrent)
+                            ? null
+                            : _handleReschedule,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AafiyaColors.healthBlue,
+                          foregroundColor: AafiyaColors.pureWhite,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: _isSubmitting
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: AafiyaColors.pureWhite,
+                                ),
+                              )
+                            : Text(
+                                widget.strings.confirmRescheduleAction,
+                                style: AafiyaTypography.bodyMedium.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: AafiyaColors.pureWhite,
+                                ),
+                              ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+

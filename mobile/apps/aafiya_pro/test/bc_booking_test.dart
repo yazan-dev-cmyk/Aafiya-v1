@@ -643,6 +643,155 @@ void main() {
       expect(cancelCalled, isTrue);
       expect(quotaRefreshTriggered, isTrue);
     });
+
+    testWidgets('Cancellation succeeds even if onQuotaNeedsRefresh throws an exception', (tester) async {
+      configureTestScreen(tester);
+      int cancelCallCount = 0;
+
+      final mockClient = MockClient((request) async {
+        if (request.url.path == '/api/v1/appointments') {
+          return jsonResponse(mockAppointmentsListPayload);
+        }
+        if (request.url.path == '/api/v1/appointments/apt-uuid-001/cancel' && request.method == 'POST') {
+          cancelCallCount++;
+          return jsonResponse(mockCreatedAppointmentPayload);
+        }
+        return jsonResponse({});
+      });
+
+      final (apiClient, sessionManager) = createTestClients(mockClient);
+      final service = BookingCenterService(apiClient: apiClient);
+
+      await tester.pumpWidget(createTestWidget(
+        child: BcAppointmentsListScreen(
+          sessionManager: sessionManager,
+          user: bcUser,
+          apiClient: apiClient,
+          bookingCenterService: service,
+          onQuotaNeedsRefresh: () {
+            throw Exception('Simulated quota refresh failure');
+          },
+        ),
+      ));
+      await tester.pumpAndSettle();
+
+      // Tap Cancel button on first card
+      final cancelButtons = find.text('إلغاء الموعد الطبي');
+      await tester.tap(cancelButtons.first);
+      await tester.pumpAndSettle();
+
+      // Confirm cancel
+      await tester.tap(find.text('تأكيد الإلغاء'));
+      await tester.pumpAndSettle();
+
+      // Exactly one cancellation call should have occurred (no retry triggered)
+      expect(cancelCallCount, 1);
+      // Success snackbar must be rendered despite the callback failure
+      expect(find.text('تم إلغاء الموعد بنجاح وتحديث الرصيد إن كان مؤكداً.'), findsOneWidget);
+    });
+
+    testWidgets('Backend 422 error is surfaced clearly in UI SnackBar and does not cancel', (tester) async {
+      configureTestScreen(tester);
+      bool cancelCalled = false;
+
+      final mockClient = MockClient((request) async {
+        if (request.url.path == '/api/v1/appointments') {
+          return jsonResponse(mockAppointmentsListPayload);
+        }
+        if (request.url.path == '/api/v1/appointments/apt-uuid-001/cancel' && request.method == 'POST') {
+          cancelCalled = true;
+          return jsonResponse({
+            'message': 'The given data was invalid.',
+            'errors': {
+              'authorization': ['غير مصرح لك بإلغاء هذا الموعد الطبي.'],
+            },
+          }, 422);
+        }
+        return jsonResponse({});
+      });
+
+      final (apiClient, sessionManager) = createTestClients(mockClient);
+      final service = BookingCenterService(apiClient: apiClient);
+
+      await tester.pumpWidget(createTestWidget(
+        child: BcAppointmentsListScreen(
+          sessionManager: sessionManager,
+          user: bcUser,
+          apiClient: apiClient,
+          bookingCenterService: service,
+        ),
+      ));
+      await tester.pumpAndSettle();
+
+      // Tap Cancel button on first card
+      final cancelButtons = find.text('إلغاء الموعد الطبي');
+      await tester.tap(cancelButtons.first);
+      await tester.pumpAndSettle();
+
+      // Confirm cancel
+      await tester.tap(find.text('تأكيد الإلغاء'));
+      await tester.pumpAndSettle();
+
+      expect(cancelCalled, isTrue);
+      // Error message surfaced from 422 errors.authorization
+      expect(find.text('غير مصرح لك بإلغاء هذا الموعد الطبي.'), findsOneWidget);
+    });
+
+    testWidgets('Terminal appointments do not render cancel button', (tester) async {
+      configureTestScreen(tester);
+      final cancelledListPayload = {
+        'data': [
+          {
+            'id': 'apt-uuid-003',
+            'booking_reference': 'MS-2026-TERM',
+            'clinic': {
+              'id': 'clinic-uuid-001',
+              'name': 'عيادة النور',
+              'phone': '021123456',
+              'wilaya': 'الجزائر',
+            },
+            'doctor': {
+              'id': 'doc-uuid-001',
+              'name': 'د. فاطمة الزهراء',
+              'specialty': 'أمراض القلب والشرايين',
+            },
+            'patient': {
+              'name': 'يوسف بن علي',
+              'phone': '0555998877',
+            },
+            'appointment_date': '2026-09-22',
+            'time_slot': '11:00',
+            'status': 'cancelled',
+            'created_at': '2026-09-20T10:00:00.000Z',
+          },
+        ]
+      };
+
+      final mockClient = MockClient((request) async {
+        if (request.url.path == '/api/v1/appointments') {
+          return jsonResponse(cancelledListPayload);
+        }
+        return jsonResponse({});
+      });
+
+      final (apiClient, sessionManager) = createTestClients(mockClient);
+      final service = BookingCenterService(apiClient: apiClient);
+
+      await tester.pumpWidget(createTestWidget(
+        child: BcAppointmentsListScreen(
+          sessionManager: sessionManager,
+          user: bcUser,
+          apiClient: apiClient,
+          bookingCenterService: service,
+        ),
+      ));
+      await tester.pumpAndSettle();
+
+      expect(find.text('MS-2026-TERM'), findsOneWidget);
+      expect(find.text('ملغى'), findsAtLeast(1));
+      // Cancel button must NOT be present
+      expect(find.text('إلغاء الموعد الطبي'), findsNothing);
+    });
   });
 
   group('BcBookingTicketSheet Standalone Tests', () {

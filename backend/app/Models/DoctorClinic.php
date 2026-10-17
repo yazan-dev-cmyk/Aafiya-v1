@@ -32,6 +32,10 @@ class DoctorClinic extends Pivot
         'position',
         'is_primary',
         'is_active',
+        'max_patients_per_slot',
+        'is_working_hours_activated',
+        'working_hours_activated_at',
+        'schedule_version',
         'joined_at',
     ];
 
@@ -45,6 +49,10 @@ class DoctorClinic extends Pivot
         return [
             'is_primary' => 'boolean',
             'is_active' => 'boolean',
+            'is_working_hours_activated' => 'boolean',
+            'working_hours_activated_at' => 'datetime',
+            'schedule_version' => 'integer',
+            'max_patients_per_slot' => 'integer',
             'joined_at' => 'datetime',
         ];
     }

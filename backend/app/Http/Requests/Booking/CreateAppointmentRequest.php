@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Booking;
 
+use App\Services\BookingService;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CreateAppointmentRequest extends FormRequest
 {
@@ -26,7 +28,7 @@ class CreateAppointmentRequest extends FormRequest
             'patient_national_id' => ['nullable', 'string', 'max:50'],
             'booking_center_id' => ['nullable', 'uuid', 'exists:booking_centers,id'],
             'appointment_date' => ['required', 'date_format:Y-m-d', 'after_or_equal:today'],
-            'time_slot' => ['required', 'string', 'max:5'],
+            'time_slot' => ['required', 'string', Rule::in(BookingService::ALLOWED_BOOKING_START_SLOTS)],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];
     }

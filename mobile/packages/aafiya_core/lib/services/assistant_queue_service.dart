@@ -107,6 +107,26 @@ class AssistantQueueService {
     };
   }
 
+  /// Cancels an appointment.
+  /// Mapped from `POST /api/v1/appointments/{appointment}/cancel`.
+  /// Transitions status from `pending`/`confirmed` -> `cancelled`.
+  Future<ApiResult<Appointment>> cancelAppointment(
+    String appointmentId, {
+    String? reason,
+  }) async {
+    final result = await _apiClient.post(
+      ApiEndpoints.appointmentCancel(appointmentId),
+      body: reason != null && reason.trim().isNotEmpty
+          ? {'reason': reason.trim()}
+          : null,
+    );
+
+    return switch (result) {
+      ApiSuccess(:final data) => _parseAppointment(data),
+      ApiFailure(:final exception) => ApiFailure(exception),
+    };
+  }
+
   /// Checks in an appointment using its single-use secure QR token.
   /// Mapped from `POST /api/v1/appointments/check-in`.
   /// Transitions status from `confirmed` -> `attended`.

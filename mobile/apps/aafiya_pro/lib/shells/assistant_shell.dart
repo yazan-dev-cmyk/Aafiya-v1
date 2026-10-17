@@ -3,6 +3,7 @@ import 'package:aafiya_core/aafiya_core.dart';
 import 'package:aafiya_ui/aafiya_ui.dart';
 
 import '../screens/assistant_queue_screen.dart';
+import '../screens/unresolved_reschedules_screen.dart';
 
 /// AAFIYA Pro — Clinic Assistant Operational Shell (TASK-05-01).
 ///
@@ -12,6 +13,7 @@ import '../screens/assistant_queue_screen.dart';
 /// 3. Attendance confirmation (`/attend`) and No-Show handling (`/no-show`).
 /// 4. QR Token single-use Check-In (`POST /api/v1/appointments/check-in`).
 /// 5. Clinic-scoped Patient Directory Lookup (`GET /api/v1/patients`).
+/// 6. Urgent Unresolved Reschedules Dashboard (`GET /api/v1/clinic/reschedule-dashboard/unresolved`).
 class AssistantShell extends StatelessWidget {
   const AssistantShell({
     super.key,
@@ -37,6 +39,19 @@ class AssistantShell extends StatelessWidget {
       appBar: AafiyaAppBar(
         title: '${strings.assistantRoleTitle}: ${user.name}',
         actions: [
+          IconButton(
+            icon: const Icon(Icons.assignment_late_outlined),
+            tooltip: strings.unresolvedReschedulesTitle,
+            onPressed: () {
+              Navigator.of(context).push(
+                UnresolvedReschedulesScreen.route(
+                  sessionManager: sessionManager,
+                  user: user,
+                  apiClient: effectiveClient,
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.logout_rounded),
             tooltip: strings.signOut,

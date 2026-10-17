@@ -3,9 +3,11 @@
 namespace App\Services;
 
 use App\Models\Doctor;
+use App\Models\MedicalSpecialty;
 use App\Models\User;
 use App\Services\LegacySpecialtyResolutionService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 class DoctorService
 {
@@ -130,5 +132,53 @@ class DoctorService
         $doctor->update(['is_verified' => $isVerified]);
 
         return $doctor->fresh();
+    }
+
+    /**
+     * Update the personal identity and clinical profile of an authenticated doctor.
+     *
+     * @param User $user Authenticated doctor account owner
+     * @param array<string, mixed> $validated Validated attributes
+     * @return User
+     */
+    public function updateDoctorProfile(User $user, array $validated): User
+    {
+        return DB::transaction(function () use ($user, $validated) {
+            // 1. Update User Identity attributes
+            $userUpdates = [];
+            if (array_key_exists('name', $validated)) {
+                $userUpdates['name'] = trim((string) $validated['name']);
+            }
+            if (array_key_exists('phone', $validated)) {
+                $userUpdates['phone'] = trim((string) $validated['phone']);
+            }
+            if (! empty($userUpdates)) {
+                $user->update($userUpdates);
+            }
+
+            // 2. Update Doctor Clinical Profile attributes
+            /** @var Doctor $doctor */
+            $doctor = $user->doctor()->lockForUpdate()->firstOrFail();
+            $doctorUpdates = [];
+
+            if (array_key_exists('bio', $validated)) {
+                $doctorUpdates['bio'] = $validated['bio'] !== null ? trim((string) $validated['bio']) : null;
+            }
+
+            if (array_key_exists('specialty_id', $validated)) {
+                $specialty = MedicalSpecialty::where('id', $validated['specialty_id'])
+                    ->where('is_active', true)
+                    ->firstOrFail();
+
+                $doctorUpdates['specialty_id'] = $specialty->id;
+                $doctorUpdates['specialty'] = $specialty->name_ar; // Dual-write canonical Arabic name
+            }
+
+            if (! empty($doctorUpdates)) {
+                $doctor->update($doctorUpdates);
+            }
+
+            return $user->fresh(['doctor.medicalSpecialty', 'roles', 'doctor.clinics']);
+        });
     }
 }

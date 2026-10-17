@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Doctor\UpdateDoctorProfileRequest;
 use App\Http\Resources\DoctorPublicResource;
+use App\Http\Resources\UserResource;
 use App\Services\DoctorService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -134,6 +136,30 @@ class DoctorController extends Controller
         return response()->json([
             'status' => 'success',
             'data' => $clinics,
+        ]);
+    }
+
+    /**
+     * Update the authenticated doctor's profile.
+     */
+    public function updateProfile(UpdateDoctorProfileRequest $request): JsonResponse
+    {
+        $user = $request->user();
+
+        if (! $user || ! $user->hasRole('doctor') || ! $user->doctor) {
+            return response()->json([
+                'status'  => 'error',
+                'code'    => 403,
+                'message' => 'غير مصرح: هذا المسار مخصص للأطباء فقط.',
+            ], 403);
+        }
+
+        $updatedUser = $this->doctorService->updateDoctorProfile($user, $request->validated());
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'تم تحديث الملف الشخصي بنجاح.',
+            'data'    => new UserResource($updatedUser),
         ]);
     }
 

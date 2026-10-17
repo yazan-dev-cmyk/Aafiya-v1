@@ -133,4 +133,20 @@ class Clinic extends Model
     {
         return $this->hasMany(ClinicDoctorInvitation::class, 'clinic_id');
     }
+
+    /**
+     * Operating hours configured for this clinic across weekdays.
+     */
+    public function operatingHours(): HasMany
+    {
+        return $this->hasMany(ClinicOperatingHour::class, 'clinic_id');
+    }
+
+    /**
+     * Doctor weekly day schedules configured at this clinic.
+     */
+    public function doctorDaySchedules(): HasMany
+    {
+        return $this->hasMany(DoctorDaySchedule::class, 'clinic_id');
+    }
 }

@@ -309,11 +309,29 @@ export const BookingCenterDashboard: React.FC<BookingCenterDashboardProps> = ({
   };
 
   // Action: Update Booking Status
-  const handleUpdateStatus = (
+  const handleUpdateStatus = async (
     bookingId: string,
     newStatus: BookingStatus,
     extra?: { notes?: string; rejectionReason?: string; rescheduledTime?: string }
   ) => {
+    if (newStatus === 'cancelled') {
+      const reasonText = extra?.notes || 'Cancelled by Booking Center staff';
+      await appointmentService.cancelAppointment(bookingId, reasonText);
+
+      // Refresh authoritative live quota balance from backend to reflect the ledger refund
+      try {
+        const balanceRes = await bookingCenterService.getQuotaBalance();
+        if (balanceRes?.data) {
+          setPackageDetails((prev) => ({
+            ...prev,
+            remainingQuota: balanceRes.data.quota_balance,
+          }));
+        }
+      } catch (quotaErr) {
+        console.warn('Failed to refresh quota balance after cancellation:', quotaErr);
+      }
+    }
+
     setBookings((prev) =>
       prev.map((b) => {
         if (b.id === bookingId) {
@@ -342,12 +360,12 @@ export const BookingCenterDashboard: React.FC<BookingCenterDashboardProps> = ({
       const newAuditLog: AuditLogEntry = {
         id: `log-${Date.now()}`,
         timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
-        employeeId: 'emp-1',
-        employeeName: 'محمد أحمد (استقبال)',
+        employeeId: user?.id || 'emp-1',
+        employeeName: user?.name || 'مركز الحجز',
         action: `تحديث حالة الحجز إلى ${newStatus}`,
         targetRef: targetBooking.refNumber,
         details: extra?.notes || extra?.rejectionReason || `تعديل حالة الحجز ${targetBooking.refNumber}`,
-        ipAddress: '192.168.1.45',
+        ipAddress: '127.0.0.1',
       };
       setAuditLogs((prev) => [newAuditLog, ...prev]);
     }

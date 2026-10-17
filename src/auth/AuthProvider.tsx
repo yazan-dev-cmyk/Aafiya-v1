@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { authService, UserProfile, AuthResponse } from '../services/authService';
-import { getActiveClinicId, setActiveClinicId as setApiActiveClinicId } from '../lib/api';
+import { getActiveClinicId, setActiveClinicId as setApiActiveClinicId, getStoredToken } from '../lib/api';
 
 interface AuthContextType {
   user: UserProfile | null;
@@ -70,6 +70,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const refreshUser = useCallback(async () => {
+    const token = getStoredToken();
+    if (!token) {
+      setUser(null);
+      setApiActiveClinicId(null);
+      setActiveClinicId(null);
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const profile = await authService.me();
       setUser(profile);

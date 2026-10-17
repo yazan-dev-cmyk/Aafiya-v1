@@ -18,7 +18,7 @@ export const CtaSection: React.FC<CtaSectionProps> = ({ onOpenAuth }) => {
   const locale = useLocale();
 
   return (
-    <section className="py-32 bg-[#0F172A] relative overflow-hidden">
+    <section className="py-32 bg-[#0F172A] relative overflow-hidden [contain:paint]">
       
       {/* Background Glows */}
       <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[120px] pointer-events-none -translate-y-1/2 translate-x-1/2" />

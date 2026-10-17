@@ -7,13 +7,15 @@ export class ApiError extends Error {
   public status: number;
   public code?: number;
   public errors?: Record<string, string[]>;
+  public responseData?: any;
 
-  constructor(message: string, status: number, code?: number, errors?: Record<string, string[]>) {
+  constructor(message: string, status: number, code?: number, errors?: Record<string, string[]>, responseData?: any) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
     this.code = code;
     this.errors = errors;
+    this.responseData = responseData;
   }
 }
 
@@ -42,7 +44,7 @@ const getApiBaseUrl = (): string => {
   return 'http://localhost:8000/api/v1';
 };
 
-const getStoredToken = (): string | null => {
+export const getStoredToken = (): string | null => {
   if (typeof document === 'undefined') return null;
   const match = document.cookie.match(new RegExp('(^| )medi_session_token=([^;]+)'));
   if (match) return decodeURIComponent(match[2]);
@@ -112,7 +114,7 @@ export async function apiClient<T = any>(
       }
 
       const errorMessage = data?.message || `HTTP ${response.status}: ${response.statusText}`;
-      throw new ApiError(errorMessage, response.status, data?.code, data?.errors);
+      throw new ApiError(errorMessage, response.status, data?.code, data?.errors, data);
     }
 
     return data as ApiResponse<T>;

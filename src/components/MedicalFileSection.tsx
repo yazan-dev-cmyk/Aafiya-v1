@@ -1,6 +1,5 @@
-'use client';
-
 import React from 'react';
+import { useTranslations, useLocale } from 'next-intl';
 import { 
   FileText, 
   Lock, 
@@ -11,6 +10,7 @@ import {
   FlaskConical, 
   CheckCircle2, 
   ArrowLeft,
+  ArrowRight,
   Activity,
   Cpu
 } from 'lucide-react';
@@ -25,8 +25,11 @@ interface MedicalFileSectionProps {
 }
 
 export const MedicalFileSection: React.FC<MedicalFileSectionProps> = ({ onOpenAuth }) => {
+  const t = useTranslations('medical_file');
+  const locale = useLocale();
+
   return (
-    <section id="emr" className="py-24 bg-white relative overflow-hidden">
+    <section id="emr" className="py-24 bg-white relative overflow-hidden [contain:paint]">
       
       {/* Subtle background glow */}
       <div className="absolute top-1/2 left-0 -translate-y-1/2 w-[600px] h-[600px] bg-teal-50 rounded-full blur-[120px] pointer-events-none opacity-50" />
@@ -51,25 +54,31 @@ export const MedicalFileSection: React.FC<MedicalFileSectionProps> = ({ onOpenAu
                 className="absolute left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-teal-500/50 to-transparent z-10 pointer-events-none" 
               />
 
-              <div className="p-8 space-y-8 relative z-20">
+              <div className="p-8 space-y-6 relative z-20">
+                {/* Demo Watermark Notice */}
+                <div className="flex items-center justify-center p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-black text-center">
+                  <ShieldAlert className="w-4 h-4 me-2 text-amber-400 shrink-0" />
+                  <span>{t('demo_watermark')}</span>
+                </div>
+
                 {/* Patient Header */}
                 <div className="flex items-center justify-between border-b border-white/5 pb-6">
                   <div className="flex items-center gap-4">
                     <div className="w-14 h-14 rounded-2xl bg-teal-500/20 text-teal-400 flex items-center justify-center font-black text-xl border border-teal-500/30">
-                      م.س
+                      {t('demo_patient_initials')}
                     </div>
-                    <div>
-                      <h4 className="font-black text-lg text-white">سامي عبد الرحمن</h4>
-                      <p className="text-xs text-slate-400 font-bold">مريض مسجل برقم دائم</p>
+                    <div className="text-start">
+                      <h4 className="font-black text-lg text-white">{t('demo_patient_name')}</h4>
+                      <p className="text-xs text-slate-400 font-bold">{t('demo_patient_sub')}</p>
                     </div>
                   </div>
 
-                  <div className="text-right">
+                  <div className="text-end">
                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-teal-500/10 border border-teal-500/20 rounded-full mb-1">
                       <Cpu className="w-3 h-3 text-teal-400" />
-                      <span className="text-[10px] text-teal-400 font-black font-mono">UUID-8841-9023</span>
+                      <span className="text-[10px] text-teal-400 font-black font-mono">UUID-DEMO-SAMPLE</span>
                     </div>
-                    <div className="text-[10px] text-slate-500 font-black uppercase tracking-widest block">مشفر AES-256</div>
+                    <div className="text-[10px] text-slate-500 font-black uppercase tracking-widest block">{t('encryption_standard')}</div>
                   </div>
                 </div>
 
@@ -90,30 +99,30 @@ export const MedicalFileSection: React.FC<MedicalFileSectionProps> = ({ onOpenAu
                 {/* Timeline mockup */}
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">التاريخ الطبي الأخير</span>
-                    <Badge variant="info" className="bg-primary/10 border-primary/20 text-primary">نشط</Badge>
+                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t('latest_medical_event')}</span>
+                    <Badge variant="info" className="bg-primary/10 border-primary/20 text-primary text-[10px]">{t('status_active')}</Badge>
                   </div>
 
-                  <div className="bg-white/[0.05] rounded-3xl p-5 border border-white/5 space-y-4">
+                  <div className="bg-white/[0.05] rounded-3xl p-5 border border-white/5 space-y-4 text-start">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <Activity className="w-4 h-4 text-teal-400" />
-                        <span className="text-sm font-black text-white">زيارة طبيب القلب — د. سليم</span>
+                        <span className="text-sm font-black text-white">{t('simulated_consultation_title')}</span>
                       </div>
-                      <span className="text-[10px] text-slate-500 font-bold">01 أغسطس 2026</span>
+                      <span className="text-[10px] text-slate-400 font-bold">{t('sample_record_label')}</span>
                     </div>
-                    <p className="text-slate-400 text-xs font-medium leading-relaxed">التشخيص: ارتفاع طفيف في ضغط الدم. تم إصدار وصفة طبية وتحاليل دورية.</p>
+                    <p className="text-slate-400 text-xs font-medium leading-relaxed">{t('simulated_consultation_desc')}</p>
                     <div className="flex flex-wrap gap-2">
-                      <Badge variant="neutral" className="bg-teal-500/10 border-teal-500/20 text-teal-400 text-[10px]" icon={<Pill className="w-3 h-3" />}>وصفة معتمدة</Badge>
-                      <Badge variant="neutral" className="bg-primary/10 border-primary/20 text-primary text-[10px]" icon={<FlaskConical className="w-3 h-3" />}>رفع نتائج المختبر</Badge>
+                      <Badge variant="neutral" className="bg-teal-500/10 border-teal-500/20 text-teal-400 text-[10px]" icon={<Pill className="w-3 h-3" />}>{t('prescription_approved')}</Badge>
+                      <Badge variant="neutral" className="bg-primary/10 border-primary/20 text-primary text-[10px]" icon={<FlaskConical className="w-3 h-3" />}>{t('lab_results_uploaded')}</Badge>
                     </div>
                   </div>
                 </div>
 
                 {/* Security Footer Note */}
-                <div className="flex items-center gap-3 text-[10px] text-slate-500 border-t border-white/5 pt-6 font-bold">
-                  <Lock className="w-4 h-4 text-teal-500" />
-                  <span>الفصل 7.10: لا يجوز حذف السجل الطبي التاريخي، وأي تصحيح يُحفظ بسجل جديد.</span>
+                <div className="flex items-center gap-3 text-[10px] text-slate-400 border-t border-white/5 pt-6 font-bold text-start">
+                  <Lock className="w-4 h-4 text-teal-500 shrink-0" />
+                  <span>{t('immutability_note')}</span>
                 </div>
 
               </div>
@@ -125,17 +134,17 @@ export const MedicalFileSection: React.FC<MedicalFileSectionProps> = ({ onOpenAu
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="lg:col-span-6 order-1 lg:order-2 space-y-8"
+            className="lg:col-span-6 order-1 lg:order-2 space-y-8 text-start"
           >
             
             <div className="space-y-4">
-              <Badge variant="info" icon={<Fingerprint className="w-4 h-4" />}>الفصل السابع من وثيقة الأعمال</Badge>
+              <Badge variant="info" icon={<Fingerprint className="w-4 h-4" />}>{t('section_badge')}</Badge>
               <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">
-                الملف الطبي الإلكتروني <br />
-                <span className="text-primary underline decoration-primary/20 underline-offset-8">سجل صحي رقمي موحد</span>
+                {t('title')} <br />
+                <span className="text-primary underline decoration-primary/20 underline-offset-8">{t('subtitle')}</span>
               </h2>
               <p className="text-lg text-slate-500 font-bold leading-relaxed">
-                يُنشأ الملف الطبي الإلكتروني تلقائياً عند تسجيل المريض في منصة عافية، ويُمنح معرفاً داخلياً فريداً (UUID) يضمن استمرارية وتكامل ملفك الصحى.
+                {t('desc')}
               </p>
             </div>
 
@@ -143,18 +152,18 @@ export const MedicalFileSection: React.FC<MedicalFileSectionProps> = ({ onOpenAu
               {[
                 { 
                   icon: <History className="w-5 h-5" />, 
-                  title: 'التراكم الصحي الموثوق', 
-                  desc: 'تُضاف جميع التشخيصات والوصفات ونتائج التحاليل والأشعة تلقائياً إلى مسارك دون خطورة فقدان الورقيات.' 
+                  title: t('points.emr_history_title'), 
+                  desc: t('points.emr_history_desc') 
                 },
                 { 
                   icon: <Lock className="w-5 h-5" />, 
-                  title: 'سرية تامة ومبدأ أقل صلاحية', 
-                  desc: 'الاطلاع مقتصر على الطبيب المعالج أثناء الزيارة المعتمدة فقط، مع تشفير البيانات وتسجيل جميع عمليات الوصول.' 
+                  title: t('points.least_privilege_title'), 
+                  desc: t('points.least_privilege_desc') 
                 },
                 { 
                   icon: <ShieldAlert className="w-5 h-5" />, 
-                  title: 'المريض الزائر (Guest Patient)', 
-                  desc: 'المريض الزائر يحصل على الوصفات والطلبات المطبوعة فوراً دون فتح سجل طبي دائم داخل قاعدة البيانات.' 
+                  title: t('points.guest_patient_title'), 
+                  desc: t('points.guest_patient_desc') 
                 }
               ].map((item, i) => (
                 <div key={i} className="flex items-start gap-5 p-4 rounded-3xl hover:bg-slate-50 transition-colors group">
@@ -175,8 +184,8 @@ export const MedicalFileSection: React.FC<MedicalFileSectionProps> = ({ onOpenAu
                 onClick={() => onOpenAuth('patient_registered', true)}
                 className="px-10 h-14 rounded-2xl shadow-2xl shadow-primary/20"
               >
-                <span>إنشاء حساب مريض مسجل (UUID)</span>
-                <ArrowLeft className="w-5 h-5" />
+                <span>{t('create_account_cta')}</span>
+                {locale === 'ar' ? <ArrowLeft className="w-5 h-5 ms-2" /> : <ArrowRight className="w-5 h-5 ms-2" />}
               </Button>
             </div>
 

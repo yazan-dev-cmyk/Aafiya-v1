@@ -165,4 +165,12 @@ class Doctor extends Model
     {
         return $this->hasMany(ClinicDoctorInvitation::class, 'doctor_id');
     }
+
+    /**
+     * Weekly day schedules configured for this doctor across clinics.
+     */
+    public function daySchedules(): HasMany
+    {
+        return $this->hasMany(DoctorDaySchedule::class, 'doctor_id');
+    }
 }

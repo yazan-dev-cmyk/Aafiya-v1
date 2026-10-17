@@ -511,4 +511,533 @@ void main() {
       expect(find.text('Aucun patient en salle d’attente actuellement.'), findsOneWidget);
     });
   });
+
+  group('DA-03: Doctor Queue Statistics Synchronization Tests', () {
+    testWidgets('DA-03.1: Sub-tab badge displays authoritative total when total exceeds page size',
+        (tester) async {
+      final mockClient = MockClient((request) async {
+        final status = request.url.queryParameters['status'];
+
+        if (status == 'attended') {
+          // 15 items in page 1, but total is 25
+          return http.Response(
+            jsonEncode({
+              'data': List.generate(
+                15,
+                (i) => {
+                  'id': 'app-att-$i',
+                  'booking_reference': 'MS-ATT-$i',
+                  'status': 'attended',
+                  'appointment_date': '2026-09-15',
+                  'time_slot': '08:00',
+                  'patient': {
+                    'id': 'pat-$i',
+                    'name': 'مريض في الانتظار $i',
+                  },
+                },
+              ),
+              'meta': {
+                'current_page': 1,
+                'last_page': 2,
+                'per_page': 15,
+                'total': 25,
+              },
+            }),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        } else if (status == 'confirmed') {
+          // 15 items in page 1, but total is 42
+          return http.Response(
+            jsonEncode({
+              'data': List.generate(
+                15,
+                (i) => {
+                  'id': 'app-conf-$i',
+                  'booking_reference': 'MS-CONF-$i',
+                  'status': 'confirmed',
+                  'appointment_date': '2026-09-15',
+                  'time_slot': '09:00',
+                  'patient': {
+                    'id': 'pat-conf-$i',
+                    'name': 'مريض متوقع $i',
+                  },
+                },
+              ),
+              'meta': {
+                'current_page': 1,
+                'last_page': 3,
+                'per_page': 15,
+                'total': 42,
+              },
+            }),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        }
+
+        return http.Response('{}', 404);
+      });
+
+      final apiClient = ApiClient(
+        httpClient: mockClient,
+        tokenStorage: InMemoryTokenStorage('test-token'),
+      );
+      final sessionManager = AuthSessionManager(
+        tokenStorage: InMemoryTokenStorage('test-token'),
+        apiClient: apiClient,
+      );
+      sessionManager.setAuthorizedClinics([testClinic01]);
+
+      await tester.pumpWidget(createTestWidget(sessionManager: sessionManager));
+      await tester.pumpAndSettle();
+
+      // Waiting Room badge must reflect authoritative total (25), not items.length (15)
+      expect(find.text('25'), findsOneWidget);
+
+      // Expected Arrivals badge must reflect authoritative total (42), not items.length (15)
+      expect(find.text('42'), findsOneWidget);
+    });
+
+    testWidgets('DA-03.2: Infinite scroll pagination deduplicates items by ID and retains authoritative total',
+        (tester) async {
+      final mockClient = MockClient((request) async {
+        final status = request.url.queryParameters['status'];
+        final page = int.tryParse(request.url.queryParameters['page'] ?? '1') ?? 1;
+
+        if (status == 'attended') {
+          if (page == 1) {
+            return http.Response(
+              jsonEncode({
+                'data': [
+                  {
+                    'id': 'app-1',
+                    'booking_reference': 'REF-1',
+                    'status': 'attended',
+                    'appointment_date': '2026-09-15',
+                    'time_slot': '08:00',
+                    'patient': {'id': 'p-1', 'name': 'مريض 1'},
+                  },
+                  {
+                    'id': 'app-2',
+                    'booking_reference': 'REF-2',
+                    'status': 'attended',
+                    'appointment_date': '2026-09-15',
+                    'time_slot': '08:30',
+                    'patient': {'id': 'p-2', 'name': 'مريض 2'},
+                  },
+                ],
+                'meta': {
+                  'current_page': 1,
+                  'last_page': 2,
+                  'per_page': 2,
+                  'total': 3,
+                },
+              }),
+              200,
+              headers: {'content-type': 'application/json'},
+            );
+          } else {
+            // Page 2 contains app-2 (overlapping duplicate) and app-3 (new)
+            return http.Response(
+              jsonEncode({
+                'data': [
+                  {
+                    'id': 'app-2',
+                    'booking_reference': 'REF-2',
+                    'status': 'attended',
+                    'appointment_date': '2026-09-15',
+                    'time_slot': '08:30',
+                    'patient': {'id': 'p-2', 'name': 'مريض 2'},
+                  },
+                  {
+                    'id': 'app-3',
+                    'booking_reference': 'REF-3',
+                    'status': 'attended',
+                    'appointment_date': '2026-09-15',
+                    'time_slot': '09:00',
+                    'patient': {'id': 'p-3', 'name': 'مريض 3'},
+                  },
+                ],
+                'meta': {
+                  'current_page': 2,
+                  'last_page': 2,
+                  'per_page': 2,
+                  'total': 3,
+                },
+              }),
+              200,
+              headers: {'content-type': 'application/json'},
+            );
+          }
+        }
+
+        return http.Response(
+          jsonEncode({
+            'data': [],
+            'meta': {'current_page': 1, 'last_page': 1, 'per_page': 15, 'total': 0},
+          }),
+          200,
+          headers: {'content-type': 'application/json'},
+        );
+      });
+
+      final apiClient = ApiClient(
+        httpClient: mockClient,
+        tokenStorage: InMemoryTokenStorage('test-token'),
+      );
+      final sessionManager = AuthSessionManager(
+        tokenStorage: InMemoryTokenStorage('test-token'),
+        apiClient: apiClient,
+      );
+      sessionManager.setAuthorizedClinics([testClinic01]);
+
+      await tester.pumpWidget(createTestWidget(sessionManager: sessionManager));
+      await tester.pumpAndSettle();
+
+      expect(find.text('مريض 1'), findsOneWidget);
+      expect(find.text('مريض 2'), findsOneWidget);
+      expect(find.text('3'), findsOneWidget); // badge total = 3
+
+      // Trigger scroll to load page 2
+      final scrollableFinder = find.byType(Scrollable);
+      await tester.scrollUntilVisible(
+        find.text('مريض 2'),
+        100.0,
+        scrollable: scrollableFinder,
+      );
+      await tester.pumpAndSettle();
+
+      // If duplicate was NOT prevented, 'مريض 2' would have appeared 2 times.
+      // With deduplication, 'مريض 2' appears exactly once.
+      expect(find.text('مريض 2'), findsOneWidget);
+      expect(find.text('3'), findsOneWidget);
+    });
+
+    testWidgets('DA-03.3: Attend action authoritatively re-syncs queue statistics for both tabs',
+        (tester) async {
+      int attendCallCount = 0;
+      bool attended = false;
+
+      final mockClient = MockClient((request) async {
+        final path = request.url.path;
+
+        if (path.contains('/attend')) {
+          attended = true;
+          return http.Response(
+            jsonEncode({
+              'message': 'تم تسجيل الحضور بنجاح.',
+              'data': {
+                'id': 'app-100',
+                'status': 'attended',
+              },
+            }),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        }
+
+        final status = request.url.queryParameters['status'];
+        if (status == 'confirmed') {
+          return http.Response(
+            jsonEncode({
+              'data': attended
+                  ? []
+                  : [
+                      {
+                        'id': 'app-100',
+                        'booking_reference': 'CONF-100',
+                        'status': 'confirmed',
+                        'appointment_date': '2026-09-15',
+                        'time_slot': '10:00',
+                        'patient': {'id': 'p-100', 'name': 'مريض للتأكيد'},
+                      }
+                    ],
+              'meta': {
+                'current_page': 1,
+                'last_page': 1,
+                'per_page': 15,
+                'total': attended ? 0 : 1,
+              },
+            }),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        } else if (status == 'attended') {
+          attendCallCount++;
+          return http.Response(
+            jsonEncode({
+              'data': attended
+                  ? [
+                      {
+                        'id': 'app-100',
+                        'booking_reference': 'CONF-100',
+                        'status': 'attended',
+                        'appointment_date': '2026-09-15',
+                        'time_slot': '10:00',
+                        'patient': {'id': 'p-100', 'name': 'مريض للتأكيد'},
+                      }
+                    ]
+                  : [],
+              'meta': {
+                'current_page': 1,
+                'last_page': 1,
+                'per_page': 15,
+                'total': attended ? 1 : 0,
+              },
+            }),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        }
+
+        return http.Response('{}', 404);
+      });
+
+      final apiClient = ApiClient(
+        httpClient: mockClient,
+        tokenStorage: InMemoryTokenStorage('test-token'),
+      );
+      final sessionManager = AuthSessionManager(
+        tokenStorage: InMemoryTokenStorage('test-token'),
+        apiClient: apiClient,
+      );
+      sessionManager.setAuthorizedClinics([testClinic01]);
+
+      await tester.pumpWidget(createTestWidget(sessionManager: sessionManager));
+      await tester.pumpAndSettle();
+
+      // Before attendance: Waiting Room = 0, Expected = 1
+      expect(find.text('0'), findsOneWidget);
+      expect(find.text('1'), findsOneWidget);
+
+      // Switch to Expected tab
+      await tester.tap(find.text('المتوقع حضورهم'));
+      await tester.pumpAndSettle();
+
+      // Perform attend
+      await tester.tap(find.text('تسجيل حضور'));
+      await tester.pumpAndSettle();
+
+      final confirmButton = find.widgetWithText(ElevatedButton, 'تسجيل حضور').last;
+      await tester.tap(confirmButton);
+      await tester.pumpAndSettle();
+
+      expect(attended, isTrue);
+      expect(attendCallCount, greaterThan(0));
+
+      // After attendance: Expected becomes 0, Waiting Room becomes 1
+      expect(find.text('0'), findsOneWidget);
+      expect(find.text('1'), findsOneWidget);
+    });
+
+    testWidgets('DA-03.4: No-show action authoritatively re-syncs expected queue statistics',
+        (tester) async {
+      bool noShowRecorded = false;
+
+      final mockClient = MockClient((request) async {
+        final path = request.url.path;
+
+        if (path.contains('/no-show')) {
+          noShowRecorded = true;
+          return http.Response(
+            jsonEncode({
+              'message': 'تم تسجيل عدم الحضور.',
+              'data': {'id': 'app-200', 'status': 'no_show'},
+            }),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        }
+
+        final status = request.url.queryParameters['status'];
+        if (status == 'confirmed') {
+          return http.Response(
+            jsonEncode({
+              'data': noShowRecorded
+                  ? []
+                  : [
+                      {
+                        'id': 'app-200',
+                        'booking_reference': 'CONF-200',
+                        'status': 'confirmed',
+                        'appointment_date': '2026-09-15',
+                        'time_slot': '11:00',
+                        'patient': {'id': 'p-200', 'name': 'مريض غائب'},
+                      }
+                    ],
+              'meta': {
+                'current_page': 1,
+                'last_page': 1,
+                'per_page': 15,
+                'total': noShowRecorded ? 0 : 1,
+              },
+            }),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        }
+
+        return http.Response(
+          jsonEncode({
+            'data': [],
+            'meta': {'current_page': 1, 'last_page': 1, 'per_page': 15, 'total': 0},
+          }),
+          200,
+          headers: {'content-type': 'application/json'},
+        );
+      });
+
+      final apiClient = ApiClient(
+        httpClient: mockClient,
+        tokenStorage: InMemoryTokenStorage('test-token'),
+      );
+      final sessionManager = AuthSessionManager(
+        tokenStorage: InMemoryTokenStorage('test-token'),
+        apiClient: apiClient,
+      );
+      sessionManager.setAuthorizedClinics([testClinic01]);
+
+      await tester.pumpWidget(createTestWidget(sessionManager: sessionManager));
+      await tester.pumpAndSettle();
+
+      // Navigate to expected tab
+      await tester.tap(find.text('المتوقع حضورهم'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('1'), findsOneWidget); // Expected total = 1
+
+      // Tap no-show
+      await tester.tap(find.text('لم يحضر'));
+      await tester.pumpAndSettle();
+
+      final confirmButton = find.widgetWithText(ElevatedButton, 'لم يحضر').last;
+      await tester.tap(confirmButton);
+      await tester.pumpAndSettle();
+
+      expect(noShowRecorded, isTrue);
+
+      // Now Expected total becomes 0
+      expect(find.text('0'), findsNWidgets(2)); // Both tabs are 0
+    });
+
+    testWidgets('DA-03.5: API failure on initial load displays "-" indicator rather than misleading 0 and recovers on retry',
+        (tester) async {
+      bool shouldFail = true;
+
+      final mockClient = MockClient((request) async {
+        if (shouldFail) {
+          return http.Response(
+            jsonEncode({'message': 'خطأ في الخادم أو انقطاع الاتصال.'}),
+            500,
+            headers: {'content-type': 'application/json'},
+          );
+        }
+
+        return http.Response(
+          jsonEncode({
+            'data': [
+              {
+                'id': 'app-recovered',
+                'booking_reference': 'REF-REC',
+                'status': 'attended',
+                'appointment_date': '2026-09-15',
+                'time_slot': '08:00',
+                'patient': {'id': 'p-rec', 'name': 'مريض بعد التعافي'},
+              }
+            ],
+            'meta': {'current_page': 1, 'last_page': 1, 'per_page': 15, 'total': 7},
+          }),
+          200,
+          headers: {'content-type': 'application/json'},
+        );
+      });
+
+      final apiClient = ApiClient(
+        httpClient: mockClient,
+        tokenStorage: InMemoryTokenStorage('test-token'),
+      );
+      final sessionManager = AuthSessionManager(
+        tokenStorage: InMemoryTokenStorage('test-token'),
+        apiClient: apiClient,
+      );
+      sessionManager.setAuthorizedClinics([testClinic01]);
+
+      await tester.pumpWidget(createTestWidget(sessionManager: sessionManager));
+      await tester.pumpAndSettle();
+
+      // During failure, badges show '-' rather than misleading '0'
+      expect(find.text('-'), findsNWidgets(2));
+      expect(find.text('خطأ في الخادم أو انقطاع الاتصال.'), findsOneWidget);
+
+      // Retry
+      shouldFail = false;
+      await tester.tap(find.text('إعادة المحاولة'));
+      await tester.pumpAndSettle();
+
+      // Now badges recover and reflect authoritative total 7
+      expect(find.text('7'), findsNWidgets(2));
+      expect(find.text('مريض بعد التعافي'), findsOneWidget);
+    });
+
+    testWidgets('DA-03.6: Active clinic switch re-syncs queue statistics to target clinic without stale overlap',
+        (tester) async {
+      final mockClient = MockClient((request) async {
+        final clinicHeader = request.headers['X-Clinic-ID'];
+        final isClinic07 = clinicHeader == 'clinic-07';
+
+        return http.Response(
+          jsonEncode({
+            'data': [
+              {
+                'id': isClinic07 ? 'app-oran' : 'app-algiers',
+                'booking_reference': isClinic07 ? 'ORAN-01' : 'ALG-01',
+                'status': 'attended',
+                'appointment_date': '2026-09-15',
+                'time_slot': '09:00',
+                'patient': {
+                  'id': isClinic07 ? 'p-oran' : 'p-alg',
+                  'name': isClinic07 ? 'مريض وهران' : 'مريض الجزائر',
+                },
+              }
+            ],
+            'meta': {
+              'current_page': 1,
+              'last_page': 1,
+              'per_page': 15,
+              'total': isClinic07 ? 3 : 11,
+            },
+          }),
+          200,
+          headers: {'content-type': 'application/json'},
+        );
+      });
+
+      final apiClient = ApiClient(
+        httpClient: mockClient,
+        tokenStorage: InMemoryTokenStorage('test-token'),
+      );
+      final sessionManager = AuthSessionManager(
+        tokenStorage: InMemoryTokenStorage('test-token'),
+        apiClient: apiClient,
+      );
+      sessionManager.setAuthorizedClinics([testClinic01, testClinic07]);
+
+      await tester.pumpWidget(createTestWidget(sessionManager: sessionManager));
+      await tester.pumpAndSettle();
+
+      // Clinic 01 initial state: total = 11
+      expect(find.text('11'), findsNWidgets(2));
+      expect(find.text('مريض الجزائر'), findsOneWidget);
+
+      // Switch to Clinic 07
+      sessionManager.switchActiveClinic('clinic-07');
+      await tester.pumpAndSettle();
+
+      // Clinic 07 state: total = 3
+      expect(find.text('3'), findsNWidgets(2));
+      expect(find.text('مريض وهران'), findsOneWidget);
+      expect(find.text('مريض الجزائر'), findsNothing);
+    });
+  });
 }

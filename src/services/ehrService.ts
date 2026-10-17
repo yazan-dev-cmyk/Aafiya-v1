@@ -49,6 +49,69 @@ export interface ClinicalVisitRecord {
   clinic?: { id: string; name: string; wilaya?: string };
 }
 
+export interface SharedPatientMedicalRecord {
+  scope: 'all_emr';
+  patient: {
+    id: string;
+    mrn: string;
+    first_name: string;
+    last_name: string;
+    full_name: string;
+    gender: 'male' | 'female' | string;
+    date_of_birth: string;
+    blood_group: string;
+    allergies: Array<{
+      id: string;
+      patient_id: string;
+      allergen: string;
+      severity: string;
+      reaction: string;
+      diagnosed_at?: string | null;
+      notes?: string | null;
+      created_at?: string;
+    }>;
+    chronic_conditions: Array<{
+      id: string;
+      patient_id: string;
+      condition_name: string;
+      icd10_code?: string | null;
+      diagnosed_date?: string | null;
+      status: string;
+      notes?: string | null;
+      created_at?: string;
+    }>;
+    current_medications: Array<{
+      id: string;
+      patient_id: string;
+      medication_name: string;
+      dosage?: string | null;
+      frequency?: string | null;
+      start_date?: string | null;
+      prescribed_by?: string | null;
+      is_active: boolean;
+      notes?: string | null;
+      created_at?: string;
+    }>;
+  };
+  share_metadata: {
+    scope: 'all_emr';
+    access_granted_at: string;
+    expires_at: string;
+    authorized_clinical_scope: string;
+  };
+}
+
+export interface PatientShareTokenCreated {
+  id: string;
+  token: string;
+  scope: 'all_emr';
+  duration: '24h' | '7d' | '30d';
+  expires_at: string;
+  share_url: string;
+  has_pin: boolean;
+  status: 'active';
+}
+
 export const ehrService = {
   getMyPatientProfile: async (): Promise<ApiResponse<PatientRecord>> => {
     return api.get<PatientRecord>('/patients/me');
@@ -89,15 +152,30 @@ export const ehrService = {
   },
 
   generateShareToken: async (data: {
-    scope: 'single_report' | 'all_emr';
-    resource_type?: 'lab' | 'radiology' | 'prescription';
-    resource_id?: string;
+    pin: string;
     duration: '24h' | '7d' | '30d';
-  }): Promise<ApiResponse<{ token: string; share_url: string; expires_at: string }>> => {
-    return api.post('/patients/share-token', data);
+    scope?: 'all_emr';
+  }): Promise<ApiResponse<PatientShareTokenCreated>> => {
+    return api.post<PatientShareTokenCreated>('/patients/share-token', {
+      scope: 'all_emr',
+      duration: data.duration,
+      pin: data.pin.trim(),
+    });
   },
 
   getSharedRecord: async (token: string): Promise<ApiResponse<any>> => {
     return api.get(`/shared-records/${token}`);
+  },
+
+  /**
+   * Public resolution of an encrypted shared medical record with mandatory PIN (DEC-P05-02, DEC-P05-03, DEC-P05-04)
+   */
+  resolveSharedRecord: async (data: {
+    token: string;
+    pin: string;
+  }): Promise<ApiResponse<SharedPatientMedicalRecord>> => {
+    return api.post<SharedPatientMedicalRecord>('/shared-records/resolve', data, {
+      'Authorization': '',
+    });
   },
 };

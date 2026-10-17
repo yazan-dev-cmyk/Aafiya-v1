@@ -6,6 +6,7 @@ import '../screens/appointment_detail_screen.dart';
 import '../screens/clinic_directory_screen.dart';
 import '../screens/doctor_directory_screen.dart';
 import '../screens/emergency_profile_screen.dart';
+import '../screens/patient_shared_records_screen.dart';
 import '../screens/prescriptions_screen.dart';
 import '../widgets/appointment_card.dart';
 
@@ -237,7 +238,13 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
               const SizedBox(height: 8),
               AppointmentCard(
                 appointment: _upcomingAppointments.first,
-                onTap: () => AppointmentDetailScreen.show(context, _upcomingAppointments.first),
+                onTap: () => AppointmentDetailScreen.show(
+                  context,
+                  _upcomingAppointments.first,
+                  apiClient: widget.apiClient,
+                  onAppointmentCancelled: (_) => _fetchAppointments(),
+                  onAppointmentRescheduled: (_) => _fetchAppointments(),
+                ),
               ),
               const SizedBox(height: 16),
             ],
@@ -492,7 +499,13 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
         final appointment = items[index];
         return AppointmentCard(
           appointment: appointment,
-          onTap: () => AppointmentDetailScreen.show(context, appointment),
+          onTap: () => AppointmentDetailScreen.show(
+            context,
+            appointment,
+            apiClient: widget.apiClient,
+            onAppointmentCancelled: (_) => _fetchAppointments(),
+            onAppointmentRescheduled: (_) => _fetchAppointments(),
+          ),
         );
       },
     );
@@ -554,6 +567,36 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
               subtitle: Text(strings.viewEmergencyProfile, style: AafiyaTypography.caption),
               trailing: const Icon(Icons.chevron_right_rounded),
               onTap: () => EmergencyProfileScreen.show(context, apiClient: widget.apiClient),
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // Encrypted Sharing (Sender Flow)
+          AafiyaCard(
+            child: ListTile(
+              leading: const CircleAvatar(
+                backgroundColor: AafiyaColors.lightBackground,
+                child: Icon(Icons.share_rounded, color: AafiyaColors.healthBlue),
+              ),
+              title: Text(strings.shareMedicalRecordTitle, style: AafiyaTypography.titleMedium),
+              subtitle: Text(strings.shareMedicalRecordSubtitle, style: AafiyaTypography.caption),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () => PatientSharedRecordsScreen.show(context, apiClient: widget.apiClient),
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // View Shared Record (Recipient Viewer - Manual Ingress)
+          AafiyaCard(
+            child: ListTile(
+              leading: CircleAvatar(
+                backgroundColor: AafiyaColors.healthBlue.withValues(alpha: 0.1),
+                child: const Icon(Icons.lock_open_rounded, color: AafiyaColors.healthBlue),
+              ),
+              title: Text(strings.viewSharedRecordHubTitle, style: AafiyaTypography.titleMedium),
+              subtitle: Text(strings.viewSharedRecordHubSubtitle, style: AafiyaTypography.caption),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () => SharedRecordViewerSheet.show(context, apiClient: widget.apiClient),
             ),
           ),
         ],

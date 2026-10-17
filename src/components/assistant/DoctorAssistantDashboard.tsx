@@ -53,6 +53,7 @@ import { appointmentService } from '@/services/appointmentService';
 import { clinicService } from '@/services/clinicService';
 import { ChangePasswordCard } from '../shared/ChangePasswordCard';
 import { OperationalDayBar } from '../shared/OperationalDayBar';
+import { UnresolvedReschedulesDashboard } from '../clinic/UnresolvedReschedulesDashboard';
 import { Globe } from 'lucide-react';
 
 export const AssistantCapabilitiesCard: React.FC<{ isRtl: boolean; isDarkMode?: boolean }> = ({ isRtl, isDarkMode }) => {
@@ -101,6 +102,26 @@ export const AssistantCapabilitiesCard: React.FC<{ isRtl: boolean; isDarkMode?: 
       </div>
     </div>
   );
+};
+
+const getLocalDateString = (d: Date = new Date()): string => {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const formatSlotRange = (slotTime: string): string => {
+  if (!slotTime) return '';
+  const parts = slotTime.split(':');
+  if (parts.length < 2) return slotTime;
+  const hour = parseInt(parts[0], 10);
+  if (isNaN(hour)) return slotTime;
+  const minute = parts[1];
+  const nextHour = (hour + 1) % 24;
+  const startStr = `${String(hour).padStart(2, '0')}:${minute}`;
+  const nextHourStr = `${String(nextHour).padStart(2, '0')}:${minute}`;
+  return `${startStr} - ${nextHourStr}`;
 };
 
 interface DoctorAssistantDashboardProps {
@@ -216,6 +237,8 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
           priority: 'normal',
           phone: canViewContacts ? (app.patient?.phone || app.patient_phone || '—') : '—',
           doctorName: app.doctor?.user?.name || app.doctor?.name || '—',
+          doctorId: app.doctor_id || app.doctor?.id,
+          clinicId: app.clinic_id || app.clinic?.id,
           checked_in_at: app.checked_in_at || null
         }));
         setQueue(liveQ);
@@ -285,6 +308,7 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
           phone: canViewContacts ? (app.patient?.phone || app.patient_phone || '—') : '—',
           doctorName: app.doctor?.user?.name || app.doctor?.name || '—',
           doctorId: app.doctor_id || app.doctor?.id,
+          clinicId: app.clinic_id || app.clinic?.id,
           checked_in_at: app.checked_in_at || null,
         }));
         setAppointmentsList(mapped);
@@ -347,6 +371,10 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
   const [showNewBookingWizard, setShowNewBookingWizard] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
   const [showRescheduleModal, setShowRescheduleModal] = useState<any>(null);
+  const [rescheduleSlots, setRescheduleSlots] = useState<any[]>([]);
+  const [loadingRescheduleSlots, setLoadingRescheduleSlots] = useState<boolean>(false);
+  const [rescheduleSlotsError, setRescheduleSlotsError] = useState<string | null>(null);
+  const [submittingReschedule, setSubmittingReschedule] = useState<boolean>(false);
   const [selectedPatientView, setSelectedPatientView] = useState<any>(null);
   const [noticeMessage, setNoticeMessage] = useState<string | null>(null);
 
@@ -355,18 +383,81 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
     setTimeout(() => setNoticeMessage(null), 4000);
   };
 
+  useEffect(() => {
+    if (!showRescheduleModal?.clinicId || !showRescheduleModal?.doctorId || !showRescheduleModal?.appointment_date) {
+      setRescheduleSlots([]);
+      return;
+    }
+
+    let isMounted = true;
+    setLoadingRescheduleSlots(true);
+    setRescheduleSlotsError(null);
+
+    appointmentService.getSlots(
+      showRescheduleModal.clinicId,
+      showRescheduleModal.doctorId,
+      showRescheduleModal.appointment_date
+    ).then((res) => {
+      if (!isMounted) return;
+      const rawSlots = res.data?.slots || res.data || [];
+      const slotsList = Array.isArray(rawSlots) ? rawSlots : [];
+      setRescheduleSlots(slotsList);
+    }).catch((err: any) => {
+      if (!isMounted) return;
+      setRescheduleSlots([]);
+      setRescheduleSlotsError(
+        err?.response?.data?.message || err?.message || (isRtl ? 'تعذر تحميل الفترات الزمنية المتاحة.' : 'Failed to load available time slots.')
+      );
+    }).finally(() => {
+      if (isMounted) {
+        setLoadingRescheduleSlots(false);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [showRescheduleModal?.clinicId, showRescheduleModal?.doctorId, showRescheduleModal?.appointment_date, isRtl]);
+
   const handleOpenReschedule = (app: any) => {
+    const todayStr = getLocalDateString();
+    const origDate = app.appointmentDate || todayStr;
+    const initialDate = origDate >= todayStr ? origDate : todayStr;
+    const origSlot = app.timeSlot || app.time || '';
+    const resolvedClinicId = app.clinicId || activeClinicId || user?.clinic?.id || '';
+    const resolvedDoctorId = app.doctorId || selectedDoctorId || clinicDoctors[0]?.id || '';
+
     setShowRescheduleModal({
       id: app.id,
       patientName: app.patientName,
-      appointment_date: app.appointmentDate || new Date().toISOString().split('T')[0],
-      time_slot: app.timeSlot || '09:00',
+      doctorName: app.doctorName,
+      clinicId: resolvedClinicId,
+      doctorId: resolvedDoctorId,
+      originalDate: origDate,
+      originalTimeSlot: origSlot,
+      appointment_date: initialDate,
+      time_slot: origSlot,
     });
   };
 
   const handleExecuteReschedule = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!showRescheduleModal) return;
+    if (!showRescheduleModal || submittingReschedule) return;
+
+    if (
+      showRescheduleModal.appointment_date === showRescheduleModal.originalDate &&
+      showRescheduleModal.time_slot === showRescheduleModal.originalTimeSlot
+    ) {
+      triggerNotice(isRtl ? 'يرجى اختيار تاريخ أو فترة زمنية مختلفة عن الموعد الحالي.' : 'Please select a date or time slot different from the current appointment.');
+      return;
+    }
+
+    if (!showRescheduleModal.time_slot) {
+      triggerNotice(isRtl ? 'يرجى اختيار فترة زمنية.' : 'Please select a time slot.');
+      return;
+    }
+
+    setSubmittingReschedule(true);
     try {
       await appointmentService.rescheduleAppointment(showRescheduleModal.id, {
         appointment_date: showRescheduleModal.appointment_date,
@@ -374,9 +465,15 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
       });
       triggerNotice(isRtl ? `تمت إعادة جدولة موعد المريض ${showRescheduleModal.patientName} بنجاح.` : `Appointment rescheduled successfully.`);
       setShowRescheduleModal(null);
-      fetchQueue();
+      await fetchQueue();
+      if (activeTab === 'appointments') {
+        await fetchAppointments();
+      }
     } catch (err: any) {
-      triggerNotice(err?.message || (isRtl ? 'حدث خطأ أثناء إعادة الجدولة.' : 'Failed to reschedule appointment.'));
+      const errMsg = err?.response?.data?.message || err?.message || (isRtl ? 'حدث خطأ أثناء إعادة الجدولة.' : 'Failed to reschedule appointment.');
+      triggerNotice(errMsg);
+    } finally {
+      setSubmittingReschedule(false);
     }
   };
 
@@ -434,6 +531,7 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
     { id: 'reception', label: t('tabs.reception'), icon: UserCheck, path: '/assistant/reception' },
     { id: 'notifications', label: t('tabs.notifications'), icon: Bell, badge: '0', path: '/assistant/notifications' },
     { id: 'calendar', label: t('tabs.calendar'), icon: Calendar, path: '/assistant/calendar' },
+    { id: 'unresolved-reschedules', label: isRtl ? 'حالات إعادة الجدولة المعلقة' : 'Unresolved Reschedules', icon: ShieldAlert, path: '/assistant/unresolved' },
     { id: 'reports', label: t('tabs.reports'), icon: BarChart3, path: '/assistant/reports' },
     { id: 'profile', label: t('tabs.profile'), icon: User, path: '/assistant/profile' },
     { id: 'settings', label: t('tabs.settings'), icon: Settings, path: '/assistant/settings' }
@@ -1318,12 +1416,14 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
 
                                           {app.status !== 'cancelled' && app.status !== 'rejected' && (
                                             <>
-                                              <button
-                                                onClick={() => handleOpenReschedule(app)}
-                                                className="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 font-bold rounded-md text-[10px] cursor-pointer transition-colors"
-                                              >
-                                                {t('today.table.reschedule')}
-                                              </button>
+                                              {!['attended', 'cancelled', 'rejected', 'expired'].includes(app.status) && (
+                                                <button
+                                                  onClick={() => handleOpenReschedule(app)}
+                                                  className="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 font-bold rounded-md text-[10px] cursor-pointer transition-colors"
+                                                >
+                                                  {t('today.table.reschedule')}
+                                                </button>
+                                              )}
                                               <button
                                                 onClick={() => handleCancelAppointment(app.id, app.patientName)}
                                                 className="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 font-bold rounded-md text-[10px] cursor-pointer transition-colors"
@@ -1464,6 +1564,25 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
             </div>
           )}
 
+          {/* TAB: UNRESOLVED RESCHEDULES (DEC-VAC-06 / Option B Dashboard) */}
+          {activeTab === 'unresolved-reschedules' && (
+            <div className="space-y-6">
+              {activeClinicId || user?.clinic?.id ? (
+                <UnresolvedReschedulesDashboard
+                  clinicId={activeClinicId || user?.clinic?.id || ''}
+                  isDarkMode={isDarkMode}
+                />
+              ) : (
+                <div className={`${containerClass} rounded-2xl p-8 border text-center space-y-3`}>
+                  <ShieldAlert className="w-10 h-10 text-amber-500 mx-auto" />
+                  <p className="text-xs font-bold text-slate-600 dark:text-slate-400">
+                    {isRtl ? 'يرجى تحديد العيادة النشطة أولاً لعرض الحالات غير المحلولة.' : 'Please select an active clinic first to view unresolved cases.'}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* TAB 8: OPERATIONAL REPORTS */}
           {activeTab === 'reports' && (
             <div className={`${containerClass} rounded-2xl p-6 border space-y-6`}>
@@ -1577,64 +1696,202 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
       )}
 
       {/* Modal for Reschedule Appointment */}
-      {showRescheduleModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 max-w-md w-full shadow-2xl border border-slate-200 dark:border-slate-800 space-y-6 text-start" dir={isRtl ? 'rtl' : 'ltr'}>
-            <div className="flex items-center justify-between border-b pb-3 border-slate-200 dark:border-slate-800">
-              <h3 className="font-bold text-slate-900 dark:text-white text-sm">
-                {isRtl ? `إعادة جدولة موعد: ${showRescheduleModal.patientName}` : `Reschedule Appointment: ${showRescheduleModal.patientName}`}
-              </h3>
-              <button onClick={() => setShowRescheduleModal(null)} className="text-slate-400 hover:text-slate-600">✕</button>
-            </div>
-            <form onSubmit={handleExecuteReschedule} className="space-y-4 text-xs font-bold">
-              <div>
-                <label className="block text-slate-700 dark:text-slate-300 mb-1">{isRtl ? 'التاريخ الجديد' : 'New Date'}</label>
-                <input
-                  type="date"
-                  required
-                  value={showRescheduleModal.appointment_date}
-                  onChange={(e) => setShowRescheduleModal({ ...showRescheduleModal, appointment_date: e.target.value })}
-                  className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-slate-700 dark:text-slate-300 mb-1">{isRtl ? 'الفترة الزمنية الجديدة' : 'New Time Slot'}</label>
-                <select
-                  value={showRescheduleModal.time_slot}
-                  onChange={(e) => setShowRescheduleModal({ ...showRescheduleModal, time_slot: e.target.value })}
-                  className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white"
-                >
-                  <option value="08:00">08:00 - 09:00</option>
-                  <option value="09:00">09:00 - 10:00</option>
-                  <option value="10:00">10:00 - 11:00</option>
-                  <option value="11:00">11:00 - 12:00</option>
-                  <option value="12:00">12:00 - 13:00</option>
-                  <option value="13:00">13:00 - 14:00</option>
-                  <option value="14:00">14:00 - 15:00</option>
-                  <option value="15:00">15:00 - 16:00</option>
-                  <option value="16:00">16:00 - 17:00</option>
-                  <option value="17:00">17:00 - 18:00</option>
-                </select>
-              </div>
-              <div className="pt-2 flex justify-end gap-2">
+      {showRescheduleModal && (() => {
+        const isNoOp =
+          showRescheduleModal.appointment_date === showRescheduleModal.originalDate &&
+          showRescheduleModal.time_slot === showRescheduleModal.originalTimeSlot;
+        const selectedSlotObj = rescheduleSlots.find((s: any) => s.time_slot === showRescheduleModal.time_slot);
+        const isSelectedSlotAvailable = selectedSlotObj
+          ? Boolean(selectedSlotObj.is_available ?? selectedSlotObj.isAvailable ?? (selectedSlotObj.available > 0))
+          : false;
+        const canSubmit =
+          !isNoOp &&
+          Boolean(showRescheduleModal.time_slot) &&
+          isSelectedSlotAvailable &&
+          !loadingRescheduleSlots &&
+          !submittingReschedule;
+
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+            <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 max-w-md w-full shadow-2xl border border-slate-200 dark:border-slate-800 space-y-5 text-start" dir={isRtl ? 'rtl' : 'ltr'}>
+              <div className="flex items-center justify-between border-b pb-3 border-slate-200 dark:border-slate-800">
+                <div>
+                  <h3 className="font-bold text-slate-900 dark:text-white text-sm">
+                    {isRtl ? `إعادة جدولة موعد: ${showRescheduleModal.patientName}` : `Reschedule Appointment: ${showRescheduleModal.patientName}`}
+                  </h3>
+                  <p className="text-[11px] text-slate-500 mt-0.5">
+                    {isRtl ? 'اختر تاريخاً وفترة زمنية جديدة ومتاحة للطبيب' : 'Select a new available date and time slot for the doctor'}
+                  </p>
+                </div>
                 <button
                   type="button"
                   onClick={() => setShowRescheduleModal(null)}
-                  className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl font-bold"
+                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-lg"
                 >
-                  {isRtl ? 'إلغاء' : 'Cancel'}
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-black"
-                >
-                  {isRtl ? 'تأكيد الموعد الجديد' : 'Confirm Reschedule'}
+                  <X className="w-5 h-5" />
                 </button>
               </div>
-            </form>
+
+              {/* Current Appointment Summary */}
+              <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 text-xs space-y-1">
+                <div className="text-slate-600 dark:text-slate-400">
+                  <span className="font-bold">{isRtl ? 'الموعد الحالي: ' : 'Current Appointment: '}</span>
+                  <span className="font-mono text-slate-900 dark:text-white">{showRescheduleModal.originalDate}</span>
+                  <span className="mx-1.5">•</span>
+                  <span className="font-mono text-slate-900 dark:text-white">{formatSlotRange(showRescheduleModal.originalTimeSlot)}</span>
+                </div>
+                {showRescheduleModal.doctorName && (
+                  <div className="text-slate-600 dark:text-slate-400">
+                    <span className="font-bold">{isRtl ? 'الطبيب المعين: ' : 'Doctor: '}</span>
+                    <span className="text-slate-900 dark:text-white">{showRescheduleModal.doctorName}</span>
+                  </div>
+                )}
+              </div>
+
+              <form onSubmit={handleExecuteReschedule} className="space-y-4 text-xs font-bold">
+                {/* Date Input */}
+                <div>
+                  <label className="block text-slate-700 dark:text-slate-300 mb-1">
+                    {isRtl ? 'التاريخ الجديد' : 'New Date'}
+                  </label>
+                  <input
+                    type="date"
+                    required
+                    min={getLocalDateString()}
+                    value={showRescheduleModal.appointment_date}
+                    onChange={(e) => {
+                      const newDate = e.target.value;
+                      setShowRescheduleModal((prev: any) => ({
+                        ...prev,
+                        appointment_date: newDate,
+                        time_slot: '',
+                      }));
+                    }}
+                    className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all font-medium"
+                  />
+                </div>
+
+                {/* Slot Selector */}
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-slate-700 dark:text-slate-300">
+                      {isRtl ? 'الفترة الزمنية الجديدة' : 'New Time Slot'}
+                    </label>
+                    {loadingRescheduleSlots && (
+                      <span className="text-[11px] text-slate-400 flex items-center gap-1 font-normal">
+                        <RefreshCw className="w-3 h-3 animate-spin text-teal-600" />
+                        <span>{isRtl ? 'جاري فحص السعة...' : 'Checking capacity...'}</span>
+                      </span>
+                    )}
+                  </div>
+
+                  <select
+                    required
+                    value={showRescheduleModal.time_slot}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setShowRescheduleModal((prev: any) => ({ ...prev, time_slot: val }));
+                    }}
+                    disabled={loadingRescheduleSlots || rescheduleSlots.length === 0}
+                    className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white disabled:opacity-50 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all font-medium"
+                  >
+                    <option value="">
+                      {loadingRescheduleSlots
+                        ? (isRtl ? '-- جاري تحميل الفترات المتاحة --' : '-- Loading available slots --')
+                        : (isRtl ? '-- اختر الفترة الزمنية --' : '-- Select a time slot --')}
+                    </option>
+                    {rescheduleSlots.map((slot: any) => {
+                      const isAvail = Boolean(slot.is_available ?? slot.isAvailable ?? (slot.available > 0));
+                      const isCurrentSlot =
+                        showRescheduleModal.appointment_date === showRescheduleModal.originalDate &&
+                        slot.time_slot === showRescheduleModal.originalTimeSlot;
+
+                      let statusLabel = '';
+                      if (isCurrentSlot) {
+                        statusLabel = isRtl ? `(${slot.time_slot} - الموعد الحالي)` : `(${slot.time_slot} - Current Slot)`;
+                      } else if (!isAvail) {
+                        statusLabel = isRtl ? '(مكتمل)' : '(Full)';
+                      } else if (typeof slot.available === 'number') {
+                        statusLabel = isRtl
+                          ? `(متاح: ${slot.available}${typeof slot.max_capacity === 'number' ? `/${slot.max_capacity}` : ''})`
+                          : `(Available: ${slot.available}${typeof slot.max_capacity === 'number' ? `/${slot.max_capacity}` : ''})`;
+                      } else {
+                        statusLabel = isRtl ? '(متاح)' : '(Available)';
+                      }
+
+                      return (
+                        <option
+                          key={slot.time_slot}
+                          value={slot.time_slot}
+                          disabled={!isAvail}
+                        >
+                          {formatSlotRange(slot.time_slot)} {statusLabel}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+
+                {/* Inline alerts & warnings */}
+                {isNoOp && (
+                  <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300 text-xs flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                    <span>
+                      {isRtl
+                        ? 'يرجى اختيار تاريخ أو فترة زمنية مختلفة عن الموعد الحالي.'
+                        : 'Please select a date or time slot different from the current appointment.'}
+                    </span>
+                  </div>
+                )}
+
+                {rescheduleSlotsError && (
+                  <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 text-xs flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                    <span>{rescheduleSlotsError}</span>
+                  </div>
+                )}
+
+                {!loadingRescheduleSlots && rescheduleSlots.length === 0 && !rescheduleSlotsError && (
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 text-xs flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                    <span>
+                      {isRtl
+                        ? 'لا توجد فترات عمل متاحة لهذا التاريخ.'
+                        : 'No available working slots for this date.'}
+                    </span>
+                  </div>
+                )}
+
+                {/* Modal Actions */}
+                <div className="pt-2 flex justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowRescheduleModal(null)}
+                    disabled={submittingReschedule}
+                    className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl font-bold cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                  >
+                    {isRtl ? 'إلغاء' : 'Cancel'}
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={!canSubmit}
+                    className="px-5 py-2 bg-teal-600 hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-black transition-colors flex items-center gap-2 cursor-pointer shadow-xs"
+                  >
+                    {submittingReschedule ? (
+                      <>
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                        <span>{isRtl ? 'جاري الحفظ...' : 'Saving...'}</span>
+                      </>
+                    ) : (
+                      <span>{isRtl ? 'تأكيد الموعد الجديد' : 'Confirm Reschedule'}</span>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
     </div>
   );

@@ -127,6 +127,14 @@ class Patient extends Model
     }
 
     /**
+     * Document sharing tokens issued by this patient (TASK-PAR-PAT-05).
+     */
+    public function shareTokens(): HasMany
+    {
+        return $this->hasMany(PatientShareToken::class, 'patient_id')->orderBy('created_at', 'desc');
+    }
+
+    /**
      * Full name attribute.
      */
     public function getFullNameAttribute(): string

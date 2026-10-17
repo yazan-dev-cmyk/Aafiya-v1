@@ -61,6 +61,7 @@ class ApiClient {
   Future<Map<String, String>> _buildHeaders({
     Map<String, String>? extraHeaders,
     bool requiresAuth = true,
+    bool includeClinicContext = true,
   }) async {
     final headers = <String, String>{
       'Accept': 'application/json',
@@ -75,7 +76,7 @@ class ApiClient {
       }
     }
 
-    if (_activeClinicId != null && _activeClinicId!.isNotEmpty) {
+    if (includeClinicContext && _activeClinicId != null && _activeClinicId!.isNotEmpty) {
       headers['X-Clinic-ID'] = _activeClinicId!;
       headers['X-Active-Clinic-ID'] = _activeClinicId!;
     }
@@ -93,6 +94,7 @@ class ApiClient {
     Map<String, String>? queryParameters,
     Map<String, String>? headers,
     bool requiresAuth = true,
+    bool includeClinicContext = true,
     bool allowRetry = true,
     bool notifyUnauthorized = true,
   }) async {
@@ -102,6 +104,7 @@ class ApiClient {
       queryParameters: queryParameters,
       headers: headers,
       requiresAuth: requiresAuth,
+      includeClinicContext: includeClinicContext,
       allowRetry: allowRetry,
       notifyUnauthorized: notifyUnauthorized,
     );
@@ -114,6 +117,7 @@ class ApiClient {
     Map<String, String>? queryParameters,
     Map<String, String>? headers,
     bool requiresAuth = true,
+    bool includeClinicContext = true,
     bool allowRetry = false,
     bool notifyUnauthorized = true,
   }) async {
@@ -124,6 +128,7 @@ class ApiClient {
       queryParameters: queryParameters,
       headers: headers,
       requiresAuth: requiresAuth,
+      includeClinicContext: includeClinicContext,
       allowRetry: allowRetry,
       notifyUnauthorized: notifyUnauthorized,
     );
@@ -136,6 +141,7 @@ class ApiClient {
     Map<String, String>? queryParameters,
     Map<String, String>? headers,
     bool requiresAuth = true,
+    bool includeClinicContext = true,
     bool allowRetry = false,
     bool notifyUnauthorized = true,
   }) async {
@@ -146,6 +152,7 @@ class ApiClient {
       queryParameters: queryParameters,
       headers: headers,
       requiresAuth: requiresAuth,
+      includeClinicContext: includeClinicContext,
       allowRetry: allowRetry,
       notifyUnauthorized: notifyUnauthorized,
     );
@@ -158,6 +165,7 @@ class ApiClient {
     Map<String, String>? queryParameters,
     Map<String, String>? headers,
     bool requiresAuth = true,
+    bool includeClinicContext = true,
     bool allowRetry = false,
     bool notifyUnauthorized = true,
   }) async {
@@ -168,6 +176,7 @@ class ApiClient {
       queryParameters: queryParameters,
       headers: headers,
       requiresAuth: requiresAuth,
+      includeClinicContext: includeClinicContext,
       allowRetry: allowRetry,
       notifyUnauthorized: notifyUnauthorized,
     );
@@ -181,6 +190,7 @@ class ApiClient {
     Map<String, String>? queryParameters,
     Map<String, String>? headers,
     required bool requiresAuth,
+    bool includeClinicContext = true,
     bool allowRetry = true,
     bool notifyUnauthorized = true,
   }) async {
@@ -204,6 +214,7 @@ class ApiClient {
         final requestHeaders = await _buildHeaders(
           extraHeaders: headers,
           requiresAuth: requiresAuth,
+          includeClinicContext: includeClinicContext,
         );
 
         final String? encodedBody = body != null ? jsonEncode(body) : null;
@@ -324,6 +335,7 @@ class ApiClient {
       statusCode: statusCode,
       rawBody: response.body,
       parsedResponse: errorResponse,
+      cause: parsedJson,
     );
 
     return ApiFailure(exception);

@@ -100,6 +100,13 @@ export const clinicService = {
   },
 
   /**
+   * Update clinic operational settings (Director only).
+   */
+  async updateClinic(clinicId: string, data: Partial<ClinicDetails>): Promise<ApiResponse<ClinicDetails>> {
+    return api.put<ClinicDetails>(`/clinics/${clinicId}`, data);
+  },
+
+  /**
    * Get authenticated doctor's onboarding and clinic affiliation status.
    */
   async getOnboardingStatus(): Promise<ApiResponse<OnboardingStatusResponse>> {

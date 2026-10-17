@@ -67,5 +67,15 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('api.general', function (Request $request) {
             return Limit::perMinute(120)->by($request->user()?->id ?: $request->ip());
         });
+
+        RateLimiter::for('share.resolve', function (Request $request) {
+            return Limit::perMinute(15)->by($request->ip())->response(function () {
+                return response()->json([
+                    'status' => 'error',
+                    'code' => 429,
+                    'message' => 'تم تجاوز معدل محاولات التحقق من رمز المشاركة (15 محاولة/دقيقة). يرجى الانتظار والمحاولة لاحقاً.',
+                ], 429);
+            });
+        });
     }
 }

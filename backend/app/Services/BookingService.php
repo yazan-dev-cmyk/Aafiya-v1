@@ -8,9 +8,11 @@ use App\Models\AppointmentStatusHistory;
 use App\Models\BookingCenter;
 use App\Models\Clinic;
 use App\Models\Doctor;
+use App\Models\NotificationOutbox;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -21,10 +23,24 @@ class BookingService
         '13:00', '14:00', '15:00', '16:00', '17:00',
     ];
 
+    public const ALLOWED_BOOKING_START_SLOTS = [
+        '08:00', '09:00', '10:00', '11:00', '12:00',
+        '13:00', '14:00', '15:00', '16:00',
+    ];
+
     public function __construct(
         protected QuotaService $quotaService,
-        protected AuthorizationService $authService
-    ) {}
+        protected AuthorizationService $authService,
+        protected ?DoctorWorkingHoursService $doctorWorkingHoursService = null,
+        protected ?ClinicOperatingHoursService $clinicOperatingHoursService = null,
+        protected ?DoctorTimeReservationService $timeReservationService = null,
+        protected ?DoctorVacationService $vacationService = null
+    ) {
+        $this->clinicOperatingHoursService = $clinicOperatingHoursService ?? app(ClinicOperatingHoursService::class);
+        $this->doctorWorkingHoursService = $doctorWorkingHoursService ?? app(DoctorWorkingHoursService::class);
+        $this->timeReservationService = $timeReservationService ?? app(DoctorTimeReservationService::class);
+        $this->vacationService = $vacationService ?? app(DoctorVacationService::class);
+    }
 
     /**
      * Resolve slot capacity hierarchy: doctor_clinic override -> clinic capacity -> default 10.
@@ -102,45 +118,127 @@ class BookingService
             }
         }
 
-        // 1. One-Hour Slot Rule (P3 Frozen)
+        // Enforce Patient Self-Booking Policy (DEC-GAP-D01)
+        if ($creator->hasRole('patient_guest')) {
+            abort(403, 'غير مصرح: حساب المريض الضيف غير مخول بإنشاء مواعيد مباشرة.');
+        }
+
+        if ($this->resolveCreatorType($creator) === 'patient') {
+            if (! config('booking.patient_booking_enabled', false)) {
+                abort(403, 'غير مصرح: حجز المواعيد الذاتي للمرضى غير مفعّل حالياً بانتظار إطلاق الدفع الإلكتروني. يرجى الحجز عبر العيادة أو مركز الحجز المعتمد.');
+            }
+        }
+
+        // 1. One-Hour Slot Rule & 16:00 Platform Limit (17:00 excluded as booking start)
         $timeSlot = $this->normalizeTimeSlot($data['time_slot']);
-        if (! in_array($timeSlot, self::ALLOWED_HOURLY_SLOTS, true)) {
+        if ($timeSlot === '17:00' || ! in_array($timeSlot, self::ALLOWED_HOURLY_SLOTS, true)) {
             throw ValidationException::withMessages([
-                'time_slot' => ['فترة الحجز غير صالحة. وفق قاعدة الساعة الواحدة (P3)، يجب أن تبدأ الفترات على رأس الساعة (مثال: 09:00).'],
+                'time_slot' => ['فترة الحجز غير صالحة. وفق قواعد المنصة، يبدأ آخر موعد متاح في الساعة 16:00، وفترة 17:00 مخصصة للإغلاق ومحظورة.'],
             ]);
         }
 
-        $date = Carbon::parse($data['appointment_date'])->format('Y-m-d');
+        $carbonDate = Carbon::parse($data['appointment_date']);
+        $date = $carbonDate->format('Y-m-d');
+        $dow = ($carbonDate->dayOfWeek + 1) % 7;
 
-        // Pre-ensure deterministic slot row exists before entering transaction to eliminate gap-locking
-        $this->ensureSlotExists($clinic, $doctor, $date, $timeSlot);
+        // Active slot boundary check (DEC-GAP-01): reject if slot_end <= now('Africa/Algiers')
+        $this->validateActiveSlotBoundary($date, $timeSlot);
 
-        return DB::transaction(function () use ($data, $creator, $clinic, $doctor, $date, $timeSlot) {
-            // 2. Deterministic Row-Level Lock on dedicated slot ledger
-            /** @var AppointmentSlot $slot */
-            $slot = AppointmentSlot::where('clinic_id', $clinic->id)
-                ->where('doctor_id', $doctor->id)
-                ->where('appointment_date', $date)
-                ->where('time_slot', $timeSlot)
-                ->lockForUpdate()
-                ->firstOrFail();
+        // 1.5. Validate Doctor Vacation guard (TASK-DWH-05 / DEC-VAC-01)
+        if ($this->vacationService->isDoctorOnVacation($doctor->id, $clinic->id, $date)) {
+            throw ValidationException::withMessages([
+                'appointment_date' => ['لا يمكن إنشاء الحجز: الطبيب في إجازة معتمدة في هذا التاريخ.'],
+            ])->errorBag('DOCTOR_ON_VACATION');
+        }
 
-            // Refresh capacity from clinic/doctor configuration to ensure real-time accuracy
-            $configuredCapacity = $this->resolveSlotCapacity($clinic, $doctor);
-            if ($slot->capacity !== $configuredCapacity) {
-                $slot->capacity = $configuredCapacity;
-                $slot->save();
-            }
+        // 2. Validate Clinic Operating Hours completeness
+        if (! $this->clinicOperatingHoursService->isClinicConfigured($clinic->id)) {
+            throw ValidationException::withMessages([
+                'clinic_id' => ['لا يمكن إنشاء الحجز: ساعات تشغيل العيادة الأسبوعية غير مهيأة بعد.'],
+            ])->errorBag('CLINIC_SCHEDULE_NOT_CONFIGURED');
+        }
 
-            // Invariant check: verify active appointments in database
-            $activeOccupied = Appointment::where('clinic_id', $clinic->id)
-                ->where('doctor_id', $doctor->id)
-                ->where('appointment_date', $date)
-                ->where('time_slot', $timeSlot)
-                ->whereIn('status', Appointment::OCCUPYING_STATUSES)
-                ->count();
+        // 3. Validate Doctor Working Hours activation
+        if (! $this->doctorWorkingHoursService->isScheduleActivated($clinic->id, $doctor->id)) {
+            throw ValidationException::withMessages([
+                'doctor_id' => ['لا يمكن إنشاء الحجز: ساعات العمل الأسبوعية للطبيب غير مفعّلة في هذه العيادة.'],
+            ])->errorBag('DOCTOR_SCHEDULE_NOT_ACTIVATED');
+        }
 
-            $currentOccupied = max((int) $slot->booked_count, $activeOccupied);
+        // 4. Validate slot is enabled in the doctor's activated schedule
+        if (! $this->doctorWorkingHoursService->isSlotAvailable($clinic->id, $doctor->id, $dow, $timeSlot)) {
+            throw ValidationException::withMessages([
+                'time_slot' => ['الفترة الزمنية المختارة غير متاحة في جدول عمل الطبيب المعتمد لهذا اليوم.'],
+            ])->errorBag('SLOT_NOT_AVAILABLE_IN_SCHEDULE');
+        }
+
+        // Pre-ensure deterministic slot row exists only after full eligibility validation
+        $slotPre = $this->ensureSlotExists($clinic, $doctor, $date, $timeSlot);
+        if ($slotPre->is_quarantined) {
+            throw ValidationException::withMessages([
+                'time_slot' => ['الفترة الزمنية المختارة معلقة إدارياً وغير متاحة للحجز حالياً.'],
+            ])->errorBag('SLOT_QUARANTINED');
+        }
+
+        try {
+            return DB::transaction(function () use ($data, $creator, $clinic, $doctor, $date, $timeSlot) {
+                // Level 1 Canonical Lock: Atomically acquire or validate doctor time ownership across clinics
+                $this->timeReservationService->acquireOrValidate($clinic->id, $doctor->id, $date, $timeSlot);
+
+                // Level 2 Canonical Lock: Deterministic Row-Level Lock on dedicated slot ledger
+                /** @var AppointmentSlot $slot */
+                $slot = AppointmentSlot::where('clinic_id', $clinic->id)
+                    ->where('doctor_id', $doctor->id)
+                    ->where('appointment_date', $date)
+                    ->where('time_slot', $timeSlot)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                // Refresh capacity from clinic/doctor configuration to ensure real-time accuracy
+                $configuredCapacity = $this->resolveSlotCapacity($clinic, $doctor);
+                if ($slot->capacity !== $configuredCapacity) {
+                    $slot->capacity = $configuredCapacity;
+                    $slot->save();
+                }
+
+                // Guard: Reject booking on quarantined slot
+                if ($slot->is_quarantined) {
+                    throw ValidationException::withMessages([
+                        'time_slot' => ['الفترة الزمنية المختارة معلقة إدارياً وغير متاحة للحجز حالياً.'],
+                    ])->errorBag('SLOT_QUARANTINED');
+                }
+
+                // Invariant check: verify active appointments in database
+                $activeOccupied = Appointment::where('clinic_id', $clinic->id)
+                    ->where('doctor_id', $doctor->id)
+                    ->where('appointment_date', $date)
+                    ->where('time_slot', $timeSlot)
+                    ->whereIn('status', Appointment::OCCUPYING_STATUSES)
+                    ->count();
+
+                // Detect counter drift: C_stored != C_actual
+                if ((int) $slot->booked_count !== $activeOccupied) {
+                    $reason = "COUNTER_DRIFT_DETECTED: stored={$slot->booked_count}, actual={$activeOccupied}";
+                    $stored = (int) $slot->booked_count;
+                    $actual = $activeOccupied;
+                    $slotId = $slot->id;
+
+                    $ex = ValidationException::withMessages([
+                        'time_slot' => ['تعذر إتمام الحجز: تم تعليق الفترة الزمنية للتحقق من اتساق السعة.'],
+                    ])->errorBag('SLOT_QUARANTINED_DRIFT');
+
+                    // Attach drift details to exception so outer block can persist quarantine durably
+                    $ex->driftContext = [
+                        'slot_id'      => $slotId,
+                        'reason'       => $reason,
+                        'stored_count' => $stored,
+                        'actual_count' => $actual,
+                    ];
+
+                    throw $ex;
+                }
+
+            $currentOccupied = (int) $slot->booked_count;
 
             if ($currentOccupied >= $slot->capacity) {
                 throw ValidationException::withMessages([
@@ -261,6 +359,37 @@ class BookingService
 
             return $appointment;
         }, 5);
+        } catch (ValidationException $e) {
+            if (isset($e->driftContext)) {
+                $ctx = $e->driftContext;
+                $persisted = $this->quarantineSlot(
+                    $ctx['slot_id'],
+                    $ctx['reason'],
+                    $ctx['stored_count'],
+                    $ctx['actual_count'],
+                    [
+                        'clinic_id'        => $clinic->id,
+                        'doctor_id'        => $doctor->id,
+                        'appointment_date' => $date,
+                        'time_slot'        => $timeSlot,
+                    ]
+                );
+
+                if (! $persisted) {
+                    $failedEx = ValidationException::withMessages([
+                        'time_slot' => ['تعذر إتمام الحجز بسبب تعارض في سعة الفترة الزمنية. يرجى اختيار موعد آخر أو المحاولة لاحقاً.'],
+                    ])->errorBag('SLOT_COUNTER_DRIFT_UNCONFIRMED');
+                    $failedEx->driftContext = $ctx;
+                    $failedEx->quarantinePersisted = false;
+
+                    throw $failedEx;
+                }
+
+                $e->quarantinePersisted = true;
+            }
+
+            throw $e;
+        }
     }
 
     /**
@@ -456,9 +585,46 @@ class BookingService
         string $reason,
         string $targetStatus = 'cancelled'
     ): Appointment {
-        return DB::transaction(function () use ($appointment, $user, $reason, $targetStatus) {
+        // Initial non-locking read of appointment parameters
+        $initialClinicId = (string) $appointment->clinic_id;
+        $initialDoctorId = (string) $appointment->doctor_id;
+        $initialDate = $appointment->appointment_date ? Carbon::parse($appointment->appointment_date)->format('Y-m-d') : null;
+        $initialSlot = $appointment->time_slot ? $this->normalizeTimeSlot($appointment->time_slot) : null;
+
+        return DB::transaction(function () use ($appointment, $user, $reason, $targetStatus, $initialClinicId, $initialDoctorId, $initialDate, $initialSlot) {
+            // Level 1 Canonical Lock: Lock doctor time reservation if date and slot exist
+            if ($initialDoctorId && $initialDate && $initialSlot) {
+                $this->timeReservationService->lockReservation($initialDoctorId, $initialDate, $initialSlot);
+            }
+
+            // Level 2 Canonical Lock: Lock appointment slot row
+            $slot = null;
+            if ($initialClinicId && $initialDoctorId && $initialDate && $initialSlot) {
+                $slot = AppointmentSlot::where('clinic_id', $initialClinicId)
+                    ->where('doctor_id', $initialDoctorId)
+                    ->where('appointment_date', $initialDate)
+                    ->where('time_slot', $initialSlot)
+                    ->lockForUpdate()
+                    ->first();
+            }
+
+            // Level 3 Canonical Lock: Lock and revalidate appointment row
             /** @var Appointment $lockedAppointment */
             $lockedAppointment = Appointment::where('id', $appointment->id)->lockForUpdate()->firstOrFail();
+
+            // Revalidate critical attributes to prevent acting on stale data
+            $currentClinicId = (string) $lockedAppointment->clinic_id;
+            $currentDoctorId = (string) $lockedAppointment->doctor_id;
+            $currentDate = $lockedAppointment->appointment_date ? Carbon::parse($lockedAppointment->appointment_date)->format('Y-m-d') : null;
+            $currentSlot = $lockedAppointment->time_slot ? $this->normalizeTimeSlot($lockedAppointment->time_slot) : null;
+
+            if ($currentClinicId !== $initialClinicId || $currentDoctorId !== $initialDoctorId || $currentDate !== $initialDate || $currentSlot !== $initialSlot) {
+                // If appointment coordinates shifted concurrently, abort immediately to preserve canonical lock hierarchy
+                // and prevent deadlock cycles from acquiring lower-level locks out of order while holding appointment lock.
+                throw ValidationException::withMessages([
+                    'appointment' => ['تغيرت بيانات وفترة الموعد بالتزامن قبل إتمام عملية الإلغاء أو الرفض.'],
+                ])->errorBag('APPOINTMENT_COORDINATES_CHANGED');
+            }
 
             // Enforce cancellation authorization
             $this->authorizeCancellation($lockedAppointment, $user);
@@ -477,20 +643,42 @@ class BookingService
 
             $lockedAppointment->update(['status' => $targetStatus]);
 
-            // Synchronize slot booked_count if transitioning from occupying to non-occupying status
+            // Synchronize slot booked_count and conditionally release doctor time reservation
             if (in_array($fromStatus, Appointment::OCCUPYING_STATUSES, true)) {
-                $slotDate = $lockedAppointment->appointment_date ? Carbon::parse($lockedAppointment->appointment_date)->format('Y-m-d') : null;
-                if ($slotDate && $lockedAppointment->time_slot) {
-                    $slot = AppointmentSlot::where('clinic_id', $lockedAppointment->clinic_id)
-                        ->where('doctor_id', $lockedAppointment->doctor_id)
-                        ->where('appointment_date', $slotDate)
-                        ->where('time_slot', $lockedAppointment->time_slot)
-                        ->lockForUpdate()
-                        ->first();
+                if ($slot) {
+                    // Check actual occupancy prior to status change (excluding this transitioning appointment)
+                    $remainingOccupying = Appointment::where('clinic_id', $currentClinicId)
+                        ->where('doctor_id', $currentDoctorId)
+                        ->where('appointment_date', $currentDate)
+                        ->where('time_slot', $currentSlot)
+                        ->whereIn('status', Appointment::OCCUPYING_STATUSES)
+                        ->where('id', '!=', $lockedAppointment->id)
+                        ->count();
 
-                    if ($slot && $slot->booked_count > 0) {
+                    // Expected pre-transition count was remainingOccupying + 1
+                    if ((int) $slot->booked_count !== ($remainingOccupying + 1)) {
+                        $this->quarantineSlot(
+                            $slot,
+                            "COUNTER_DRIFT_ON_CANCELLATION: stored={$slot->booked_count}, expected=" . ($remainingOccupying + 1),
+                            (int) $slot->booked_count,
+                            $remainingOccupying + 1
+                        );
+                    }
+
+                    if ($slot->booked_count > 0) {
                         $slot->decrement('booked_count');
                     }
+                }
+
+                // Conditionally release doctor_time_reservations only if no other occupying appointments remain
+                if ($currentClinicId && $currentDoctorId && $currentDate && $currentSlot) {
+                    $this->timeReservationService->releaseIfEmpty(
+                        $currentClinicId,
+                        $currentDoctorId,
+                        $currentDate,
+                        $currentSlot,
+                        $lockedAppointment->id
+                    );
                 }
             }
 
@@ -502,7 +690,184 @@ class BookingService
                 'reason' => $reason,
             ]);
 
+            // Record transactional notification in outbox for patient in-app delivery (DEC-NOT-01 / DEC-GAP-04)
+            $recipientPhone = $lockedAppointment->patient_phone ?: ($lockedAppointment->patient?->phone ?? 'UNKNOWN_PHONE');
+            $idempotencyKey = sprintf('appointment_%s_%s', $targetStatus, $lockedAppointment->id);
+
+            if (! NotificationOutbox::where('idempotency_key', $idempotencyKey)->exists()) {
+                $clinicName = $lockedAppointment->clinic?->name ?? 'العيادة';
+                $doctorName = $lockedAppointment->doctor?->user?->name ?? 'الطبيب المعالج';
+                $isPatientSelf = $user->patient && $user->patient->id === $lockedAppointment->patient_id;
+
+                $message = $isPatientSelf
+                    ? "تم إلغاء موعدكم الطبي ({$lockedAppointment->booking_reference}) بنجاح بناءً على طلبكم."
+                    : ($targetStatus === 'rejected'
+                        ? "نحيطكم علماً بأنه تم رفض طلب موعدكم الطبي ({$lockedAppointment->booking_reference}) في {$clinicName}. السبب: {$reason}."
+                        : "نحيطكم علماً بأنه تم إلغاء موعدكم الطبي ({$lockedAppointment->booking_reference}) في {$clinicName}. السبب: {$reason}.");
+
+                NotificationOutbox::create([
+                    'id'              => (string) Str::uuid(),
+                    'appointment_id'  => $lockedAppointment->id,
+                    'recipient_phone' => $recipientPhone,
+                    'recipient_type'  => 'patient',
+                    'channel'         => 'in_app',
+                    'template'        => $targetStatus === 'cancelled' ? 'appointment_cancelled' : 'appointment_rejected',
+                    'payload'         => [
+                        'appointment_id'    => $lockedAppointment->id,
+                        'booking_reference' => $lockedAppointment->booking_reference,
+                        'appointment_date'  => $currentDate,
+                        'time_slot'         => $currentSlot,
+                        'clinic_name'       => $clinicName,
+                        'doctor_name'       => $doctorName,
+                        'cancelled_by'      => $user->name,
+                        'cancelled_by_role' => $user->roles->first()?->name ?? 'staff',
+                        'reason'            => $reason,
+                        'message'           => $message,
+                    ],
+                    'idempotency_key' => $idempotencyKey,
+                    'status'          => NotificationOutbox::STATUS_SENT,
+                    'retry_count'     => 0,
+                ]);
+            }
+
             return $lockedAppointment->fresh();
+        }, 5);
+    }
+
+    /**
+     * Automatically expire a single past pending appointment under DEC-GAP-02.
+     * Enforces Canonical Lock Hierarchy: DoctorTimeReservation -> AppointmentSlot -> Appointment.
+     *
+     * @param Appointment $appointment The appointment candidate.
+     * @param Carbon|null $evaluationNow Current time in Africa/Algiers for boundary validation.
+     * @return bool True if expired, false if skipped due to concurrency or ineligibility.
+     */
+    public function expirePendingAppointment(Appointment $appointment, ?Carbon $evaluationNow = null): bool
+    {
+        $now = $evaluationNow ?? Carbon::now('Africa/Algiers');
+
+        // Initial non-locking read of coordinates
+        $initialClinicId = (string) $appointment->clinic_id;
+        $initialDoctorId = (string) $appointment->doctor_id;
+        $initialDate = $appointment->appointment_date ? Carbon::parse($appointment->appointment_date)->format('Y-m-d') : null;
+        $initialSlot = $appointment->time_slot ? $this->normalizeTimeSlot($appointment->time_slot) : null;
+
+        if (! $initialDate || ! $initialSlot) {
+            Log::warning('EXPIRE_PENDING_APPOINTMENT_SKIPPED_MALFORMED', [
+                'appointment_id' => $appointment->id,
+                'date'           => $appointment->appointment_date,
+                'time_slot'      => $appointment->time_slot,
+            ]);
+            return false;
+        }
+
+        // Validate that slot_end is genuinely in the past
+        try {
+            $slotStart = Carbon::createFromFormat('Y-m-d H:i', "{$initialDate} {$initialSlot}", 'Africa/Algiers');
+            $slotEnd = $slotStart->copy()->addHour();
+            if ($now->lessThan($slotEnd)) {
+                return false; // Not yet past slot end
+            }
+        } catch (\Throwable $e) {
+            Log::warning('EXPIRE_PENDING_APPOINTMENT_SKIPPED_INVALID_TIME', [
+                'appointment_id' => $appointment->id,
+                'date'           => $initialDate,
+                'time_slot'      => $initialSlot,
+                'error'          => $e->getMessage(),
+            ]);
+            return false;
+        }
+
+        return DB::transaction(function () use ($appointment, $now, $initialClinicId, $initialDoctorId, $initialDate, $initialSlot) {
+            // Level 1 Canonical Lock: Doctor Time Reservation
+            $this->timeReservationService->lockReservation($initialDoctorId, $initialDate, $initialSlot);
+
+            // Level 2 Canonical Lock: Slot Row
+            /** @var AppointmentSlot|null $slot */
+            $slot = AppointmentSlot::where('clinic_id', $initialClinicId)
+                ->where('doctor_id', $initialDoctorId)
+                ->where('appointment_date', $initialDate)
+                ->where('time_slot', $initialSlot)
+                ->lockForUpdate()
+                ->first();
+
+            // Level 3 Canonical Lock: Appointment Row
+            /** @var Appointment|null $locked */
+            $locked = Appointment::where('id', $appointment->id)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $locked) {
+                return false;
+            }
+
+            // Post-lock Revalidation
+            if ($locked->status !== 'pending') {
+                return false; // Changed concurrently (e.g. cancelled or confirmed)
+            }
+
+            $currentClinicId = (string) $locked->clinic_id;
+            $currentDoctorId = (string) $locked->doctor_id;
+            $currentDate = $locked->appointment_date ? Carbon::parse($locked->appointment_date)->format('Y-m-d') : null;
+            $currentSlot = $locked->time_slot ? $this->normalizeTimeSlot($locked->time_slot) : null;
+
+            if ($currentClinicId !== $initialClinicId || $currentDoctorId !== $initialDoctorId || $currentDate !== $initialDate || $currentSlot !== $initialSlot) {
+                return false; // Coordinates shifted concurrently
+            }
+
+            // Re-verify eligibility under lock
+            $slotStart = Carbon::createFromFormat('Y-m-d H:i', "{$currentDate} {$currentSlot}", 'Africa/Algiers');
+            $slotEnd = $slotStart->copy()->addHour();
+            if ($now->lessThan($slotEnd)) {
+                return false;
+            }
+
+            // 1. Transition status to expired
+            $locked->update(['status' => 'expired']);
+
+            // 2. Synchronize slot booked_count and detect counter drift
+            if ($slot) {
+                $remainingOccupying = Appointment::where('clinic_id', $currentClinicId)
+                    ->where('doctor_id', $currentDoctorId)
+                    ->where('appointment_date', $currentDate)
+                    ->where('time_slot', $currentSlot)
+                    ->whereIn('status', Appointment::OCCUPYING_STATUSES)
+                    ->where('id', '!=', $locked->id)
+                    ->count();
+
+                if ((int) $slot->booked_count !== ($remainingOccupying + 1)) {
+                    $this->quarantineSlot(
+                        $slot,
+                        "COUNTER_DRIFT_ON_EXPIRY: stored={$slot->booked_count}, expected=" . ($remainingOccupying + 1),
+                        (int) $slot->booked_count,
+                        $remainingOccupying + 1
+                    );
+                }
+
+                if ($slot->booked_count > 0) {
+                    $slot->decrement('booked_count');
+                }
+            }
+
+            // 3. Conditionally release doctor_time_reservations if no remaining occupying appointments
+            $this->timeReservationService->releaseIfEmpty(
+                $currentClinicId,
+                $currentDoctorId,
+                $currentDate,
+                $currentSlot,
+                $locked->id
+            );
+
+            // 4. Create Status History using approved created_by_id actor
+            AppointmentStatusHistory::create([
+                'appointment_id' => $locked->id,
+                'from_status'    => 'pending',
+                'to_status'      => 'expired',
+                'changed_by_id'  => $locked->created_by_id,
+                'reason'         => '[SYSTEM_AUTO_EXPIRE] انتهت صلاحية الموعد تلقائياً لتجاوز نهاية الخانة الزمنية المحددة (DEC-GAP-02)',
+            ]);
+
+            return true;
         }, 5);
     }
 
@@ -514,27 +879,128 @@ class BookingService
         $newDate = Carbon::parse($newSlotData['appointment_date'])->format('Y-m-d');
         $newSlot = $this->normalizeTimeSlot($newSlotData['time_slot']);
 
-        if (! in_array($newSlot, self::ALLOWED_HOURLY_SLOTS, true)) {
+        // 1. One-Hour Slot Rule & 16:00 Platform Limit (17:00 excluded as booking start)
+        if ($newSlot === '17:00' || ! in_array($newSlot, self::ALLOWED_HOURLY_SLOTS, true)) {
             throw ValidationException::withMessages([
-                'time_slot' => ['فترة الحجز غير صالحة. وفق قاعدة الساعة الواحدة (P3)، يجب أن تبدأ الفترات على رأس الساعة (مثال: 09:00).'],
+                'time_slot' => ['فترة الحجز غير صالحة. وفق قواعد المنصة، يبدأ آخر موعد متاح في الساعة 16:00، وفترة 17:00 مخصصة للإغلاق ومحظورة.'],
             ]);
         }
+
+        // Active slot boundary check (DEC-GAP-01): reject if slot_end <= now('Africa/Algiers')
+        $this->validateActiveSlotBoundary($newDate, $newSlot);
 
         $clinic = Clinic::findOrFail($appointment->clinic_id);
         $doctor = Doctor::findOrFail($appointment->doctor_id);
 
+        // 1.5. Validate Doctor Vacation guard (TASK-DWH-05 / DEC-VAC-01)
+        if ($this->vacationService->isDoctorOnVacation($doctor->id, $clinic->id, $newDate)) {
+            throw ValidationException::withMessages([
+                'appointment_date' => ['لا يمكن إعادة جدولة الموعد: الطبيب في إجازة معتمدة في هذا التاريخ.'],
+            ])->errorBag('DOCTOR_ON_VACATION');
+        }
+
+        // 2. Validate Clinic Operating Hours completeness
+        if (! $this->clinicOperatingHoursService->isClinicConfigured($clinic->id)) {
+            throw ValidationException::withMessages([
+                'clinic_id' => ['لا يمكن إعادة جدولة الموعد: ساعات تشغيل العيادة غير مهيأة.'],
+            ])->errorBag('CLINIC_SCHEDULE_NOT_CONFIGURED');
+        }
+
+        // 3. Validate Doctor Working Hours activation
+        if (! $this->doctorWorkingHoursService->isScheduleActivated($clinic->id, $doctor->id)) {
+            throw ValidationException::withMessages([
+                'doctor_id' => ['لا يمكن إعادة جدولة الموعد: ساعات العمل الأسبوعية للطبيب غير مفعّلة في هذه العيادة.'],
+            ])->errorBag('DOCTOR_SCHEDULE_NOT_ACTIVATED');
+        }
+
+        // 4. Validate destination slot is open and enabled in the doctor's activated schedule
+        $newDow = (Carbon::parse($newDate)->dayOfWeek + 1) % 7;
+        if (! $this->doctorWorkingHoursService->isSlotAvailable($clinic->id, $doctor->id, $newDow, $newSlot)) {
+            throw ValidationException::withMessages([
+                'time_slot' => ['الفترة الزمنية المختارة غير متاحة في جدول عمل الطبيب المعتمد لهذا اليوم.'],
+            ])->errorBag('SLOT_NOT_AVAILABLE_IN_SCHEDULE');
+        }
+
         $oldDate = $appointment->appointment_date ? Carbon::parse($appointment->appointment_date)->format('Y-m-d') : null;
         $oldSlot = $this->normalizeTimeSlot($appointment->time_slot);
 
-        // Pre-ensure both slot rows exist prior to locking to prevent gap-lock deadlock
+        // Pre-ensure slot rows only after destination eligibility is fully validated
         if ($oldDate && $oldSlot) {
             $this->ensureSlotExists($clinic, $doctor, $oldDate, $oldSlot);
         }
         $this->ensureSlotExists($clinic, $doctor, $newDate, $newSlot);
 
-        return DB::transaction(function () use ($appointment, $newSlotData, $user, $clinic, $doctor, $oldDate, $oldSlot, $newDate, $newSlot) {
+        try {
+            return DB::transaction(function () use ($appointment, $newSlotData, $user, $clinic, $doctor, $oldDate, $oldSlot, $newDate, $newSlot) {
+            // Level 1 Canonical Lock: Deterministic Reservation Locks
+            // Compare doctor_id:date:slot lexicographically to prevent deadlocks across concurrent reschedules
+            $resKeyOld = sprintf('%s:%s:%s', $doctor->id, $oldDate, $oldSlot);
+            $resKeyNew = sprintf('%s:%s:%s', $doctor->id, $newDate, $newSlot);
+
+            if (strcmp($resKeyOld, $resKeyNew) < 0) {
+                if ($oldDate && $oldSlot) {
+                    $this->timeReservationService->lockReservation($doctor->id, $oldDate, $oldSlot);
+                }
+                $this->timeReservationService->acquireOrValidate($clinic->id, $doctor->id, $newDate, $newSlot);
+            } else {
+                $this->timeReservationService->acquireOrValidate($clinic->id, $doctor->id, $newDate, $newSlot);
+                if ($oldDate && $oldSlot) {
+                    $this->timeReservationService->lockReservation($doctor->id, $oldDate, $oldSlot);
+                }
+            }
+
+            // Level 2 Canonical Lock: Deterministic Row-Level Locks on appointment_slots
+            $keyOld = sprintf('%s:%s:%s:%s', $clinic->id, $doctor->id, $oldDate, $oldSlot);
+            $keyNew = sprintf('%s:%s:%s:%s', $clinic->id, $doctor->id, $newDate, $newSlot);
+
+            $oldSlotRow = null;
+            $newSlotRow = null;
+
+            if (strcmp($keyOld, $keyNew) < 0) {
+                if ($oldDate && $oldSlot) {
+                    $oldSlotRow = AppointmentSlot::where('clinic_id', $clinic->id)
+                        ->where('doctor_id', $doctor->id)
+                        ->where('appointment_date', $oldDate)
+                        ->where('time_slot', $oldSlot)
+                        ->lockForUpdate()
+                        ->first();
+                }
+                $newSlotRow = AppointmentSlot::where('clinic_id', $clinic->id)
+                    ->where('doctor_id', $doctor->id)
+                    ->where('appointment_date', $newDate)
+                    ->where('time_slot', $newSlot)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+            } else {
+                $newSlotRow = AppointmentSlot::where('clinic_id', $clinic->id)
+                    ->where('doctor_id', $doctor->id)
+                    ->where('appointment_date', $newDate)
+                    ->where('time_slot', $newSlot)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+                if ($oldDate && $oldSlot) {
+                    $oldSlotRow = AppointmentSlot::where('clinic_id', $clinic->id)
+                        ->where('doctor_id', $doctor->id)
+                        ->where('appointment_date', $oldDate)
+                        ->where('time_slot', $oldSlot)
+                        ->lockForUpdate()
+                        ->first();
+                }
+            }
+
+            // Level 3 Canonical Lock: Lock and revalidate Appointment row
             /** @var Appointment $locked */
             $locked = Appointment::where('id', $appointment->id)->lockForUpdate()->firstOrFail();
+
+            // Revalidate appointment state inside lock
+            $actualOldDate = $locked->appointment_date ? Carbon::parse($locked->appointment_date)->format('Y-m-d') : null;
+            $actualOldSlot = $locked->time_slot ? $this->normalizeTimeSlot($locked->time_slot) : null;
+
+            if ($actualOldDate !== $oldDate || $actualOldSlot !== $oldSlot || (string) $locked->clinic_id !== (string) $clinic->id || (string) $locked->doctor_id !== (string) $doctor->id) {
+                throw ValidationException::withMessages([
+                    'status' => ['تغيرت بيانات الموعد الأصلية بالتزامن قبل إتمام عملية إعادة الجدولة.'],
+                ]);
+            }
 
             // 1. Enforce reschedule authorization
             $this->authorizeReschedule($locked, $user);
@@ -553,48 +1019,6 @@ class BookingService
                 ]);
             }
 
-            // 4. Canonical Lock Order enforcement (Section 8) to prevent deadlocks:
-            // Compare composite keys lexicographically: smaller key locked first, larger key locked second.
-            $keyOld = sprintf('%s:%s:%s:%s', $clinic->id, $doctor->id, $oldDate, $oldSlot);
-            $keyNew = sprintf('%s:%s:%s:%s', $clinic->id, $doctor->id, $newDate, $newSlot);
-
-            $oldSlotRow = null;
-            $newSlotRow = null;
-
-            if (strcmp($keyOld, $keyNew) < 0) {
-                // Lock Old first, then New
-                if ($oldDate && $oldSlot) {
-                    $oldSlotRow = AppointmentSlot::where('clinic_id', $clinic->id)
-                        ->where('doctor_id', $doctor->id)
-                        ->where('appointment_date', $oldDate)
-                        ->where('time_slot', $oldSlot)
-                        ->lockForUpdate()
-                        ->first();
-                }
-                $newSlotRow = AppointmentSlot::where('clinic_id', $clinic->id)
-                    ->where('doctor_id', $doctor->id)
-                    ->where('appointment_date', $newDate)
-                    ->where('time_slot', $newSlot)
-                    ->lockForUpdate()
-                    ->firstOrFail();
-            } else {
-                // Lock New first, then Old
-                $newSlotRow = AppointmentSlot::where('clinic_id', $clinic->id)
-                    ->where('doctor_id', $doctor->id)
-                    ->where('appointment_date', $newDate)
-                    ->where('time_slot', $newSlot)
-                    ->lockForUpdate()
-                    ->firstOrFail();
-                if ($oldDate && $oldSlot) {
-                    $oldSlotRow = AppointmentSlot::where('clinic_id', $clinic->id)
-                        ->where('doctor_id', $doctor->id)
-                        ->where('appointment_date', $oldDate)
-                        ->where('time_slot', $oldSlot)
-                        ->lockForUpdate()
-                        ->first();
-                }
-            }
-
             // Sync configured capacity on target slot
             $configuredCapacity = $this->resolveSlotCapacity($clinic, $doctor);
             if ($newSlotRow->capacity !== $configuredCapacity) {
@@ -602,7 +1026,14 @@ class BookingService
                 $newSlotRow->save();
             }
 
-            // 5. Capacity Concurrency Protection on new target slot
+            // Reject quarantined target slot
+            if ($newSlotRow->is_quarantined) {
+                throw ValidationException::withMessages([
+                    'time_slot' => ['الفترة الزمنية المختارة معلقة إدارياً وغير متاحة للحجز أو إعادة الجدولة.'],
+                ])->errorBag('SLOT_QUARANTINED');
+            }
+
+            // 4. Capacity Concurrency Protection & Drift Detection on new target slot
             $activeOccupiedOnTarget = Appointment::where('clinic_id', $clinic->id)
                 ->where('doctor_id', $doctor->id)
                 ->where('appointment_date', $newDate)
@@ -611,14 +1042,42 @@ class BookingService
                 ->where('id', '!=', $locked->id)
                 ->count();
 
-            $currentOccupiedTarget = max((int) $newSlotRow->booked_count, $activeOccupiedOnTarget);
+            // Detect drift on target slot
+            if ((int) $newSlotRow->booked_count !== $activeOccupiedOnTarget) {
+                $reason = "COUNTER_DRIFT_ON_RESCHEDULE_TARGET: stored={$newSlotRow->booked_count}, actual={$activeOccupiedOnTarget}";
+                $stored = (int) $newSlotRow->booked_count;
+                $actual = $activeOccupiedOnTarget;
+                $slotId = $newSlotRow->id;
+
+                $ex = ValidationException::withMessages([
+                    'time_slot' => ['تعذر إتمام إعادة الجدولة: تم تعليق الفترة الزمنية المستهدفة للتحقق من اتساق السعة.'],
+                ])->errorBag('SLOT_QUARANTINED_DRIFT');
+
+                // Attach drift details to exception so outer block can persist quarantine durably outside rolled-back transaction
+                $ex->driftContext = [
+                    'slot_id'      => $slotId,
+                    'reason'       => $reason,
+                    'stored_count' => $stored,
+                    'actual_count' => $actual,
+                    'coordinates'  => [
+                        'clinic_id'        => $clinic->id,
+                        'doctor_id'        => $doctor->id,
+                        'appointment_date' => $newDate,
+                        'time_slot'        => $newSlot,
+                    ],
+                ];
+
+                throw $ex;
+            }
+
+            $currentOccupiedTarget = (int) $newSlotRow->booked_count;
             if ($currentOccupiedTarget >= $newSlotRow->capacity) {
                 throw ValidationException::withMessages([
                     'capacity' => ["اكتملت السعة القصوى المحددة ({$newSlotRow->capacity} مرضى) للطبيب في هذه الفترة الزمنية ({$newSlot})."],
                 ]);
             }
 
-            // 6. Duplicate active booking check for the same patient on the new slot
+            // 5. Duplicate active booking check for the same patient on the new slot
             if ($locked->patient_phone) {
                 $duplicate = Appointment::where('clinic_id', $clinic->id)
                     ->where('doctor_id', $doctor->id)
@@ -636,13 +1095,45 @@ class BookingService
                 }
             }
 
-            // 7. Atomically adjust booked counters on both slots
-            if ($oldSlotRow && $oldSlotRow->booked_count > 0) {
-                $oldSlotRow->decrement('booked_count');
+            // 6. Atomically adjust booked counters on both slots
+            if ($oldSlotRow) {
+                // Check drift on old slot prior to moving
+                $remainingOccupyingOld = Appointment::where('clinic_id', $clinic->id)
+                    ->where('doctor_id', $doctor->id)
+                    ->where('appointment_date', $oldDate)
+                    ->where('time_slot', $oldSlot)
+                    ->whereIn('status', Appointment::OCCUPYING_STATUSES)
+                    ->where('id', '!=', $locked->id)
+                    ->count();
+
+                if ((int) $oldSlotRow->booked_count !== ($remainingOccupyingOld + 1)) {
+                    $this->quarantineSlot(
+                        $oldSlotRow,
+                        "COUNTER_DRIFT_ON_RESCHEDULE_OLD: stored={$oldSlotRow->booked_count}, expected=" . ($remainingOccupyingOld + 1),
+                        (int) $oldSlotRow->booked_count,
+                        $remainingOccupyingOld + 1
+                    );
+                }
+
+                if ($oldSlotRow->booked_count > 0) {
+                    $oldSlotRow->decrement('booked_count');
+                }
             }
+
             $newSlotRow->update([
                 'booked_count' => $currentOccupiedTarget + 1,
             ]);
+
+            // 7. Conditionally release old doctor time reservation if no remaining occupying appointments exist
+            if ($oldDate && $oldSlot && in_array($locked->status, Appointment::OCCUPYING_STATUSES, true)) {
+                $this->timeReservationService->releaseIfEmpty(
+                    $clinic->id,
+                    $doctor->id,
+                    $oldDate,
+                    $oldSlot,
+                    $locked->id
+                );
+            }
 
             // 8. In-Place Update: preserve ID, booking_reference, secure_token, status, and ownership
             $notes = $newSlotData['notes'] ?? $locked->notes;
@@ -670,6 +1161,32 @@ class BookingService
 
             return $locked->fresh(['clinic', 'doctor.user', 'patient', 'bookingCenter', 'statusHistory']);
         }, 5);
+        } catch (ValidationException $e) {
+            if (isset($e->driftContext)) {
+                $ctx = $e->driftContext;
+                $persisted = $this->quarantineSlot(
+                    $ctx['slot_id'],
+                    $ctx['reason'],
+                    $ctx['stored_count'],
+                    $ctx['actual_count'],
+                    $ctx['coordinates'] ?? null
+                );
+
+                if (! $persisted) {
+                    $failedEx = ValidationException::withMessages([
+                        'time_slot' => ['تعذر إتمام إعادة الجدولة بسبب تعارض في سعة الفترة الزمنية المستهدفة. يرجى اختيار موعد آخر أو المحاولة لاحقاً.'],
+                    ])->errorBag('SLOT_COUNTER_DRIFT_UNCONFIRMED');
+                    $failedEx->driftContext = $ctx;
+                    $failedEx->quarantinePersisted = false;
+
+                    throw $failedEx;
+                }
+
+                $e->quarantinePersisted = true;
+            }
+
+            throw $e;
+        }
     }
 
     /**
@@ -679,11 +1196,24 @@ class BookingService
      */
     public function getAvailableSlots(Doctor $doctor, Clinic $clinic, string $date): array
     {
-        // Pre-ensure all 10 hourly slots exist for this date
-        foreach (self::ALLOWED_HOURLY_SLOTS as $slotTime) {
-            $this->ensureSlotExists($clinic, $doctor, $date, $slotTime);
+        // 1. If clinic operating hours are not configured or doctor schedule is not activated, return empty list (pure read-only)
+        if (! $this->clinicOperatingHoursService->isClinicConfigured($clinic->id)) {
+            return [];
         }
 
+        if (! $this->doctorWorkingHoursService->isScheduleActivated($clinic->id, $doctor->id)) {
+            return [];
+        }
+
+        // 1.5. If doctor is on vacation for this clinic and date, return empty list (DEC-VAC-01)
+        if ($this->vacationService->isDoctorOnVacation($doctor->id, $clinic->id, $date)) {
+            return [];
+        }
+
+        $carbonDate = Carbon::parse($date);
+        $dow = ($carbonDate->dayOfWeek + 1) % 7;
+
+        // 2. Fetch existing slot records (pure read query, no ensureSlotExists call)
         $slotRows = AppointmentSlot::where('clinic_id', $clinic->id)
             ->where('doctor_id', $doctor->id)
             ->where('appointment_date', $date)
@@ -702,8 +1232,23 @@ class BookingService
         $configuredCapacity = $this->resolveSlotCapacity($clinic, $doctor);
 
         $slots = [];
+        // Only evaluate allowed booking starts (08:00..16:00, 17:00 permanently excluded)
         foreach (self::ALLOWED_HOURLY_SLOTS as $slotTime) {
+            if ($slotTime === '17:00') {
+                continue;
+            }
+
+            // Check if slot is enabled in the doctor's activated schedule for this day
+            if (! $this->doctorWorkingHoursService->isSlotAvailable($clinic->id, $doctor->id, $dow, $slotTime)) {
+                continue;
+            }
+
             $slotRow = $slotRows->get($slotTime);
+            if ($slotRow && $slotRow->is_quarantined) {
+                // Quarantined slot is strictly excluded from booking availability
+                continue;
+            }
+
             $capacity = $slotRow ? (int) $slotRow->capacity : $configuredCapacity;
             $activeCount = (int) ($activeCounts[$slotTime] ?? 0);
             $occupied = $slotRow ? max((int) $slotRow->booked_count, $activeCount) : $activeCount;
@@ -767,9 +1312,29 @@ class BookingService
         return $slot;
     }
 
+    /**
+     * Validate active slot boundary under DEC-GAP-01.
+     * Rejects if slot_end <= now('Africa/Algiers').
+     *
+     * @throws ValidationException
+     */
+    public function validateActiveSlotBoundary(string $date, string $timeSlot): void
+    {
+        $normalizedSlot = $this->normalizeTimeSlot($timeSlot);
+        $slotStart = Carbon::createFromFormat('Y-m-d H:i', "{$date} {$normalizedSlot}", 'Africa/Algiers');
+        $slotEnd = $slotStart->copy()->addHour();
+        $now = Carbon::now('Africa/Algiers');
+
+        if ($now->greaterThanOrEqualTo($slotEnd)) {
+            throw ValidationException::withMessages([
+                'time_slot' => ['فترة الحجز المختارة انتهت صلاحيتها ولا يمكن حجزها.'],
+            ])->errorBag('SLOT_EXPIRED');
+        }
+    }
+
     protected function resolveCreatorType(User $user): string
     {
-        if ($user->hasRole('booking_center')) {
+        if ($user->hasRole('booking_center') || $user->hasRole('booking_center_staff')) {
             return 'booking_center';
         }
         if ($user->hasRole('doctor_assistant')) {
@@ -863,6 +1428,11 @@ class BookingService
 
         // The creator
         if ($appointment->created_by_id === $user->id) {
+            return;
+        }
+
+        // Booking center staff of the owning booking center
+        if ($appointment->booking_center_id && $user->bookingCenter && $user->bookingCenter->id === $appointment->booking_center_id) {
             return;
         }
 
@@ -982,5 +1552,87 @@ class BookingService
             'expired' => 'لا يمكن تسجيل عدم الحضور لموعد منتهي الصلاحية.',
             default => "لا يمكن تسجيل عدم الحضور لموعد بحالة ({$status}). هذا الإجراء متاح فقط للمواعيد المؤكدة.",
         };
+    }
+
+    /**
+     * Durably quarantine a slot due to detected counter drift or integrity anomaly.
+     * Persists even if the calling business transaction rolls back.
+     *
+     * @return bool True if quarantine was durably confirmed in storage (affected > 0), false otherwise.
+     */
+    public function quarantineSlot(AppointmentSlot|string $slotOrId, string $reason, int $storedCount, int $actualOccupied, ?array $slotCoordinates = null): bool
+    {
+        $slotId = $slotOrId instanceof AppointmentSlot ? $slotOrId->id : $slotOrId;
+        $clinicId = $slotOrId instanceof AppointmentSlot ? $slotOrId->clinic_id : ($slotCoordinates['clinic_id'] ?? null);
+        $doctorId = $slotOrId instanceof AppointmentSlot ? $slotOrId->doctor_id : ($slotCoordinates['doctor_id'] ?? null);
+        $appointmentDate = $slotOrId instanceof AppointmentSlot
+            ? ($slotOrId->appointment_date instanceof Carbon ? $slotOrId->appointment_date->format('Y-m-d') : (string) $slotOrId->appointment_date)
+            : ($slotCoordinates['appointment_date'] ?? null);
+        $timeSlot = $slotOrId instanceof AppointmentSlot ? $slotOrId->time_slot : ($slotCoordinates['time_slot'] ?? null);
+
+        $persisted = false;
+
+        try {
+            $affected = DB::table('appointment_slots')
+                ->where('id', $slotId)
+                ->update([
+                    'is_quarantined'    => true,
+                    'quarantine_reason' => $reason,
+                    'updated_at'        => now(),
+                ]);
+
+            $persisted = ($affected > 0);
+        } catch (\Throwable $e) {
+            Log::critical('SLOT_QUARANTINE_PERSISTENCE_FAILED', [
+                'slot_id'          => $slotId,
+                'clinic_id'        => $clinicId,
+                'doctor_id'        => $doctorId,
+                'appointment_date' => $appointmentDate,
+                'time_slot'        => $timeSlot,
+                'stored_count'     => $storedCount,
+                'actual_occupied'  => $actualOccupied,
+                'reason'           => $reason,
+                'error'            => $e->getMessage(),
+                'detected_at'      => Carbon::now('Africa/Algiers')->toIso8601String(),
+            ]);
+
+            return false;
+        }
+
+        if (! $persisted) {
+            Log::critical('SLOT_QUARANTINE_PERSISTENCE_FAILED', [
+                'slot_id'          => $slotId,
+                'clinic_id'        => $clinicId,
+                'doctor_id'        => $doctorId,
+                'appointment_date' => $appointmentDate,
+                'time_slot'        => $timeSlot,
+                'stored_count'     => $storedCount,
+                'actual_occupied'  => $actualOccupied,
+                'reason'           => $reason,
+                'error'            => 'Zero rows affected when persisting quarantine (slot not found or unpersisted)',
+                'detected_at'      => Carbon::now('Africa/Algiers')->toIso8601String(),
+            ]);
+
+            return false;
+        }
+
+        if ($slotOrId instanceof AppointmentSlot) {
+            $slotOrId->is_quarantined = true;
+            $slotOrId->quarantine_reason = $reason;
+        }
+
+        Log::critical('SLOT_COUNTER_DRIFT_QUARANTINED', [
+            'slot_id'          => $slotId,
+            'clinic_id'        => $clinicId,
+            'doctor_id'        => $doctorId,
+            'appointment_date' => $appointmentDate,
+            'time_slot'        => $timeSlot,
+            'stored_count'     => $storedCount,
+            'actual_occupied'  => $actualOccupied,
+            'reason'           => $reason,
+            'detected_at'      => Carbon::now('Africa/Algiers')->toIso8601String(),
+        ]);
+
+        return true;
     }
 }

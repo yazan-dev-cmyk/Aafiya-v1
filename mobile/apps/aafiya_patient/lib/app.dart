@@ -138,6 +138,10 @@ class AafiyaPatientAppState extends State<AafiyaPatientApp>
         _handleAppointmentDestination(appointmentId);
         return true;
 
+      case SharedRecordDestination(:final token):
+        _handleSharedRecordDestination(token);
+        return true;
+
       case UnknownDestination():
         return false;
     }
@@ -151,6 +155,39 @@ class AafiyaPatientAppState extends State<AafiyaPatientApp>
       context,
       apiClient: widget.apiClient,
       token: token,
+    );
+  }
+
+  void _handleSharedRecordDestination(String token) {
+    final isAuthenticated =
+        widget.sessionManager.isAuthenticated && _navState == PatientNavState.home;
+
+    if (isAuthenticated) {
+      _presentSharedRecordViewer(token);
+    } else {
+      // Sub-decision B: Unauthenticated ingress — ignore token without volatile memory storage,
+      // and show notification requiring authentication.
+      final context = _navigatorKey.currentContext;
+      if (context != null) {
+        final strings = LocalizedStrings.of(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(strings.sharedRecordAuthRequired),
+            backgroundColor: AafiyaColors.warning,
+          ),
+        );
+      }
+    }
+  }
+
+  void _presentSharedRecordViewer(String token) {
+    final context = _navigatorKey.currentContext;
+    if (context == null) return;
+
+    SharedRecordViewerSheet.show(
+      context,
+      apiClient: widget.apiClient,
+      initialToken: token,
     );
   }
 
@@ -189,7 +226,10 @@ class AafiyaPatientAppState extends State<AafiyaPatientApp>
           final appointment = Appointment.fromJson(apptData);
           navState.push(
             MaterialPageRoute<void>(
-              builder: (_) => AppointmentDetailScreen(appointment: appointment),
+              builder: (_) => AppointmentDetailScreen(
+                appointment: appointment,
+                apiClient: widget.apiClient,
+              ),
             ),
           );
         } catch (_) {

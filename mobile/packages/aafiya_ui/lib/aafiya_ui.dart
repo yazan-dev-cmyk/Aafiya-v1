@@ -20,3 +20,4 @@ export 'widgets/aafiya_commune_selector.dart';
 export 'widgets/aafiya_wilaya_filter_chips.dart';
 export 'widgets/aafiya_specialty_filter_chips.dart';
 export 'widgets/aafiya_specialty_selector.dart';
+export 'widgets/shared_record_viewer_sheet.dart';

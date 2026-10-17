@@ -156,7 +156,7 @@ export default async function LocaleLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className={`${isRtl ? ibmPlexSansArabic.className : plusJakartaSans.className} bg-slate-50 text-slate-900 antialiased selection:bg-teal-500 selection:text-white`} suppressHydrationWarning>
+      <body className={`${isRtl ? ibmPlexSansArabic.className : plusJakartaSans.className} bg-slate-50 text-slate-900 antialiased selection:bg-teal-500 selection:text-white overflow-x-hidden max-w-full`} suppressHydrationWarning>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <AuthProvider>
             {children}

@@ -3,8 +3,12 @@ import 'package:aafiya_core/aafiya_core.dart';
 import 'package:aafiya_ui/aafiya_ui.dart';
 
 import '../screens/clinic_director_stats_screen.dart';
+import '../screens/clinic_operating_hours_screen.dart';
 import '../screens/doctor_queue_screen.dart';
 import '../screens/doctor_staff_screen.dart';
+import '../screens/doctor_vacations_screen.dart';
+import '../screens/doctor_working_hours_screen.dart';
+import '../screens/unresolved_reschedules_screen.dart';
 import '../widgets/doctor_dashboard_view.dart';
 
 /// AAFIYA Pro — Doctor Operational Shell.
@@ -162,6 +166,158 @@ class _DoctorShellState extends State<DoctorShell> {
             icon: const Icon(Icons.refresh_rounded),
             tooltip: strings.retry,
             onPressed: _isLoading ? null : _loadClinics,
+          ),
+          IconButton(
+            icon: const Icon(Icons.schedule_rounded),
+            tooltip: strings.doctorWorkingHoursTitle,
+            onPressed: () {
+              Navigator.of(context).push(
+                DoctorWorkingHoursScreen.route(
+                  sessionManager: widget.sessionManager,
+                  user: widget.user,
+                  apiClient: widget.apiClient,
+                ),
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.event_busy_outlined),
+            tooltip: strings.doctorVacationsTitle,
+            onPressed: () {
+              Navigator.of(context).push(
+                DoctorVacationsScreen.route(
+                  sessionManager: widget.sessionManager,
+                  user: widget.user,
+                  apiClient: widget.apiClient,
+                ),
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.assignment_late_outlined),
+            tooltip: strings.unresolvedReschedulesTitle,
+            onPressed: () {
+              Navigator.of(context).push(
+                UnresolvedReschedulesScreen.route(
+                  sessionManager: widget.sessionManager,
+                  user: widget.user,
+                  apiClient: widget.apiClient,
+                ),
+              );
+            },
+          ),
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert_rounded),
+            tooltip: strings.viewSharedRecordHubTitle,
+            onSelected: (value) async {
+              if (value == 'shared_record') {
+                final client = widget.apiClient ?? widget.sessionManager.apiClient;
+                await SharedRecordViewerSheet.show(context, apiClient: client);
+              } else if (value == 'doctor_vacations') {
+                Navigator.of(context).push(
+                  DoctorVacationsScreen.route(
+                    sessionManager: widget.sessionManager,
+                    user: widget.user,
+                    apiClient: widget.apiClient,
+                  ),
+                );
+              } else if (value == 'clinic_operating_hours') {
+                Navigator.of(context).push(
+                  ClinicOperatingHoursScreen.route(
+                    sessionManager: widget.sessionManager,
+                    clinicId: widget.sessionManager.activeClinic?.id,
+                    apiClient: widget.apiClient,
+                  ),
+                );
+              } else if (value == 'working_hours') {
+                Navigator.of(context).push(
+                  DoctorWorkingHoursScreen.route(
+                    sessionManager: widget.sessionManager,
+                    user: widget.user,
+                    apiClient: widget.apiClient,
+                  ),
+                );
+              }
+            },
+            itemBuilder: (context) => [
+              if (isDirector)
+                PopupMenuItem<String>(
+                  value: 'clinic_operating_hours',
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.store_mall_directory_outlined,
+                        color: AafiyaColors.primaryBlue,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          strings.clinicOperatingHoursTitle,
+                          style: AafiyaTypography.bodyMedium,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              PopupMenuItem<String>(
+                value: 'working_hours',
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.schedule_rounded,
+                      color: AafiyaColors.primaryBlue,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        strings.doctorWorkingHoursTitle,
+                        style: AafiyaTypography.bodyMedium,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: 'doctor_vacations',
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.event_busy_outlined,
+                      color: AafiyaColors.primaryBlue,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        strings.doctorVacationsTitle,
+                        style: AafiyaTypography.bodyMedium,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: 'shared_record',
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.lock_person_outlined,
+                      color: AafiyaColors.primaryBlue,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        strings.viewSharedRecordHubTitle,
+                        style: AafiyaTypography.bodyMedium,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
           IconButton(
             icon: const Icon(Icons.logout_rounded),
@@ -459,6 +615,43 @@ class _DoctorShellState extends State<DoctorShell> {
                         ),
                     ],
                   ),
+                  if (clinic.isActive) ...[
+                    const SizedBox(height: AafiyaSpacing.xs),
+                    Wrap(
+                      alignment: WrapAlignment.end,
+                      spacing: 8,
+                      children: [
+                        if (clinic.isMedicalDirector)
+                          TextButton.icon(
+                            icon: const Icon(Icons.store_mall_directory_outlined, size: 16),
+                            label: Text(strings.clinicOperatingHoursTitle),
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                ClinicOperatingHoursScreen.route(
+                                  sessionManager: widget.sessionManager,
+                                  clinicId: clinic.id,
+                                  apiClient: widget.apiClient,
+                                ),
+                              );
+                            },
+                          ),
+                        TextButton.icon(
+                          icon: const Icon(Icons.schedule_rounded, size: 16),
+                          label: Text(strings.doctorWorkingHoursTitle),
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              DoctorWorkingHoursScreen.route(
+                                sessionManager: widget.sessionManager,
+                                user: widget.user,
+                                clinicId: clinic.id,
+                                apiClient: widget.apiClient,
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
                 ],
               ),
             );

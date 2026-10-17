@@ -43,4 +43,14 @@ export 'models/wilaya.dart';
 export 'models/commune.dart';
 export 'models/medical_specialty.dart';
 export 'services/master_data_service.dart';
+export 'models/shared_patient_record.dart';
+export 'services/shared_record_service.dart';
+export 'models/unresolved_reschedule_item.dart';
+export 'services/clinic_reschedule_dashboard_service.dart';
+export 'models/doctor_vacation.dart';
+export 'services/doctor_vacation_service.dart';
+export 'models/doctor_working_hours.dart';
+export 'services/doctor_working_hours_service.dart';
+export 'models/clinic_operating_hours.dart';
+export 'services/clinic_operating_hours_service.dart';
 

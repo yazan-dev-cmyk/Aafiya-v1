@@ -33,10 +33,16 @@ abstract final class ApiEndpoints {
   static const String patientMe = '/patients/me';
   static String patient(String id) => '/patients/$id';
 
-  // Doctor Operational (TASK-04-01 & TASK-04-02)
+  // Doctor Operational (TASK-04-01 & TASK-04-02 & TASK-PAR-DOC-04 & TASK-PAR-DOC-03)
   static const String doctorClinics = '/doctor/clinics';
   static const String doctorStats = '/doctor/stats';
   static const String clinicDoctorStats = '/clinic/doctor-stats';
+  static const String clinicUnresolvedReschedules = '/clinic/reschedule-dashboard/unresolved';
+  static const String doctorVacations = '/doctor/vacations';
+  static String doctorVacation(String id) => '/doctor/vacations/$id';
+  static String doctorWorkingHours(String doctorId) => '/doctors/$doctorId/working-hours';
+  static String doctorWorkingHoursActivate(String doctorId) => '/doctors/$doctorId/working-hours/activate';
+  static const String clinicOperatingHours = '/clinic/operating-hours';
 
   // Appointment Attendance & Queue Actions (TASK-04-03 & TASK-05-04)
   static String appointmentAttend(String id) => '/appointments/$id/attend';

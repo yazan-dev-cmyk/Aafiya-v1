@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:aafiya_core/aafiya_core.dart';
 import 'package:aafiya_ui/aafiya_ui.dart';
 
+import '../widgets/patient_share_record_dialog.dart';
+
 /// Screen displaying the authenticated patient's Emergency Medical Profile.
 ///
 /// STRICTLY READ-ONLY: No edit, save, update, or delete operations exist.
@@ -74,6 +76,13 @@ class _EmergencyProfileScreenState extends State<EmergencyProfileScreen> {
         leading: BackButton(
           onPressed: () => Navigator.of(context).pop(),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.share_rounded),
+            tooltip: strings.shareMedicalRecordTitle,
+            onPressed: () => PatientShareRecordDialog.show(context, apiClient: widget.apiClient),
+          ),
+        ],
       ),
       body: _buildContent(context, strings),
     );

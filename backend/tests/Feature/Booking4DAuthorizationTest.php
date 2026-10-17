@@ -118,6 +118,42 @@ class Booking4DAuthorizationTest extends TestCase
             'wilaya' => 'قسنطينة',
             'quota_balance' => 10,
         ]);
+
+        // Configure 7-day clinic operating hours and activate schedule for employed doctor
+        $this->setupWorkingHoursFixture();
+
+        // Enable patient booking for test fixture generation
+        config(['booking.patient_booking_enabled' => true]);
+    }
+
+    protected function setupWorkingHoursFixture(): void
+    {
+        $clinicHoursService = app(\App\Services\ClinicOperatingHoursService::class);
+        $days = [];
+        for ($d = 0; $d <= 6; $d++) {
+            $days[] = [
+                'day_of_week' => $d,
+                'is_closed' => false,
+                'periods' => [
+                    ['period_index' => 0, 'open_time' => '08:00', 'close_time' => '17:00'],
+                ],
+            ];
+        }
+        $clinicHoursService->saveOperatingHours($this->clinic->id, $days, $this->directorUser);
+
+        $slots = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00'];
+        $doctorScheduleDays = [];
+        for ($d = 0; $d <= 6; $d++) {
+            $doctorScheduleDays[] = [
+                'day_of_week' => $d,
+                'is_closed' => false,
+                'slots' => $slots,
+            ];
+        }
+
+        $doctorHoursService = app(\App\Services\DoctorWorkingHoursService::class);
+        $doctorHoursService->saveDraft($this->clinic->id, $this->employedDoctor->id, $doctorScheduleDays, $this->directorUser);
+        $doctorHoursService->activateSchedule($this->clinic->id, $this->employedDoctor->id, $this->directorUser);
     }
 
     public function test_assigned_doctor_can_confirm_their_appointment(): void

@@ -37,7 +37,12 @@ Route::get('/clinics/{id}', [ClinicController::class, 'show'])->whereUuid('id');
 Route::get('/booking-packages', [\App\Http\Controllers\Api\V1\BookingPackageController::class, 'index']);
 Route::get('/booking-packages/{bookingPackage}', [\App\Http\Controllers\Api\V1\BookingPackageController::class, 'show']);
 Route::get('/appointments/slots', [\App\Http\Controllers\Api\V1\AppointmentController::class, 'slots']);
-Route::get('/shared-records/{token}', [\App\Http\Controllers\Api\V1\PatientController::class, 'viewSharedRecord']);
+// Recipient Public Shared Records Resolution (TASK-PAR-PAT-05: DEC-P05-02, DEC-P05-03, DEC-P05-04, DEC-P05-05)
+Route::middleware(['throttle:share.resolve'])->group(function () {
+    Route::post('/shared-records/resolve', [\App\Http\Controllers\Api\V1\PatientShareTokenController::class, 'resolve']);
+    Route::post('/shared-records/{token}/resolve', [\App\Http\Controllers\Api\V1\PatientShareTokenController::class, 'resolve']);
+    Route::get('/shared-records/{token}', [\App\Http\Controllers\Api\V1\PatientShareTokenController::class, 'viewSharedRecord']);
+});
 
 // Master Data Routes (Authoritative Reference Data)
 Route::prefix('master')->group(function () {
@@ -49,11 +54,27 @@ Route::prefix('master')->group(function () {
 // Protected Clinical & Booking Routes
 Route::middleware(['auth:sanctum', 'throttle:api.general', 'active.clinic'])->group(function () {
     // Doctor Multi-Clinic Context & Affiliations
+    Route::put('/doctor/profile', [DoctorController::class, 'updateProfile']);
     Route::get('/doctor/stats', [DoctorController::class, 'stats']);
     Route::get('/doctor/clinics', [DoctorController::class, 'myClinics']);
     Route::get('/doctor/invitations', [\App\Http\Controllers\Api\V1\ClinicDoctorInvitationController::class, 'myInvitations']);
     Route::post('/doctor/invitations/{invitationId}/accept', [\App\Http\Controllers\Api\V1\ClinicDoctorInvitationController::class, 'accept']);
     Route::post('/doctor/invitations/{invitationId}/reject', [\App\Http\Controllers\Api\V1\ClinicDoctorInvitationController::class, 'reject']);
+
+    // Doctor Weekly Working Hours & Clinic Operating Hours (Phase 1)
+    Route::get('/doctors/{doctorId}/working-hours', [\App\Http\Controllers\Api\V1\DoctorWorkingHoursController::class, 'show']);
+    Route::put('/doctors/{doctorId}/working-hours', [\App\Http\Controllers\Api\V1\DoctorWorkingHoursController::class, 'saveDraft']);
+    Route::post('/doctors/{doctorId}/working-hours/activate', [\App\Http\Controllers\Api\V1\DoctorWorkingHoursController::class, 'activate']);
+    Route::get('/clinic/operating-hours', [\App\Http\Controllers\Api\V1\ClinicOperatingHoursController::class, 'show']);
+    Route::put('/clinic/operating-hours', [\App\Http\Controllers\Api\V1\ClinicOperatingHoursController::class, 'save']);
+
+    // Doctor Vacations (TASK-DWH-09 / DEC-VAC-01 / DEC-VAC-05)
+    Route::get('/doctor/vacations', [\App\Http\Controllers\Api\V1\DoctorVacationController::class, 'index']);
+    Route::post('/doctor/vacations', [\App\Http\Controllers\Api\V1\DoctorVacationController::class, 'store']);
+    Route::delete('/doctor/vacations/{id}', [\App\Http\Controllers\Api\V1\DoctorVacationController::class, 'destroy']);
+
+    // Clinic Reschedule Dashboard (TASK-DWH-09 / DEC-VAC-06 / DEC-GAP-03)
+    Route::get('/clinic/reschedule-dashboard/unresolved', [\App\Http\Controllers\Api\V1\ClinicRescheduleDashboardController::class, 'unresolvedAppointments']);
 
     // Booking Packages Governance (Admin / Delegated Assistant)
     Route::post('/booking-packages', [\App\Http\Controllers\Api\V1\BookingPackageController::class, 'store']);
@@ -115,6 +136,11 @@ Route::middleware(['auth:sanctum', 'throttle:api.general', 'active.clinic'])->gr
     // EHR & Patients
     Route::get('/patients', [\App\Http\Controllers\Api\V1\PatientController::class, 'index']);
     Route::get('/patients/me', [\App\Http\Controllers\Api\V1\PatientController::class, 'me']);
+    // Patient Document Sharing Management (TASK-PAR-PAT-05: DEC-P05-01..04)
+    Route::post('/patients/share-tokens', [\App\Http\Controllers\Api\V1\PatientShareTokenController::class, 'store']);
+    Route::post('/patients/share-token', [\App\Http\Controllers\Api\V1\PatientShareTokenController::class, 'store']);
+    Route::get('/patients/share-tokens', [\App\Http\Controllers\Api\V1\PatientShareTokenController::class, 'index']);
+    Route::delete('/patients/share-tokens/{id}', [\App\Http\Controllers\Api\V1\PatientShareTokenController::class, 'destroy'])->whereUuid('id');
     Route::post('/patients', [\App\Http\Controllers\Api\V1\PatientController::class, 'store']);
     Route::get('/patients/{patient}', [\App\Http\Controllers\Api\V1\PatientController::class, 'show']);
     Route::put('/patients/{patient}', [\App\Http\Controllers\Api\V1\PatientController::class, 'update']);
@@ -123,8 +149,11 @@ Route::middleware(['auth:sanctum', 'throttle:api.general', 'active.clinic'])->gr
     Route::post('/patients/{patient}/chronic-conditions', [\App\Http\Controllers\Api\V1\PatientController::class, 'addChronicCondition']);
     Route::post('/patients/{patient}/medications', [\App\Http\Controllers\Api\V1\PatientController::class, 'addMedication']);
     Route::delete('/patients/{patient}/medications/{medication}', [\App\Http\Controllers\Api\V1\PatientController::class, 'removeMedication']);
-    Route::post('/patients/{patient}/emergency-contacts', [\App\Http\Controllers\Api\V1\PatientController::class, 'addEmergencyContact']);
-    Route::post('/patients/share-token', [\App\Http\Controllers\Api\V1\PatientController::class, 'generateShareToken']);
+
+    // Patient In-App Notifications (TASK-DWH-08 / DEC-NOT-01 / DEC-GAP-04)
+    Route::get('/patient/notifications', [\App\Http\Controllers\Api\V1\PatientNotificationController::class, 'index']);
+    Route::get('/patient/notifications/{id}', [\App\Http\Controllers\Api\V1\PatientNotificationController::class, 'show']);
+    Route::post('/patient/notifications/{id}/acknowledge', [\App\Http\Controllers\Api\V1\PatientNotificationController::class, 'acknowledge']);
 
     // Clinical Visits
     Route::get('/clinical-visits', [\App\Http\Controllers\Api\V1\ClinicalVisitController::class, 'index']);

@@ -167,7 +167,10 @@ class _DoctorDashboardViewState extends State<DoctorDashboardView> {
 
     if (result case ApiSuccess(:final data)) {
       setState(() {
-        _appointments = [..._appointments, ...data.items];
+        final existingIds = _appointments.map((e) => e.id).toSet();
+        final uniqueItems =
+            data.items.where((e) => !existingIds.contains(e.id)).toList();
+        _appointments = [..._appointments, ...uniqueItems];
         _currentPage = data.currentPage;
         _lastPage = data.lastPage;
         _isLoadingMore = false;

@@ -26,18 +26,21 @@ export interface Testimonial {
   role: string;
   entity: string;
   location: string;
-  avatar: string;
+  avatar?: string;
   comment: string;
   rating: number;
+  badge?: string;
+  icon?: string;
 }
 
 export interface NewsItem {
   id: string;
   title: string;
-  date: string;
+  date?: string;
   category: string;
   categoryKey: string;
   summary: string;
-  image: string;
+  image?: string;
   readTime: string;
+  icon?: string;
 }

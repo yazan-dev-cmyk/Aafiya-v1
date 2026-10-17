@@ -37,7 +37,9 @@ import {
   Download,
   Users,
   X,
-  RefreshCw
+  RefreshCw,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 
 import { DashboardLayout } from '../ui/DashboardLayout';
@@ -50,7 +52,7 @@ import { authService, UserProfile } from '@/services/authService';
 import { appointmentService, AppointmentItem as ApiAppointmentItem } from '@/services/appointmentService';
 import { prescriptionService, PrescriptionRecord } from '@/services/prescriptionService';
 import { diagnosticService, DiagnosticOrderRecord } from '@/services/diagnosticService';
-import { ehrService, PatientRecord, ClinicalVisitRecord } from '@/services/ehrService';
+import { ehrService, PatientRecord, ClinicalVisitRecord, PatientShareTokenCreated } from '@/services/ehrService';
 import QRCode from 'react-qr-code';
 import { MedicalDocumentCode } from '../shared/MedicalDocumentCode';
 import { ChangePasswordCard } from '../shared/ChangePasswordCard';
@@ -81,6 +83,8 @@ export interface AppointmentItem {
   doctorName: string;
   specialty: string;
   clinic: string;
+  clinicId?: string;
+  doctorId?: string;
   date: string;
   time: string;
   status: 'confirmed' | 'pending' | 'completed' | 'cancelled';
@@ -89,6 +93,7 @@ export interface AppointmentItem {
   docRefNumber: string;
   secure_token?: string;
   checked_in_at?: string | null;
+  notes?: string;
 }
 
 export interface LabResultItem {
@@ -153,6 +158,16 @@ export interface DownloadLogItem {
   status: string;
 }
 
+/**
+ * Normalizes Eastern Arabic (٠-٩) and Persian/Urdu (۰-۹) numerals to ASCII 0-9 and strips non-digits.
+ */
+function normalizeDigits(value: string): string {
+  return value
+    .replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 1632))
+    .replace(/[۰-۹]/g, (d) => String(d.charCodeAt(0) - 1776))
+    .replace(/[^0-9]/g, '');
+}
+
 export function PatientDashboard({
   onBackToMainPlatform,
   onOpenDoctorDashboard,
@@ -204,9 +219,17 @@ export function PatientDashboard({
   const [selectedScanForViewer, setSelectedScanForViewer] = useState<RadResultItem | null>(null);
   const [selectedReportToShare, setSelectedReportToShare] = useState<string>('all_emr');
   const [shareDuration, setShareDuration] = useState<'24h' | '7d' | '30d'>('24h');
+  const [sharePin, setSharePin] = useState<string>('');
+  const [createdPin, setCreatedPin] = useState<string>('');
+  const [showSharePin, setShowSharePin] = useState<boolean>(false);
+  const [sharePinError, setSharePinError] = useState<string | null>(null);
+  const [shareErrorMessage, setShareErrorMessage] = useState<string | null>(null);
+  const [createdShareData, setCreatedShareData] = useState<PatientShareTokenCreated | null>(null);
   const [generatedShareUrl, setGeneratedShareUrl] = useState<string>('');
   const [isGeneratingToken, setIsGeneratingToken] = useState<boolean>(false);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [copiedToken, setCopiedToken] = useState(false);
+  const [copiedPin, setCopiedPin] = useState(false);
 
   // Live Data States
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
@@ -221,6 +244,252 @@ export function PatientDashboard({
   const [selectedAppForQr, setSelectedAppForQr] = useState<AppointmentItem | null>(null);
   const [selectedDiagnosticForQr, setSelectedDiagnosticForQr] = useState<{ id: string; order_reference?: string; secure_token?: string; order_type: string; title?: string } | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  // Cancellation Modal States (FIX-PAT-01)
+  const [cancellingAppointment, setCancellingAppointment] = useState<AppointmentItem | null>(null);
+  const [cancelReason, setCancelReason] = useState<string>('');
+  const [isCancelling, setIsCancelling] = useState<boolean>(false);
+  const [cancelError, setCancelError] = useState<string | null>(null);
+  const [cancelSuccessMessage, setCancelSuccessMessage] = useState<string | null>(null);
+
+  const handleOpenCancelModal = (app: AppointmentItem) => {
+    setCancellingAppointment(app);
+    setCancelReason('');
+    setCancelError(null);
+  };
+
+  const handleCloseCancelModal = () => {
+    if (isCancelling) return;
+    setCancellingAppointment(null);
+    setCancelReason('');
+    setCancelError(null);
+  };
+
+  const handleConfirmCancel = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!cancellingAppointment || isCancelling) return;
+
+    setIsCancelling(true);
+    setCancelError(null);
+
+    try {
+      const defaultReason = isRtl
+        ? 'إلغاء الموعد بناءً على طلب المريض'
+        : (locale === 'fr' ? 'Annulation à la demande du patient' : 'Cancelled at patient request');
+
+      const res = await appointmentService.cancelAppointment(
+        cancellingAppointment.id,
+        cancelReason.trim() || defaultReason
+      );
+
+      // Immediately update local appointments state
+      setAppointments(prev =>
+        prev.map(a => (a.id === cancellingAppointment.id ? { ...a, status: 'cancelled' } : a))
+      );
+
+      const successMsg = res?.message || (isRtl ? 'تم إلغاء الموعد بنجاح.' : (locale === 'fr' ? 'Rendez-vous annulé avec succès.' : 'Appointment cancelled successfully.'));
+      setCancelSuccessMessage(successMsg);
+      setCancellingAppointment(null);
+      setCancelReason('');
+
+      setTimeout(() => {
+        setCancelSuccessMessage(prev => (prev === successMsg ? null : prev));
+      }, 5000);
+    } catch (err: any) {
+      const errMsg = err?.message || (isRtl ? 'تعذر إلغاء الموعد. يرجى المحاولة لاحقاً.' : (locale === 'fr' ? "Échec de l'annulation. Veuillez réessayer." : 'Failed to cancel appointment. Please try again.'));
+      setCancelError(errMsg);
+    } finally {
+      setIsCancelling(false);
+    }
+  };
+
+  // Rescheduling Modal States (FIX-PAT-02)
+  const [reschedulingAppointment, setReschedulingAppointment] = useState<AppointmentItem | null>(null);
+  const [rescheduleDate, setRescheduleDate] = useState<string>('');
+  const [rescheduleSlot, setRescheduleSlot] = useState<string>('');
+  const [rescheduleNotes, setRescheduleNotes] = useState<string>('');
+  const [availableSlots, setAvailableSlots] = useState<Array<{
+    time_slot: string;
+    max_capacity: number;
+    occupied: number;
+    available: number;
+    is_available: boolean;
+  }>>([]);
+  const [isFetchingSlots, setIsFetchingSlots] = useState<boolean>(false);
+  const [slotFetchError, setSlotFetchError] = useState<string | null>(null);
+  const [isRescheduling, setIsRescheduling] = useState<boolean>(false);
+  const [rescheduleError, setRescheduleError] = useState<string | null>(null);
+  const [rescheduleSuccessMessage, setRescheduleSuccessMessage] = useState<string | null>(null);
+
+  const getTodayString = (): string => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const fetchSlotsForDate = async (clinicId?: string, doctorId?: string, date?: string) => {
+    if (!clinicId || !doctorId || !date) {
+      setAvailableSlots([]);
+      return;
+    }
+
+    setIsFetchingSlots(true);
+    setSlotFetchError(null);
+    try {
+      const res = await appointmentService.getSlots(clinicId, doctorId, date);
+      const rawSlots = res?.data?.slots || (Array.isArray(res?.data) ? res.data : []);
+      const parsedSlots = Array.isArray(rawSlots)
+        ? rawSlots.map((s: any) => ({
+            time_slot: s.time_slot,
+            max_capacity: Number(s.max_capacity) || 0,
+            occupied: Number(s.occupied) || 0,
+            available: Number(s.available) || 0,
+            is_available: Boolean(s.is_available),
+          }))
+        : [];
+      setAvailableSlots(parsedSlots);
+    } catch (err: any) {
+      console.warn('Failed to fetch available slots:', err);
+      setSlotFetchError(
+        err?.message || (isRtl ? 'تعذر جلب الفترات المتاحة لهذا اليوم.' : (locale === 'fr' ? 'Impossible de charger les créneaux pour cette date.' : 'Failed to fetch available slots for this date.'))
+      );
+      setAvailableSlots([]);
+    } finally {
+      setIsFetchingSlots(false);
+    }
+  };
+
+  const handleOpenRescheduleModal = (app: AppointmentItem) => {
+    setReschedulingAppointment(app);
+    setRescheduleError(null);
+    setRescheduleNotes(app.notes || '');
+
+    const today = getTodayString();
+    const initialDate = app.date && app.date >= today ? app.date : today;
+    setRescheduleDate(initialDate);
+    setRescheduleSlot('');
+
+    if (app.clinicId && app.doctorId) {
+      fetchSlotsForDate(app.clinicId, app.doctorId, initialDate);
+    } else {
+      setAvailableSlots([]);
+    }
+  };
+
+  const handleCloseRescheduleModal = () => {
+    if (isRescheduling) return;
+    setReschedulingAppointment(null);
+    setRescheduleDate('');
+    setRescheduleSlot('');
+    setRescheduleNotes('');
+    setRescheduleError(null);
+    setSlotFetchError(null);
+    setAvailableSlots([]);
+  };
+
+  const handleDateChange = (newDate: string) => {
+    setRescheduleDate(newDate);
+    setRescheduleSlot('');
+    setRescheduleError(null);
+    if (reschedulingAppointment?.clinicId && reschedulingAppointment?.doctorId && newDate) {
+      fetchSlotsForDate(reschedulingAppointment.clinicId, reschedulingAppointment.doctorId, newDate);
+    }
+  };
+
+  const handleConfirmReschedule = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (
+      !reschedulingAppointment ||
+      isRescheduling ||
+      !rescheduleDate ||
+      !rescheduleSlot
+    ) {
+      return;
+    }
+
+    // Prevent no-op submission
+    if (
+      rescheduleDate === reschedulingAppointment.date &&
+      rescheduleSlot === reschedulingAppointment.time
+    ) {
+      setRescheduleError(
+        isRtl
+          ? 'التاريخ والفترة المحددة مطابقة لموعدك الحالي بالفعل.'
+          : (locale === 'fr'
+              ? 'La date et le créneau sélectionnés sont identiques à votre rendez-vous actuel.'
+              : 'Selected date and time slot are identical to your current appointment.')
+      );
+      return;
+    }
+
+    setIsRescheduling(true);
+    setRescheduleError(null);
+
+    try {
+      const res = await appointmentService.rescheduleAppointment(
+        reschedulingAppointment.id,
+        {
+          appointment_date: rescheduleDate,
+          time_slot: rescheduleSlot,
+          notes: rescheduleNotes.trim() || undefined,
+        }
+      );
+
+      const updatedDate = res?.data?.appointment_date || rescheduleDate;
+      const updatedSlot = res?.data?.time_slot || rescheduleSlot;
+      const updatedNotes = res?.data?.notes || (rescheduleNotes.trim() || reschedulingAppointment.notes);
+
+      // Immediately update local appointments state with the verified server response
+      setAppointments(prev =>
+        prev.map(a =>
+          a.id === reschedulingAppointment.id
+            ? {
+                ...a,
+                date: updatedDate,
+                time: updatedSlot,
+                notes: updatedNotes,
+                preparationInstructions: updatedNotes ? [updatedNotes] : a.preparationInstructions,
+              }
+            : a
+        )
+      );
+
+      const successMsg =
+        res?.message ||
+        (isRtl
+          ? 'تمت إعادة جدولة الموعد الطبي بنجاح.'
+          : (locale === 'fr'
+              ? 'Rendez-vous médical reprogrammé avec succès.'
+              : 'Medical appointment rescheduled successfully.'));
+      setRescheduleSuccessMessage(successMsg);
+      handleCloseRescheduleModal();
+
+      setTimeout(() => {
+        setRescheduleSuccessMessage(prev => (prev === successMsg ? null : prev));
+      }, 6000);
+    } catch (err: any) {
+      console.warn('Reschedule appointment error:', err);
+      let errMsg = err?.message;
+      if (err?.errors) {
+        const errorKeys = Object.keys(err.errors);
+        if (errorKeys.length > 0 && Array.isArray(err.errors[errorKeys[0]]) && err.errors[errorKeys[0]].length > 0) {
+          errMsg = err.errors[errorKeys[0]][0];
+        }
+      }
+      if (!errMsg) {
+        errMsg = isRtl
+          ? 'تعذر إعادة جدولة الموعد. يرجى اختيار موعد آخر أو المحاولة لاحقاً.'
+          : (locale === 'fr'
+              ? 'Échec de la reprogrammation. Veuillez choisir un autre créneau.'
+              : 'Failed to reschedule appointment. Please select another slot or try again.');
+      }
+      setRescheduleError(errMsg);
+    } finally {
+      setIsRescheduling(false);
+    }
+  };
 
   // Fetch real patient data on mount
   useEffect(() => {
@@ -263,6 +532,8 @@ export function PatientDashboard({
                 doctorName: app.doctor?.name || app.doctor?.user?.name || (isRtl ? 'د. الطبيب المعالج' : 'Attending Doctor'),
                 specialty: app.doctor?.specialty || (isRtl ? 'الطب العام' : 'General Practice'),
                 clinic: app.clinic ? `${app.clinic.name} (${app.clinic.wilaya})` : (isRtl ? 'العيادة التخصصية' : 'Specialized Clinic'),
+                clinicId: app.clinic_id || app.clinic?.id,
+                doctorId: app.doctor_id || app.doctor?.id,
                 date: app.appointment_date,
                 time: app.time_slot,
                 status: mappedStatus,
@@ -270,6 +541,7 @@ export function PatientDashboard({
                 docRefNumber: app.booking_reference,
                 secure_token: app.secure_token,
                 checked_in_at: app.checked_in_at,
+                notes: app.notes,
                 preparationInstructions: app.notes ? [app.notes] : undefined
               };
             });
@@ -418,33 +690,96 @@ export function PatientDashboard({
     };
   }, [rxCurrentPage, isRtl]);
 
-  const handleCopyShareLink = async () => {
-    setIsGeneratingToken(true);
-    try {
-      const isAllEmr = selectedReportToShare === 'all_emr';
-      const resourceType = !isAllEmr ? (selectedReportToShare.startsWith('lab-') ? 'lab' : 'radiology') : undefined;
-      const resourceId = !isAllEmr ? selectedReportToShare.replace(/^(lab|rad)-/, '') : undefined;
+  const validateSharePin = (pin: string): string | null => {
+    const clean = normalizeDigits(pin);
+    if (!clean) {
+      return isRtl
+        ? 'رمز الحماية PIN إلزامي لإنشاء رابط المشاركة'
+        : (locale === 'fr'
+          ? 'Le code PIN est obligatoire pour générer le lien de partage'
+          : 'Security PIN is required to generate a share link');
+    }
+    if (!/^[0-9]{4,8}$/.test(clean)) {
+      return isRtl
+        ? 'يجب أن يتكون رمز الحماية PIN من 4 إلى 8 أرقام فقط'
+        : (locale === 'fr'
+          ? 'Le code PIN doit comporter entre 4 et 8 chiffres uniquement'
+          : 'Security PIN must be between 4 and 8 digits only');
+    }
+    return null;
+  };
 
+  const handleCopyShareLink = async () => {
+    const cleanPin = normalizeDigits(sharePin);
+    const pinErr = validateSharePin(cleanPin);
+    if (pinErr) {
+      setSharePinError(pinErr);
+      return;
+    }
+    setSharePinError(null);
+    setShareErrorMessage(null);
+    setCreatedPin('');
+    setIsGeneratingToken(true);
+
+    try {
       const res = await ehrService.generateShareToken({
-        scope: isAllEmr ? 'all_emr' : 'single_report',
-        resource_type: resourceType,
-        resource_id: resourceId,
+        scope: 'all_emr',
         duration: shareDuration,
+        pin: cleanPin,
       });
 
       if (res.data?.share_url) {
+        setCreatedPin(cleanPin);
+        setCreatedShareData(res.data);
         setGeneratedShareUrl(res.data.share_url);
         if (typeof navigator !== 'undefined' && navigator.clipboard) {
-          await navigator.clipboard.writeText(res.data.share_url);
+          try {
+            await navigator.clipboard.writeText(res.data.share_url);
+            setCopiedLink(true);
+            setTimeout(() => setCopiedLink(false), 3000);
+          } catch {
+            // Clipboard fallback
+          }
         }
-        setCopiedLink(true);
-        setTimeout(() => setCopiedLink(false), 3000);
+      } else {
+        throw new Error(isRtl ? 'استجابة غير متوقعة من الخادم' : 'Unexpected server response');
       }
     } catch (err: any) {
-      alert(err?.message || (isRtl ? 'حدث خطأ أثناء إنشاء رابط المشاركة المشفر' : 'Failed to generate encrypted share token'));
+      const serverMsg = err?.errors?.pin?.[0] || err?.errors?.scope?.[0] || err?.message;
+      setShareErrorMessage(serverMsg || (isRtl ? 'حدث خطأ أثناء إنشاء رابط المشاركة المشفر' : 'Failed to generate encrypted share token'));
     } finally {
       setIsGeneratingToken(false);
     }
+  };
+
+  const handleCopyField = async (text: string, type: 'url' | 'token' | 'pin') => {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      try {
+        await navigator.clipboard.writeText(text);
+        if (type === 'url') {
+          setCopiedLink(true);
+          setTimeout(() => setCopiedLink(false), 3000);
+        } else if (type === 'token') {
+          setCopiedToken(true);
+          setTimeout(() => setCopiedToken(false), 3000);
+        } else if (type === 'pin') {
+          setCopiedPin(true);
+          setTimeout(() => setCopiedPin(false), 3000);
+        }
+      } catch {
+        // Clipboard fallback
+      }
+    }
+  };
+
+  const handleResetShare = () => {
+    setCreatedShareData(null);
+    setGeneratedShareUrl('');
+    setSharePin('');
+    setCreatedPin('');
+    setShowSharePin(false);
+    setSharePinError(null);
+    setShareErrorMessage(null);
   };
 
   const handleSimulateDownload = (fileName: string, type: 'LAB' | 'RAD' | 'RX' | 'VISIT' | 'PASS' = 'LAB') => {
@@ -855,6 +1190,40 @@ export function PatientDashboard({
               </Button>
             </div>
 
+            {cancelSuccessMessage && (
+              <div className="bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-2xl p-4 flex items-center justify-between gap-3 shadow-xs animate-in fade-in">
+                <div className="flex items-center gap-2.5">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+                  <p className="text-xs font-black">{cancelSuccessMessage}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setCancelSuccessMessage(null)}
+                  className="text-emerald-700 hover:text-emerald-950 p-1 cursor-pointer"
+                  aria-label="Dismiss"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+
+            {rescheduleSuccessMessage && (
+              <div className="bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-2xl p-4 flex items-center justify-between gap-3 shadow-xs animate-in fade-in">
+                <div className="flex items-center gap-2.5">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+                  <p className="text-xs font-black">{rescheduleSuccessMessage}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setRescheduleSuccessMessage(null)}
+                  className="text-emerald-700 hover:text-emerald-950 p-1 cursor-pointer"
+                  aria-label="Dismiss"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+
             {appointments.length === 0 ? (
               <div className="py-16 text-center text-slate-500 bg-slate-50 rounded-[32px] border border-slate-100">
                 <Calendar className="w-12 h-12 text-slate-300 mx-auto mb-3" />
@@ -889,8 +1258,8 @@ export function PatientDashboard({
                           <p className="text-[10px] text-slate-400 font-black uppercase">{isRtl ? 'التاريخ والوقت' : 'Date & Time'}</p>
                           <p className="text-sm font-black text-slate-900">{app.date} • {app.time}</p>
                         </div>
-                        <Badge variant={app.status === 'confirmed' ? 'success' : (app.status === 'completed' ? 'neutral' : 'info')} className="px-4 py-2">
-                          {app.status === 'confirmed' ? (isRtl ? 'مؤكد 🟢' : 'Confirmed 🟢') : (app.status === 'completed' ? (isRtl ? 'مكتمل' : 'Completed') : (isRtl ? 'في انتظار تأكيد الطبيب/المساعد ⏳' : 'Pending Doctor/Assistant Confirmation ⏳'))}
+                        <Badge variant={app.status === 'confirmed' ? 'success' : (app.status === 'completed' ? 'neutral' : (app.status === 'cancelled' ? 'error' : 'info'))} className="px-4 py-2">
+                          {app.status === 'confirmed' ? (isRtl ? 'مؤكد 🟢' : 'Confirmed 🟢') : (app.status === 'completed' ? (isRtl ? 'مكتمل' : 'Completed') : (app.status === 'cancelled' ? (isRtl ? 'ملغى 🔴' : 'Cancelled 🔴') : (isRtl ? 'في انتظار تأكيد الطبيب/المساعد ⏳' : 'Pending Doctor/Assistant Confirmation ⏳')))}
                         </Badge>
                       </div>
                     </div>
@@ -918,12 +1287,29 @@ export function PatientDashboard({
                         {t('appointments.viewPass')}
                       </Button>
                       <div className="flex items-center gap-2">
-                        <Button variant="ghost" className="text-slate-500" onClick={() => alert('الخاصية معطلة حاليًا، قد يتم تفعيلها لاحقًا')}>
-                          {t('appointments.reschedule')}
-                        </Button>
-                        <Button variant="ghost" className="text-rose-600" onClick={() => alert(isRtl ? 'يرجى تأكيد طلب الإلغاء.' : 'Please confirm cancellation.')}>
-                          {t('appointments.cancel')}
-                        </Button>
+                        {app.status !== 'cancelled' && app.status !== 'completed' && (
+                          <>
+                            <Button
+                              variant="ghost"
+                              className="text-slate-600 hover:text-teal-700 hover:bg-teal-50"
+                              onClick={() => handleOpenRescheduleModal(app)}
+                            >
+                              {t('appointments.reschedule')}
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              className="text-rose-600 hover:text-rose-700 hover:bg-rose-50"
+                              onClick={() => handleOpenCancelModal(app)}
+                            >
+                              {t('appointments.cancel')}
+                            </Button>
+                          </>
+                        )}
+                        {app.status === 'cancelled' && (
+                          <span className="text-xs font-bold text-rose-600 bg-rose-50 px-3 py-1.5 rounded-xl border border-rose-100">
+                            {isRtl ? 'تم إلغاء هذا الموعد' : (locale === 'fr' ? 'Ce rendez-vous est annulé' : 'This appointment was cancelled')}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -1603,12 +1989,12 @@ export function PatientDashboard({
                 </p>
               </div>
 
-              {/* Granular Document Sharing Tool */}
+              {/* Encrypted Medical Record Sharing Tool (DEC-P05-01, DEC-P05-03) */}
               <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-200 pb-2">
                   <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
                     <Share2 className="w-4 h-4 text-teal-600" />
-                    {isRtl ? 'مشاركة تقرير فردي محدد مع طبيب استشاري خارجي' : 'Share Specific Report with External Doctor'}
+                    {isRtl ? 'مشاركة السجل الطبي المشفر (رمز PIN إلزامي)' : (locale === 'fr' ? 'Partage sécurisé du dossier médical (Code PIN obligatoire)' : 'Encrypted Medical Record Sharing (PIN Required)')}
                   </h3>
                   <span className="bg-teal-100 text-teal-900 text-[10px] font-bold px-2 py-0.5 rounded font-mono">
                     SECURE TOKEN
@@ -1616,53 +2002,195 @@ export function PatientDashboard({
                 </div>
 
                 <p className="text-xs text-slate-600">
-                  {isRtl ? 'تسمح لك هذه الخاصية بإنشاء رابط مؤقت آمن لمشاركة تقرير واحد محدد فقط دون إتاحة الوصول لكامل ملفك الطبي.' : 'Create a temporary single-document access token without exposing your entire medical record.'}
+                  {isRtl ? 'تسمح لك هذه الخاصية بإنشاء رابط مشفر ومحمي برمز PIN لمشاركة سجلك الطبي الموحد بأمان مع طبيب معالج أو جهة استشارية وفق القرار DEC-P05-01.' : (locale === 'fr' ? 'Générez un lien chiffré protégé par code PIN pour partager votre dossier médical unifié en toute sécurité selon DEC-P05-01.' : 'Generate a secure encrypted link protected by PIN to share your unified medical record with consulting providers per DEC-P05-01.')}
                 </p>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                  <div>
-                    <label className="font-bold text-slate-700 block mb-1">{isRtl ? 'اختر التقرير المراد مشاركته:' : 'Select Report to Share:'}</label>
-                    <select
-                      value={selectedReportToShare}
-                      onChange={(e) => setSelectedReportToShare(e.target.value)}
-                      className="w-full bg-white border border-slate-300 text-slate-900 rounded-xl px-3 py-2 focus:outline-none focus:border-teal-600"
-                    >
-                      <option value="all_emr">{isRtl ? 'الملف الطبي الموحد بالكامل (حالة خاصة)' : 'Full Unified EMR Record'}</option>
-                      {labResults.map(l => (
-                        <option key={l.id} value={`lab-${l.id}`}>{l.testNameAr} ({l.date})</option>
-                      ))}
-                      {radResults.map(r => (
-                        <option key={r.id} value={`rad-${r.id}`}>{r.scanNameAr} ({r.date})</option>
-                      ))}
-                    </select>
-                  </div>
+                {!createdShareData ? (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                      <div>
+                        <label className="font-bold text-slate-700 block mb-1">
+                          {isRtl ? 'نطاق المشاركة المعتمد:' : (locale === 'fr' ? 'Portée autorisée :' : 'Authorized Scope:')}
+                        </label>
+                        <div className="w-full bg-slate-100 border border-slate-300 text-slate-800 rounded-xl px-3 py-2 font-medium">
+                          {isRtl ? 'الملف الطبي الموحد (all_emr)' : (locale === 'fr' ? 'Dossier unifié (all_emr)' : 'Full Unified EMR (all_emr)')}
+                        </div>
+                      </div>
 
-                  <div>
-                    <label className="font-bold text-slate-700 block mb-1">{isRtl ? 'صلاحية رابط المشاركة:' : 'Token Expiry Duration:'}</label>
-                    <select
-                      value={shareDuration}
-                      onChange={(e) => setShareDuration(e.target.value as any)}
-                      className="w-full bg-white border border-slate-300 text-slate-900 rounded-xl px-3 py-2 focus:outline-none focus:border-teal-600"
-                    >
-                      <option value="24h">{isRtl ? '24 ساعة (مستحسن للزيارات السريعة)' : '24 Hours (Recommended)'}</option>
-                      <option value="7d">{isRtl ? '7 أيام (للاستشارات الممتدة)' : '7 Days'}</option>
-                      <option value="30d">{isRtl ? '30 يوماً' : '30 Days'}</option>
-                    </select>
-                  </div>
-                </div>
+                      <div>
+                        <label className="font-bold text-slate-700 block mb-1">
+                          {isRtl ? 'صلاحية رابط المشاركة:' : (locale === 'fr' ? 'Durée de validité :' : 'Token Expiry Duration:')}
+                        </label>
+                        <select
+                          value={shareDuration}
+                          onChange={(e) => setShareDuration(e.target.value as any)}
+                          className="w-full bg-white border border-slate-300 text-slate-900 rounded-xl px-3 py-2 focus:outline-none focus:border-teal-600 font-medium"
+                        >
+                          <option value="24h">{isRtl ? '24 ساعة (مستحسن للزيارات السريعة)' : (locale === 'fr' ? '24 heures (recommandé)' : '24 Hours (Recommended)')}</option>
+                          <option value="7d">{isRtl ? '7 أيام (للاستشارات الممتدة)' : (locale === 'fr' ? '7 jours' : '7 Days')}</option>
+                          <option value="30d">{isRtl ? '30 يوماً' : (locale === 'fr' ? '30 jours' : '30 Days')}</option>
+                        </select>
+                      </div>
 
-                <div className="bg-white border border-slate-300 p-3 rounded-xl flex items-center justify-between text-xs font-mono">
-                  <span className="text-slate-600 truncate">
-                    {generatedShareUrl || `https://aafiya.health/api/v1/shared-records/sh_sec_${patientMrn.toLowerCase()}-${selectedReportToShare}`}
-                  </span>
-                  <button
-                    onClick={handleCopyShareLink}
-                    disabled={isGeneratingToken}
-                    className="bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs px-3 py-1.5 rounded-lg transition-colors cursor-pointer shrink-0 ml-2 disabled:opacity-50"
-                  >
-                    {isGeneratingToken ? (isRtl ? 'جارٍ التوليد...' : 'Generating...') : copiedLink ? (isRtl ? 'تم النسخ! ✓' : 'Copied! ✓') : (isRtl ? 'توليد ونسخ الرابط المشفر' : 'Generate & Copy Link')}
-                  </button>
-                </div>
+                      <div>
+                        <label className="font-bold text-slate-700 block mb-1">
+                          {isRtl ? 'رمز الحماية PIN (4-8 أرقام):' : (locale === 'fr' ? 'Code PIN (4-8 chiffres) :' : 'Security PIN (4-8 digits):')}
+                        </label>
+                        <div className="relative">
+                          <input
+                            type={showSharePin ? 'text' : 'password'}
+                            inputMode="numeric"
+                            maxLength={8}
+                            value={sharePin}
+                            onChange={(e) => {
+                              const v = normalizeDigits(e.target.value);
+                              setSharePin(v);
+                              if (sharePinError) setSharePinError(null);
+                            }}
+                            placeholder={isRtl ? '4 إلى 8 أرقام' : (locale === 'fr' ? '4 à 8 chiffres' : '4 to 8 digits')}
+                            className={`w-full bg-white border ${sharePinError ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-300'} text-slate-900 rounded-xl px-3 py-2 ${isRtl ? 'pl-10 pr-3' : 'pr-10 pl-3'} focus:outline-none focus:border-teal-600 font-mono tracking-widest text-center`}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowSharePin((prev) => !prev)}
+                            className={`absolute ${isRtl ? 'left-2.5' : 'right-2.5'} top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 rounded-lg transition-colors cursor-pointer`}
+                            title={isRtl ? (showSharePin ? 'إخفاء رمز PIN' : 'إظهار رمز PIN') : (locale === 'fr' ? (showSharePin ? 'Masquer le code PIN' : 'Afficher le code PIN') : (showSharePin ? 'Hide PIN' : 'Show PIN'))}
+                            aria-label={isRtl ? (showSharePin ? 'إخفاء رمز PIN' : 'إظهار رمز PIN') : (locale === 'fr' ? (showSharePin ? 'Masquer le code PIN' : 'Afficher le code PIN') : (showSharePin ? 'Hide PIN' : 'Show PIN'))}
+                          >
+                            {showSharePin ? (
+                              <EyeOff className="w-4 h-4" />
+                            ) : (
+                              <Eye className="w-4 h-4" />
+                            )}
+                          </button>
+                        </div>
+                        {sharePinError && (
+                          <p className="text-[11px] text-red-600 font-bold mt-1">{sharePinError}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    {shareErrorMessage && (
+                      <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl text-xs flex items-center gap-2">
+                        <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+                        <span>{shareErrorMessage}</span>
+                      </div>
+                    )}
+
+                    <div className="flex justify-end pt-1">
+                      <button
+                        onClick={handleCopyShareLink}
+                        disabled={isGeneratingToken}
+                        className="bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition-colors cursor-pointer flex items-center gap-2 shadow-xs disabled:opacity-50"
+                      >
+                        {isGeneratingToken ? (
+                          <>
+                            <RefreshCw className="w-4 h-4 animate-spin" />
+                            <span>{isRtl ? 'جارٍ إنشاء الرابط المشفر...' : (locale === 'fr' ? 'Génération en cours...' : 'Generating Link...')}</span>
+                          </>
+                        ) : (
+                          <>
+                            <Share2 className="w-4 h-4" />
+                            <span>{isRtl ? 'إنشاء رابط المشاركة المشفر' : (locale === 'fr' ? 'Générer le lien chiffré' : 'Generate Encrypted Link')}</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-white border border-emerald-200 rounded-xl p-5 space-y-4">
+                    <div className="flex items-center justify-between border-b border-emerald-100 pb-3">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                        <h4 className="text-sm font-bold text-emerald-950">
+                          {isRtl ? 'تم إنشاء رابط المشاركة المشفر بنجاح' : (locale === 'fr' ? 'Lien de partage chiffré généré avec succès' : 'Encrypted Share Link Generated Successfully')}
+                        </h4>
+                      </div>
+                      <button
+                        onClick={handleResetShare}
+                        className="text-xs text-teal-600 hover:text-teal-800 font-bold underline cursor-pointer"
+                      >
+                        {isRtl ? 'إنشاء مشاركة جديدة' : (locale === 'fr' ? 'Nouveau partage' : 'Create New Share')}
+                      </button>
+                    </div>
+
+                    <div className="bg-amber-50 border border-amber-200 p-3.5 rounded-xl text-xs text-amber-900 flex items-start gap-2.5">
+                      <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                      <div>
+                        <span className="font-bold block mb-0.5">
+                          {isRtl ? 'تنبيه أمني هام:' : (locale === 'fr' ? 'Avis de sécurité important :' : 'Important Security Notice:')}
+                        </span>
+                        <span>
+                          {isRtl
+                            ? 'لن يتم عرض رمز التوكن أو رمز الحماية PIN مجدداً بعد مغادرة هذه الشاشة. يرجى نسخهما ومشاركتهما مع الطبيب الآن عبر وسيلة آمنة.'
+                            : (locale === 'fr'
+                              ? 'Le jeton et le code PIN ne seront plus jamais réaffichés après avoir quitté. Veuillez les copier et les transmettre maintenant.'
+                              : 'The token and PIN will not be displayed again after leaving this view. Please copy and share them with the recipient now via a secure channel.')}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3 text-xs">
+                      <div>
+                        <label className="font-bold text-slate-700 block mb-1">
+                          {isRtl ? 'رابط المشاركة المشفر:' : (locale === 'fr' ? 'Lien de partage chiffré :' : 'Encrypted Share URL:')}
+                        </label>
+                        <div className="bg-slate-50 border border-slate-300 p-2.5 rounded-xl flex items-center justify-between font-mono">
+                          <span className="text-slate-800 truncate text-[11px] select-all mr-2">
+                            {createdShareData.share_url}
+                          </span>
+                          <button
+                            onClick={() => handleCopyField(createdShareData.share_url, 'url')}
+                            className="bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs px-3 py-1.5 rounded-lg transition-colors cursor-pointer shrink-0"
+                          >
+                            {copiedLink ? (isRtl ? 'تم النسخ! ✓' : 'Copied! ✓') : (isRtl ? 'نسخ الرابط' : 'Copy Link')}
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                        <div>
+                          <label className="font-bold text-slate-700 block mb-1">
+                            {isRtl ? 'رمز الحماية PIN:' : (locale === 'fr' ? 'Code PIN de sécurité :' : 'Security PIN:')}
+                          </label>
+                          <div className="bg-slate-50 border border-slate-300 p-2.5 rounded-xl flex items-center justify-between font-mono">
+                            <span className="text-slate-900 font-bold text-sm tracking-widest select-all">
+                              {createdPin}
+                            </span>
+                            <button
+                              onClick={() => handleCopyField(createdPin, 'pin')}
+                              className="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+                            >
+                              {copiedPin ? (isRtl ? 'تم! ✓' : 'Copied! ✓') : (isRtl ? 'نسخ PIN' : 'Copy PIN')}
+                            </button>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="font-bold text-slate-700 block mb-1">
+                            {isRtl ? 'رمز التوكن (Token):' : (locale === 'fr' ? 'Jeton de partage (Token) :' : 'Share Token:')}
+                          </label>
+                          <div className="bg-slate-50 border border-slate-300 p-2.5 rounded-xl flex items-center justify-between font-mono">
+                            <span className="text-slate-800 truncate text-[11px] select-all mr-2">
+                              {createdShareData.token}
+                            </span>
+                            <button
+                              onClick={() => handleCopyField(createdShareData.token, 'token')}
+                              className="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs px-3 py-1.5 rounded-lg transition-colors cursor-pointer shrink-0"
+                            >
+                              {copiedToken ? (isRtl ? 'تم! ✓' : 'Copied! ✓') : (isRtl ? 'نسخ Token' : 'Copy Token')}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="text-[11px] text-slate-500 pt-1">
+                        <span className="font-bold">{isRtl ? 'صالح حتى:' : (locale === 'fr' ? 'Valable jusqu\'au :' : 'Expires at:')} </span>
+                        <span>{new Date(createdShareData.expires_at).toLocaleString(locale === 'ar' ? 'ar-DZ' : (locale === 'fr' ? 'fr-FR' : 'en-US'))}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Download Audit History Log */}
@@ -2002,12 +2530,15 @@ export function PatientDashboard({
         </div>
       )}
 
-      {/* SHARE REPORT MODAL */}
+      {/* SHARE REPORT MODAL (DEC-P05-01, DEC-P05-03) */}
       {showShareModal && (
         <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full space-y-5 shadow-2xl relative animate-in fade-in zoom-in duration-200">
             <button
-              onClick={() => setShowShareModal(false)}
+              onClick={() => {
+                setShowShareModal(false);
+                handleResetShare();
+              }}
               className="absolute top-4 left-4 p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full cursor-pointer"
             >
               <X className="w-5 h-5" />
@@ -2016,50 +2547,186 @@ export function PatientDashboard({
             <div className="space-y-1">
               <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
                 <Share2 className="w-5 h-5 text-teal-600" />
-                {isRtl ? 'مشاركة تقرير طبي مع طبيب خارجي' : 'Share Medical Report'}
+                {isRtl ? 'مشاركة السجل الطبي المشفر' : (locale === 'fr' ? 'Partager le dossier médical chiffré' : 'Share Encrypted Medical Record')}
               </h3>
               <p className="text-xs text-slate-500">
-                {isRtl ? 'إنشاء رابط أو رمز QR للوصول المؤقت لتقرير واحد فقط دون كشف باقي السجل' : 'Generate a temporary single-report access link'}
+                {isRtl ? 'إنشاء رابط مشفر ومحمي برمز PIN لمشاركة سجلك الطبي بأمان وفق القرار DEC-P05-01' : (locale === 'fr' ? 'Générer un lien chiffré protégé par PIN selon DEC-P05-01' : 'Generate an encrypted PIN-protected share link per DEC-P05-01')}
               </p>
             </div>
 
-            <div className="space-y-3 text-xs">
-              <div>
-                <label className="font-bold text-slate-700 block mb-1">{isRtl ? 'حدد التقرير المراد مشاركته:' : 'Select Report:'}</label>
-                <select className="w-full bg-slate-50 border border-slate-300 text-slate-900 p-2.5 rounded-xl font-medium">
-                  <option value="all_emr">{isRtl ? 'الملف الطبي الموحد' : 'Full Medical Record'}</option>
-                  {labResults.map(l => (
-                    <option key={l.id} value={`lab-${l.id}`}>{l.testNameAr} ({l.date})</option>
-                  ))}
-                  {radResults.map(r => (
-                    <option key={r.id} value={`rad-${r.id}`}>{r.scanNameAr} ({r.date})</option>
-                  ))}
-                </select>
-              </div>
+            {!createdShareData ? (
+              <div className="space-y-3 text-xs">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">
+                    {isRtl ? 'نطاق المشاركة المعتمد:' : (locale === 'fr' ? 'Portée autorisée :' : 'Authorized Scope:')}
+                  </label>
+                  <div className="w-full bg-slate-100 border border-slate-300 text-slate-800 rounded-xl px-3 py-2 font-medium">
+                    {isRtl ? 'الملف الطبي الموحد (all_emr)' : (locale === 'fr' ? 'Dossier unifié (all_emr)' : 'Full Unified EMR (all_emr)')}
+                  </div>
+                </div>
 
-              <div className="bg-amber-50 border border-amber-200 p-3 rounded-xl text-[11px] text-amber-900">
-                {isRtl ? '🔒 تنبيه: ينتهي هذا الرابط تلقائياً بعد 24 ساعة لضمان أمان خصوصيتك الطبية.' : '🔒 Security notice: This token expires automatically in 24 hours.'}
-              </div>
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">
+                    {isRtl ? 'صلاحية رابط المشاركة:' : (locale === 'fr' ? 'Durée de validité :' : 'Token Expiry Duration:')}
+                  </label>
+                  <select
+                    value={shareDuration}
+                    onChange={(e) => setShareDuration(e.target.value as any)}
+                    className="w-full bg-white border border-slate-300 text-slate-900 rounded-xl px-3 py-2 focus:outline-none focus:border-teal-600 font-medium"
+                  >
+                    <option value="24h">{isRtl ? '24 ساعة (مستحسن للزيارات السريعة)' : (locale === 'fr' ? '24 heures (recommandé)' : '24 Hours (Recommended)')}</option>
+                    <option value="7d">{isRtl ? '7 أيام (للاستشارات الممتدة)' : (locale === 'fr' ? '7 jours' : '7 Days')}</option>
+                    <option value="30d">{isRtl ? '30 يوماً' : (locale === 'fr' ? '30 jours' : '30 Days')}</option>
+                  </select>
+                </div>
 
-              <div className="bg-slate-100 p-3 rounded-xl font-mono text-[11px] text-slate-700 break-all">
-                https://aafiya.health/share/{patientMrn.toLowerCase()}-{selectedReportToShare}
-              </div>
-            </div>
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">
+                    {isRtl ? 'رمز الحماية PIN (إلزامي، 4 إلى 8 أرقام):' : (locale === 'fr' ? 'Code PIN (obligatoire, 4 à 8 chiffres) :' : 'Security PIN (Required, 4 to 8 digits):')}
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showSharePin ? 'text' : 'password'}
+                      inputMode="numeric"
+                      maxLength={8}
+                      value={sharePin}
+                      onChange={(e) => {
+                        const v = normalizeDigits(e.target.value);
+                        setSharePin(v);
+                        if (sharePinError) setSharePinError(null);
+                      }}
+                      placeholder={isRtl ? '4 إلى 8 أرقام' : (locale === 'fr' ? '4 à 8 chiffres' : '4 to 8 digits')}
+                      className={`w-full bg-white border ${sharePinError ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-300'} text-slate-900 rounded-xl px-3 py-2 ${isRtl ? 'pl-10 pr-3' : 'pr-10 pl-3'} focus:outline-none focus:border-teal-600 font-mono tracking-widest text-center`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowSharePin((prev) => !prev)}
+                      className={`absolute ${isRtl ? 'left-2.5' : 'right-2.5'} top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 rounded-lg transition-colors cursor-pointer`}
+                      title={isRtl ? (showSharePin ? 'إخفاء رمز PIN' : 'إظهار رمز PIN') : (locale === 'fr' ? (showSharePin ? 'Masquer le code PIN' : 'Afficher le code PIN') : (showSharePin ? 'Hide PIN' : 'Show PIN'))}
+                      aria-label={isRtl ? (showSharePin ? 'إخفاء رمز PIN' : 'إظهار رمز PIN') : (locale === 'fr' ? (showSharePin ? 'Masquer le code PIN' : 'Afficher le code PIN') : (showSharePin ? 'Hide PIN' : 'Show PIN'))}
+                    >
+                      {showSharePin ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
+                  {sharePinError && (
+                    <p className="text-[11px] text-red-600 font-bold mt-1">{sharePinError}</p>
+                  )}
+                </div>
 
-            <div className="flex gap-2 pt-2">
-              <button
-                onClick={handleCopyShareLink}
-                className="flex-1 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs py-2.5 rounded-xl cursor-pointer shadow-xs text-center"
-              >
-                {copiedLink ? (isRtl ? 'تم النسخ! ✓' : 'Copied! ✓') : (isRtl ? 'نسخ رابط المشاركة' : 'Copy Link')}
-              </button>
-              <button
-                onClick={() => setShowShareModal(false)}
-                className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs px-4 py-2.5 rounded-xl cursor-pointer"
-              >
-                {isRtl ? 'إلغاء' : 'Cancel'}
-              </button>
-            </div>
+                {shareErrorMessage && (
+                  <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl text-[11px] flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+                    <span>{shareErrorMessage}</span>
+                  </div>
+                )}
+
+                <div className="flex gap-2 pt-2">
+                  <button
+                    onClick={handleCopyShareLink}
+                    disabled={isGeneratingToken}
+                    className="flex-1 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs py-2.5 rounded-xl cursor-pointer shadow-xs text-center flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    {isGeneratingToken ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        <span>{isRtl ? 'جارٍ الإنشاء...' : (locale === 'fr' ? 'Génération...' : 'Generating...')}</span>
+                      </>
+                    ) : (
+                      <span>{isRtl ? 'إنشاء رابط المشاركة' : (locale === 'fr' ? 'Générer le lien' : 'Generate Link')}</span>
+                    )}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowShareModal(false);
+                      handleResetShare();
+                    }}
+                    className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs px-4 py-2.5 rounded-xl cursor-pointer"
+                  >
+                    {isRtl ? 'إلغاء' : (locale === 'fr' ? 'Annuler' : 'Cancel')}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4 text-xs">
+                <div className="bg-emerald-50 border border-emerald-200 text-emerald-900 p-3 rounded-xl flex items-center gap-2">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+                  <span className="font-bold">
+                    {isRtl ? 'تم إنشاء رابط المشاركة المشفر بنجاح' : (locale === 'fr' ? 'Lien généré avec succès' : 'Link Generated Successfully')}
+                  </span>
+                </div>
+
+                <div className="bg-amber-50 border border-amber-200 p-3 rounded-xl text-[11px] text-amber-900">
+                  <p className="font-bold mb-1">
+                    {isRtl ? 'تنبيه أمني هام:' : (locale === 'fr' ? 'Avis de sécurité :' : 'Important Notice:')}
+                  </p>
+                  <p>
+                    {isRtl
+                      ? 'لن يتم عرض رمز التوكن أو PIN مجدداً. يرجى نسخهما ومشاركتهما مع الطبيب الآن.'
+                      : (locale === 'fr'
+                        ? 'Le jeton et le PIN ne seront plus jamais réaffichés. Copiez-les maintenant.'
+                        : 'The token and PIN will not be displayed again. Please copy them now.')}
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <div>
+                    <label className="font-bold text-slate-700 block mb-1">
+                      {isRtl ? 'رابط المشاركة:' : (locale === 'fr' ? 'Lien de partage :' : 'Share URL:')}
+                    </label>
+                    <div className="bg-slate-100 p-2.5 rounded-xl font-mono text-[11px] text-slate-800 flex items-center justify-between">
+                      <span className="truncate mr-2 select-all">{createdShareData.share_url}</span>
+                      <button
+                        onClick={() => handleCopyField(createdShareData.share_url, 'url')}
+                        className="bg-teal-600 hover:bg-teal-700 text-white font-bold text-[11px] px-2.5 py-1 rounded-lg shrink-0 cursor-pointer"
+                      >
+                        {copiedLink ? (isRtl ? 'تم! ✓' : 'Copied! ✓') : (isRtl ? 'نسخ' : 'Copy')}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">PIN:</label>
+                      <div className="bg-slate-100 p-2.5 rounded-xl font-mono text-xs text-slate-900 font-bold flex items-center justify-between">
+                        <span className="tracking-widest select-all">{createdPin}</span>
+                        <button
+                          onClick={() => handleCopyField(createdPin, 'pin')}
+                          className="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-[10px] px-2 py-0.5 rounded cursor-pointer"
+                        >
+                          {copiedPin ? '✓' : (isRtl ? 'نسخ' : 'Copy')}
+                        </button>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">Token:</label>
+                      <div className="bg-slate-100 p-2.5 rounded-xl font-mono text-[10px] text-slate-800 flex items-center justify-between">
+                        <span className="truncate mr-1 select-all">{createdShareData.token}</span>
+                        <button
+                          onClick={() => handleCopyField(createdShareData.token, 'token')}
+                          className="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-[10px] px-2 py-0.5 rounded shrink-0 cursor-pointer"
+                        >
+                          {copiedToken ? '✓' : (isRtl ? 'نسخ' : 'Copy')}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => {
+                    setShowShareModal(false);
+                    handleResetShare();
+                  }}
+                  className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-2.5 rounded-xl cursor-pointer"
+                >
+                  {isRtl ? 'إغلاق' : (locale === 'fr' ? 'Fermer' : 'Close')}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -2110,6 +2777,361 @@ export function PatientDashboard({
                 {isRtl ? 'إغلاق المعاين' : 'Close Viewer'}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* APPOINTMENT CANCELLATION CONFIRMATION MODAL (FIX-PAT-01) */}
+      {cancellingAppointment && (
+        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full space-y-5 text-start shadow-2xl relative animate-in fade-in zoom-in duration-200">
+            <button
+              type="button"
+              onClick={handleCloseCancelModal}
+              disabled={isCancelling}
+              className="absolute top-4 left-4 rtl:left-4 rtl:right-auto ltr:right-4 ltr:left-auto p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full cursor-pointer disabled:opacity-50"
+              aria-label="Close"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
+              <div className="w-10 h-10 rounded-xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600 shrink-0">
+                <AlertTriangle className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-base font-black text-slate-900">
+                  {isRtl ? 'إلغاء الموعد الطبي' : (locale === 'fr' ? 'Annuler le rendez-vous' : 'Cancel Medical Appointment')}
+                </h3>
+                <p className="text-xs text-slate-500">
+                  {isRtl ? 'يرجى تأكيد رغبتك في إلغاء هذا الحجز' : (locale === 'fr' ? 'Veuillez confirmer l\'annulation' : 'Please confirm appointment cancellation')}
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-slate-50 border border-slate-200/70 rounded-2xl p-4 space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-slate-500 font-bold">{isRtl ? 'الطبيب:' : (locale === 'fr' ? 'Médecin :' : 'Doctor:')}</span>
+                <span className="font-black text-slate-800">{cancellingAppointment.doctorName}</span>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-slate-500 font-bold">{isRtl ? 'العيادة:' : (locale === 'fr' ? 'Clinique :' : 'Clinic:')}</span>
+                <span className="font-bold text-slate-700">{cancellingAppointment.clinic}</span>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-slate-500 font-bold">{isRtl ? 'الموعد:' : (locale === 'fr' ? 'Date & Heure :' : 'Date & Time:')}</span>
+                <span className="font-bold text-slate-700">{cancellingAppointment.date} • {cancellingAppointment.time}</span>
+              </div>
+              {cancellingAppointment.docRefNumber && (
+                <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-200/50">
+                  <span className="text-slate-400 font-mono text-[10px]">{isRtl ? 'الرقم المرجعي:' : (locale === 'fr' ? 'Réf :' : 'Ref:')}</span>
+                  <span className="font-mono text-slate-600 text-[10px]">{cancellingAppointment.docRefNumber}</span>
+                </div>
+              )}
+            </div>
+
+            {cancelError && (
+              <div className="bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-xl p-3 flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                <p className="font-bold leading-relaxed">{cancelError}</p>
+              </div>
+            )}
+
+            <form onSubmit={handleConfirmCancel} className="space-y-4">
+              <div>
+                <label className="block text-xs font-black text-slate-700 mb-1.5">
+                  {isRtl ? 'سبب الإلغاء (اختياري)' : (locale === 'fr' ? 'Motif d\'annulation (optionnel)' : 'Cancellation reason (optional)')}
+                </label>
+                <textarea
+                  value={cancelReason}
+                  onChange={(e) => setCancelReason(e.target.value)}
+                  disabled={isCancelling}
+                  rows={2}
+                  maxLength={500}
+                  placeholder={isRtl ? 'اكتب سبب الإلغاء هنا إن رغبت...' : (locale === 'fr' ? 'Précisez le motif si souhaité...' : 'Enter reason if any...')}
+                  className="w-full text-xs p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition-all disabled:bg-slate-100 disabled:cursor-not-allowed"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={handleCloseCancelModal}
+                  disabled={isCancelling}
+                >
+                  {isRtl ? 'تراجع' : (locale === 'fr' ? 'Garder le rendez-vous' : 'Keep Appointment')}
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isCancelling}
+                  className="bg-rose-600 hover:bg-rose-700 text-white font-bold"
+                >
+                  {isCancelling ? (
+                    <span className="flex items-center gap-2">
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      {isRtl ? 'جاري الإلغاء...' : (locale === 'fr' ? 'Annulation en cours...' : 'Cancelling...')}
+                    </span>
+                  ) : (
+                    (isRtl ? 'تأكيد إلغاء الموعد' : (locale === 'fr' ? 'Confirmer l\'annulation' : 'Confirm Cancellation'))
+                  )}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* APPOINTMENT RESCHEDULING MODAL (FIX-PAT-02) */}
+      {reschedulingAppointment && (
+        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-xl w-full space-y-5 text-start shadow-2xl relative max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in duration-200">
+            <button
+              type="button"
+              onClick={handleCloseRescheduleModal}
+              disabled={isRescheduling}
+              className="absolute top-4 left-4 rtl:left-4 rtl:right-auto ltr:right-4 ltr:left-auto p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full cursor-pointer disabled:opacity-50"
+              aria-label="Close"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
+              <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center text-teal-600 shrink-0">
+                <Clock className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-base font-black text-slate-900">
+                  {t('appointments.rescheduleModal.title')}
+                </h3>
+                <p className="text-xs text-slate-500">
+                  {t('appointments.rescheduleModal.subtitle')}
+                </p>
+              </div>
+            </div>
+
+            {/* Doctor & Clinic Info Card */}
+            <div className="bg-slate-50 border border-slate-200/70 rounded-2xl p-4 space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-slate-500 font-bold">{t('appointments.rescheduleModal.doctor')}</span>
+                <span className="font-black text-slate-800">
+                  {reschedulingAppointment.doctorName}
+                  {reschedulingAppointment.specialty ? ` (${reschedulingAppointment.specialty})` : ''}
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-slate-500 font-bold">{t('appointments.rescheduleModal.clinic')}</span>
+                <span className="font-bold text-slate-700">{reschedulingAppointment.clinic}</span>
+              </div>
+              {reschedulingAppointment.docRefNumber && (
+                <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-200/50">
+                  <span className="text-slate-400 font-mono text-[10px]">{isRtl ? 'الرقم المرجعي:' : (locale === 'fr' ? 'Réf :' : 'Ref:')}</span>
+                  <span className="font-mono text-slate-600 text-[10px]">{reschedulingAppointment.docRefNumber}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Comparison Grid: Current vs Proposed */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="bg-slate-100/70 border border-slate-200 rounded-2xl p-3.5 space-y-1">
+                <p className="text-[10px] text-slate-500 font-black uppercase tracking-wider">
+                  {t('appointments.rescheduleModal.currentAppointment')}
+                </p>
+                <p className="text-sm font-black text-slate-800">
+                  {reschedulingAppointment.date}
+                </p>
+                <p className="text-xs font-bold text-slate-600 flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 text-slate-400" />
+                  {reschedulingAppointment.time}
+                </p>
+              </div>
+
+              <div className={`border rounded-2xl p-3.5 space-y-1 transition-all ${
+                rescheduleSlot
+                  ? (rescheduleDate === reschedulingAppointment.date && rescheduleSlot === reschedulingAppointment.time
+                      ? 'bg-amber-50 border-amber-200 text-amber-900'
+                      : 'bg-teal-50 border-teal-200 text-teal-900')
+                  : 'bg-slate-50 border-dashed border-slate-300 text-slate-600'
+              }`}>
+                <p className="text-[10px] font-black uppercase tracking-wider opacity-80">
+                  {t('appointments.rescheduleModal.newAppointment')}
+                </p>
+                <p className="text-sm font-black">
+                  {rescheduleDate || '--'}
+                </p>
+                <p className="text-xs font-bold flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 opacity-70" />
+                  {rescheduleSlot || (isRtl ? 'بانتظار اختيار الفترة' : (locale === 'fr' ? 'Choisir un créneau' : 'Select a slot'))}
+                </p>
+              </div>
+            </div>
+
+            {/* Warning if data incomplete */}
+            {(!reschedulingAppointment.clinicId || !reschedulingAppointment.doctorId) && (
+              <div className="bg-amber-50 border border-amber-200 text-amber-900 text-xs rounded-xl p-3 flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <p className="font-bold leading-relaxed">
+                  {t('appointments.rescheduleModal.incompleteData')}
+                </p>
+              </div>
+            )}
+
+            <form onSubmit={handleConfirmReschedule} className="space-y-4">
+              {/* Date Selection */}
+              <div>
+                <label className="block text-xs font-black text-slate-700 mb-1.5">
+                  {t('appointments.rescheduleModal.selectDate')}
+                </label>
+                <input
+                  type="date"
+                  min={getTodayString()}
+                  value={rescheduleDate}
+                  onChange={(e) => handleDateChange(e.target.value)}
+                  disabled={isRescheduling || !reschedulingAppointment.clinicId || !reschedulingAppointment.doctorId}
+                  className="w-full text-xs p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none font-bold text-slate-800 disabled:bg-slate-100 disabled:cursor-not-allowed"
+                />
+              </div>
+
+              {/* Time Slot Selection */}
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-black text-slate-700">
+                    {t('appointments.rescheduleModal.selectSlot')}
+                  </label>
+                  {isFetchingSlots && (
+                    <span className="text-[11px] text-teal-600 flex items-center gap-1 font-bold">
+                      <RefreshCw className="w-3 h-3 animate-spin" />
+                      {t('appointments.rescheduleModal.loadingSlots')}
+                    </span>
+                  )}
+                </div>
+
+                {slotFetchError && (
+                  <div className="bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-xl p-3 flex items-start gap-2 mb-2">
+                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                    <p className="font-bold leading-relaxed">{slotFetchError}</p>
+                  </div>
+                )}
+
+                {!isFetchingSlots && !slotFetchError && availableSlots.length === 0 && (
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-center text-xs text-slate-500">
+                    <Calendar className="w-6 h-6 text-slate-400 mx-auto mb-1.5" />
+                    <p className="font-bold">{t('appointments.rescheduleModal.noSlots')}</p>
+                  </div>
+                )}
+
+                {!isFetchingSlots && availableSlots.length > 0 && (
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-48 overflow-y-auto p-1">
+                    {availableSlots.map((slot) => {
+                      const isSelected = rescheduleSlot === slot.time_slot;
+                      const isCurrentApptSlot =
+                        rescheduleDate === reschedulingAppointment.date &&
+                        slot.time_slot === reschedulingAppointment.time;
+                      const isDisabled = !slot.is_available || slot.available <= 0 || isRescheduling;
+
+                      return (
+                        <button
+                          key={slot.time_slot}
+                          type="button"
+                          disabled={isDisabled}
+                          onClick={() => {
+                            setRescheduleSlot(slot.time_slot);
+                            setRescheduleError(null);
+                          }}
+                          className={`p-2.5 rounded-xl text-xs font-bold transition-all text-center border cursor-pointer disabled:cursor-not-allowed ${
+                            isSelected
+                              ? 'bg-teal-600 text-white border-teal-600 shadow-sm ring-2 ring-teal-600/30'
+                              : isDisabled
+                              ? 'bg-slate-100 text-slate-400 border-slate-200 opacity-60'
+                              : 'bg-slate-50 hover:bg-teal-50 hover:border-teal-300 text-slate-800 border-slate-200'
+                          }`}
+                        >
+                          <div className="text-sm font-black">{slot.time_slot}</div>
+                          <div className="text-[10px] mt-0.5 opacity-80">
+                            {isDisabled
+                              ? (isRtl ? 'مكتمل' : (locale === 'fr' ? 'Complet' : 'Full'))
+                              : isCurrentApptSlot
+                              ? (isRtl ? 'الحالي' : (locale === 'fr' ? 'Actuel' : 'Current'))
+                              : (isRtl ? `${slot.available} متاح` : (locale === 'fr' ? `${slot.available} dispo` : `${slot.available} left`))}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Same Slot Warning */}
+              {rescheduleSlot &&
+                rescheduleDate === reschedulingAppointment.date &&
+                rescheduleSlot === reschedulingAppointment.time && (
+                  <div className="bg-amber-50 border border-amber-200 text-amber-900 text-xs rounded-xl p-3 flex items-start gap-2">
+                    <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                    <p className="font-bold leading-relaxed">
+                      {t('appointments.rescheduleModal.sameSlotWarning')}
+                    </p>
+                  </div>
+                )}
+
+              {/* Notes */}
+              <div>
+                <label className="block text-xs font-black text-slate-700 mb-1.5">
+                  {t('appointments.rescheduleModal.notesLabel')}
+                </label>
+                <textarea
+                  value={rescheduleNotes}
+                  onChange={(e) => setRescheduleNotes(e.target.value)}
+                  disabled={isRescheduling}
+                  rows={2}
+                  maxLength={500}
+                  placeholder={t('appointments.rescheduleModal.notesPlaceholder')}
+                  className="w-full text-xs p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all disabled:bg-slate-100 disabled:cursor-not-allowed"
+                />
+              </div>
+
+              {/* Error Display */}
+              {rescheduleError && (
+                <div className="bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-xl p-3 flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                  <p className="font-bold leading-relaxed">{rescheduleError}</p>
+                </div>
+              )}
+
+              {/* Footer Buttons */}
+              <div className="flex items-center justify-end gap-3 pt-2 border-t border-slate-100">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={handleCloseRescheduleModal}
+                  disabled={isRescheduling}
+                >
+                  {t('appointments.rescheduleModal.cancel')}
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={
+                    isRescheduling ||
+                    isFetchingSlots ||
+                    !rescheduleSlot ||
+                    !rescheduleDate ||
+                    (rescheduleDate === reschedulingAppointment.date &&
+                      rescheduleSlot === reschedulingAppointment.time) ||
+                    !reschedulingAppointment.clinicId ||
+                    !reschedulingAppointment.doctorId
+                  }
+                  className="bg-teal-600 hover:bg-teal-700 text-white font-bold"
+                >
+                  {isRescheduling ? (
+                    <span className="flex items-center gap-2">
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      {t('appointments.rescheduleModal.submitting')}
+                    </span>
+                  ) : (
+                    t('appointments.rescheduleModal.confirm')
+                  )}
+                </Button>
+              </div>
+            </form>
           </div>
         </div>
       )}

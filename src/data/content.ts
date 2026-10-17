@@ -29,10 +29,10 @@ export const SYSTEM_META = {
 };
 
 export const STATISTICS_DATA = [
-  { id: 'centers', count: '+1,250', label: 'مركز حجز معتمد', description: 'نقاط حجز موثوقة عبر كافة الولايات' },
-  { id: 'doctors', count: '+4,800', label: 'طبيب ومؤسسة صحية', description: 'عيادات ومراكز طبية متعددة التخصصات' },
-  { id: 'appointments', count: '+850,000', label: 'موعد طبي مؤكد', description: 'تمت إدارتها بنجاح عبر المنصة' },
-  { id: 'patients', count: '+320,000', label: 'ملف طبي إلكتروني', description: 'للمرضى المسجلين بحماية وتشفير' }
+  { id: 'quota_governance', count: 'اعتماد الموعد', label: 'حوكمة رصيد الحجز', description: 'ربط استهلاك الباقات باعتماد الموعد فقط مع حماية رصيد مراكز الحجز' },
+  { id: 'national_directory', count: 'البيانات المرجعية', label: 'التقسيم الإداري الوطني', description: 'اعتماد السجل الرسمي لولايات وبلديات الجزائر في تنظيم المنشآت' },
+  { id: 'data_security', count: 'الصلاحيات المقيدة', label: 'سرية السجلات الطبية', description: 'تطبيق ضوابط الوصول المقيد والتشفير لحماية خصوصية بيانات المرضى' },
+  { id: 'care_coordination', count: 'تكامل متوازن', label: 'تنسيق مسار الرعاية', description: 'تكامل تنظيمي يجمع الطبيب ومساعده والمخابر ومراكز الأشعة' }
 ];
 
 export const FEATURES_LIST: Feature[] = [
@@ -324,76 +324,77 @@ export const FAQS_LIST: FAQItem[] = [
 
 export const TESTIMONIALS_LIST: Testimonial[] = [
   {
-    id: 't1',
-    name: 'أحمد بن علي',
-    role: 'مدير مركز حجز معتمد',
-    entity: 'مركز الخدمات الرقمية - الجزائر العاصمة',
-    location: 'الجزائر',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
-    comment: 'نظام الباقات الشفاف أتاح لنا تقديم خدمة حجز سريعة للمواطنين مع تحقيق إيرادات ممتازة، وميزة عدم الخصم عند الرفض تعطي ثقة كاملة في التعامل.',
-    rating: 5
+    id: 'scenario_booking_center',
+    name: 'مراكز الحجز المعتمدة',
+    role: 'تنظيم تدفق حجوزات المراجعين',
+    entity: 'شريك تشغيلي رسمي',
+    location: 'الجزائر العاصمة',
+    comment: 'استقبال طلبات المرضى وتنسيق المواعيد إلكترونياً مع الاستفادة من شفافية رصيد الباقات وعدم الخصم إلا بعد اعتماد الطبيب.',
+    rating: 5,
+    badge: 'سيناريو نموذجي',
+    icon: 'Building2'
   },
   {
-    id: 't2',
-    name: 'د. مريم القاسمي',
-    role: 'طبيبة اختصاصية أمراض الباطنية',
-    entity: 'عيادة الأمل الطبية',
+    id: 'scenario_doctor',
+    name: 'العيادات والأطباء',
+    role: 'تنظيم جدول العمل وتفويض المساعد',
+    entity: 'ممارسة طبية معتمدة',
     location: 'وهران',
-    avatar: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=200&q=80',
-    comment: 'المنصة نظمت جدول عمل العيادة وقضت على الاكتظاظ. إمكانية الاطلاع على التاريخ الطبي للمريض المسجل تساعدني كثيراً في اتخاذ القرار العلاجي الدقيق.',
-    rating: 5
+    comment: 'مراجعة طلبات الحجز وفق الطاقة الاستيعابية اليومية، وتفويض تنظيم الاستقبال وتأكيد الوصول للمساعد المصرح له.',
+    rating: 5,
+    badge: 'سيناريو نموذجي',
+    icon: 'Stethoscope'
   },
   {
-    id: 't3',
-    name: 'كريم حمداوي',
-    role: 'مريض مسجل',
-    entity: 'حساب مريض رقمي (UUID)',
+    id: 'scenario_patient',
+    name: 'المريض المسجل',
+    role: 'متابعة التاريخ الصحي والوصفات',
+    entity: 'حساب مريض موحد (UUID)',
     location: 'قسنطينة',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
-    comment: 'أصبح بإمكاني الاطلاع على وصفاتي الطبية ونتائج تحاليل المختبر مباشرة من هاتفي دون عناء التنقل، ملفي الطبي الإلكتروني آمن ومتاح متى احتجته.',
-    rating: 5
+    comment: 'الوصول الميسر للوصفات الطبية الرقمية ونتائج الفحوصات عبر الحساب الشخصي دون الحاجة للاحتفاظ بالأوراق.',
+    rating: 5,
+    badge: 'سيناريو نموذجي',
+    icon: 'UserCheck'
   },
   {
-    id: 't4',
-    name: 'د. يوسف التلمساني',
-    role: 'مدير مخبر تحاليل طبية',
-    entity: 'مخبر الشفاء للتحاليل المخبرية',
+    id: 'scenario_diagnostic',
+    name: 'مراكز التشخيص والمخابر',
+    role: 'رفع النتائج وربطها برقم الطلب',
+    entity: 'مخبر تحاليل وأشعة',
     location: 'عنابة',
-    avatar: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=200&q=80',
-    comment: 'رفع النتائج عبر بروتوكول Aafiya المعتمد برقم الطلب وفر الوقت على المرضى والأطباء ومنع تضارب النتائج.',
-    rating: 5
+    comment: 'تسليم التقارير المخبرية والإشعاعية مباشرة إلى ملف المريض برقم الطلب المعتمد لمنع التضارب وتسريع المتابعة.',
+    rating: 5,
+    badge: 'سيناريو نموذجي',
+    icon: 'FlaskConical'
   }
 ];
 
 export const NEWS_LIST: NewsItem[] = [
   {
-    id: 'article_1',
-    title: 'توسع شبكة مراكز الحجز المعتمدة ليشمل 48 ولاية',
-    date: '02 أغسطس 2026',
-    category: 'تحديثات المنصة',
-    categoryKey: 'platform_updates',
-    summary: 'منصة عافية تعلن عن اعتماد أكثر من 200 مركز حجز جديد لتقديم خدمات الحجز الإلكتروني للمواطنين في المناطق النائية.',
-    image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=600&q=80',
-    readTime: '3 دقائق'
+    id: 'guide_booking_center',
+    title: 'دليل تشغيل مراكز الحجز المعتمدة ونظام الباقات',
+    category: 'أدلة المنصة',
+    categoryKey: 'operational_guide',
+    summary: 'شرح متكامل لآلية إنشاء طلبات المواعيد، شروط الخصم والتعويض لرصيد العمليات، والتفريق بين المريض الزائر والمسجل.',
+    readTime: 'دليل تشغيلي',
+    icon: 'BookOpen'
   },
   {
-    id: 'article_2',
-    title: 'إطلاق الإصدار 1.0 لنظام الباقات التشغيلية وتحديد المعايير المالية',
-    date: '28 يوليوز 2026',
-    category: 'إدارة الأعمال',
-    categoryKey: 'platform_updates',
-    summary: 'تحديد الضوابط التشغيلية لسلسلة الباقات الذكية مع ضمان عدم الاقتطاع المالي إلا بعد موافقة الطبيب النهائية.',
-    image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=600&q=80',
-    readTime: '4 دقائق'
+    id: 'guide_clinics',
+    title: 'ضوابط جداول عمل الأطباء وتفويض المساعدين',
+    category: 'الحوكمة الكلينيكية',
+    categoryKey: 'clinical_governance',
+    summary: 'المعايير المعتمدة لبرمجة ساعات الدوام، تنظيم فترات الراحة والإجازات، وإسناد صلاحيات الاستقبال لمساعد العيادة.',
+    readTime: 'دليل تنظيمي',
+    icon: 'CalendarClock'
   },
   {
-    id: 'article_3',
-    title: 'كيف يساهم الملف الطبي الإلكتروني في تقليل الأخطاء الدوائية؟',
-    date: '15 يوليوز 2026',
-    category: 'مقالات طبية',
-    categoryKey: 'medical_research',
-    summary: 'دراسة حديثة تبين أثر ربط الوصفات بالمعرف الفريد (UUID) للمريض في رفع مستوى السلامة الصحية والحد من التداخلات الدوائية.',
-    image: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=600&q=80',
-    readTime: '5 دقائق'
+    id: 'guide_emr_privacy',
+    title: 'معايير أمان وتشفير الملف الطبي الإلكتروني (EMR)',
+    category: 'حوكمة البيانات',
+    categoryKey: 'data_privacy',
+    summary: 'المبادئ البرمجية المعتمدة لحفظ السجلات الطبية وفق مبدأ أقل صلاحية وحوكمة مشاركة التقارير مع الأطراف المعنية.',
+    readTime: 'دليل أمني',
+    icon: 'ShieldCheck'
   }
 ];

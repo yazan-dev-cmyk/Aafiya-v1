@@ -287,5 +287,157 @@ void main() {
       expect(validation.statusCode, equals(422));
       expect(validation.message, contains('maximum capacity'));
     });
+
+    test('rescheduleAppointment calls endpoint with auth and payload correctly', () async {
+      const appointmentId = '01a081ea-2e14-72d8-b97d-29026efc9999';
+      const newDate = '2026-09-20';
+      const newSlot = '11:00';
+      const rescheduleNotes = 'Patient requested later time';
+
+      final mockClient = MockClient((request) async {
+        expect(request.method, equals('POST'));
+        expect(request.url.path, endsWith('/appointments/$appointmentId/reschedule'));
+        expect(request.headers['Authorization'], contains('Bearer'));
+
+        final body = jsonDecode(request.body) as Map<String, dynamic>;
+        expect(body['appointment_date'], equals(newDate));
+        expect(body['time_slot'], equals(newSlot));
+        expect(body['notes'], equals(rescheduleNotes));
+
+        final responseData = {
+          'data': {
+            'id': appointmentId,
+            'booking_reference': 'MS-2026-0042',
+            'status': 'confirmed',
+            'appointment_date': newDate,
+            'time_slot': newSlot,
+            'notes': rescheduleNotes,
+            'clinic': {'id': clinicId, 'name': 'عيادة الأمل'},
+            'doctor': {'id': doctorId, 'name': 'د. مرسلي فاتح'},
+            'patient': {
+              'id': 'patient-uuid-123',
+              'name': 'أحمد الجزائري',
+              'phone': '0555112233',
+              'mrn': 'MRN-2026-VAL99',
+            },
+          },
+        };
+
+        return http.Response(
+          jsonEncode(responseData),
+          200,
+          headers: {'content-type': 'application/json'},
+        );
+      });
+
+      final tokenStorage = InMemoryTokenStorage();
+      await tokenStorage.saveToken('test-bearer-token');
+      final apiClient = ApiClient(
+        httpClient: mockClient,
+        tokenStorage: tokenStorage,
+      );
+      final service = AssistantBookingService(apiClient: apiClient);
+      final result = await service.rescheduleAppointment(
+        appointmentId: appointmentId,
+        appointmentDate: newDate,
+        timeSlot: newSlot,
+        notes: rescheduleNotes,
+      );
+
+      expect(result, isA<ApiSuccess<Appointment>>());
+      final appointment = (result as ApiSuccess<Appointment>).data;
+      expect(appointment.id, equals(appointmentId));
+      expect(appointment.appointmentDate, equals(newDate));
+      expect(appointment.timeSlot, equals(newSlot));
+      expect(appointment.notes, equals(rescheduleNotes));
+    });
+
+    test('rescheduleAppointment handles 422 error when slot is full or invalid', () async {
+      const appointmentId = '01a081ea-2e14-72d8-b97d-29026efc9999';
+
+      final mockClient = MockClient((request) async {
+        final errorResponse = {
+          'message': 'Selected slot is full',
+          'errors': {
+            'time_slot': ['The slot is at maximum capacity.'],
+          },
+        };
+
+        return http.Response(
+          jsonEncode(errorResponse),
+          422,
+          headers: {'content-type': 'application/json'},
+        );
+      });
+
+      final apiClient = ApiClient(
+        httpClient: mockClient,
+      );
+      final service = AssistantBookingService(apiClient: apiClient);
+      final result = await service.rescheduleAppointment(
+        appointmentId: appointmentId,
+        appointmentDate: '2026-09-20',
+        timeSlot: '11:00',
+      );
+
+      expect(result, isA<ApiFailure<Appointment>>());
+      final failure = result as ApiFailure<Appointment>;
+      expect(failure.exception, isA<ValidationException>());
+      final validation = failure.exception as ValidationException;
+      expect(validation.statusCode, equals(422));
+    });
+
+    test('searchPatients queries ApiEndpoints.patients and parses PatientSearchResult list', () async {
+      final mockClient = MockClient((request) async {
+        expect(request.method, equals('GET'));
+        expect(request.url.path, endsWith('/patients'));
+        expect(request.url.queryParameters['search'], equals('أحمد'));
+        expect(request.url.queryParameters['page'], equals('1'));
+        expect(request.url.queryParameters['per_page'], equals('20'));
+
+        final responseData = {
+          'data': [
+            {
+              'id': 'pat-uuid-1',
+              'first_name': 'أحمد',
+              'last_name': 'بن سالم',
+              'phone': '0555123456',
+              'mrn': 'MRN-12345',
+              'gender': 'male',
+            },
+            {
+              'id': 'pat-uuid-2',
+              'first_name': 'أحمد',
+              'last_name': 'قدور',
+              'phone': '0555987654',
+              'mrn': '',
+              'gender': 'male',
+            },
+          ],
+        };
+
+        return http.Response(
+          jsonEncode(responseData),
+          200,
+          headers: {'content-type': 'application/json'},
+        );
+      });
+
+      final apiClient = ApiClient(httpClient: mockClient);
+      final service = AssistantBookingService(apiClient: apiClient);
+      final result = await service.searchPatients(query: 'أحمد');
+
+      expect(result, isA<ApiSuccess<List<PatientSearchResult>>>());
+      final patients = (result as ApiSuccess<List<PatientSearchResult>>).data;
+      expect(patients.length, equals(2));
+      expect(patients[0].id, equals('pat-uuid-1'));
+      expect(patients[0].fullName, equals('أحمد بن سالم'));
+      expect(patients[0].phone, equals('0555123456'));
+      expect(patients[0].mrn, equals('MRN-12345'));
+      expect(patients[1].id, equals('pat-uuid-2'));
+      expect(patients[1].fullName, equals('أحمد قدور'));
+      expect(patients[1].mrn, isEmpty);
+    });
   });
 }
+

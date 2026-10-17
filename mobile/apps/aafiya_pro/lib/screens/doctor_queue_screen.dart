@@ -50,6 +50,7 @@ class _DoctorQueueScreenState extends State<DoctorQueueScreen> {
   int _waitingRoomPage = 1;
   bool _hasMoreWaitingRoom = false;
   String? _waitingRoomError;
+  int? _waitingRoomTotal;
 
   // Expected Check-In state (status = confirmed)
   bool _isLoadingExpected = false;
@@ -57,6 +58,7 @@ class _DoctorQueueScreenState extends State<DoctorQueueScreen> {
   int _expectedPage = 1;
   bool _hasMoreExpected = false;
   String? _expectedError;
+  int? _expectedTotal;
 
   // Mutating appointment ID (prevents duplicate submissions)
   String? _processingAppointmentId;
@@ -118,6 +120,12 @@ class _DoctorQueueScreenState extends State<DoctorQueueScreen> {
       _expectedError = null;
       _waitingRoomPage = 1;
       _expectedPage = 1;
+      if (_waitingRoomItems.isEmpty) {
+        _waitingRoomTotal = null;
+      }
+      if (_expectedItems.isEmpty) {
+        _expectedTotal = null;
+      }
     });
 
     // Fetch both queues concurrently
@@ -152,20 +160,30 @@ class _DoctorQueueScreenState extends State<DoctorQueueScreen> {
       switch (waitingResult) {
         case ApiSuccess(:final data):
           _waitingRoomItems = data.items;
+          _waitingRoomTotal = data.total;
+          _waitingRoomPage = 1;
           _hasMoreWaitingRoom = data.hasMore;
           _waitingRoomError = null;
         case ApiFailure(:final exception):
           _waitingRoomError = exception.message;
+          if (_waitingRoomItems.isEmpty) {
+            _waitingRoomTotal = null;
+          }
       }
 
       // Parse Expected Check-in
       switch (expectedResult) {
         case ApiSuccess(:final data):
           _expectedItems = data.items;
+          _expectedTotal = data.total;
+          _expectedPage = 1;
           _hasMoreExpected = data.hasMore;
           _expectedError = null;
         case ApiFailure(:final exception):
           _expectedError = exception.message;
+          if (_expectedItems.isEmpty) {
+            _expectedTotal = null;
+          }
       }
     });
   }
@@ -191,7 +209,11 @@ class _DoctorQueueScreenState extends State<DoctorQueueScreen> {
       _isLoadingWaitingRoom = false;
       switch (result) {
         case ApiSuccess(:final data):
-          _waitingRoomItems = [..._waitingRoomItems, ...data.items];
+          final existingIds = _waitingRoomItems.map((e) => e.id).toSet();
+          final uniqueNewItems =
+              data.items.where((e) => !existingIds.contains(e.id)).toList();
+          _waitingRoomItems = [..._waitingRoomItems, ...uniqueNewItems];
+          _waitingRoomTotal = data.total;
           _waitingRoomPage = nextPage;
           _hasMoreWaitingRoom = data.hasMore;
         case ApiFailure():
@@ -221,7 +243,11 @@ class _DoctorQueueScreenState extends State<DoctorQueueScreen> {
       _isLoadingExpected = false;
       switch (result) {
         case ApiSuccess(:final data):
-          _expectedItems = [..._expectedItems, ...data.items];
+          final existingIds = _expectedItems.map((e) => e.id).toSet();
+          final uniqueNewItems =
+              data.items.where((e) => !existingIds.contains(e.id)).toList();
+          _expectedItems = [..._expectedItems, ...uniqueNewItems];
+          _expectedTotal = data.total;
           _expectedPage = nextPage;
           _hasMoreExpected = data.hasMore;
         case ApiFailure():
@@ -233,6 +259,7 @@ class _DoctorQueueScreenState extends State<DoctorQueueScreen> {
   // --- ATTENDANCE ACTIONS ---
 
   Future<void> _handleAttend(Appointment appointment) async {
+    if (_processingAppointmentId != null) return;
     final strings = LocalizedStrings.of(context);
 
     // 1. Confirm dialog
@@ -279,8 +306,8 @@ class _DoctorQueueScreenState extends State<DoctorQueueScreen> {
             behavior: SnackBarBehavior.floating,
           ),
         );
-        // Authoritative reload
-        _loadQueueData();
+        // Authoritative reload of queue data and statistics
+        await _loadQueueData();
       case ApiFailure(:final exception):
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -293,6 +320,7 @@ class _DoctorQueueScreenState extends State<DoctorQueueScreen> {
   }
 
   Future<void> _handleNoShow(Appointment appointment) async {
+    if (_processingAppointmentId != null) return;
     final strings = LocalizedStrings.of(context);
 
     // 1. Confirm dialog with optional reason
@@ -326,8 +354,8 @@ class _DoctorQueueScreenState extends State<DoctorQueueScreen> {
             behavior: SnackBarBehavior.floating,
           ),
         );
-        // Authoritative reload
-        _loadQueueData();
+        // Authoritative reload of queue data and statistics
+        await _loadQueueData();
       case ApiFailure(:final exception):
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -361,8 +389,11 @@ class _DoctorQueueScreenState extends State<DoctorQueueScreen> {
   }
 
   Widget _buildSubTabBar(LocalizedStrings strings) {
-    final waitingCount = _waitingRoomItems.length;
-    final expectedCount = _expectedItems.length;
+    final waitingCount = _waitingRoomTotal ?? _waitingRoomItems.length;
+    final expectedCount = _expectedTotal ?? _expectedItems.length;
+    final waitingHasError =
+        _waitingRoomError != null && _waitingRoomItems.isEmpty;
+    final expectedHasError = _expectedError != null && _expectedItems.isEmpty;
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -381,7 +412,7 @@ class _DoctorQueueScreenState extends State<DoctorQueueScreen> {
           Expanded(
             child: _buildTabButton(
               title: strings.waitingRoomTab,
-              count: waitingCount,
+              count: waitingHasError ? null : waitingCount,
               isSelected: _activeTab == QueueSubTab.waitingRoom,
               accentColor: AafiyaColors.info,
               onTap: () {
@@ -395,7 +426,7 @@ class _DoctorQueueScreenState extends State<DoctorQueueScreen> {
           Expanded(
             child: _buildTabButton(
               title: strings.expectedCheckInTab,
-              count: expectedCount,
+              count: expectedHasError ? null : expectedCount,
               isSelected: _activeTab == QueueSubTab.expectedCheckIn,
               accentColor: AafiyaColors.healthBlue,
               onTap: () {
@@ -410,7 +441,7 @@ class _DoctorQueueScreenState extends State<DoctorQueueScreen> {
 
   Widget _buildTabButton({
     required String title,
-    required int count,
+    required int? count,
     required bool isSelected,
     required Color accentColor,
     required VoidCallback onTap,
@@ -454,7 +485,7 @@ class _DoctorQueueScreenState extends State<DoctorQueueScreen> {
                   shape: BoxShape.circle,
                 ),
                 child: Text(
-                  '$count',
+                  count != null ? '$count' : '-',
                   style: AafiyaTypography.caption.copyWith(
                     color: isSelected ? AafiyaColors.pureWhite : AafiyaColors.secondaryText,
                     fontWeight: FontWeight.bold,

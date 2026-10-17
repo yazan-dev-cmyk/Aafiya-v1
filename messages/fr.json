@@ -241,15 +241,20 @@
     "footer_badge": "Réorganiser l'expérience de santé de manière sûre et professionnelle"
   },
   "statistics": {
-    "centers": "Centres de Réservation Agréés",
-    "centers_desc": "Points de réservation de confiance dans toutes les wilayas",
-    "doctors": "Médecins et Établissements de Santé",
-    "doctors_desc": "Cliniques et centres médicaux multidisciplinaires",
-    "appointments": "Rendez-vous Médicaux Confirmés",
-    "appointments_desc": "Gérés avec succès via la plateforme",
-    "patients": "Dossiers Médicaux Électroniques",
-    "patients_desc": "Pour les patients inscrits avec protection et cryptage",
-    "performance_indicator": "Indicateur de Performance"
+    "operational_pillar": "Pilier Opérationnel",
+    "quota_governance": "Gouvernance des Quotas",
+    "quota_governance_highlight": "Validation du Rendez-vous",
+    "quota_governance_desc": "Consommation du forfait strictement liée à la validation du rendez-vous avec protection du solde du centre",
+    "national_directory": "Découpage Administratif National",
+    "national_directory_highlight": "Données de Référence",
+    "national_directory_desc": "Adoption du registre officiel des wilayas et communes d'Algérie pour organiser les structures de santé",
+    "data_security": "Confidentialité des Dossiers Médicaux",
+    "data_security_highlight": "Moindre Privilège",
+    "data_security_desc": "Application des contrôles d'accès restreints et du chiffrement pour protéger la vie privée des patients",
+    "care_coordination": "Coordination du Parcours de Soins",
+    "care_coordination_highlight": "Intégration Équilibrée",
+    "care_coordination_desc": "Intégration organisationnelle réunissant médecin, assistant, laboratoires et centres d'imagerie",
+    "performance_indicator": "Pilier Opérationnel"
   },
   "features": {
     "section_badge": "Fonctions Structurelles de la Plateforme",
@@ -525,12 +530,40 @@
     "clear_filters": "Effacer les Filtres",
     "specialty_label": "Spécialité",
     "book_now": "Réserver Maintenant",
+    "generic_doctor_name": "Médecin Agréé",
+    "doctor_role_title": "Médecin Agréé",
+    "clinic_role_title": "Établissement de Santé Agréé",
+    "verified_practitioner": "Praticien Vérifié",
+    "loading_directory": "Chargement de l'annuaire unifié...",
+    "error_loading": "Échec de connexion à l'annuaire public",
+    "retry": "Réessayer",
+    "join_network_cta": "Rejoindre le Réseau Médical",
+    "contact_clinic": "Contacter l'Établissement",
     "no_results_title": "Désolé, aucun résultat correspondant n'a été trouvé",
     "no_results_desc": "Essayez de modifier vos termes de recherche ou la wilaya pour de meilleurs résultats",
     "view_all": "Voir Tous les Résultats",
+    "view_category_all": "Voir plus dans cette catégorie",
+    "pagination_summary": "Total des résultats: {total} (page {page} sur {lastPage})",
+    "prev_page": "Page Précédente",
+    "next_page": "Page Suivante",
+    "categories": {
+      "doctors": "Derniers Médecins Agréés",
+      "clinics": "Dernières Cliniques de Santé",
+      "booking_centers": "Centres de Réservation Agréés",
+      "labs": "Laboratoires d'Analyses Médicales",
+      "radiology": "Centres d'Imagerie et de Radiologie"
+    },
+    "accreditation": {
+      "booking_centers_desc": "Réseau national agréé pour la coordination des rendez-vous des patients et la gouvernance des quotas, disponible pour les centres certifiés.",
+      "labs_desc": "Système numérique intégré reliant directement les résultats d'analyses médicales au dossier du patient avec accord du médecin.",
+      "radiology_desc": "Archivage et partage de rapports d'imagerie médicale (DICOM/PACS) selon les normes médicales certifiées avec haute sécurité.",
+      "apply_cta": "Demande d'Agrément",
+      "login_cta": "Connexion Établissement"
+    },
     "tabs": {
       "all": "Tous",
       "doctor": "Médecins",
+      "clinic": "Cliniques",
       "booking_center": "Centres de Réservation",
       "lab": "Labos",
       "radiology": "Radiologie"
@@ -653,31 +686,82 @@
     },
     "all_specialties": "Toutes les spécialités"
   },
+  "testimonials": {
+    "section_badge": "Scénarios d'Utilisation Types",
+    "title": "Parcours d'Utilisation du Système",
+    "subtitle": "À Travers les Différents Rôles de Santé",
+    "description": "Modèles opérationnels illustrant l'interaction de chaque rôle avec les services Aafiya selon les règles et politiques approuvées.",
+    "sample_scenario_badge": "Scénario Type",
+    "scenario_booking_center_name": "Centres de Réservation Agréés",
+    "scenario_booking_center_role": "Organisation du Flux des Rendez-vous",
+    "scenario_booking_center_entity": "Partenaire Opérationnel Officiel",
+    "scenario_booking_center_comment": "Réception des demandes des patients et coordination électronique avec transparence totale du forfait, sans déduction avant validation du médecin.",
+    "scenario_doctor_name": "Cabinets et Médecins",
+    "scenario_doctor_role": "Gestion du Planning & Délégation à l'Assistant",
+    "scenario_doctor_entity": "Pratique Médicale Agréée",
+    "scenario_doctor_comment": "Examen des demandes selon la capacité journalière et délégation de l'accueil et du pointage des arrivées à l'assistant autorisé.",
+    "scenario_patient_name": "Patient Inscrit",
+    "scenario_patient_role": "Accès à l'Historique de Santé et Ordonnances",
+    "scenario_patient_entity": "Compte Patient Unifié (UUID)",
+    "scenario_patient_comment": "Accès fluide aux ordonnances numériques et résultats d'analyses via le compte personnel sans besoin de conserver des documents papier.",
+    "scenario_diagnostic_name": "Centres de Diagnostic et Laboratoires",
+    "scenario_diagnostic_role": "Téléversement Direct par Numéro de Demande",
+    "scenario_diagnostic_entity": "Laboratoire d'Analyses et Radiologie",
+    "scenario_diagnostic_comment": "Transmission des comptes rendus directement dans le dossier du patient via le numéro de commande officiel pour éviter tout conflit."
+  },
+  "medical_file": {
+    "demo_watermark": "Modèle Illustratif de Démonstration — Ce n'est pas un vrai dossier patient",
+    "demo_patient_initials": "M.P",
+    "demo_patient_name": "Modèle Patient Démo",
+    "demo_patient_sub": "Simulation d'Identifiant Numérique EMR",
+    "encryption_standard": "Chiffré AES-256",
+    "latest_medical_event": "Historique Médical Type",
+    "status_active": "Actif",
+    "simulated_consultation_title": "Consultation Médicale Documentée (Simulation)",
+    "sample_record_label": "Enregistrement Démo",
+    "simulated_consultation_desc": "Enregistrement automatique du diagnostic, des ordonnances validées et des résultats dans le dossier unifié.",
+    "prescription_approved": "Ordonnance Validée",
+    "lab_results_uploaded": "Résultats d'Analyses Téléversés",
+    "immutability_note": "Article 7.10: Le dossier médical historique est inaltérable; toute correction fait l'objet d'un nouvel enregistrement complémentaire.",
+    "section_badge": "Architecture du Dossier Médical",
+    "title": "Dossier Médical Électronique (EMR)",
+    "subtitle": "Dossier de Santé Numérique Unifié",
+    "desc": "Le dossier médical électronique est créé lors de l'inscription du patient sur Aafiya, doté d'un identifiant interne unique (UUID) assurant la continuité des soins.",
+    "points": {
+      "emr_history_title": "Historique de Santé Fiable et Cumulatif",
+      "emr_history_desc": "Tous les diagnostics, ordonnances et résultats d'examens sont automatiquement rattachés à votre parcours sans risque de perte.",
+      "least_privilege_title": "Confidentialité Totale et Moindre Privilège",
+      "least_privilege_desc": "Accès strictement restreint au médecin traitant durant la consultation validée, avec chiffrement et journalisation complète.",
+      "guest_patient_title": "Patient Visiteur (Guest Patient)",
+      "guest_patient_desc": "Le patient visiteur reçoit ses ordonnances et demandes imprimées immédiatement sans ouverture de dossier électronique permanent."
+    },
+    "create_account_cta": "Créer un Compte Patient Inscrit (UUID)"
+  },
   "news": {
-    "section_badge": "Latest Updates and Research",
-    "title": "Platform News and",
-    "subtitle": "Digital Health Transformation",
-    "view_all": "All Articles and News",
-    "read_more": "Read Details",
+    "section_badge": "Guides de la Plateforme & Transformation Sanitaire",
+    "title": "Guides Opérationnels de la Plateforme",
+    "subtitle": "Normes Cliniques et Opérationnelles",
+    "view_all": "Questions Fréquentes",
+    "read_more": "Consulter le Guide",
     "categories": {
-      "digital_health": "Digital Health",
-      "platform_updates": "Platform Updates",
-      "medical_research": "Medical Research"
+      "operational_guide": "Guide Opérationnel",
+      "clinical_governance": "Gouvernance Clinique",
+      "data_privacy": "Gouvernance des Données"
     },
-    "article_1": {
-      "title": "Launching the first version of the unified electronic medical file in Algeria",
-      "summary": "Aafiya has officially started activating the digital medical file feature linked to citizens' national identity, facilitating secure treatment history tracking.",
-      "readTime": "5 min read"
+    "guide_booking_center": {
+      "title": "Guide d'Exploitation des Centres de Réservation et Gestion des Forfaits",
+      "summary": "Explication complète de la création des demandes, des règles de déduction et de compensation des quotas, et de la distinction visiteur/inscrit.",
+      "readTime": "Guide Opérationnel"
     },
-    "article_2": {
-      "title": "How to choose the right operational package for your booking center?",
-      "summary": "A comprehensive guide for certified booking centers on the mechanism of buying wholesale operation credits and achieving the highest operational return from direct service fees.",
-      "readTime": "4 min read"
+    "guide_clinics": {
+      "title": "Règles de Planning des Médecins et Délégation aux Assistants",
+      "summary": "Normes approuvées pour la configuration des horaires, la gestion des congés et l'attribution des tâches d'accueil à l'assistant.",
+      "readTime": "Guide Organisationnel"
     },
-    "article_3": {
-      "title": "Importance of digitizing medical prescriptions in reducing medication errors",
-      "summary": "A study showing how the Aafiya system contributes to converting paper prescriptions into accurate digital records that prevent drug interactions and protect the patient.",
-      "readTime": "6 min read"
+    "guide_emr_privacy": {
+      "title": "Normes de Sécurité, Chiffrement et Confidentialité EMR",
+      "summary": "Principes d'architecture régissant la conservation des dossiers sous moindre privilège et le partage des résultats diagnostiques.",
+      "readTime": "Guide Sécurité"
     }
   },
   "cta": {
@@ -2158,7 +2242,27 @@
       "preparationTitle": "Instructions de Préparation :",
       "viewPass": "Voir Pass de Visite",
       "reschedule": "Reprogrammer",
-      "cancel": "Annuler Rendez-vous"
+      "cancel": "Annuler Rendez-vous",
+      "rescheduleModal": {
+        "title": "Reprogrammer le Rendez-vous Médical",
+        "subtitle": "Choisissez une date et un créneau alternatif disponible pour reprogrammer votre rendez-vous",
+        "currentAppointment": "Rendez-vous Actuel",
+        "newAppointment": "Nouveau Rendez-vous Proposé",
+        "selectDate": "Nouvelle Date de Rendez-vous",
+        "selectSlot": "Créneau Horaire Disponible",
+        "loadingSlots": "Chargement des créneaux disponibles...",
+        "noSlots": "Aucun créneau disponible à cette date (le médecin est peut-être en congé ou la clinique fermée).",
+        "doctor": "Médecin :",
+        "clinic": "Clinique :",
+        "notesLabel": "Remarques Supplémentaires (Optionnel)",
+        "notesPlaceholder": "Saisissez toute remarque concernant la reprogrammation...",
+        "cancel": "Retour",
+        "confirm": "Confirmer la Reprogrammation",
+        "submitting": "Reprogrammation en cours...",
+        "successMessage": "Rendez-vous médical reprogrammé avec succès.",
+        "sameSlotWarning": "La date et le créneau sélectionnés sont identiques à votre rendez-vous actuel.",
+        "incompleteData": "Données de clinique ou médecin incomplètes pour la reprogrammation automatique."
+      }
     }
   },
   "bookingCenter": {
@@ -3217,5 +3321,57 @@
     "loadingSpecialties": "Chargement des spécialités...",
     "errorSpecialties": "Échec du chargement des spécialités",
     "allSpecialties": "Toutes les spécialités"
+  },
+  "sharedRecordViewer": {
+    "title": "Dossier Médical Unifié Chiffré",
+    "subtitle": "Passerelle de Vérification Sécurisée et Authentification PIN",
+    "pinPrompt": "Veuillez saisir le code PIN de sécurité pour accéder au dossier médical partagé",
+    "pinPlaceholder": "Entrez le code PIN (4 à 8 chiffres)",
+    "submitButton": "Déchiffrer et afficher le dossier",
+    "verifying": "Vérification et déchiffrement en cours...",
+    "remainingAttempts": "Tentatives restantes : {count}",
+    "missingTokenTitle": "Lien de partage invalide ou manquant",
+    "missingTokenDesc": "Aucun jeton de partage détecté dans le lien. Veuillez vous assurer d'ouvrir le lien chiffré complet tel que reçu du patient.",
+    "invalidPin": "Code PIN de sécurité incorrect.",
+    "lockedTitle": "Lien temporairement verrouillé",
+    "lockedDesc": "Le lien a été temporairement verrouillé pendant 15 minutes suite à des tentatives infructueuses consécutives. Veuillez réessayer plus tard.",
+    "expiredTitle": "Lien de partage expiré",
+    "expiredDesc": "La période de validité de ce lien de partage a expiré. Veuillez demander un nouveau lien au patient.",
+    "revokedTitle": "Lien de partage révoqué",
+    "revokedDesc": "Le patient a révoqué l'accès à ce lien de partage, il n'est plus utilisable.",
+    "notFoundTitle": "Lien de partage introuvable",
+    "notFoundDesc": "Le lien de partage est invalide ou inexistant.",
+    "rateLimitTitle": "Limite de requêtes dépassée",
+    "rateLimitDesc": "Trop de tentatives de vérification. Veuillez patienter un instant et réessayer.",
+    "networkError": "Échec de connexion au serveur. Veuillez vérifier votre connexion Internet.",
+    "patientInfo": "Informations du Patient",
+    "mrn": "Numéro de dossier médical (MRN)",
+    "fullName": "Nom complet",
+    "gender": "Genre",
+    "male": "Homme",
+    "female": "Femme",
+    "dateOfBirth": "Date de naissance",
+    "bloodGroup": "Groupe sanguin",
+    "allergiesTitle": "Allergies Documentées",
+    "noAllergies": "Aucune allergie enregistrée",
+    "allergen": "Allergène",
+    "severity": "Gravité",
+    "reaction": "Réaction",
+    "chronicConditionsTitle": "Affections Chroniques",
+    "noConditions": "Aucune affection chronique enregistrée",
+    "conditionName": "Affection",
+    "icd10": "Code CIM-10",
+    "diagnosedDate": "Date de diagnostic",
+    "currentMedicationsTitle": "Médicaments Actuels",
+    "noMedications": "Aucun médicament actuel enregistré",
+    "medicationName": "Médicament",
+    "dosage": "Posologie",
+    "frequency": "Fréquence",
+    "metadataTitle": "Métadonnées et Portée du Partage",
+    "scope": "Portée autorisée",
+    "allEmrScope": "Dossier médical unifié approuvé (coordonnées et identifiant personnel exclus)",
+    "expiresAt": "Expire le",
+    "accessGrantedAt": "Accès accordé le",
+    "securityNotice": "Minimisation stricte des données appliquée : les coordonnées et le numéro d'identification national sont totalement exclus pour la confidentialité."
   }
 }

@@ -136,6 +136,15 @@ void main() {
 
       final apptMixed = PatientDeepLinkRouter.parse('aafiya://Appointments/$validUuid');
       expect(apptMixed, equals(AppointmentDetailsDestination(validUuid)));
+
+      final recUpper = PatientDeepLinkRouter.parse('AAFIYA://RECORD/$validToken');
+      expect(recUpper, equals(SharedRecordDestination(validToken)));
+
+      final recPlural = PatientDeepLinkRouter.parse('aafiya://records/$validToken');
+      expect(recPlural, equals(SharedRecordDestination(validToken)));
+
+      final recPath = PatientDeepLinkRouter.parse('aafiya:///record/$validToken');
+      expect(recPath, equals(SharedRecordDestination(validToken)));
     });
 
     test('accepts valid prescription tokens with alphanumeric, hyphens, and underscores', () {
@@ -816,6 +825,71 @@ void main() {
       expect(find.text('Nom complet'), findsOneWidget);
       expect(find.text('Délivrée le'), findsOneWidget);
       expect(find.text('Expire le'), findsOneWidget);
+    });
+  });
+
+  // =========================================================================
+  // Shared Medical Record Deep Link Tests (Parity Ingress)
+  // =========================================================================
+  group('Shared Medical Record Deep Link Ingress Tests', () {
+    testWidgets('unauthenticated deep link ignores token without volatile storage and shows SnackBar warning', (tester) async {
+      final mockClient = MockClient((request) async {
+        return jsonResponse({'message': 'Unused'}, 200);
+      });
+
+      final tokenStorage = InMemoryTokenStorage();
+      final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+      final sessionManager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
+
+      await tester.pumpWidget(
+        AafiyaPatientApp(
+          sessionManager: sessionManager,
+          apiClient: apiClient,
+          initialNavState: PatientNavState.auth,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final appState = tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
+      final handled = await appState.handleDeepLinkUri('aafiya://record/$validToken');
+      await tester.pumpAndSettle();
+
+      expect(handled, isTrue);
+      // Sheet should NOT be presented
+      expect(find.byType(SharedRecordViewerSheet), findsNothing);
+      // SnackBar should be displayed warning the user
+      expect(find.text('يرجى تسجيل الدخول أولاً ثم إعادة فتح رابط المشاركة.'), findsOneWidget);
+    });
+
+    testWidgets('authenticated deep link presents SharedRecordViewerSheet with initialToken', (tester) async {
+      final mockClient = MockClient((request) async {
+        if (request.url.path == '/api/v1/appointments') {
+          return jsonResponse({'data': []});
+        }
+        return jsonResponse({'data': {}});
+      });
+
+      final tokenStorage = InMemoryTokenStorage();
+      final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+      final sessionManager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
+      await sessionManager.setAuthenticatedUser(token: 'mock_jwt', user: testPatientUser);
+
+      await tester.pumpWidget(
+        AafiyaPatientApp(
+          sessionManager: sessionManager,
+          apiClient: apiClient,
+          initialNavState: PatientNavState.home,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final appState = tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
+      final handled = await appState.handleDeepLinkUri('aafiya://record/$validToken');
+      await tester.pumpAndSettle();
+
+      expect(handled, isTrue);
+      expect(find.byType(SharedRecordViewerSheet), findsOneWidget);
+      expect(find.text('عرض السجل الطبي المشفر'), findsOneWidget);
     });
   });
 }

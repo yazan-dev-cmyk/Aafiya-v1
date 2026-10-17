@@ -3,8 +3,16 @@ import { useTranslations, useLocale } from 'next-intl';
 import { useRouter, usePathname } from '../../../i18n/routing';
 import { useSearchParams } from 'next/navigation';
 import { authService } from '@/services/authService';
+import { clinicService } from '@/services/clinicService';
+import { useAuth } from '@/auth';
+import { SpecialtySelect, masterDataService } from '@/components/master-data';
 import { ChangePasswordCard } from '../../shared/ChangePasswordCard';
 import { DoctorStaffTab } from './DoctorStaffTab';
+import { ClinicOperatingHoursEditor } from './ClinicOperatingHoursEditor';
+import { DoctorWorkingHoursEditor } from './DoctorWorkingHoursEditor';
+import { DoctorVacationModal } from './DoctorVacationModal';
+import { UnresolvedReschedulesDashboard } from '../../clinic/UnresolvedReschedulesDashboard';
+import { vacationService, DoctorVacationItem } from '@/services/vacationService';
 import {
   Settings,
   Clock,
@@ -137,28 +145,41 @@ export const DoctorSettingsTab: React.FC<DoctorSettingsTabProps> = ({
   // 1. Personal Info State
   const [personalInfo, setPersonalInfo] = useState({
     title: t('mockData.personalTitle'),
-    fullName: t('mockData.fullName'),
-    specialty: t('mockData.specialty'),
-    licenseNumber: 'DZ-ALGIERS-88492',
-    phone: '+213 555 12 34 56',
-    email: 'dr.larbi@aafiya.dz'
+    fullName: '',
+    specialty: '',
+    specialtyId: undefined as number | undefined,
+    licenseNumber: '',
+    isVerified: false,
+    phone: '',
+    email: '',
+    bio: '',
   });
+
+  const [isSavingProfile, setIsSavingProfile] = useState<boolean>(false);
+  const [profileSuccessMessage, setProfileSuccessMessage] = useState<string | null>(null);
+  const [profileErrorMessage, setProfileErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
     const loadProfile = async () => {
       try {
-        const user = await authService.me();
-        if (isMounted && user) {
+        const currentUser = await authService.me();
+        if (isMounted && currentUser) {
           setPersonalInfo(prev => ({
             ...prev,
-            fullName: user.name || prev.fullName,
-            email: user.email || prev.email,
+            fullName: currentUser.name || '',
+            email: currentUser.email || '',
+            phone: currentUser.phone || '',
+            specialty: currentUser.doctor?.specialty || '',
+            specialtyId: currentUser.doctor?.specialty_id,
+            licenseNumber: currentUser.doctor?.license_number || '',
+            isVerified: Boolean(currentUser.doctor?.is_verified),
+            bio: currentUser.doctor?.bio || '',
           }));
-          if (user.clinic?.name) {
+          if (currentUser.clinic?.name) {
             setClinicInfo(prev => ({
               ...prev,
-              name: user.clinic?.name || prev.name,
+              name: currentUser.clinic?.name || prev.name,
             }));
           }
         }
@@ -182,7 +203,98 @@ export const DoctorSettingsTab: React.FC<DoctorSettingsTabProps> = ({
     roomCount: t('mockData.roomCount')
   });
 
-  // 3. Weekly Working Hours Schedule State
+  // Auth and Clinic Context Resolution
+  const { user, activeClinicId, hasPermission, refreshUser } = useAuth();
+  const effectiveClinicId = activeClinicId || user?.clinic?.id;
+  const activeAffiliation = user?.clinics?.find((c) => c.id === effectiveClinicId) || user?.clinic;
+  const isDirector = activeAffiliation?.position === 'director' || activeAffiliation?.is_director === true;
+  const canManageSettings = isDirector || Boolean(user?.permissions?.includes('clinic.manage_settings')) || hasPermission('clinic.manage_settings');
+
+  const handleSavePersonal = async () => {
+    setProfileErrorMessage(null);
+    setProfileSuccessMessage(null);
+
+    const trimmedName = personalInfo.fullName.trim();
+    const trimmedPhone = personalInfo.phone.trim();
+
+    if (!trimmedName) {
+      setProfileErrorMessage(isRtl ? 'الاسم الكامل مطلوب ولا يمكن تركه فارغاً.' : 'Full name is required.');
+      return;
+    }
+    if (!trimmedPhone) {
+      setProfileErrorMessage(isRtl ? 'رقم الهاتف مطلوب ولا يمكن تركه فارغاً.' : 'Phone number is required.');
+      return;
+    }
+
+    setIsSavingProfile(true);
+    try {
+      const payload: {
+        name: string;
+        phone: string;
+        specialty_id?: number;
+        bio?: string | null;
+      } = {
+        name: trimmedName,
+        phone: trimmedPhone,
+        bio: personalInfo.bio.trim() || null,
+      };
+
+      if (personalInfo.specialtyId) {
+        payload.specialty_id = personalInfo.specialtyId;
+      }
+
+      const updatedUser = await authService.updateProfile(payload);
+
+      setPersonalInfo(prev => ({
+        ...prev,
+        fullName: updatedUser.name || prev.fullName,
+        phone: updatedUser.phone || prev.phone,
+        specialty: updatedUser.doctor?.specialty || prev.specialty,
+        specialtyId: updatedUser.doctor?.specialty_id ?? prev.specialtyId,
+        bio: updatedUser.doctor?.bio ?? '',
+      }));
+
+      await refreshUser();
+
+      addAuditEntry(
+        t('tabs.personal'),
+        t('auditLog.previousScheduleValue'),
+        trimmedName,
+        t('personal.saveButton')
+      );
+      setProfileSuccessMessage(t('personal.successMessage'));
+      triggerToast(t('personal.successMessage'));
+    } catch (err: any) {
+      console.error('Failed to update doctor profile:', err);
+      const msg = err?.errors?.name?.[0]
+        || err?.errors?.phone?.[0]
+        || err?.errors?.specialty_id?.[0]
+        || err?.errors?.bio?.[0]
+        || err?.errors?.email?.[0]
+        || err?.errors?.license_number?.[0]
+        || err?.message
+        || (isRtl ? 'حدث خطأ أثناء حفظ الملف الشخصي.' : 'An error occurred while saving profile.');
+      setProfileErrorMessage(msg);
+      triggerToast(msg);
+    } finally {
+      setIsSavingProfile(false);
+    }
+  };
+
+  // Authoritative Slot Capacity & Duration State
+  const [slotCapacity, setSlotCapacity] = useState<number>(10);
+  const [clinicSettingsLoading, setClinicSettingsLoading] = useState<boolean>(false);
+  const [clinicSettingsError, setClinicSettingsError] = useState<string | null>(null);
+  const [isSavingCapacity, setIsSavingCapacity] = useState<boolean>(false);
+  const [capacitySuccessMessage, setCapacitySuccessMessage] = useState<string | null>(null);
+  const [capacityErrorMessage, setCapacityErrorMessage] = useState<string | null>(null);
+
+  // Clinic Information Persistence State & Feedback
+  const [isSavingClinicInfo, setIsSavingClinicInfo] = useState<boolean>(false);
+  const [clinicInfoSuccessMessage, setClinicInfoSuccessMessage] = useState<string | null>(null);
+  const [clinicInfoErrorMessage, setClinicInfoErrorMessage] = useState<string | null>(null);
+
+  // 3. Weekly Working Hours Schedule State (Strict 60-min Platform Invariant)
   const [workingHours, setWorkingHours] = useState([
     {
       id: 'sun',
@@ -193,7 +305,7 @@ export const DoctorSettingsTab: React.FC<DoctorSettingsTabProps> = ({
       breakStart: '12:00',
       breakEnd: '13:00',
       maxPatientsPerSlot: 10,
-      slotDurationMin: 20,
+      slotDurationMin: 60,
       note: t('workingHours.fullTime')
     },
     {
@@ -205,7 +317,7 @@ export const DoctorSettingsTab: React.FC<DoctorSettingsTabProps> = ({
       breakStart: '12:00',
       breakEnd: '13:00',
       maxPatientsPerSlot: 10,
-      slotDurationMin: 20,
+      slotDurationMin: 60,
       note: t('workingHours.fullTime')
     },
     {
@@ -217,7 +329,7 @@ export const DoctorSettingsTab: React.FC<DoctorSettingsTabProps> = ({
       breakStart: '12:00',
       breakEnd: '13:00',
       maxPatientsPerSlot: 10,
-      slotDurationMin: 20,
+      slotDurationMin: 60,
       note: t('workingHours.fullTime')
     },
     {
@@ -229,7 +341,7 @@ export const DoctorSettingsTab: React.FC<DoctorSettingsTabProps> = ({
       breakStart: '12:00',
       breakEnd: '13:00',
       maxPatientsPerSlot: 10,
-      slotDurationMin: 20,
+      slotDurationMin: 60,
       note: t('workingHours.fullTime')
     },
     {
@@ -241,7 +353,7 @@ export const DoctorSettingsTab: React.FC<DoctorSettingsTabProps> = ({
       breakStart: '11:30',
       breakEnd: '12:00',
       maxPatientsPerSlot: 10,
-      slotDurationMin: 20,
+      slotDurationMin: 60,
       note: t('workingHours.halfDay')
     },
     {
@@ -253,7 +365,7 @@ export const DoctorSettingsTab: React.FC<DoctorSettingsTabProps> = ({
       breakStart: '00:00',
       breakEnd: '00:00',
       maxPatientsPerSlot: 0,
-      slotDurationMin: 20,
+      slotDurationMin: 60,
       note: t('workingHours.weekend')
     },
     {
@@ -264,45 +376,67 @@ export const DoctorSettingsTab: React.FC<DoctorSettingsTabProps> = ({
       endTime: '13:00',
       breakStart: '11:00',
       breakEnd: '11:30',
-      maxPatientsPerSlot: 5,
-      slotDurationMin: 30,
+      maxPatientsPerSlot: 10,
+      slotDurationMin: 60,
       note: t('workingHours.complexCases')
     }
   ]);
 
-  // 4. Vacations & Exceptions State
-  const [exceptions, setExceptions] = useState<ExceptionRecord[]>([
-    {
-      id: 'exc-1',
-      type: 'conference',
-      typeNameAr: t('types.conference'),
-      startDate: '2026-08-15',
-      endDate: '2026-08-17',
-      reason: t('mockData.exc1Reason'),
-      description: t('mockData.exc1Desc'),
-      bookingStatus: 'unavailable'
-    },
-    {
-      id: 'exc-2',
-      type: 'vacation',
-      typeNameAr: t('types.vacation'),
-      startDate: '2026-08-20',
-      endDate: '2026-08-25',
-      reason: t('mockData.exc2Reason'),
-      description: t('mockData.exc2Desc'),
-      bookingStatus: 'unavailable'
-    },
-    {
-      id: 'exc-3',
-      type: 'emergency',
-      typeNameAr: t('types.emergency'),
-      startDate: '2026-08-28',
-      endDate: '2026-08-28',
-      reason: t('mockData.exc3Reason'),
-      description: t('mockData.exc3Desc'),
-      bookingStatus: 'unavailable'
+  // 4. Vacations & Exceptions State (Integrated with Backend API DEC-VAC-01 / DEC-VAC-05)
+  const [vacations, setVacations] = useState<DoctorVacationItem[]>([]);
+  const [loadingVacations, setLoadingVacations] = useState<boolean>(false);
+  const [vacationsError, setVacationsError] = useState<string | null>(null);
+  const [isVacationModalOpen, setIsVacationModalOpen] = useState<boolean>(false);
+  const [cancellingVacationId, setCancellingVacationId] = useState<string | null>(null);
+
+  const fetchVacations = async () => {
+    setLoadingVacations(true);
+    setVacationsError(null);
+    try {
+      const res = await vacationService.getDoctorVacations(1, 50);
+      const raw = res.data || [];
+      const list = Array.isArray(raw) ? raw : (raw as any)?.data || [];
+      setVacations(list);
+    } catch (err: any) {
+      console.error('Failed to load vacations:', err);
+      setVacationsError(
+        err?.response?.data?.message ||
+        err?.message ||
+        (isRtl ? 'تعذر تحميل قائمة الإجازات من الخادم.' : 'Failed to load vacations from server.')
+      );
+    } finally {
+      setLoadingVacations(false);
     }
-  ]);
+  };
+
+  const handleCancelVacation = async (vacationId: string) => {
+    if (!window.confirm(isRtl ? 'هل أنت متأكد من رغبتك في إلغاء هذه الإجازة؟' : 'Are you sure you want to cancel this vacation?')) {
+      return;
+    }
+    setCancellingVacationId(vacationId);
+    try {
+      await vacationService.cancelVacation(vacationId);
+      triggerToast(isRtl ? 'تم إلغاء الإجازة بنجاح.' : 'Vacation cancelled successfully.');
+      await fetchVacations();
+    } catch (err: any) {
+      console.error('Failed to cancel vacation:', err);
+      alert(
+        err?.response?.data?.message ||
+        err?.message ||
+        (isRtl ? 'تعذر إلغاء الإجازة. يرجى المحاولة لاحقاً.' : 'Failed to cancel vacation.')
+      );
+    } finally {
+      setCancellingVacationId(null);
+    }
+  };
+
+  useEffect(() => {
+    if (activeSubTab === 'vacation-exceptions') {
+      fetchVacations();
+    }
+  }, [activeSubTab]);
+
+  const [exceptions, setExceptions] = useState<ExceptionRecord[]>([]);
 
   // Form states for adding new exception
   const [newExcType, setNewExcType] = useState<ExceptionRecord['type']>('vacation');
@@ -311,59 +445,11 @@ export const DoctorSettingsTab: React.FC<DoctorSettingsTabProps> = ({
   const [newExcReason, setNewExcReason] = useState('');
   const [newExcDesc, setNewExcDesc] = useState('');
 
-  // Conflicting Appointments State (affected by schedule changes/vacations)
-  const [conflictingAppointments, setConflictingAppointments] = useState<ConflictingAppointment[]>([
-    {
-      id: 'apt-101',
-      patientName: t('mockData.patient1Name'),
-      patientPhone: '+213 661 22 33 44',
-      appointmentTime: t('mockData.apt1Time'),
-      conflictReason: t('mockData.apt1Conflict'),
-      status: 'needs_review'
-    },
-    {
-      id: 'apt-102',
-      patientName: t('mockData.patient2Name'),
-      patientPhone: '+213 770 11 22 33',
-      appointmentTime: t('mockData.apt2Time'),
-      conflictReason: t('mockData.apt2Conflict'),
-      status: 'needs_review'
-    },
-    {
-      id: 'apt-103',
-      patientName: t('mockData.patient3Name'),
-      patientPhone: '+213 552 44 55 66',
-      appointmentTime: t('mockData.apt3Time'),
-      conflictReason: t('mockData.apt3Conflict'),
-      status: 'needs_review'
-    }
-  ]);
+  // Conflicting Appointments State (Empty initial state; Backend endpoints not yet implemented)
+  const [conflictingAppointments, setConflictingAppointments] = useState<ConflictingAppointment[]>([]);
 
-  // 5. Audit Log State
-  const [auditLogs, setAuditLogs] = useState<SettingsAuditLog[]>([
-    {
-      id: 'log-1',
-      timestamp: '2026-08-06 09:15',
-      user: t('mockData.doctorNameWithRole'),
-      fieldChanged: t('mockData.log1Field'),
-      oldValue: t('workingHours.openStatus'),
-      newValue: t('mockData.log1NewValue'),
-      reason: t('mockData.log1Reason'),
-      ipAddress: '197.204.18.92',
-      device: t('mockData.clinicDevice')
-    },
-    {
-      id: 'log-2',
-      timestamp: '2026-08-05 14:30',
-      user: t('mockData.doctorNameWithRole'),
-      fieldChanged: t('mockData.log2Field'),
-      oldValue: '08:00 - 16:00',
-      newValue: '08:00 - 14:00',
-      reason: t('mockData.log2Reason'),
-      ipAddress: '197.204.18.92',
-      device: t('mockData.clinicDevice')
-    }
-  ]);
+  // 5. Audit Log State (Empty initial state; Backend clinical/settings audit trail pending integration)
+  const [auditLogs, setAuditLogs] = useState<SettingsAuditLog[]>([]);
 
   // General settings state
   const [bookingSettings, setBookingSettings] = useState({
@@ -428,14 +514,189 @@ export const DoctorSettingsTab: React.FC<DoctorSettingsTabProps> = ({
     );
   };
 
-  const saveWorkingHours = () => {
+  // Fetch Authoritative Clinic Settings on mount / active clinic change
+  useEffect(() => {
+    if (!effectiveClinicId) return;
+
+    let isMounted = true;
+    const fetchClinicSettings = async () => {
+      setClinicSettingsLoading(true);
+      setClinicSettingsError(null);
+      try {
+        const res = await clinicService.getClinic(effectiveClinicId);
+        if (!isMounted) return;
+        if (res.data) {
+          const fetchedCapacity = res.data.max_patients_per_slot ?? 10;
+          setSlotCapacity(fetchedCapacity);
+          setWorkingHours((prev) =>
+            prev.map((wh) => ({
+              ...wh,
+              maxPatientsPerSlot: wh.isOpen ? fetchedCapacity : 0,
+              slotDurationMin: 60,
+            }))
+          );
+          if (res.data.name) {
+            setClinicInfo((prev) => ({
+              ...prev,
+              name: res.data.name || prev.name,
+              address: res.data.address || prev.address,
+              phone: res.data.phone || prev.phone,
+            }));
+          }
+        }
+      } catch (err: any) {
+        if (!isMounted) return;
+        console.warn('Failed to load clinic settings in settings tab:', err);
+        setClinicSettingsError(
+          err?.message || (isRtl ? 'تعذر تحميل إعدادات العيادة من الخادم.' : 'Failed to load clinic settings.')
+        );
+      } finally {
+        if (isMounted) {
+          setClinicSettingsLoading(false);
+        }
+      }
+    };
+
+    fetchClinicSettings();
+    return () => {
+      isMounted = false;
+    };
+  }, [effectiveClinicId, isRtl]);
+
+  const handleSaveSlotCapacity = async () => {
+    if (!effectiveClinicId) return;
+    if (!canManageSettings) {
+      setCapacityErrorMessage(
+        isRtl
+          ? 'غير مصرح: يحق لمدير العيادة فقط تعديل وحفظ سعة المواعيد.'
+          : 'Forbidden: Only the Clinic Director can update slot capacity.'
+      );
+      return;
+    }
+
+    const parsedCapacity = Number(slotCapacity);
+    if (isNaN(parsedCapacity) || parsedCapacity < 1 || parsedCapacity > 10) {
+      setCapacityErrorMessage(
+        isRtl
+          ? 'سعة الموعد غير صالحة. يجب أن تكون القيمة بين 1 و 10 مرضى لكل فترة.'
+          : 'Invalid capacity. Must be between 1 and 10 patients per slot.'
+      );
+      return;
+    }
+
+    setIsSavingCapacity(true);
+    setCapacityErrorMessage(null);
+    setCapacitySuccessMessage(null);
+
+    try {
+      const res = await clinicService.updateClinic(effectiveClinicId, {
+        max_patients_per_slot: parsedCapacity,
+      });
+
+      if (res.data) {
+        const updatedCapacity = res.data.max_patients_per_slot ?? parsedCapacity;
+        setSlotCapacity(updatedCapacity);
+        setWorkingHours((prev) =>
+          prev.map((wh) => ({
+            ...wh,
+            maxPatientsPerSlot: wh.isOpen ? updatedCapacity : 0,
+            slotDurationMin: 60,
+          }))
+        );
+      }
+
+      const msg = isRtl
+        ? 'تم حفظ سعة المواعيد بنجاح والتزامن مع محرك الحجز بالعيادة.'
+        : 'Slot capacity saved successfully and synchronized with booking engine.';
+      setCapacitySuccessMessage(msg);
+      triggerToast(msg);
+    } catch (err: any) {
+      console.error('Failed to update slot capacity:', err);
+      const errMsg =
+        err?.response?.data?.message ||
+        err?.message ||
+        (isRtl ? 'تعذر حفظ سعة المواعيد. يرجى التحقق من اتصال الخادم.' : 'Failed to save slot capacity.');
+      setCapacityErrorMessage(errMsg);
+    } finally {
+      setIsSavingCapacity(false);
+    }
+  };
+
+  const handleSaveClinicInfo = async () => {
+    if (!effectiveClinicId) return;
+    if (!canManageSettings) {
+      setClinicInfoErrorMessage(
+        isRtl
+          ? 'غير مصرح: يحق لمدير العيادة فقط تعديل وحفظ معلومات العيادة.'
+          : 'Forbidden: Only the Clinic Director can update clinic information.'
+      );
+      return;
+    }
+
+    const trimmedName = clinicInfo.name.trim();
+    const trimmedAddress = clinicInfo.address.trim();
+    const trimmedPhone = clinicInfo.phone.trim();
+
+    if (!trimmedName || !trimmedAddress || !trimmedPhone) {
+      setClinicInfoErrorMessage(
+        isRtl
+          ? 'يرجى ملء جميع الحقول الإلزامية (اسم العيادة، العنوان، رقم الهاتف).'
+          : 'Please fill in all required fields (Clinic Name, Address, Phone).'
+      );
+      return;
+    }
+
+    setIsSavingClinicInfo(true);
+    setClinicInfoErrorMessage(null);
+    setClinicInfoSuccessMessage(null);
+
+    try {
+      const res = await clinicService.updateClinic(effectiveClinicId, {
+        name: trimmedName,
+        address: trimmedAddress,
+        phone: trimmedPhone,
+      });
+
+      if (res.data) {
+        setClinicInfo((prev) => ({
+          ...prev,
+          name: res.data.name || trimmedName,
+          address: res.data.address || trimmedAddress,
+          phone: res.data.phone || trimmedPhone,
+        }));
+      }
+
+      const msg = isRtl
+        ? 'تم حفظ معلومات العيادة بنجاح والتزامن مع الخادم.'
+        : 'Clinic information saved successfully and synchronized with server.';
+      setClinicInfoSuccessMessage(msg);
+      triggerToast(msg);
+      addAuditEntry(
+        t('tabs.clinic'),
+        t('auditLog.previousScheduleValue'),
+        trimmedName,
+        t('clinic.saveButton')
+      );
+    } catch (err: any) {
+      console.error('Failed to update clinic info:', err);
+      const errMsg =
+        err?.response?.data?.message ||
+        err?.message ||
+        (isRtl ? 'تعذر حفظ معلومات العيادة. يرجى التحقق من اتصال الخادم.' : 'Failed to save clinic information.');
+      setClinicInfoErrorMessage(errMsg);
+    } finally {
+      setIsSavingClinicInfo(false);
+    }
+  };
+
+  const saveWorkingHours = async () => {
+    await handleSaveSlotCapacity();
     addAuditEntry(
       t('auditLog.weeklyScheduleField'),
       t('auditLog.previousScheduleValue'),
-      t('auditLog.newScheduleValue'),
+      `${slotCapacity} patients/slot (60 min)`,
       t('auditLog.saveScheduleReason')
     );
-    triggerToast(t('workingHours.successMessage'));
   };
 
   const handleAddException = () => {
@@ -655,77 +916,151 @@ export const DoctorSettingsTab: React.FC<DoctorSettingsTabProps> = ({
             <span className="text-xs text-slate-500">{t('personal.description')}</span>
           </div>
 
+          {/* Feedback Banners */}
+          {profileSuccessMessage && (
+            <div className="p-3 rounded-xl bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800 text-teal-800 dark:text-teal-200 text-xs font-bold flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 shrink-0 text-teal-600 dark:text-teal-400" />
+              <span>{profileSuccessMessage}</span>
+            </div>
+          )}
+          {profileErrorMessage && (
+            <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-200 text-xs font-bold flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 dark:text-rose-400" />
+              <span>{profileErrorMessage}</span>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+            {/* Academic Title (Read-only / Cosmetic) */}
             <div className="space-y-1.5">
-              <label className="font-bold block text-slate-700 dark:text-slate-300">{t('personal.academicTitle')}</label>
+              <div className="flex items-center justify-between">
+                <label className="font-bold block text-slate-700 dark:text-slate-300">{t('personal.academicTitle')}</label>
+                <span className="text-[10px] text-slate-400 font-mono">({isRtl ? 'للعرض فقط' : 'Read-only'})</span>
+              </div>
               <input
                 type="text"
+                readOnly
+                disabled
                 value={personalInfo.title}
-                onChange={(e) => setPersonalInfo({ ...personalInfo, title: e.target.value })}
-                className={`w-full p-2.5 rounded-xl border font-bold ${cardBgClass}`}
+                className={`w-full p-2.5 rounded-xl border font-bold opacity-75 cursor-not-allowed bg-slate-100 dark:bg-slate-900/60 ${cardBgClass}`}
               />
             </div>
 
+            {/* Full Name (Editable) */}
             <div className="space-y-1.5">
-              <label className="font-bold block text-slate-700 dark:text-slate-300">{t('personal.fullName')}</label>
+              <label className="font-bold block text-slate-700 dark:text-slate-300">
+                {t('personal.fullName')} <span className="text-red-500">*</span>
+              </label>
               <input
                 type="text"
                 value={personalInfo.fullName}
                 onChange={(e) => setPersonalInfo({ ...personalInfo, fullName: e.target.value })}
+                disabled={isSavingProfile}
                 className={`w-full p-2.5 rounded-xl border font-bold ${cardBgClass}`}
               />
             </div>
 
+            {/* Medical Specialty (Canonical Master Data Select) */}
             <div className="space-y-1.5">
-              <label className="font-bold block text-slate-700 dark:text-slate-300">{t('personal.specialty')}</label>
-              <input
-                type="text"
-                value={personalInfo.specialty}
-                onChange={(e) => setPersonalInfo({ ...personalInfo, specialty: e.target.value })}
-                className={`w-full p-2.5 rounded-xl border font-bold ${cardBgClass}`}
+              <label className="font-bold block text-slate-700 dark:text-slate-300">
+                {t('personal.specialty')}
+              </label>
+              <SpecialtySelect
+                value={personalInfo.specialtyId || personalInfo.specialty}
+                onChange={(selectedId, selectedModel) => {
+                  setPersonalInfo((prev) => ({
+                    ...prev,
+                    specialtyId: selectedModel?.id ?? (selectedId && !isNaN(Number(selectedId)) ? Number(selectedId) : undefined),
+                    specialty: selectedModel ? masterDataService.getLocalizedName(selectedModel, locale) : (selectedId || prev.specialty),
+                  }));
+                }}
+                disabled={isSavingProfile}
+                placeholder={isRtl ? 'اختر التخصص الطبي المعتمد' : 'Select medical specialty'}
               />
             </div>
 
+            {/* License Number (Read-only / Regulatory Lock) */}
             <div className="space-y-1.5">
-              <label className="font-bold block text-slate-700 dark:text-slate-300">{t('personal.licenseNumber')}</label>
+              <div className="flex items-center justify-between">
+                <label className="font-bold block text-slate-700 dark:text-slate-300">{t('personal.licenseNumber')}</label>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 ${
+                  personalInfo.isVerified
+                    ? 'bg-teal-100 dark:bg-teal-900/50 text-teal-800 dark:text-teal-300 border border-teal-200 dark:border-teal-800'
+                    : 'bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
+                }`}>
+                  <ShieldCheck className="w-3 h-3" />
+                  {personalInfo.isVerified
+                    ? (isRtl ? 'معرّف معتمد' : 'Verified License')
+                    : (isRtl ? 'قيد التدقيق' : 'Pending Verification')}
+                </span>
+              </div>
               <input
                 type="text"
-                value={personalInfo.licenseNumber}
-                onChange={(e) => setPersonalInfo({ ...personalInfo, licenseNumber: e.target.value })}
-                className={`w-full p-2.5 rounded-xl border font-bold font-mono ${cardBgClass}`}
+                readOnly
+                disabled
+                value={personalInfo.licenseNumber || (isRtl ? 'غير محدد' : 'Not set')}
+                className={`w-full p-2.5 rounded-xl border font-bold font-mono opacity-80 cursor-not-allowed bg-slate-100 dark:bg-slate-900/60 ${cardBgClass}`}
               />
             </div>
 
+            {/* Phone Number (Editable) */}
             <div className="space-y-1.5">
-              <label className="font-bold block text-slate-700 dark:text-slate-300">{t('personal.phone')}</label>
+              <label className="font-bold block text-slate-700 dark:text-slate-300">
+                {t('personal.phone')} <span className="text-red-500">*</span>
+              </label>
               <input
                 type="text"
                 value={personalInfo.phone}
                 onChange={(e) => setPersonalInfo({ ...personalInfo, phone: e.target.value })}
+                disabled={isSavingProfile}
                 className={`w-full p-2.5 rounded-xl border font-bold font-mono ${cardBgClass}`}
               />
             </div>
 
+            {/* Email (Read-only / Security Lock) */}
             <div className="space-y-1.5">
-              <label className="font-bold block text-slate-700 dark:text-slate-300">{t('personal.email')}</label>
+              <div className="flex items-center justify-between">
+                <label className="font-bold block text-slate-700 dark:text-slate-300">{t('personal.email')}</label>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                  {isRtl ? 'هوية تسجيل الدخول' : 'Auth Login ID'}
+                </span>
+              </div>
               <input
                 type="email"
+                readOnly
+                disabled
                 value={personalInfo.email}
-                onChange={(e) => setPersonalInfo({ ...personalInfo, email: e.target.value })}
-                className={`w-full p-2.5 rounded-xl border font-bold font-mono ${cardBgClass}`}
+                className={`w-full p-2.5 rounded-xl border font-bold font-mono opacity-80 cursor-not-allowed bg-slate-100 dark:bg-slate-900/60 ${cardBgClass}`}
+              />
+            </div>
+
+            {/* Bio (Editable) */}
+            <div className="space-y-1.5 sm:col-span-2 lg:col-span-3">
+              <label className="font-bold block text-slate-700 dark:text-slate-300">
+                {isRtl ? 'النبذة المهنية والخبرات السريرية (Bio)' : 'Clinical Bio & Experience'}
+              </label>
+              <textarea
+                rows={3}
+                value={personalInfo.bio}
+                onChange={(e) => setPersonalInfo({ ...personalInfo, bio: e.target.value })}
+                placeholder={isRtl ? 'أدخل نبذة مختصرة عن خبراتك الطبية والمجالات الدقيقة...' : 'Brief description of medical practice and background...'}
+                disabled={isSavingProfile}
+                className={`w-full p-2.5 rounded-xl border font-normal text-xs resize-none ${cardBgClass}`}
               />
             </div>
           </div>
 
           <div className="pt-3 flex justify-end">
             <button
-              onClick={() => {
-                addAuditEntry(t('tabs.personal'), t('auditLog.previousScheduleValue'), personalInfo.fullName, t('personal.saveButton'));
-                triggerToast(t('personal.successMessage'));
-              }}
-              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer"
+              onClick={handleSavePersonal}
+              disabled={isSavingProfile}
+              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer"
             >
-              <Save className="w-4 h-4" />
+              {isSavingProfile ? (
+                <RefreshCw className="w-4 h-4 animate-spin" />
+              ) : (
+                <Save className="w-4 h-4" />
+              )}
               <span>{t('personal.saveButton')}</span>
             </button>
           </div>
@@ -735,22 +1070,67 @@ export const DoctorSettingsTab: React.FC<DoctorSettingsTabProps> = ({
       {/* TAB 2: Clinic Info */}
       {activeSubTab === 'clinic' && (
         <div className={`${containerClass} rounded-2xl p-6 border space-y-6`}>
-          <div className="flex items-center justify-between border-b pb-4 border-slate-200 dark:border-slate-800">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-4 border-slate-200 dark:border-slate-800">
             <div className="flex items-center gap-2">
               <Building className="w-5 h-5 text-blue-600" />
-              <h3 className="font-bold text-base">{t('clinic.title')}</h3>
+              <div>
+                <h3 className="font-bold text-base text-slate-900 dark:text-white">{t('clinic.title')}</h3>
+                <span className="text-xs text-slate-500">{t('clinic.description')}</span>
+              </div>
             </div>
-            <span className="text-xs text-slate-500">{t('clinic.description')}</span>
+
+            {canManageSettings && (
+              <button
+                type="button"
+                disabled={isSavingClinicInfo || clinicSettingsLoading}
+                onClick={handleSaveClinicInfo}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer"
+              >
+                {isSavingClinicInfo ? (
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Save className="w-4 h-4" />
+                )}
+                <span>
+                  {isSavingClinicInfo
+                    ? (isRtl ? 'جاري الحفظ والتزامن...' : 'Saving...')
+                    : t('clinic.saveButton')}
+                </span>
+              </button>
+            )}
           </div>
+
+          {/* Success / Error Feedback Alerts */}
+          {clinicInfoSuccessMessage && (
+            <div className="p-3.5 rounded-xl bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800 text-teal-800 dark:text-teal-300 text-xs flex items-center gap-2.5">
+              <CheckCircle2 className="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0" />
+              <span className="font-semibold">{clinicInfoSuccessMessage}</span>
+            </div>
+          )}
+
+          {clinicInfoErrorMessage && (
+            <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs flex items-center gap-2.5">
+              <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
+              <span className="font-semibold">{clinicInfoErrorMessage}</span>
+            </div>
+          )}
+
+          {clinicSettingsError && (
+            <div className="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 text-xs flex items-center gap-2.5">
+              <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+              <span>{clinicSettingsError}</span>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
             <div className="space-y-1.5">
               <label className="font-bold block text-slate-700 dark:text-slate-300">{t('clinic.name')}</label>
               <input
                 type="text"
+                disabled={!canManageSettings || isSavingClinicInfo}
                 value={clinicInfo.name}
                 onChange={(e) => setClinicInfo({ ...clinicInfo, name: e.target.value })}
-                className={`w-full p-2.5 rounded-xl border font-bold ${cardBgClass}`}
+                className={`w-full p-2.5 rounded-xl border font-bold ${cardBgClass} ${!canManageSettings ? 'cursor-not-allowed opacity-70' : ''}`}
               />
             </div>
 
@@ -758,9 +1138,10 @@ export const DoctorSettingsTab: React.FC<DoctorSettingsTabProps> = ({
               <label className="font-bold block text-slate-700 dark:text-slate-300">{t('clinic.city')}</label>
               <input
                 type="text"
+                disabled={!canManageSettings || isSavingClinicInfo}
                 value={clinicInfo.city}
                 onChange={(e) => setClinicInfo({ ...clinicInfo, city: e.target.value })}
-                className={`w-full p-2.5 rounded-xl border font-bold ${cardBgClass}`}
+                className={`w-full p-2.5 rounded-xl border font-bold ${cardBgClass} ${!canManageSettings ? 'cursor-not-allowed opacity-70' : ''}`}
               />
             </div>
 
@@ -768,9 +1149,10 @@ export const DoctorSettingsTab: React.FC<DoctorSettingsTabProps> = ({
               <label className="font-bold block text-slate-700 dark:text-slate-300">{t('clinic.address')}</label>
               <input
                 type="text"
+                disabled={!canManageSettings || isSavingClinicInfo}
                 value={clinicInfo.address}
                 onChange={(e) => setClinicInfo({ ...clinicInfo, address: e.target.value })}
-                className={`w-full p-2.5 rounded-xl border font-bold ${cardBgClass}`}
+                className={`w-full p-2.5 rounded-xl border font-bold ${cardBgClass} ${!canManageSettings ? 'cursor-not-allowed opacity-70' : ''}`}
               />
             </div>
 
@@ -778,9 +1160,10 @@ export const DoctorSettingsTab: React.FC<DoctorSettingsTabProps> = ({
               <label className="font-bold block text-slate-700 dark:text-slate-300">{t('clinic.phone')}</label>
               <input
                 type="text"
+                disabled={!canManageSettings || isSavingClinicInfo}
                 value={clinicInfo.phone}
                 onChange={(e) => setClinicInfo({ ...clinicInfo, phone: e.target.value })}
-                className={`w-full p-2.5 rounded-xl border font-bold font-mono ${cardBgClass}`}
+                className={`w-full p-2.5 rounded-xl border font-bold font-mono ${cardBgClass} ${!canManageSettings ? 'cursor-not-allowed opacity-70' : ''}`}
               />
             </div>
 
@@ -788,23 +1171,31 @@ export const DoctorSettingsTab: React.FC<DoctorSettingsTabProps> = ({
               <label className="font-bold block text-slate-700 dark:text-slate-300">{t('clinic.email')}</label>
               <input
                 type="text"
+                disabled={!canManageSettings || isSavingClinicInfo}
                 value={clinicInfo.email}
                 onChange={(e) => setClinicInfo({ ...clinicInfo, email: e.target.value })}
-                className={`w-full p-2.5 rounded-xl border font-bold font-mono ${cardBgClass}`}
+                className={`w-full p-2.5 rounded-xl border font-bold font-mono ${cardBgClass} ${!canManageSettings ? 'cursor-not-allowed opacity-70' : ''}`}
               />
             </div>
           </div>
 
           <div className="pt-3 flex justify-end">
             <button
-              onClick={() => {
-                addAuditEntry(t('tabs.clinic'), t('auditLog.previousScheduleValue'), clinicInfo.name, t('clinic.saveButton'));
-                triggerToast(t('clinic.successMessage'));
-              }}
-              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer"
+              type="button"
+              disabled={isSavingClinicInfo || clinicSettingsLoading || !canManageSettings}
+              onClick={handleSaveClinicInfo}
+              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer"
             >
-              <Save className="w-4 h-4" />
-              <span>{t('clinic.saveButton')}</span>
+              {isSavingClinicInfo ? (
+                <RefreshCw className="w-4 h-4 animate-spin" />
+              ) : (
+                <Save className="w-4 h-4" />
+              )}
+              <span>
+                {isSavingClinicInfo
+                  ? (isRtl ? 'جاري الحفظ والتزامن...' : 'Saving...')
+                  : t('clinic.saveButton')}
+              </span>
             </button>
           </div>
         </div>
@@ -825,151 +1216,160 @@ export const DoctorSettingsTab: React.FC<DoctorSettingsTabProps> = ({
             </div>
           </div>
 
-          {/* Weekly Schedule Grid Editor */}
-          <div className={`${containerClass} rounded-2xl p-6 border space-y-6`}>
+          {/* Authoritative Slot Duration & Capacity Settings Card */}
+          <div className={`${containerClass} rounded-2xl p-6 border space-y-5 shadow-xs`}>
             <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-4 border-slate-200 dark:border-slate-800">
-              <div className="flex items-center gap-2">
-                <Clock className="w-5 h-5 text-teal-600" />
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-teal-500/10 text-teal-600 dark:text-teal-400 flex items-center justify-center">
+                  <Sliders className="w-5 h-5" />
+                </div>
                 <div>
-                  <h3 className="font-bold text-base">{t('workingHours.title')}</h3>
-                  <p className="text-xs text-slate-500 mt-0.5">{t('workingHours.subtitle')}</p>
+                  <h3 className="font-bold text-base text-slate-900 dark:text-white">
+                    {isRtl ? 'إعدادات فترات وسعة الحجز الرسمية' : 'Authoritative Slot & Capacity Settings'}
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                    {isRtl
+                      ? 'التحكم في سعة المواعيد المتاحة لكل فترة زمنية والتزامن مع محرك الحجز بالعيادة'
+                      : 'Configure slot booking capacity per hourly window and synchronize with booking engine'}
+                  </p>
                 </div>
               </div>
 
-              <button
-                onClick={saveWorkingHours}
-                className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer"
-              >
-                <Save className="w-4 h-4" />
-                <span>{t('workingHours.saveButton')}</span>
-              </button>
+              {canManageSettings && (
+                <button
+                  type="button"
+                  key="save_slot_capacity_button"
+                  disabled={isSavingCapacity || clinicSettingsLoading}
+                  onClick={handleSaveSlotCapacity}
+                  className="px-4 py-2 bg-teal-600 hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer"
+                >
+                  {isSavingCapacity ? (
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Save className="w-4 h-4" />
+                  )}
+                  <span>
+                    {isSavingCapacity
+                      ? (isRtl ? 'جاري الحفظ والتزامن...' : 'Saving...')
+                      : (isRtl ? 'حفظ سعة المواعيد' : 'Save Slot Capacity')}
+                  </span>
+                </button>
+              )}
             </div>
 
-            {/* Days Rows */}
-            <div className="space-y-3">
-              {workingHours.map((wh) => (
-                <div
-                  key={wh.id}
-                  className={`p-4 rounded-xl border transition-all ${
-                    wh.isOpen ? cardBgClass : isDarkMode ? 'bg-slate-950/40 border-slate-800 opacity-60' : 'bg-slate-100/60 border-slate-200 opacity-60'
-                  }`}
-                >
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center text-xs">
-                    
-                    {/* Day Name & Toggle */}
-                    <div className="lg:col-span-3 flex items-center justify-between gap-3 border-b lg:border-b-0 pb-2 lg:pb-0 border-slate-200 dark:border-slate-800">
-                      <div className="flex items-center gap-2.5">
-                        <button
-                          onClick={() => handleDayToggle(wh.id)}
-                          className={`w-10 h-6 rounded-full transition-colors relative p-0.5 cursor-pointer ${
-                            wh.isOpen ? 'bg-teal-600' : 'bg-slate-400'
-                          }`}
-                        >
-                          <span
-                            className={`block w-5 h-5 rounded-full bg-white shadow-xs transition-transform ${
-                              wh.isOpen ? (isRtl ? 'translate-x-[-16px]' : 'translate-x-4') : 'translate-x-0'
-                            }`}
-                          />
-                        </button>
-                        <div>
-                          <strong className="font-bold block text-sm">{wh.dayAr}</strong>
-                          <span className={`text-[10px] font-bold ${wh.isOpen ? 'text-teal-600 dark:text-teal-400' : 'text-slate-400'}`}>
-                            {wh.isOpen ? t('workingHours.openStatus') : t('workingHours.closedStatus')}
-                          </span>
-                        </div>
-                      </div>
+            {/* Success / Error Feedback Alerts */}
+            {capacitySuccessMessage && (
+              <div className="p-3.5 rounded-xl bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800 text-teal-800 dark:text-teal-300 text-xs flex items-center gap-2.5">
+                <CheckCircle2 className="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0" />
+                <span className="font-semibold">{capacitySuccessMessage}</span>
+              </div>
+            )}
 
-                      <span className="text-[10px] px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-mono">
-                        {wh.note}
-                      </span>
-                    </div>
+            {capacityErrorMessage && (
+              <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs flex items-center gap-2.5">
+                <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
+                <span className="font-semibold">{capacityErrorMessage}</span>
+              </div>
+            )}
 
-                    {wh.isOpen ? (
-                      <>
-                        {/* Working Hours Times */}
-                        <div className="lg:col-span-3 grid grid-cols-2 gap-2">
-                          <div>
-                            <label className="text-[10px] font-bold text-slate-500 block">{t('workingHours.startWork')}</label>
-                            <input
-                              type="time"
-                              value={wh.startTime}
-                              onChange={(e) => handleWorkingHourChange(wh.id, 'startTime', e.target.value)}
-                              className="w-full p-2 rounded-lg border font-mono font-bold bg-white dark:bg-slate-900"
-                            />
-                          </div>
-                          <div>
-                            <label className="text-[10px] font-bold text-slate-500 block">{t('workingHours.endWork')}</label>
-                            <input
-                              type="time"
-                              value={wh.endTime}
-                              onChange={(e) => handleWorkingHourChange(wh.id, 'endTime', e.target.value)}
-                              className="w-full p-2 rounded-lg border font-mono font-bold bg-white dark:bg-slate-900"
-                            />
-                          </div>
-                        </div>
+            {clinicSettingsError && (
+              <div className="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 text-xs flex items-center gap-2.5">
+                <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>{clinicSettingsError}</span>
+              </div>
+            )}
 
-                        {/* Break Times */}
-                        <div className="lg:col-span-3 grid grid-cols-2 gap-2">
-                          <div>
-                            <label className="text-[10px] font-bold text-amber-600 dark:text-amber-400 block">{t('workingHours.startBreak')}</label>
-                            <input
-                              type="time"
-                              value={wh.breakStart}
-                              onChange={(e) => handleWorkingHourChange(wh.id, 'breakStart', e.target.value)}
-                              className="w-full p-2 rounded-lg border font-mono font-bold bg-white dark:bg-slate-900"
-                            />
-                          </div>
-                          <div>
-                            <label className="text-[10px] font-bold text-amber-600 dark:text-amber-400 block">{t('workingHours.endBreak')}</label>
-                            <input
-                              type="time"
-                              value={wh.breakEnd}
-                              onChange={(e) => handleWorkingHourChange(wh.id, 'breakEnd', e.target.value)}
-                              className="w-full p-2 rounded-lg border font-mono font-bold bg-white dark:bg-slate-900"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Patient Capacity */}
-                        <div className="lg:col-span-3 grid grid-cols-2 gap-2">
-                          <div>
-                            <label className="text-[10px] font-bold text-slate-500 block">{t('workingHours.capacity')}</label>
-                            <input
-                              type="number"
-                              min="1"
-                              max="20"
-                              value={wh.maxPatientsPerSlot}
-                              onChange={(e) => handleWorkingHourChange(wh.id, 'maxPatientsPerSlot', parseInt(e.target.value) || 1)}
-                              className="w-full p-2 rounded-lg border font-bold bg-white dark:bg-slate-900"
-                            />
-                          </div>
-                          <div>
-                            <label className="text-[10px] font-bold text-slate-500 block">{t('workingHours.duration')}</label>
-                            <select
-                              value={wh.slotDurationMin}
-                              onChange={(e) => handleWorkingHourChange(wh.id, 'slotDurationMin', parseInt(e.target.value))}
-                              className="w-full p-2 rounded-lg border font-bold bg-white dark:bg-slate-900"
-                            >
-                              <option value={15}>{t('workingHours.minutes', { count: 15 })}</option>
-                              <option value={20}>{t('workingHours.minutes', { count: 20 })}</option>
-                              <option value={30}>{t('workingHours.minutes', { count: 30 })}</option>
-                              <option value={45}>{t('workingHours.minutes', { count: 45 })}</option>
-                              <option value={60}>{t('workingHours.minutes', { count: 60 })}</option>
-                            </select>
-                          </div>
-                        </div>
-                      </>
-                    ) : (
-                      <div className="lg:col-span-9 p-2 rounded-lg bg-slate-200/50 dark:bg-slate-800/50 text-slate-500 font-bold text-center">
-                        {t('workingHours.closedNote')}
-                      </div>
-                    )}
-
-                  </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs">
+              {/* Slot Duration (Fixed 60 Minutes Platform Invariant) */}
+              <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/30 space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                    <Clock className="w-4 h-4 text-slate-500" />
+                    <span>{isRtl ? 'مدة الفترة الزمنية (Slot Duration)' : 'Slot Duration'}</span>
+                  </label>
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700">
+                    {isRtl ? 'قاعدة المنصة (ثابت)' : 'Fixed Platform Rule'}
+                  </span>
                 </div>
-              ))}
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    disabled
+                    value={isRtl ? '60 دقيقة (ساعة كاملة)' : '60 minutes (1 hour)'}
+                    className="w-full p-2.5 rounded-xl border font-bold bg-slate-100 dark:bg-slate-900/60 text-slate-600 dark:text-slate-300 cursor-not-allowed border-slate-200 dark:border-slate-800 font-mono"
+                  />
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                  {isRtl
+                    ? 'وفق قاعدة المنصة المعتمدة (P3 Frozen Invariant)، تبدأ جميع فترات الكشف على رأس كل ساعة (من 08:00 إلى 17:00).'
+                    : 'Per platform rule (P3 Frozen Invariant), all slots start on the hour from 08:00 to 17:00.'}
+                </p>
+              </div>
+
+              {/* Slot Capacity (1..10 Patients per Slot) */}
+              <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/30 space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                    <Users className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+                    <span>{isRtl ? 'سعة الحجز للفترة (Slot Capacity)' : 'Booking Capacity per Slot'}</span>
+                  </label>
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-teal-100 dark:bg-teal-900/50 text-teal-800 dark:text-teal-300 border border-teal-200 dark:border-teal-800">
+                    {slotCapacity} / 10
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    min={1}
+                    max={10}
+                    disabled={!canManageSettings || isSavingCapacity || clinicSettingsLoading}
+                    value={slotCapacity}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value);
+                      if (!isNaN(val)) {
+                        setSlotCapacity(Math.max(1, Math.min(10, val)));
+                      }
+                    }}
+                    className={`w-full p-2.5 rounded-xl border font-bold text-sm bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white font-mono ${
+                      !canManageSettings ? 'cursor-not-allowed opacity-70 bg-slate-100 dark:bg-slate-900/60' : ''
+                    }`}
+                  />
+                  <span className="text-xs font-bold text-slate-500 whitespace-nowrap">
+                    {isRtl ? 'مرضى / Slot' : 'patients/slot'}
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                  {canManageSettings
+                    ? (isRtl
+                        ? 'النطاق المسموح به: من 1 إلى 10 مرضى لكل ساعة (القيمة الافتراضية: 10).'
+                        : 'Allowed range: 1 to 10 patients per hour (Default: 10).')
+                    : (isRtl
+                        ? 'تعديل سعة المواعيد متاح حصرياً لمدير العيادة (Clinic Director).'
+                        : 'Editing capacity is restricted to Clinic Director.')}
+                </p>
+              </div>
             </div>
           </div>
+
+          {/* Clinic Weekly Operating Hours (Required Foundation for Booking) */}
+          {effectiveClinicId && (
+            <ClinicOperatingHoursEditor
+              clinicId={effectiveClinicId}
+              canManage={canManageSettings}
+              isDarkMode={isDarkMode}
+            />
+          )}
+
+          {/* Doctor Weekly Working Hours & Locked Schedule Engine */}
+          {user?.doctor?.id && effectiveClinicId && (
+            <DoctorWorkingHoursEditor
+              doctorId={user.doctor.id}
+              clinicId={effectiveClinicId}
+              canManage={canManageSettings || user?.doctor?.id === user?.doctor?.id}
+              isDarkMode={isDarkMode}
+            />
+          )}
 
         </div>
       )}
@@ -978,232 +1378,174 @@ export const DoctorSettingsTab: React.FC<DoctorSettingsTabProps> = ({
       {activeSubTab === 'vacation-exceptions' && (
         <div className="space-y-6">
           
-          {/* Top Info Banner */}
+          {/* Top Info Banner - DEC-VAC-01 & DEC-VAC-02 Policy */}
           <div className="p-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 text-amber-900 dark:text-amber-200 flex items-start gap-3">
             <Calendar className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
             <div className="text-xs space-y-1">
-              <strong className="font-bold block text-sm">{t('vacationExceptions.bannerTitle')}</strong>
+              <strong className="font-bold block text-sm">
+                {isRtl ? 'إدارة الإجازات وإعادة الجدولة الآلية (AAFIYA V1 Policy)' : 'Vacations & Automated Rescheduling (AAFIYA V1 Policy)'}
+              </strong>
               <p className="leading-relaxed text-slate-700 dark:text-slate-300">
-                {t('vacationExceptions.bannerDesc')}
+                {isRtl
+                  ? 'تسجيل الإجازة يسري فوراً (DEC-VAC-01) ويقوم المحرك بترحيل المواعيد آلياً إلى أقرب خانة شاغرة خلال 7 أيام (DEC-VAC-02). الحالات التي يتعذر ترحيلها تُسجل كـ urgent_unresolved للمتابعة اليدوية (Option B). إلغاء الإجازة منطقي فقط ولا يحذف السجل (DEC-VAC-05).'
+                  : 'Vacation registration takes immediate effect (DEC-VAC-01) and automatically relocates conflicting appointments within a 7-day horizon (DEC-VAC-02). Non-relocatable cases become urgent_unresolved (Option B). Cancellation is logical only and preserves audit history (DEC-VAC-05).'}
               </p>
             </div>
           </div>
 
-          {/* New Exception Creation Form */}
-          <div className={`${containerClass} rounded-2xl p-6 border space-y-4`}>
-            <div className="flex items-center gap-2 border-b pb-3 border-slate-200 dark:border-slate-800">
-              <Plus className="w-5 h-5 text-amber-500" />
-              <h3 className="font-bold text-base">{t('vacationExceptions.addTitle')}</h3>
+          {/* Action Bar: Register Vacation */}
+          <div className={`${containerClass} rounded-2xl p-6 border flex flex-wrap items-center justify-between gap-4`}>
+            <div className="space-y-1">
+              <h3 className="font-bold text-base flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+                <span>{isRtl ? 'إجازات وعطلات الطبيب الرسمية' : 'Doctor Official Vacations'}</span>
+              </h3>
+              <p className="text-xs text-slate-500">
+                {isRtl
+                  ? 'يمكنك تسجيل إجازة جديدة محددة التاريخ والعيادات التابعة لتشغيل محرك إعادة الجدولة الآمن.'
+                  : 'Register a new vacation across all or specific clinics to trigger automated rescheduling.'}
+              </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-              <div className="space-y-1">
-                <label className="font-bold block text-slate-700 dark:text-slate-300">{t('vacationExceptions.typeLabel')}</label>
-                <select
-                  value={newExcType}
-                  onChange={(e) => setNewExcType(e.target.value as any)}
-                  className={`w-full p-2.5 rounded-xl border font-bold ${cardBgClass}`}
-                >
-                  <option value="vacation">{t('types.vacation')}</option>
-                  <option value="conference">{t('types.conference')}</option>
-                  <option value="emergency">{t('types.emergency')}</option>
-                  <option value="holiday">{t('types.holiday')}</option>
-                  <option value="pause">{t('types.pause')}</option>
-                </select>
-              </div>
-
-              <div className="space-y-1">
-                <label className="font-bold block text-slate-700 dark:text-slate-300">{t('vacationExceptions.startDate')}</label>
-                <input
-                  type="date"
-                  value={newExcStartDate}
-                  onChange={(e) => setNewExcStartDate(e.target.value)}
-                  className={`w-full p-2.5 rounded-xl border font-bold ${cardBgClass}`}
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="font-bold block text-slate-700 dark:text-slate-300">{t('vacationExceptions.endDate')}</label>
-                <input
-                  type="date"
-                  value={newExcEndDate}
-                  onChange={(e) => setNewExcEndDate(e.target.value)}
-                  className={`w-full p-2.5 rounded-xl border font-bold ${cardBgClass}`}
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="font-bold block text-slate-700 dark:text-slate-300">{t('vacationExceptions.reasonLabel')}</label>
-                <input
-                  type="text"
-                  placeholder={t('vacationExceptions.reasonPlaceholder')}
-                  value={newExcReason}
-                  onChange={(e) => setNewExcReason(e.target.value)}
-                  className={`w-full p-2.5 rounded-xl border font-bold ${cardBgClass}`}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-1 text-xs">
-              <label className="font-bold block text-slate-700 dark:text-slate-300">{t('vacationExceptions.descriptionLabel')}</label>
-              <input
-                type="text"
-                placeholder={t('vacationExceptions.descriptionPlaceholder')}
-                value={newExcDesc}
-                onChange={(e) => setNewExcDesc(e.target.value)}
-                className={`w-full p-2.5 rounded-xl border font-bold ${cardBgClass}`}
-              />
-            </div>
-
-            <div className="flex justify-end pt-2">
-              <button
-                onClick={handleAddException}
-                className="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer"
-              >
-                <Plus className="w-4 h-4" />
-                <span>{t('vacationExceptions.saveButton')}</span>
-              </button>
-            </div>
+            <button
+              onClick={() => setIsVacationModalOpen(true)}
+              className="px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-2 transition-all cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              <span>{isRtl ? 'تسجيل إجازة جديدة' : 'Register New Vacation'}</span>
+            </button>
           </div>
 
-          {/* Registered Exceptions Table */}
+          {/* Registered Vacations Table */}
           <div className={`${containerClass} rounded-2xl p-6 border space-y-4`}>
             <div className="flex items-center justify-between border-b pb-3 border-slate-200 dark:border-slate-800">
               <h3 className="font-bold text-base flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-amber-500" />
-                <span>{t('vacationExceptions.listTitle')}</span>
+                <Clock className="w-5 h-5 text-amber-500" />
+                <span>{isRtl ? 'سجل الإجازات المسجلة' : 'Registered Vacations Log'}</span>
               </h3>
-              <span className="text-xs font-mono font-bold px-2.5 py-1 rounded bg-amber-500/10 text-amber-600 dark:text-amber-300 border border-amber-500/20">
-                {t('vacationExceptions.activeCount', { count: exceptions.length })}
-              </span>
-            </div>
-
-            <div className="space-y-2 text-xs">
-              {exceptions.map((exc) => (
-                <div
-                  key={exc.id}
-                  className={`p-4 rounded-xl border flex flex-wrap items-center justify-between gap-3 ${cardBgClass}`}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={fetchVacations}
+                  disabled={loadingVacations}
+                  className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 transition-all cursor-pointer disabled:opacity-50"
+                  title={isRtl ? 'تحديث' : 'Refresh'}
                 >
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="px-2.5 py-0.5 rounded-full font-bold bg-amber-500/20 text-amber-700 dark:text-amber-300 text-[11px] border border-amber-500/30">
-                        {exc.typeNameAr}
-                      </span>
-                      <strong className="font-bold text-sm">{exc.reason}</strong>
-                    </div>
-
-                    <p className="text-slate-500 text-[11px]">{exc.description}</p>
-
-                    <div className="flex items-center gap-4 text-[11px] text-slate-600 dark:text-slate-400 font-mono">
-                      <span>{t('vacationExceptions.startDate')}: <strong>{exc.startDate}</strong></span>
-                      <span>{t('vacationExceptions.endDate')}: <strong>{exc.endDate}</strong></span>
-                      <span className="text-rose-600 dark:text-rose-400 font-bold">{t('workingHours.closedStatus')}</span>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => handleDeleteException(exc.id, exc.reason)}
-                    className="px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-300 font-bold rounded-lg transition-all flex items-center gap-1 cursor-pointer"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    <span>{t('vacationExceptions.cancelButton')}</span>
-                  </button>
-                </div>
-              ))}
+                  <RefreshCw className={`w-3.5 h-3.5 ${loadingVacations ? 'animate-spin' : ''}`} />
+                </button>
+                <span className="text-xs font-mono font-bold px-2.5 py-1 rounded bg-slate-500/10 text-slate-600 dark:text-slate-400 border border-slate-500/20">
+                  {vacations.length} {isRtl ? 'إجازة' : 'vacations'}
+                </span>
+              </div>
             </div>
-          </div>
 
-          {/* Conflicting Appointments Review Widget */}
-          <div className={`${containerClass} rounded-2xl p-6 border space-y-4`}>
-            <div className="flex items-center justify-between border-b pb-3 border-slate-200 dark:border-slate-800">
-              <div>
-                <h3 className="font-bold text-base flex items-center gap-2 text-rose-600 dark:text-rose-400">
-                  <AlertTriangle className="w-5 h-5" />
-                  <span>{t('vacationExceptions.conflictsTitle')}</span>
-                </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  {t('vacationExceptions.conflictsDesc')}
+            {vacationsError && (
+              <div className="p-3 rounded-xl border border-rose-500/20 bg-rose-500/10 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{vacationsError}</span>
+              </div>
+            )}
+
+            {loadingVacations ? (
+              <div className="p-8 text-center space-y-2">
+                <RefreshCw className="w-6 h-6 text-teal-600 animate-spin mx-auto" />
+                <p className="text-xs text-slate-500">{isRtl ? 'جاري تحميل الإجازات...' : 'Loading vacations...'}</p>
+              </div>
+            ) : vacations.length === 0 ? (
+              <div className="p-8 text-center space-y-2 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 border border-dashed border-slate-300 dark:border-slate-800">
+                <Calendar className="w-8 h-8 text-slate-400 mx-auto" />
+                <p className="text-xs font-bold text-slate-600 dark:text-slate-400">
+                  {isRtl ? 'لا توجد إجازات مسجلة حالياً.' : 'No vacations currently registered.'}
+                </p>
+                <p className="text-[11px] text-slate-400">
+                  {isRtl
+                    ? 'اضغط على زر "تسجيل إجازة جديدة" أعلاه لبدء تسجيل فترة عطلة.'
+                    : 'Click "Register New Vacation" above to declare a vacation period.'}
                 </p>
               </div>
+            ) : (
+              <div className="space-y-3 text-xs">
+                {vacations.map((vac) => {
+                  const isEffective = vac.status === 'effective';
+                  const isCancelling = cancellingVacationId === vac.id;
+                  return (
+                    <div
+                      key={vac.id}
+                      className={`p-4 rounded-xl border flex flex-wrap items-center justify-between gap-3 ${cardBgClass}`}
+                    >
+                      <div className="space-y-1.5">
+                        <div className="flex items-center gap-2">
+                          <span className={`px-2.5 py-0.5 rounded-full font-bold text-[11px] border ${
+                            isEffective
+                              ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30'
+                              : 'bg-slate-500/15 text-slate-600 dark:text-slate-400 border-slate-500/30'
+                          }`}>
+                            {isEffective
+                              ? (isRtl ? 'سارية المفعول' : 'Effective')
+                              : (isRtl ? 'ملغاة' : 'Cancelled')}
+                          </span>
+                          <strong className="font-bold text-sm text-slate-900 dark:text-white">
+                            {vac.reason || (isRtl ? 'إجازة عادية' : 'Regular Vacation')}
+                          </strong>
+                        </div>
 
-              <span className="px-2.5 py-1 rounded bg-rose-500/10 text-rose-600 dark:text-rose-300 font-bold text-xs border border-rose-500/20">
-                {conflictingAppointments.filter((a) => a.status === 'needs_review').length} {t('activityLog.filterPending')}
-              </span>
-            </div>
+                        {vac.notes && (
+                          <p className="text-slate-500 text-[11px]">{vac.notes}</p>
+                        )}
 
-            <div className="space-y-3 text-xs">
-              {conflictingAppointments.map((apt) => (
-                <div
-                  key={apt.id}
-                  className={`p-4 rounded-xl border space-y-3 ${
-                    apt.status === 'needs_review'
-                      ? 'bg-rose-50/50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900/50'
-                      : cardBgClass
-                  }`}
-                >
-                  <div className="flex flex-wrap items-center justify-between gap-2 border-b pb-2 border-slate-200 dark:border-slate-800">
-                    <div>
-                      <strong className="font-bold text-sm block">{apt.patientName}</strong>
-                      <span className="text-slate-500 font-mono">{apt.patientPhone}</span>
-                    </div>
-
-                    <div className="text-right">
-                      <span className="font-bold text-blue-600 dark:text-blue-400 block">{apt.appointmentTime}</span>
-                      <span className="text-[11px] text-rose-600 dark:text-rose-400 font-bold">{apt.conflictReason}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-                    <div className="text-[11px]">
-                      <span className="text-slate-500">{t('conflicts.reviewStatus')} </span>
-                      <strong className={`font-bold ${
-                        apt.status === 'needs_review'
-                          ? 'text-amber-600'
-                          : apt.status === 'approved_as_is'
-                          ? 'text-emerald-600'
-                          : apt.status === 'rescheduled'
-                          ? 'text-blue-600'
-                          : 'text-rose-600'
-                      }`}>
-                        {apt.status === 'needs_review' && t('conflicts.pendingDecision')}
-                        {apt.status === 'approved_as_is' && t('conflicts.approvedAsIs')}
-                        {apt.status === 'rescheduled' && t('conflicts.rescheduledWithTime', { time: apt.newProposedTime || t('vacationExceptions.newTime') })}
-                        {apt.status === 'cancelled' && t('conflicts.cancelledByClinic')}
-                      </strong>
-                    </div>
-
-                    {apt.status === 'needs_review' ? (
-                      <div className="flex flex-wrap items-center gap-2">
-                        <button
-                          onClick={() => handleAppointmentResolution(apt.id, 'approved_as_is')}
-                          className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg transition-all cursor-pointer"
-                        >
-                          {t('conflicts.approveButton')}
-                        </button>
-                        <button
-                          onClick={() => handleAppointmentResolution(apt.id, 'rescheduled', isRtl ? 'اليوم الموالي 09:00 صباحاً' : 'Next day 09:00 AM')}
-                          className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-all cursor-pointer"
-                        >
-                          {t('conflicts.rescheduleButton')}
-                        </button>
-                        <button
-                          onClick={() => handleAppointmentResolution(apt.id, 'cancelled')}
-                          className="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-lg transition-all cursor-pointer"
-                        >
-                          {t('conflicts.cancelButton')}
-                        </button>
+                        <div className="flex flex-wrap items-center gap-4 text-[11px] text-slate-600 dark:text-slate-400 font-mono">
+                          <span>{isRtl ? 'من:' : 'From:'} <strong>{vac.vacation_start}</strong></span>
+                          <span>{isRtl ? 'إلى:' : 'To:'} <strong>{vac.vacation_end}</strong></span>
+                          {vac.clinics && vac.clinics.length > 0 && (
+                            <span className="text-teal-600 dark:text-teal-400 font-bold">
+                              {vac.clinics.map((c) => c.name || c.clinic_id).join(', ')}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                    ) : (
-                      <span className="text-[11px] text-emerald-600 font-bold flex items-center gap-1">
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        {t('conflicts.noticeSent')}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
+
+                      {isEffective && (
+                        <button
+                          onClick={() => handleCancelVacation(vac.id)}
+                          disabled={isCancelling}
+                          className="px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-300 font-bold rounded-lg transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                        >
+                          {isCancelling ? (
+                            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <Trash2 className="w-3.5 h-3.5" />
+                          )}
+                          <span>{isRtl ? 'إلغاء الإجازة' : 'Cancel Vacation'}</span>
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
+
+          {/* Unresolved Cases Dashboard (DEC-VAC-06 / Option B) */}
+          {effectiveClinicId && (
+            <UnresolvedReschedulesDashboard
+              clinicId={effectiveClinicId}
+              isDarkMode={isDarkMode}
+            />
+          )}
+
+          {/* Doctor Vacation Modal */}
+          <DoctorVacationModal
+            isOpen={isVacationModalOpen}
+            onClose={() => setIsVacationModalOpen(false)}
+            onSuccess={() => {
+              triggerToast(isRtl ? 'تم تسجيل الإجازة بنجاح.' : 'Vacation registered successfully.');
+              fetchVacations();
+            }}
+            affiliatedClinics={(user?.clinics || []).map((c: any) => ({
+              id: c.id,
+              name: c.name || `Clinic ${c.id}`,
+            }))}
+            isDarkMode={isDarkMode}
+          />
 
         </div>
       )}
@@ -1370,32 +1712,46 @@ export const DoctorSettingsTab: React.FC<DoctorSettingsTabProps> = ({
           </span>
         </div>
 
-        <div className="space-y-2 text-xs">
-          {auditLogs.map((log) => (
-            <div
-              key={log.id}
-              className={`p-3 rounded-xl border flex flex-wrap items-center justify-between gap-3 ${cardBgClass}`}
-            >
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-blue-600 dark:text-blue-400">{log.fieldChanged}</span>
-                  <span className="text-[10px] bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded font-mono font-bold">
-                    {log.timestamp}
-                  </span>
+        {auditLogs.length === 0 ? (
+          <div className="p-8 text-center space-y-2 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 border border-dashed border-slate-300 dark:border-slate-800">
+            <ShieldCheck className="w-8 h-8 text-slate-400 mx-auto" />
+            <p className="text-xs font-bold text-slate-600 dark:text-slate-400">
+              {isRtl ? 'لا توجد سجلات تدقيق مسجلة حالياً.' : 'No audit log entries currently recorded.'}
+            </p>
+            <p className="text-[11px] text-slate-400">
+              {isRtl
+                ? 'سجل تدقيق الإعدادات في طور الربط مع خادم المراقبة المركزي (Audit Trail API). سيتم توثيق كافة التعديلات فور تفعيل الخدمة.'
+                : 'The settings audit log is awaiting integration with the centralized Audit Trail API. Changes will be documented once connected.'}
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-2 text-xs">
+            {auditLogs.map((log) => (
+              <div
+                key={log.id}
+                className={`p-3 rounded-xl border flex flex-wrap items-center justify-between gap-3 ${cardBgClass}`}
+              >
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-blue-600 dark:text-blue-400">{log.fieldChanged}</span>
+                    <span className="text-[10px] bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded font-mono font-bold">
+                      {log.timestamp}
+                    </span>
+                  </div>
+                  <p className="text-slate-600 dark:text-slate-300 text-[11px]">
+                    {t('auditLog.table.oldValue')}: <span className="line-through opacity-70">{log.oldValue}</span> ➔ {t('auditLog.table.newValue')}: <strong className="text-teal-600 dark:text-teal-400">{log.newValue}</strong>
+                  </p>
+                  <span className="text-[10px] text-slate-400 block">{t('auditLog.table.reason')}: {log.reason}</span>
                 </div>
-                <p className="text-slate-600 dark:text-slate-300 text-[11px]">
-                  {t('auditLog.table.oldValue')}: <span className="line-through opacity-70">{log.oldValue}</span> ➔ {t('auditLog.table.newValue')}: <strong className="text-teal-600 dark:text-teal-400">{log.newValue}</strong>
-                </p>
-                <span className="text-[10px] text-slate-400 block">{t('auditLog.table.reason')}: {log.reason}</span>
-              </div>
 
-              <div className={`text-${isRtl ? 'left' : 'right'} text-[10px] text-slate-400 font-mono`}>
-                <span className="block">{log.user}</span>
-                <span>IP: {log.ipAddress}</span>
+                <div className={`text-${isRtl ? 'left' : 'right'} text-[10px] text-slate-400 font-mono`}>
+                  <span className="block">{log.user}</span>
+                  <span>IP: {log.ipAddress}</span>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
     </div>

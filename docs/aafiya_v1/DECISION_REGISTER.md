@@ -2,10 +2,10 @@
 Document: AAFIYA V1 Decision Register
 Status: ACTIVE
 Created At: 2026-09-11 09:15
-Updated At: 2026-09-27 08:45
-Source/Basis: AAFIYA V1 Master Plan + Repository Forensic Audit
-Scope: Planning Only
-Implementation Authorized: TASK-06-01 FORMALLY CLOSED / VERIFIED
+Updated At: 2026-10-14 21:15
+Source/Basis: AAFIYA V1 Master Plan + Repository Forensic Audit + TASK-DWH-15 Verification
+Scope: Planning & Architecture Governance
+Implementation Authorized: TASK-06-01 FORMALLY CLOSED / VERIFIED; TASK-DWH-15 BACKEND VERIFIED
 ---
 
 # AAFIYA / عافية — V1 Decision Register
@@ -30,6 +30,7 @@ This register documents all architectural, product, and technical decisions lock
 | **TASK-05-03-CLOSURE** | Task Closure: BC Quota Dashboard & Purchase Request Shell | CLOSED | Mobile (Booking Center) | Formal closure of TASK-05-03 — PASS WITH OBSERVATIONS |
 | **TASK-05-04-CLOSURE** | Task Closure: BC Operational Booking Flow & Flutter Parity | CLOSED | Mobile (Booking Center) | Formal closure of TASK-05-04 — READY WITH MINOR OBSERVATION GAP |
 | **ADR-06-01-01** | Global Error Boundaries, Offline Banner & Network Retries | CLOSED / VERIFIED | Mobile Reliability | Governs D-06-01-R1/R2/R3/C1/S1; verified & closed |
+| **DEC-GAP-D01** | Server Patient Booking Policy & Payment-Gated Access | LOCKED / APPROVED | Backend / System-wide | Enforces fail-closed default on patient self-booking; guest rejected; test flag isolated |
 
 ---
 
@@ -229,3 +230,21 @@ This register documents all architectural, product, and technical decisions lock
 - **Human Verification**: `HUMAN VERIFICATION PASSED` (Tests A through I verified, 0 defects).
 - **Task Closure Status**: `TASK-06-01 — CLOSED / VERIFIED`.
 - **Zero Implementation Mutation**: Strictly zero code, database, web, or backend mutations during closure synchronization.
+
+### DEC-GAP-D01: Server-Side Patient Self-Booking Policy & Electronic Payment Gating
+- **Decision ID**: `DEC-GAP-D01`
+- **Status**: LOCKED / APPROVED (Formally Approved by Human Authority on 2026-10-14)
+- **Governing Task**: `TASK-DWH-15`, `WP-15`
+- **Related Decisions**: `DISC-01`, `DEC-SLOT-01`, `DEC-AUTH-01`
+- **Scope**: Backend API & Platform Booking Policy
+- **Context**: 
+  `DISC-01` strictly prohibits direct self-booking UI within the mobile patient application (`aafiya_patient`). However, the backend REST endpoint (`POST /api/v1/appointments`) previously lacked server-side rejection for direct patient booking requests and retained permissive logic across test fixtures. This gap (`GAP-D-01`) required explicit architectural reconciliation.
+- **Decision Rules**:
+  1. **Strict Mobile & Web Direct Booking UI Exclusion**: In compliance with `DISC-01`, no self-booking forms or slot selection wizards are exposed to patients in `aafiya_patient` or the patient web dashboard in V1.
+  2. **Permanent Guest Rejection**: Requests from `patient_guest` to `POST /api/v1/appointments` are strictly rejected by the backend server with HTTP `403 Forbidden` (`غير مصرح: حساب المريض الضيف غير مخول بإنشاء مواعيد مباشرة.`) across all environments, regardless of configuration flags.
+  3. **Default Fail-Closed Server Policy**: Direct appointment creation by authenticated registered patients (`patient_registered`) via `POST /api/v1/appointments` is disabled by default on the server with HTTP `403 Forbidden` (`غير مصرح: حجز المواعيد الذاتي للمرضى غير مفعّل حالياً بانتظار إطلاق الدفع الإلكتروني. يرجى الحجز عبر العيادة أو مركز الحجز المعتمد.`), pending official electronic payment gateway deployment. (Note: Response uses HTTP 403 with the localized message string; no machine-readable error code is asserted).
+  4. **Production Protection & Feature Gate**: The feature flag `FEATURE_PATIENT_BOOKING_ENABLED` (`config('booking.patient_booking_enabled')`) is strictly `false` by default. Enabling this flag in production is strictly forbidden and requires independent human approval following electronic payment release.
+  5. **Isolated Test Pathway**: The configuration parameter is authorized for temporary, isolated in-memory overrides within automated feature test environments only (`backend/tests/Feature/PatientBookingPolicyTest.php`).
+  6. **Operational Roles Immunity**: Booking permissions for licensed Booking Centers (`booking_center`, `booking_center_staff`), clinic assistants (`doctor_assistant`), doctors (`doctor`), and platform administrators (`admin`) remain fully operational and completely unaffected by patient self-booking restrictions.
+  7. **Out of Scope Clarification**: Implementation of self-booking UI on web/mobile and payment gateway integration are strictly excluded from V1 and deferred to a dedicated future release (V2).
+

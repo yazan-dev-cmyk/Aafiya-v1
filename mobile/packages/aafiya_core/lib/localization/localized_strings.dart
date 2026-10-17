@@ -1782,6 +1782,796 @@ class LocalizedStrings {
       : isFrench
           ? 'Solde de quotas insuffisant. Veuillez recharger votre compte.'
           : 'Insufficient quota balance. Please recharge your booking quota.';
+
+  // Encrypted Medical Record Sharing (TASK-PAR-PAT-05 / Phase 3)
+  String get sharedRecordViewerTitle => isArabic
+      ? 'عرض السجل الطبي المشفر'
+      : isFrench
+          ? 'Afficher le dossier médical chiffré'
+          : 'View Encrypted Medical Record';
+
+  String get sharedRecordEnterPinPrompt => isArabic
+      ? 'أدخل رمز الحماية PIN لفك تشفير السجل الطبي المشترك'
+      : isFrench
+          ? 'Saisissez le code PIN pour déchiffrer le dossier partagé'
+          : 'Enter the security PIN to decrypt the shared medical record';
+
+  String get sharedRecordPinLabel => isArabic
+      ? 'رمز الحماية PIN'
+      : isFrench
+          ? 'Code PIN de sécurité'
+          : 'Security PIN';
+
+  String get sharedRecordTokenLabel => isArabic
+      ? 'رمز أو رابط المشاركة'
+      : isFrench
+          ? 'Jeton ou lien de partage'
+          : 'Share Token or Link';
+
+  String get sharedRecordTokenPlaceholder => isArabic
+      ? 'الصق الرابط أو الرمز هنا...'
+      : isFrench
+          ? 'Collez le lien ou le jeton ici...'
+          : 'Paste link or token here...';
+
+  String get sharedRecordResolveButton => isArabic
+      ? 'فك التشفير وعرض السجل'
+      : isFrench
+          ? 'Déchiffrer et afficher'
+          : 'Decrypt & View Record';
+
+  String sharedRecordRemainingAttempts(int count) => isArabic
+      ? (count == 1 ? 'تبقى محاولة واحدة فقط' : 'متبقي $count محاولات')
+      : isFrench
+          ? 'Il reste $count tentative(s)'
+          : '$count attempt(s) remaining';
+
+  String get sharedRecordWrongPin => isArabic
+      ? 'رمز الحماية PIN غير صحيح'
+      : isFrench
+          ? 'Code PIN incorrect'
+          : 'Incorrect PIN';
+
+  String get sharedRecordExpiredOrRevoked => isArabic
+      ? 'انتهت صلاحية رابط المشاركة أو تم إلغاؤه من قِبل المريض.'
+      : isFrench
+          ? 'Ce lien de partage a expiré ou a été révoqué par le patient.'
+          : 'This share link has expired or has been revoked by the patient.';
+
+  String get sharedRecordLocked => isArabic
+      ? 'تم قفل الوصول مؤقتاً بسبب تكرار المحاولات الخاطئة. يرجى المحاولة لاحقاً.'
+      : isFrench
+          ? "L'accès est temporairement verrouillé suite à plusieurs tentatives erronées. Veuillez réessayer ultérieurement."
+          : 'Access is temporarily locked due to too many failed attempts. Please try again later.';
+
+  String get sharedRecordNotFound => isArabic
+      ? 'رابط المشاركة غير صالح أو غير موجود.'
+      : isFrench
+          ? 'Lien de partage introuvable ou invalide.'
+          : 'Share link not found or invalid.';
+
+  String get sharedRecordRateLimited => isArabic
+      ? 'تم تجاوز الحد المسموح من المحاولات. يرجى الانتظار قليلاً.'
+      : isFrench
+          ? 'Trop de tentatives. Veuillez patienter un instant.'
+          : 'Too many attempts. Please wait a moment.';
+
+  String get sharedRecordHttpsRequired => isArabic
+      ? 'الاتصال غير آمن. يجب استخدام اتصال HTTPS مشفر لعرض السجلات الطبية.'
+      : isFrench
+          ? 'Connexion non sécurisée. HTTPS est obligatoire pour afficher les dossiers médicaux.'
+          : 'Insecure connection. HTTPS is required to view medical records.';
+
+  String get sharedRecordSummaryTitle => isArabic
+      ? 'ملخص السجل الطبي المشترك'
+      : isFrench
+          ? 'Résumé du dossier médical partagé'
+          : 'Shared Medical Record Summary';
+
+  String get sharedRecordAllergiesTitle => isArabic
+      ? 'الحساسيات'
+      : isFrench
+          ? 'Allergies'
+          : 'Allergies';
+
+  String get sharedRecordConditionsTitle => isArabic
+      ? 'الأمراض المزمنة'
+      : isFrench
+          ? 'Affections chroniques'
+          : 'Chronic Conditions';
+
+  String get sharedRecordMedicationsTitle => isArabic
+      ? 'الأدوية الحالية'
+      : isFrench
+          ? 'Médicaments actuels'
+          : 'Current Medications';
+
+  String get sharedRecordNoAllergies => isArabic
+      ? 'لا توجد حساسية مسجلة'
+      : isFrench
+          ? 'Aucune allergie enregistrée'
+          : 'No recorded allergies';
+
+  String get sharedRecordNoConditions => isArabic
+      ? 'لا توجد أمراض مزمنة مسجلة'
+      : isFrench
+          ? 'Aucune affection chronique enregistrée'
+          : 'No recorded chronic conditions';
+
+  String get sharedRecordNoMedications => isArabic
+      ? 'لا توجد أدوية حالية مسجلة'
+      : isFrench
+          ? 'Aucun médicament actuel enregistré'
+          : 'No recorded current medications';
+
+  String get sharedRecordSecurityNotice => isArabic
+      ? 'سجل طبي موحد معتمد — خالٍ من بيانات الاتصال والهوية الشخصية'
+      : isFrench
+          ? 'Dossier médical unifié certifié — exempt de coordonnées personnelles'
+          : 'Certified Unified Medical Record — Free of personal contact identifiers';
+
+  String get sharedRecordPinValidation => isArabic
+      ? 'يجب أن يتكون رمز الحماية من 4 إلى 8 أرقام'
+      : isFrench
+          ? 'Le code PIN doit comporter entre 4 et 8 chiffres'
+          : 'PIN must be between 4 and 8 digits';
+
+  String get sharedRecordAuthRequired => isArabic
+      ? 'يرجى تسجيل الدخول أولاً ثم إعادة فتح رابط المشاركة.'
+      : isFrench
+          ? 'Veuillez vous connecter d\'abord, puis rouvrir le lien de partage.'
+          : 'Please sign in first, then reopen the share link.';
+
+  // Encrypted Medical Record Sharing — Patient Sender & Management (TASK-PAR-PAT-05 / Phase 4)
+  String get shareMedicalRecordTitle => isArabic
+      ? 'مشاركة السجل الطبي المشفر'
+      : isFrench
+          ? 'Partage du dossier médical chiffré'
+          : 'Encrypted Medical Record Sharing';
+
+  String get shareMedicalRecordSubtitle => isArabic
+      ? 'إنشاء روابط آمنة وإدارة الروابط النشطة'
+      : isFrench
+          ? 'Créer des liens sécurisés et gérer les partages actifs'
+          : 'Create secure links and manage active shares';
+
+  String get viewSharedRecordHubTitle => isArabic
+      ? 'استعراض سجل مشارك'
+      : isFrench
+          ? 'Consulter un dossier partagé'
+          : 'View Shared Record';
+
+  String get viewSharedRecordHubSubtitle => isArabic
+      ? 'فك تشفير واستعراض سجل طبي عبر رمز الحماية'
+      : isFrench
+          ? 'Déchiffrer et consulter un dossier avec code PIN'
+          : 'Decrypt and view a medical record via PIN';
+
+  String get activeSharesTitle => isArabic
+      ? 'المشاركات النشطة والسابقة'
+      : isFrench
+          ? 'Partages actifs et historiques'
+          : 'Active & Historical Shares';
+
+  String get createNewShare => isArabic
+      ? 'مشاركة جديدة'
+      : isFrench
+          ? 'Nouveau partage'
+          : 'New Share';
+
+  String get shareDurationLabel => isArabic
+      ? 'مدة صلاحية الرابط'
+      : isFrench
+          ? 'Durée de validité du lien'
+          : 'Link Validity Duration';
+
+  String get duration24h => isArabic
+      ? '24 ساعة (يوم واحد)'
+      : isFrench
+          ? '24 heures (1 jour)'
+          : '24 hours (1 day)';
+
+  String get duration7d => isArabic
+      ? '7 أيام (أسبوع)'
+      : isFrench
+          ? '7 jours (1 semaine)'
+          : '7 days (1 week)';
+
+  String get duration30d => isArabic
+      ? '30 يوماً (شهر)'
+      : isFrench
+          ? '30 jours (1 mois)'
+          : '30 days (1 month)';
+
+  String get sharePinInputLabel => isArabic
+      ? 'رمز الحماية PIN المطلوب للفتح (4 إلى 8 أرقام)'
+      : isFrench
+          ? 'Code PIN requis pour le déchiffrement (4 à 8 chiffres)'
+          : 'Security PIN required to open (4 to 8 digits)';
+
+  String get sharePinInputHint => isArabic
+      ? 'مثال: 4821'
+      : isFrench
+          ? 'Ex: 4821'
+          : 'e.g. 4821';
+
+  String get createShareButton => isArabic
+      ? 'إنشاء رابط المشاركة المشفر'
+      : isFrench
+          ? 'Générer le lien chiffré'
+          : 'Generate Encrypted Link';
+
+  String get shareCreatedSuccess => isArabic
+      ? 'تم إنشاء رابط المشاركة الآمن بنجاح'
+      : isFrench
+          ? 'Lien de partage sécurisé généré avec succès'
+          : 'Secure share link generated successfully';
+
+  String get shareOneTimeNotice => isArabic
+      ? 'تنبيه أمني هام: لن يتم عرض رمز التوكن أو رمز الحماية PIN مجدداً. يرجى نسخهما ومشاركتهما مع الطبيب أو المتلقي الآن.'
+      : isFrench
+          ? 'Avis de sécurité : Le jeton et le code PIN ne seront plus jamais réaffichés. Veuillez les copier et les transmettre maintenant.'
+          : 'Security notice: The token and PIN will not be displayed again. Please copy and share them with the recipient now.';
+
+  String get copyShareUrl => isArabic
+      ? 'نسخ الرابط المشفر'
+      : isFrench
+          ? 'Copier le lien chiffré'
+          : 'Copy Encrypted Link';
+
+  String get copyToken => isArabic
+      ? 'نسخ رمز المشاركة'
+      : isFrench
+          ? 'Copier le jeton de partage'
+          : 'Copy Share Token';
+
+  String get copyPin => isArabic
+      ? 'نسخ رمز PIN'
+      : isFrench
+          ? 'Copier le code PIN'
+          : 'Copy PIN';
+
+  String get copiedToClipboard => isArabic
+      ? 'تم النسخ إلى الحافظة'
+      : isFrench
+          ? 'Copié dans le presse-papiers'
+          : 'Copied to clipboard';
+
+  String get revokeShare => isArabic
+      ? 'إلغاء المشاركة'
+      : isFrench
+          ? 'Révoquer le partage'
+          : 'Revoke Share';
+
+  String get revokeShareConfirmTitle => isArabic
+      ? 'تأكيد إلغاء المشاركة'
+      : isFrench
+          ? 'Confirmer la révocation'
+          : 'Confirm Revocation';
+
+  String get revokeShareConfirmMessage => isArabic
+      ? 'هل أنت متأكد من رغبتك في إبطال رابط المشاركة هذا؟ سيتم حظر أي وصول مستقبلي للسجل الطبي فورياً.'
+      : isFrench
+          ? 'Êtes-vous sûr de vouloir révoquer ce lien de partage ? Tout accès ultérieur sera immédiatement bloqué.'
+          : 'Are you sure you want to revoke this share link? Any future access will be blocked immediately.';
+
+  String get shareRevokedSuccess => isArabic
+      ? 'تم إلغاء رابط المشاركة بنجاح'
+      : isFrench
+          ? 'Lien de partage révoqué avec succès'
+          : 'Share link revoked successfully';
+
+  String get statusRevoked => isArabic
+      ? 'ملغي'
+      : isFrench
+          ? 'Révoqué'
+          : 'Revoked';
+
+  String get statusLocked => isArabic
+      ? 'مقفل مؤقتاً'
+      : isFrench
+          ? 'Verrouillé'
+          : 'Locked';
+
+  String get noActiveSharesMessage => isArabic
+      ? 'لا توجد مشاركات نشطة حالياً. يمكنك إنشاء رابط مشاركة مشفر لملفك الطبي بموافقتك.'
+      : isFrench
+          ? 'Aucun partage actif actuellement. Vous pouvez générer un lien chiffré pour votre dossier.'
+          : 'No active shares currently. You can generate an encrypted share link for your record.';
+
+  String get accessCountLabel => isArabic
+      ? 'عدد مرات العرض:'
+      : isFrench
+          ? 'Nombre d\'accès :'
+          : 'Access count:';
+
+  String get unresolvedReschedulesTitle => isArabic
+      ? 'الحالات غير المحسومة'
+      : isFrench
+          ? 'Cas non résolus'
+          : 'Unresolved Reschedules';
+
+  String get unresolvedReschedulesBannerTitle => isArabic
+      ? 'لوحة متابعة المواعيد غير المحسومة (حالات حرجة)'
+      : isFrench
+          ? 'Tableau de suivi des rendez-vous non résolus (Cas urgents)'
+          : 'Urgent Unresolved Reschedules Dashboard';
+
+  String get unresolvedReschedulesBannerDesc => isArabic
+      ? 'تضم هذه اللوحة المواعيد التي تعذر على المحرك الآلي إعادة جدولتها أثناء إجازة الطبيب. تم تحرير الحصة وتتطلب تواصلاً هاتفياً مع المريض لإعادة الجدولة اليدوية دون رسوم إضافية.'
+      : isFrench
+          ? 'Rendez-vous qui n\'ont pas pu être reprogrammés automatiquement pendant le congé du médecin. Nécessite un suivi téléphonique pour reprogrammation manuelle.'
+          : 'Lists appointments that could not be automatically rescheduled during doctor vacation. Requires phone outreach for manual rescheduling without additional charge.';
+
+  String get urgentUnresolvedBadge => isArabic
+      ? 'حالة حرجة غير محسومة'
+      : isFrench
+          ? 'CAS URGENT NON RÉSOLU'
+          : 'URGENT UNRESOLVED';
+
+  String get failureReasonLabel => isArabic
+      ? 'سبب التعذر:'
+      : isFrench
+          ? 'Motif d\'échec :'
+          : 'Failure Reason:';
+
+  String get originalDateLabel => isArabic
+      ? 'الموعد الأصلي:'
+      : isFrench
+          ? 'Date d\'origine :'
+          : 'Original Date:';
+
+  String get noUnresolvedCasesTitle => isArabic
+      ? 'لا توجد حالات غير محسومة حالياً'
+      : isFrench
+          ? 'Aucun cas non résolu actuellement'
+          : 'No Urgent Unresolved Cases';
+
+  String get noUnresolvedCasesDesc => isArabic
+      ? 'جميع عمليات إعادة الجدولة تمت بنجاح أو لم تسجل حالات تعثر تستوجب متابعة الاستقبال في هذه العيادة.'
+      : isFrench
+          ? 'Toutes les reprogrammations ont réussi ou aucun cas bloqué n\'a été enregistré pour cette clinique.'
+          : 'All automated reschedules succeeded or no failed relocations exist for this clinic.';
+
+  String get phoneMaskedTitle => isArabic
+      ? 'رقم الهاتف محجوب (صلاحية محدودة)'
+      : isFrench
+          ? 'Numéro masqué (Autorisation restreinte)'
+          : 'Phone Masked (No Permission)';
+
+  String get copyPhoneSuccess => isArabic
+      ? 'تم نسخ رقم الهاتف للحافظة بنجاح'
+      : isFrench
+          ? 'Numéro de téléphone copié dans le presse-papiers'
+          : 'Phone number copied to clipboard';
+
+  String get copyPhoneAction => isArabic
+      ? 'نسخ الرقم'
+      : isFrench
+          ? 'Copier'
+          : 'Copy Phone';
+
+  String get searchUnresolvedPlaceholder => isArabic
+      ? 'بحث باسم المريض، رقم الملف MRN، أو المرجع...'
+      : isFrench
+          ? 'Rechercher par nom, IPU ou référence...'
+          : 'Search by patient name, MRN, or reference...';
+
+  String get unresolvedCasesCount => isArabic
+      ? 'حالات معلقة بانتظار التواصل اليدوي'
+      : isFrench
+          ? 'Cas en attente de contact manuel'
+          : 'Cases pending manual outreach';
+
+  String get activeClinicRequired => isArabic
+      ? 'معرف العيادة مطلوب لعرض الحالات غير المحسومة'
+      : isFrench
+          ? 'Le contexte de la clinique est requis'
+          : 'Active clinic context is required';
+
+  String get unnamedPatient => isArabic
+      ? 'مريض غير مسمى'
+      : isFrench
+          ? 'Patient sans nom'
+          : 'Unnamed Patient';
+
+  String get mrnLabel => isArabic
+      ? 'رقم الملف (MRN)'
+      : isFrench
+          ? 'N° IPP'
+          : 'MRN';
+
+  // Doctor Vacations (TASK-PAR-DOC-04)
+  String get doctorVacationsTitle => isArabic
+      ? 'إجازات الطبيب'
+      : isFrench
+          ? 'Congés du médecin'
+          : 'Doctor Vacations';
+
+  String get doctorVacationsSubtitle => isArabic
+      ? 'إدارة وتتبع فترات الإجازات والتعطيل المؤقت للعيادات'
+      : isFrench
+          ? 'Gestion et suivi des périodes de congés et suspensions de clinique'
+          : 'Manage and track vacation periods and temporary clinic suspensions';
+
+  String get registerVacationAction => isArabic
+      ? 'تسجيل إجازة جديدة'
+      : isFrench
+          ? 'Enregistrer un nouveau congé'
+          : 'Register New Vacation';
+
+  String get vacationStartDate => isArabic
+      ? 'تاريخ بداية الإجازة'
+      : isFrench
+          ? 'Date de début du congé'
+          : 'Vacation Start Date';
+
+  String get vacationEndDate => isArabic
+      ? 'تاريخ نهاية الإجازة'
+      : isFrench
+          ? 'Date de fin du congé'
+          : 'Vacation End Date';
+
+  String get vacationReason => isArabic
+      ? 'سبب الإجازة (اختياري)'
+      : isFrench
+          ? 'Motif du congé (optionnel)'
+          : 'Vacation Reason (optional)';
+
+  String get vacationNotes => isArabic
+      ? 'ملاحظات إضافية (اختياري)'
+      : isFrench
+          ? 'Notes supplémentaires (optionnel)'
+          : 'Additional Notes (optional)';
+
+  String get selectClinicsScope => isArabic
+      ? 'نطاق العيادات المشمولة'
+      : isFrench
+          ? 'Cliniques concernées'
+          : 'Affected Clinics Scope';
+
+  String get selectAllClinics => isArabic
+      ? 'تحديد جميع العيادات'
+      : isFrench
+          ? 'Sélectionner toutes les cliniques'
+          : 'Select All Clinics';
+
+  String get allClinicsIncludedNotice => isArabic
+      ? 'في حال عدم تحديد عيادات بعينها، ستشمل الإجازة تلقائياً كافة عياداتك النشطة.'
+      : isFrench
+          ? 'Si aucune clinique spécifique n’est sélectionnée, le congé s’appliquera automatiquement à toutes vos cliniques actives.'
+          : 'If no specific clinics are selected, the vacation will automatically apply to all your active clinics.';
+
+  String get vacationImmediateEffectNotice => isArabic
+      ? 'تنبيه: تسري الإجازة فورياً دون اشتراط موافقة مدير العيادة (DEC-VAC-01)، وسيتم تلقائياً ترحيل مواعيد المرضى المتأثرين إلى نافذة 7 أيام تقويمية تلي الإجازة (DEC-VAC-02).'
+      : isFrench
+          ? 'Attention: Le congé prend effet immédiatement sans approbation du directeur (DEC-VAC-01). Les rendez-vous affectés seront automatiquement reprogrammés dans les 7 jours calendaires suivant le congé (DEC-VAC-02).'
+          : 'Notice: Vacations take effect immediately without clinic director approval (DEC-VAC-01). Displaced appointments will be automatically rescheduled within a 7-calendar-day window post-vacation (DEC-VAC-02).';
+
+  String get vacationOverlapError => isArabic
+      ? 'توجد إجازة سارية أخرى مسجلة تتداخل مع هذه الفترة الزمنية.'
+      : isFrench
+          ? 'Un autre congé effectif chevauche cette période.'
+          : 'Another effective vacation overlaps with this time period.';
+
+  String get vacationEndDateBeforeStartDate => isArabic
+      ? 'تاريخ نهاية الإجازة يجب أن يكون مساوياً أو لاحقاً لتاريخ البداية.'
+      : isFrench
+          ? 'La date de fin doit être égale ou postérieure à la date de début.'
+          : 'End date must be on or after the start date.';
+
+  String get vacationEffectiveBadge => isArabic
+      ? 'سارية المفعول'
+      : isFrench
+          ? 'En cours'
+          : 'Effective';
+
+  String get vacationCancelledBadge => isArabic
+      ? 'ملغاة'
+      : isFrench
+          ? 'Annulée'
+          : 'Cancelled';
+
+  String get cancelVacationAction => isArabic
+      ? 'إلغاء الإجازة'
+      : isFrench
+          ? 'Annuler le congé'
+          : 'Cancel Vacation';
+
+  String get cancelVacationConfirmTitle => isArabic
+      ? 'تأكيد إلغاء الإجازة'
+      : isFrench
+          ? 'Confirmer l’annulation du congé'
+          : 'Confirm Vacation Cancellation';
+
+  String get cancelVacationConfirmMessage => isArabic
+      ? 'هل أنت متأكد من رغبتك في إلغاء هذه الإجازة؟ سيتم تحويل حالتها إلى ملغاة ويبقى السجل محفوظاً للتدقيق (DEC-VAC-05).'
+      : isFrench
+          ? 'Êtes-vous sûr de vouloir annuler ce congé ? Son statut passera à annulé tout en conservant l’historique d’audit (DEC-VAC-05).'
+          : 'Are you sure you want to cancel this vacation? Its status will change to cancelled, preserving audit records (DEC-VAC-05).';
+
+  String get noVacationsRegistered => isArabic
+      ? 'لا توجد إجازات مسجلة حتى الآن'
+      : isFrench
+          ? 'Aucun congé enregistré pour le moment'
+          : 'No vacations registered yet';
+
+  String get vacationRegisteredSuccess => isArabic
+      ? 'تم تسجيل إجازة الطبيب بنجاح وتفعيلها فورياً.'
+      : isFrench
+          ? 'Le congé a été enregistré avec succès avec prise d’effet immédiate.'
+          : 'Doctor vacation registered successfully with immediate effect.';
+
+  String get vacationCancelledSuccess => isArabic
+      ? 'تم إلغاء الإجازة بنجاح.'
+      : isFrench
+          ? 'Le congé a été annulé avec succès.'
+          : 'Vacation cancelled successfully.';
+
+  String get affectedClinicsLabel => isArabic
+      ? 'العيادات المشمولة بالإجازة'
+      : isFrench
+          ? 'Cliniques couvertes'
+          : 'Clinics covered';
+
+  String get viewUnresolvedReschedulesForVacation => isArabic
+      ? 'متابعة المواعيد العالقة المتأثرة'
+      : isFrench
+          ? 'Suivre les reprogrammations en suspens'
+          : 'View Displaced Unresolved Cases';
+
+  // Doctor Weekly Working Hours & Schedule Activation (TASK-PAR-DOC-03)
+  String get doctorWorkingHoursTitle => isArabic
+      ? 'ساعات العمل الأسبوعية'
+      : isFrench
+          ? 'Horaires de travail hebdomadaires'
+          : 'Weekly Working Hours';
+
+  String get doctorWorkingHoursSubtitle => isArabic
+      ? 'إعداد أوقات العمل وحصص المواعيد وتفعيل الجدول'
+      : isFrench
+          ? 'Configuration des horaires et créneaux de consultation'
+          : 'Configure working hours, appointment slots, and activate schedule';
+
+  String get slots => isArabic
+      ? 'حصص'
+      : isFrench
+          ? 'créneaux'
+          : 'slots';
+
+  String get scheduleDraftStatus => isArabic
+      ? 'مسودة غير مفعلة (الحجز غير متاح)'
+      : isFrench
+          ? 'Brouillon non activé (Réservations bloquées)'
+          : 'Unactivated Draft (Bookings blocked)';
+
+  String get scheduleActivatedStatus => isArabic
+      ? 'جدول مفعل ومقفل نهائياً'
+      : isFrench
+          ? 'Planning activé et verrouillé'
+          : 'Activated & Permanently Locked';
+
+  String get scheduleLockedWarning => isArabic
+      ? 'تم قفل الجدول نهائياً في هذا المركز الطبي وفقاً لسياسة V1. لا يمكن إجراء تعديلات بعد التفعيل.'
+      : isFrench
+          ? 'Le planning est définitivement verrouillé selon la politique V1. Aucune modification n’est possible.'
+          : 'Schedule is permanently locked for this clinic under AAFIYA V1 Policy. Modifications are prohibited after activation.';
+
+  String get saveScheduleDraft => isArabic
+      ? 'حفظ المسودة'
+      : isFrench
+          ? 'Enregistrer le brouillon'
+          : 'Save Draft';
+
+  String get savingScheduleDraft => isArabic
+      ? 'جاري حفظ المسودة...'
+      : isFrench
+          ? 'Enregistrement du brouillon...'
+          : 'Saving Draft...';
+
+  String get activateSchedule => isArabic
+      ? 'تفعيل الجدول نهائياً'
+      : isFrench
+          ? 'Activer définitivement'
+          : 'Permanently Activate Schedule';
+
+  String get activatingSchedule => isArabic
+      ? 'جاري التفعيل والقفل...'
+      : isFrench
+          ? 'Activation et verrouillage...'
+          : 'Activating & Locking...';
+
+  String get scheduleDraftSavedSuccess => isArabic
+      ? 'تم حفظ مسودة ساعات العمل بنجاح. تذكير: الحجوزات تظل غير متاحة حتى تفعيل الجدول نهائياً.'
+      : isFrench
+          ? 'Brouillon enregistré avec succès. Les réservations restent bloquées jusqu’à l’activation.'
+          : 'Schedule draft saved successfully. Bookings remain blocked until activated.';
+
+  String get scheduleActivatedSuccess => isArabic
+      ? 'تم تفعيل ساعات العمل وقفل الجدول نهائياً بنجاح! يمكن الآن للمرضى حجز المواعيد وفق هذا الجدول.'
+      : isFrench
+          ? 'Planning activé et verrouillé avec succès ! Les réservations sont désormais ouvertes.'
+          : 'Schedule successfully activated and permanently locked! Patient bookings are now open.';
+
+  String get activationDialogTitle => isArabic
+      ? 'المراجعة النهائية والتفعيل النهائي للجدول'
+      : isFrench
+          ? 'Examen final et activation irréversible'
+          : 'Review & Irreversible Schedule Activation';
+
+  String get activationDialogSubtitle => isArabic
+      ? 'مراجعة أسبوع العمل وتأكيد قفل ساعات العمل نهائياً'
+      : isFrench
+          ? 'Vérifiez les horaires et confirmez le verrouillage permanent'
+          : 'Review weekly schedule and confirm permanent lock';
+
+  String get activationIrreversibleWarning => isArabic
+      ? 'تحذير حرج: تفعيل جدول ساعات العمل الأسبوعية عملية نهائية غير قابلة للإلغاء أو التراجع (Irreversible Lock). بمجرد التفعيل، سيتم فتح الحجوزات للمرضى وفق هذه الحصص ولن يمكن تعديلها.'
+      : isFrench
+          ? 'Avertissement critique : l’activation est une opération irréversible. Une fois activé, les réservations s’ouvrent et le planning ne peut plus être modifié.'
+          : 'Critical Warning: Schedule activation is permanent and irreversible (Irreversible Lock). Once activated, patient bookings will unlock and the schedule cannot be edited.';
+
+  String get activationIrreversibleCheckbox => isArabic
+      ? 'أقرّ بأنني راجعت ساعات العمل المحددة، وأوافق على تفعيل الجدول وقفله نهائياً دون إمكانية التعديل لاحقاً.'
+      : isFrench
+          ? 'Je confirme avoir vérifié les horaires et j’accepte le verrouillage permanent sans modification possible.'
+          : 'I confirm that I have reviewed the configured working hours, and I agree to permanently activate and lock the schedule without future editing.';
+
+  String get confirmAndActivate => isArabic
+      ? 'تأكيد التفعيل والقفل النهائي'
+      : isFrench
+          ? 'Confirmer et verrouiller'
+          : 'Confirm & Permanently Lock';
+
+  String get openDayLabel => isArabic
+      ? 'يوم عمل'
+      : isFrench
+          ? 'Jour ouvré'
+          : 'Open day';
+
+  String get closedDayLabel => isArabic
+      ? 'عطلة أسبوعية'
+      : isFrench
+          ? 'Fermé'
+          : 'Closed';
+
+  String get openDaysCountLabel => isArabic
+      ? 'أيام العمل المفتوحة'
+      : isFrench
+          ? 'Jours ouvrés'
+          : 'Open Days';
+
+  String get totalSlotsCountLabel => isArabic
+      ? 'إجمالي الحصص الأسبوعية'
+      : isFrench
+          ? 'Total des créneaux'
+          : 'Total Weekly Slots';
+
+  String get daySaturday => isArabic ? 'السبت' : isFrench ? 'Samedi' : 'Saturday';
+  String get daySunday => isArabic ? 'الأحد' : isFrench ? 'Dimanche' : 'Sunday';
+  String get dayMonday => isArabic ? 'الاثنين' : isFrench ? 'Lundi' : 'Monday';
+  String get dayTuesday => isArabic ? 'الثلاثاء' : isFrench ? 'Mardi' : 'Tuesday';
+  String get dayWednesday => isArabic ? 'الأربعاء' : isFrench ? 'Mercredi' : 'Wednesday';
+  String get dayThursday => isArabic ? 'الخميس' : isFrench ? 'Jeudi' : 'Thursday';
+  String get dayFriday => isArabic ? 'الجمعة' : isFrench ? 'Vendredi' : 'Friday';
+
+  String getDayName(int dayOfWeek) {
+    switch (dayOfWeek) {
+      case 0:
+        return daySaturday;
+      case 1:
+        return daySunday;
+      case 2:
+        return dayMonday;
+      case 3:
+        return dayTuesday;
+      case 4:
+        return dayWednesday;
+      case 5:
+        return dayThursday;
+      case 6:
+        return dayFriday;
+      default:
+        return '';
+    }
+  }
+
+  // Clinic Operating Hours (CD-02 / WP-PARITY-DIR)
+  String get clinicOperatingHoursTitle => isArabic
+      ? 'ساعات عمل المنشأة العامة'
+      : isFrench
+          ? "Horaires d'ouverture de l'établissement"
+          : 'Clinic Operating Hours';
+
+  String get clinicOperatingHoursSubtitle => isArabic
+      ? 'إعداد فترات وساعات عمل العيادة الأسبوعية لكافة الأيام'
+      : isFrench
+          ? "Configuration des horaires d'ouverture de la clinique"
+          : 'Configure weekly clinic operating hours and periods';
+
+  String get clinicHoursConfiguredStatus => isArabic
+      ? 'ساعات المنشأة مهيأة ومعتمدة'
+      : isFrench
+          ? 'Horaires configurés et validés'
+          : 'Operating Hours Configured';
+
+  String get clinicHoursNotConfiguredStatus => isArabic
+      ? 'ساعات المنشأة غير مهيأة (الحجز محظور بالكامل)'
+      : isFrench
+          ? 'Horaires non configurés (Réservations bloquées)'
+          : 'Unconfigured (All bookings blocked)';
+
+  String get clinicHoursNotConfiguredNotice => isArabic
+      ? 'تنبيه إداري حرج: ساعات تشغيل العيادة غير مهيأة بعد. حجز المواعيد لكافة أطباء العيادة محظور بالكامل (CLINIC_SCHEDULE_NOT_CONFIGURED) حتى اعتماد وحفظ جدول الأيام السبعة.'
+      : isFrench
+          ? 'Avertissement critique : les horaires de la clinique ne sont pas encore configurés. Les réservations sont bloquées pour tous les médecins jusqu’à la configuration.'
+          : 'Critical Warning: Clinic operating hours are not configured. Patient bookings for all doctors are blocked (CLINIC_SCHEDULE_NOT_CONFIGURED) until hours are saved.';
+
+  String get saveClinicHours => isArabic
+      ? 'حفظ ساعات عمل العيادة'
+      : isFrench
+          ? 'Enregistrer les horaires'
+          : 'Save Clinic Hours';
+
+  String get savingClinicHours => isArabic
+      ? 'جاري حفظ ساعات العيادة...'
+      : isFrench
+          ? 'Enregistrement en cours...'
+          : 'Saving Clinic Hours...';
+
+  String get clinicHoursSavedSuccess => isArabic
+      ? 'تم حفظ وتحديث ساعات تشغيل العيادة بنجاح والتزامن مع النظام.'
+      : isFrench
+          ? "Horaires d'ouverture de la clinique enregistrés avec succès."
+          : 'Clinic operating hours saved and synchronized successfully.';
+
+  String get addPeriod => isArabic
+      ? 'إضافة فترة'
+      : isFrench
+          ? 'Ajouter une période'
+          : 'Add Period';
+
+  String get removePeriod => isArabic
+      ? 'حذف الفترة'
+      : isFrench
+          ? 'Supprimer la période'
+          : 'Remove Period';
+
+  String get periodLabel => isArabic
+      ? 'الفترة'
+      : isFrench
+          ? 'Période'
+          : 'Period';
+
+  String get openTimeLabel => isArabic
+      ? 'وقت الفتح'
+      : isFrench
+          ? "Heure d'ouverture"
+          : 'Open Time';
+
+  String get closeTimeLabel => isArabic
+      ? 'وقت الإغلاق'
+      : isFrench
+          ? 'Heure de fermeture'
+          : 'Close Time';
+
+  String get timeOrderError => isArabic
+      ? 'وقت الفتح يجب أن يسبق وقت الإغلاق'
+      : isFrench
+          ? "L'heure d'ouverture doit précéder l'heure de fermeture"
+          : 'Open time must be earlier than close time';
+
+  String get noPeriodsInOpenDayError => isArabic
+      ? 'يجب تحديد فترة تشغيل واحدة على الأقل لكل يوم عمل أو تعيينه كيوم عطلة'
+      : isFrench
+          ? 'Veuillez définir au moins une période ou fermer le jour'
+          : 'Please define at least one period or mark the day closed';
+
+  String get clinicDirectorOnlyNotice => isArabic
+      ? 'هذه الشاشة مخصصة حصراً للمدير الطبي للعيادة أو الموظف المصرح له بإدارة الإعدادات.'
+      : isFrench
+          ? 'Cette section est réservée au directeur médical ou gestionnaire autorisé.'
+          : 'This section is reserved for the Medical Director or authorized settings manager.';
 }
 
 

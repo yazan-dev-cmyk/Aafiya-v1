@@ -34,8 +34,10 @@ class EnsureActiveClinicContext
 
         // Exempt routes that do not require an active clinic context
         if (
+            $request->is('*doctor/profile*') ||
             $request->is('*doctor/clinics*') ||
             $request->is('*doctor/invitations*') ||
+            $request->is('*doctor/vacations*') ||
             $request->is('*doctors*') ||
             $request->is('*auth/*')
         ) {

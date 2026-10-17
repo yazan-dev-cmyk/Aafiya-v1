@@ -97,112 +97,130 @@ class _BcAppointmentsListScreenState extends State<BcAppointmentsListScreen> {
 
   // --- Cancellation Flow ---
   Future<void> _showCancelDialog(Appointment appointment) async {
+    if (_isLoading) return;
+
     final strings = LocalizedStrings.of(context);
     final reasonController = TextEditingController();
 
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
-          children: [
-            const Icon(Icons.cancel_outlined, color: AafiyaColors.error, size: 26),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                strings.cancelAppointmentTitle,
-                style: AafiyaTypography.titleMedium
-                    .copyWith(fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              strings.cancelAppointmentConfirmPrompt,
-              style: AafiyaTypography.bodyMedium,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'المرجع: ${appointment.bookingReference}',
-              style: AafiyaTypography.caption
-                  .copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: reasonController,
-              decoration: InputDecoration(
-                labelText: strings.cancellationReasonPrompt,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+    try {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Row(
+            children: [
+              const Icon(Icons.cancel_outlined, color: AafiyaColors.error, size: 26),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  strings.cancelAppointmentTitle,
+                  style: AafiyaTypography.titleMedium
+                      .copyWith(fontWeight: FontWeight.bold),
                 ),
               ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                strings.cancelAppointmentConfirmPrompt,
+                style: AafiyaTypography.bodyMedium,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'المرجع: ${appointment.bookingReference}',
+                style: AafiyaTypography.caption
+                    .copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: reasonController,
+                decoration: InputDecoration(
+                  labelText: strings.cancellationReasonPrompt,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: Text(strings.cancel),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AafiyaColors.error,
+                foregroundColor: AafiyaColors.pureWhite,
+              ),
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: Text(strings.confirmCancelAction),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(strings.cancel),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AafiyaColors.error,
-              foregroundColor: AafiyaColors.pureWhite,
+      );
+
+      if (confirmed != true) return;
+
+      if (!mounted) return;
+      setState(() {
+        _isLoading = true;
+      });
+
+      final result = await _service.cancelAppointment(
+        appointmentId: appointment.id,
+        reason: reasonController.text.trim().isNotEmpty
+            ? reasonController.text.trim()
+            : null,
+      );
+
+      if (!mounted) return;
+
+      switch (result) {
+        case ApiSuccess():
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(strings.cancelSuccessMessage),
+              backgroundColor: AafiyaColors.healingGreen,
+              behavior: SnackBarBehavior.floating,
             ),
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(strings.confirmCancelAction),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed != true) return;
-
-    if (!mounted) return;
-    setState(() {
-      _isLoading = true;
-    });
-
-    final result = await _service.cancelAppointment(
-      appointmentId: appointment.id,
-      reason: reasonController.text.trim().isNotEmpty
-          ? reasonController.text.trim()
-          : null,
-    );
-
-    if (!mounted) return;
-
-    switch (result) {
-      case ApiSuccess():
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(strings.cancelSuccessMessage),
-            backgroundColor: AafiyaColors.healingGreen,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-        widget.onQuotaNeedsRefresh?.call();
-        _loadAppointments();
-      case ApiFailure(:final exception):
-        setState(() {
-          _isLoading = false;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(exception.message),
-            backgroundColor: AafiyaColors.error,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+          );
+          try {
+            widget.onQuotaNeedsRefresh?.call();
+          } catch (_) {
+            // Failure to refresh quota balance after cancellation must never mark
+            // cancellation as failed and must not trigger automatic retry.
+          }
+          _loadAppointments();
+        case ApiFailure(:final exception):
+          setState(() {
+            _isLoading = false;
+          });
+          final errorMessage = switch (exception) {
+            ValidationException(:final validationErrors, :final message) =>
+              validationErrors.values.expand((msgs) => msgs).firstOrNull ?? message,
+            _ => exception.message,
+          };
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(errorMessage),
+              backgroundColor: AafiyaColors.error,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+      }
+    } finally {
+      reasonController.dispose();
     }
   }
 
   // --- Rescheduling Flow ---
   Future<void> _showRescheduleSheet(Appointment appointment) async {
+    if (_isLoading) return;
+
     final strings = LocalizedStrings.of(context);
 
     DateTime newDate = DateTime.now();
@@ -470,7 +488,7 @@ class _BcAppointmentsListScreenState extends State<BcAppointmentsListScreen> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         OutlinedButton.icon(
-                          onPressed: () => _showCancelDialog(appointment),
+                          onPressed: _isLoading ? null : () => _showCancelDialog(appointment),
                           icon: const Icon(Icons.close_rounded,
                               size: 16, color: AafiyaColors.error),
                           label: Text(
@@ -486,7 +504,7 @@ class _BcAppointmentsListScreenState extends State<BcAppointmentsListScreen> {
                         ),
                         const SizedBox(width: 8),
                         ElevatedButton.icon(
-                          onPressed: () => _showRescheduleSheet(appointment),
+                          onPressed: _isLoading ? null : () => _showRescheduleSheet(appointment),
                           icon: const Icon(Icons.schedule_rounded, size: 16),
                           label: Text(strings.rescheduleAppointmentTitle),
                           style: ElevatedButton.styleFrom(

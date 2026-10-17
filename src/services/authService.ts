@@ -52,6 +52,7 @@ export interface UserProfile {
   doctor?: {
     id: string;
     specialty: string;
+    specialty_id?: number;
     license_number: string;
     is_verified?: boolean;
     bio?: string;
@@ -135,6 +136,16 @@ export const authService = {
     new_password_confirmation: string;
   }): Promise<{ status: string; message: string }> => {
     const response = await api.post<{ status: string; message: string }>('/auth/change-password', data);
+    return response.data;
+  },
+
+  updateProfile: async (data: {
+    name?: string;
+    phone?: string;
+    specialty_id?: number;
+    bio?: string | null;
+  }): Promise<UserProfile> => {
+    const response = await api.put<UserProfile>('/doctor/profile', data);
     return response.data;
   },
 };

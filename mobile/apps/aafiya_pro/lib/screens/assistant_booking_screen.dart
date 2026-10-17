@@ -59,6 +59,13 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
 
   bool _isSubmitting = false;
 
+  late bool _isRegisteredPatient;
+  PatientSearchResult? _selectedPatient;
+  final TextEditingController _patientSearchController = TextEditingController();
+  bool _isSearchingPatients = false;
+  List<PatientSearchResult> _patientResults = [];
+  String? _patientSearchError;
+
   String get _formattedDate =>
       '${_selectedDate.year.toString().padLeft(4, '0')}-${_selectedDate.month.toString().padLeft(2, '0')}-${_selectedDate.day.toString().padLeft(2, '0')}';
 
@@ -69,6 +76,9 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
     super.initState();
     _apiClient = widget.apiClient ?? widget.sessionManager.apiClient;
     _bookingService = widget.bookingService ?? AssistantBookingService(apiClient: _apiClient);
+
+    _isRegisteredPatient = widget.initialPatient != null;
+    _selectedPatient = widget.initialPatient;
 
     _nameController = TextEditingController(text: widget.initialPatient?.fullName ?? '');
     _phoneController = TextEditingController(text: widget.initialPatient?.phone ?? '');
@@ -84,6 +94,7 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
     _phoneController.dispose();
     _mrnController.dispose();
     _notesController.dispose();
+    _patientSearchController.dispose();
     super.dispose();
   }
 
@@ -95,6 +106,10 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
     final clientClinicId = _apiClient.activeClinicId;
     if (clientClinicId != null && clientClinicId.trim().isNotEmpty) {
       return clientClinicId.trim();
+    }
+    final userClinicId = widget.user.clinic?.id;
+    if (userClinicId != null && userClinicId.trim().isNotEmpty) {
+      return userClinicId.trim();
     }
     return '';
   }
@@ -181,6 +196,75 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
     }
   }
 
+  Future<void> _searchPatients(String query) async {
+    final q = query.trim();
+    if (q.length < 2) {
+      setState(() {
+        _patientResults = [];
+        _patientSearchError = null;
+      });
+      return;
+    }
+
+    setState(() {
+      _isSearchingPatients = true;
+      _patientSearchError = null;
+    });
+
+    final result = await _bookingService.searchPatients(query: q);
+
+    if (!mounted) return;
+
+    setState(() {
+      _isSearchingPatients = false;
+      switch (result) {
+        case ApiSuccess(:final data):
+          _patientResults = data;
+        case ApiFailure(:final exception):
+          _patientSearchError = exception.message;
+          _patientResults = [];
+      }
+    });
+  }
+
+  void _selectPatient(PatientSearchResult patient) {
+    setState(() {
+      _selectedPatient = patient;
+      _nameController.text = patient.fullName;
+      _phoneController.text = patient.phone ?? '';
+      _mrnController.text = patient.mrn;
+      _patientResults = [];
+      _patientSearchController.clear();
+      _patientSearchError = null;
+    });
+  }
+
+  void _clearSelectedPatient() {
+    setState(() {
+      _selectedPatient = null;
+      _nameController.clear();
+      _phoneController.clear();
+      _mrnController.clear();
+      _patientResults = [];
+      _patientSearchController.clear();
+      _patientSearchError = null;
+    });
+  }
+
+  void _setRegisteredPatientMode(bool isRegistered) {
+    if (_isRegisteredPatient == isRegistered) return;
+    setState(() {
+      _isRegisteredPatient = isRegistered;
+      _selectedPatient = null;
+      _nameController.clear();
+      _phoneController.clear();
+      _mrnController.clear();
+      _patientResults = [];
+      _patientSearchController.clear();
+      _patientSearchError = null;
+    });
+  }
+
   Future<void> _handleSubmit() async {
     final strings = LocalizedStrings.of(context);
 
@@ -217,6 +301,20 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
       return;
     }
 
+    if (_isRegisteredPatient) {
+      final effectiveId = _selectedPatient?.id ?? widget.initialPatient?.id;
+      if (effectiveId == null || effectiveId.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(strings.searchPatientPlaceholder),
+            backgroundColor: AafiyaColors.error,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        return;
+      }
+    }
+
     if (!_formKey.currentState!.validate()) return;
 
     final clinicId = _getEffectiveClinicId();
@@ -226,6 +324,10 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
       _isSubmitting = true;
     });
 
+    final String? effectivePatientId = _isRegisteredPatient
+        ? (_selectedPatient?.id ?? widget.initialPatient?.id)
+        : null;
+
     final result = await _bookingService.createAppointment(
       clinicId: clinicId,
       doctorId: _selectedDoctor!.id,
@@ -233,7 +335,7 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
       timeSlot: _selectedSlot!.timeSlot,
       patientName: _nameController.text.trim(),
       patientPhone: _phoneController.text.trim(),
-      patientId: widget.initialPatient?.id,
+      patientId: effectivePatientId,
       patientMrn: _mrnController.text.trim().isNotEmpty ? _mrnController.text.trim() : null,
       notes: _notesController.text.trim().isNotEmpty ? _notesController.text.trim() : null,
     );
@@ -388,9 +490,13 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
     setState(() {
       _selectedSlot = null;
       if (!_isReturnVisit) {
+        _selectedPatient = null;
         _nameController.clear();
         _phoneController.clear();
         _mrnController.clear();
+        _patientResults = [];
+        _patientSearchController.clear();
+        _patientSearchError = null;
       }
       _notesController.clear();
     });
@@ -438,8 +544,8 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Badge indicating Return Visit vs Walk-in
-              _buildTypeBadge(strings),
+              // Patient Type Selector (Walk-in vs Registered / Return Visit)
+              _buildPatientTypeSelector(strings),
               const SizedBox(height: AafiyaSpacing.md),
 
               // Section 1: Doctor Selection
@@ -499,6 +605,46 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildPatientTypeSelector(LocalizedStrings strings) {
+    if (widget.initialPatient != null) {
+      return _buildTypeBadge(strings);
+    }
+
+    return Row(
+      children: [
+        Expanded(
+          child: ChoiceChip(
+            key: const ValueKey('patient_type_walk_in'),
+            avatar: const Icon(Icons.person_add_alt_1_rounded, size: 16),
+            label: Text(strings.walkInPatientBadge),
+            selected: !_isRegisteredPatient,
+            selectedColor: AafiyaColors.healingGreen.withValues(alpha: 0.15),
+            onSelected: (selected) {
+              if (selected) {
+                _setRegisteredPatientMode(false);
+              }
+            },
+          ),
+        ),
+        const SizedBox(width: AafiyaSpacing.sm),
+        Expanded(
+          child: ChoiceChip(
+            key: const ValueKey('patient_type_registered'),
+            avatar: const Icon(Icons.how_to_reg_rounded, size: 16),
+            label: Text(strings.registeredPatientTab),
+            selected: _isRegisteredPatient,
+            selectedColor: AafiyaColors.healthBlue.withValues(alpha: 0.15),
+            onSelected: (selected) {
+              if (selected) {
+                _setRegisteredPatientMode(true);
+              }
+            },
+          ),
+        ),
+      ],
     );
   }
 
@@ -710,14 +856,234 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
     );
   }
 
+  Widget _buildSelectedPatientCard(LocalizedStrings strings) {
+    final patient = _selectedPatient!;
+    return Container(
+      key: const ValueKey('selected_patient_card'),
+      margin: const EdgeInsets.only(bottom: AafiyaSpacing.md),
+      padding: const EdgeInsets.all(AafiyaSpacing.md),
+      decoration: BoxDecoration(
+        color: AafiyaColors.healingGreen.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(AafiyaRadius.md),
+        border: Border.all(color: AafiyaColors.healingGreen.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.check_circle_rounded, color: AafiyaColors.healingGreen, size: 18),
+                  const SizedBox(width: AafiyaSpacing.xs),
+                  Text(
+                    strings.selectedPatientLabel,
+                    style: AafiyaTypography.caption.copyWith(
+                      color: AafiyaColors.healingGreen,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              if (!_isReturnVisit)
+                TextButton.icon(
+                  key: const ValueKey('change_patient_button'),
+                  onPressed: _clearSelectedPatient,
+                  icon: const Icon(Icons.edit_outlined, size: 16),
+                  label: Text(strings.changePatientAction),
+                  style: TextButton.styleFrom(
+                    visualDensity: VisualDensity.compact,
+                    foregroundColor: AafiyaColors.healingGreen,
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: AafiyaSpacing.xs),
+          Text(
+            patient.fullName,
+            style: AafiyaTypography.titleMedium.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 4),
+          Wrap(
+            spacing: AafiyaSpacing.md,
+            children: [
+              if (patient.mrn.isNotEmpty)
+                Text(
+                  '${strings.patientMrnLabel}: ${patient.mrn}',
+                  style: AafiyaTypography.caption.copyWith(color: AafiyaColors.secondaryText),
+                ),
+              if (patient.phone != null && patient.phone!.isNotEmpty)
+                Text(
+                  patient.phone!,
+                  style: AafiyaTypography.caption.copyWith(color: AafiyaColors.secondaryText),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPatientSearchSection(LocalizedStrings strings) {
+    return Column(
+      key: const ValueKey('patient_search_section'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextField(
+          key: const ValueKey('patient_search_input'),
+          controller: _patientSearchController,
+          decoration: InputDecoration(
+            hintText: strings.searchPatientPlaceholder,
+            prefixIcon: const Icon(Icons.search_rounded, size: 20),
+            suffixIcon: _isSearchingPatients
+                ? const Padding(
+                    padding: EdgeInsets.all(12),
+                    child: SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  )
+                : _patientSearchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear_rounded, size: 18),
+                        onPressed: () {
+                          _patientSearchController.clear();
+                          setState(() {
+                            _patientResults = [];
+                            _patientSearchError = null;
+                          });
+                        },
+                      )
+                    : null,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(AafiyaRadius.md)),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: AafiyaSpacing.md,
+              vertical: AafiyaSpacing.sm,
+            ),
+          ),
+          onChanged: _searchPatients,
+          onSubmitted: _searchPatients,
+        ),
+        const SizedBox(height: AafiyaSpacing.sm),
+
+        if (_patientSearchError != null)
+          Container(
+            padding: const EdgeInsets.all(AafiyaSpacing.sm),
+            margin: const EdgeInsets.only(bottom: AafiyaSpacing.sm),
+            decoration: BoxDecoration(
+              color: AafiyaColors.error.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AafiyaRadius.md),
+            ),
+            child: Text(
+              _patientSearchError!,
+              style: AafiyaTypography.caption.copyWith(color: AafiyaColors.error),
+            ),
+          ),
+
+        if (_patientResults.isEmpty &&
+            !_isSearchingPatients &&
+            _patientSearchController.text.trim().length >= 2)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: AafiyaSpacing.md),
+            child: Center(
+              child: Text(
+                strings.noPatientsFound,
+                style: AafiyaTypography.caption.copyWith(color: AafiyaColors.secondaryText),
+              ),
+            ),
+          ),
+
+        if (_patientResults.isNotEmpty)
+          ListView.separated(
+            key: const ValueKey('patient_search_results_list'),
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: _patientResults.length,
+            separatorBuilder: (_, __) => const SizedBox(height: AafiyaSpacing.xs),
+            itemBuilder: (context, index) {
+              final pat = _patientResults[index];
+              return InkWell(
+                key: ValueKey('patient_result_${pat.id}'),
+                onTap: () => _selectPatient(pat),
+                borderRadius: BorderRadius.circular(AafiyaRadius.md),
+                child: Container(
+                  padding: const EdgeInsets.all(AafiyaSpacing.sm),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: AafiyaColors.border),
+                    borderRadius: BorderRadius.circular(AafiyaRadius.md),
+                  ),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 16,
+                        backgroundColor: AafiyaColors.healthBlue.withValues(alpha: 0.12),
+                        child: Text(
+                          pat.firstName.isNotEmpty ? pat.firstName[0].toUpperCase() : 'P',
+                          style: AafiyaTypography.caption.copyWith(
+                            color: AafiyaColors.healthBlue,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: AafiyaSpacing.sm),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              pat.fullName,
+                              style: AafiyaTypography.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+                            ),
+                            Wrap(
+                              spacing: AafiyaSpacing.sm,
+                              children: [
+                                if (pat.mrn.isNotEmpty)
+                                  Text(
+                                    '${strings.patientMrnLabel}: ${pat.mrn}',
+                                    style: AafiyaTypography.caption.copyWith(color: AafiyaColors.secondaryText),
+                                  ),
+                                if (pat.phone != null && pat.phone!.isNotEmpty)
+                                  Text(
+                                    pat.phone!,
+                                    style: AafiyaTypography.caption.copyWith(color: AafiyaColors.secondaryText),
+                                  ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AafiyaColors.secondaryText),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        const SizedBox(height: AafiyaSpacing.md),
+      ],
+    );
+  }
+
   Widget _buildPatientForm(LocalizedStrings strings) {
+    final isPrefilled = _isReturnVisit || (_isRegisteredPatient && _selectedPatient != null);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        if (_isRegisteredPatient && !_isReturnVisit) ...[
+          if (_selectedPatient == null)
+            _buildPatientSearchSection(strings)
+          else
+            _buildSelectedPatientCard(strings),
+        ],
+
         // Patient Name
         TextFormField(
           key: const ValueKey('patient_name_field'),
           controller: _nameController,
+          readOnly: isPrefilled,
           decoration: InputDecoration(
             labelText: strings.patientNameLabel,
             prefixIcon: const Icon(Icons.person_rounded, size: 20),
@@ -739,6 +1105,7 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
         TextFormField(
           key: const ValueKey('patient_phone_field'),
           controller: _phoneController,
+          readOnly: isPrefilled,
           keyboardType: TextInputType.phone,
           decoration: InputDecoration(
             labelText: strings.patientPhoneRequired,
@@ -762,12 +1129,16 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
         TextFormField(
           key: const ValueKey('patient_mrn_field'),
           controller: _mrnController,
-          readOnly: _isReturnVisit,
+          readOnly: isPrefilled,
           decoration: InputDecoration(
             labelText: strings.patientMrnLabel,
             prefixIcon: const Icon(Icons.badge_rounded, size: 20),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(AafiyaRadius.md)),
-            helperText: _isReturnVisit ? strings.returnVisitPatientBadge : null,
+            helperText: _isReturnVisit
+                ? strings.returnVisitPatientBadge
+                : (_isRegisteredPatient && _selectedPatient != null)
+                    ? strings.registeredPatientTab
+                    : null,
           ),
         ),
         const SizedBox(height: AafiyaSpacing.md),

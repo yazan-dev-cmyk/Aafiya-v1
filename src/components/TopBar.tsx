@@ -43,13 +43,13 @@ export const TopBar: React.FC<TopBarProps> = ({
   ];
 
   return (
-    <div className="bg-primary text-white text-xs py-2 px-4 shadow-sm font-bold tracking-tight">
-      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+    <div className="bg-primary text-white text-xs py-2 px-4 shadow-sm font-bold tracking-tight overflow-hidden w-full max-w-full [contain:paint]">
+      <div className="max-w-7xl mx-auto flex flex-col xl:flex-row items-center justify-between gap-3 min-w-0 w-full overflow-hidden [contain:paint]">
         {/* Highlight text */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 min-w-0 shrink">
           <Badge 
             variant="neutral" 
-            className="bg-white/20 text-white border-white/25 py-0.5 font-satisfy"
+            className="bg-white/20 text-white border-white/25 py-0.5 font-satisfy shrink-0"
             icon={<Sparkles className="w-3 h-3 text-amber-300" />}
           >
             {t('common.version')}
@@ -59,7 +59,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           </span>
           <button
             onClick={onOpenCalculator}
-            className="hidden md:inline-flex items-center gap-1 text-white/80 hover:text-white underline cursor-pointer transition-colors"
+            className="hidden md:inline-flex items-center gap-1 text-white/80 hover:text-white underline cursor-pointer transition-colors shrink-0"
           >
             {t('navigation.calculator')}
             <ArrowLeft className={cn("w-3 h-3", locale === 'en' && "rotate-180")} />
@@ -67,9 +67,9 @@ export const TopBar: React.FC<TopBarProps> = ({
         </div>
 
         {/* Controls */}
-        <div className="flex items-center gap-3 overflow-x-auto no-scrollbar pb-1 sm:pb-0 w-full sm:w-auto">
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5 max-w-full min-w-0 xl:max-w-[60%] shrink">
           {/* View Mode Switches */}
-          <div className="flex items-center gap-1 bg-black/10 p-1 rounded-xl border border-white/10 shrink-0">
+          <div className="flex items-center gap-1 bg-black/10 p-1 rounded-xl border border-white/10 overflow-x-auto no-scrollbar max-w-full min-w-0">
             {viewModes.map((mode) => {
               const Icon = mode.icon;
               const isActive = viewMode === mode.id;

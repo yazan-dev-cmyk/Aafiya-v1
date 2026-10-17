@@ -21,6 +21,8 @@ class AppointmentSlot extends Model
         'time_slot',
         'capacity',
         'booked_count',
+        'is_quarantined',
+        'quarantine_reason',
     ];
 
     protected function casts(): array
@@ -29,6 +31,7 @@ class AppointmentSlot extends Model
             'appointment_date' => 'date:Y-m-d',
             'capacity'         => 'integer',
             'booked_count'     => 'integer',
+            'is_quarantined'   => 'boolean',
         ];
     }
 
@@ -44,11 +47,19 @@ class AppointmentSlot extends Model
 
     public function getAvailableCapacityAttribute(): int
     {
+        if ($this->is_quarantined) {
+            return 0;
+        }
+
         return max(0, $this->capacity - $this->booked_count);
     }
 
     public function getIsAvailableAttribute(): bool
     {
+        if ($this->is_quarantined) {
+            return false;
+        }
+
         return $this->getAvailableCapacityAttribute() > 0;
     }
 }

@@ -37,3 +37,17 @@ Artisan::command('aafiya:repair-test-booking-center', function (\App\Services\Bo
     $this->info("Booking Center provisioned successfully for {$user->email} [ID: {$center->id}, Status: {$center->verification_status}, is_active: " . ($center->is_active ? 'true' : 'false') . ']');
     return 0;
 })->purpose('Safely provision missing BookingCenter record for test account val.booking-1@aafiya.dz');
+
+// DEC-GAP-02: Daily automatic expiration of past pending appointments at midnight in Africa/Algiers
+\Illuminate\Support\Facades\Schedule::command('aafiya:expire-past-pending-appointments')
+    ->dailyAt('00:00')
+    ->timezone('Africa/Algiers')
+    ->withoutOverlapping();
+
+// DEC-GAP-04: Periodic escalation of expired unread patient in-app notifications (24h SLA) to clinic staff
+\Illuminate\Support\Facades\Schedule::command('aafiya:escalate-unread-notifications')
+    ->hourly()
+    ->timezone('Africa/Algiers')
+    ->withoutOverlapping();
+
+

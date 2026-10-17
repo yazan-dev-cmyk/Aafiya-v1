@@ -241,15 +241,20 @@
     "footer_badge": "Reorganizing the health experience safely and professionally"
   },
   "statistics": {
-    "centers": "Certified Booking Centers",
-    "centers_desc": "Trusted booking points across all provinces",
-    "doctors": "Doctors and Health Institutions",
-    "doctors_desc": "Clinics and multi-specialty medical centers",
-    "appointments": "Confirmed Medical Appointments",
-    "appointments_desc": "Successfully managed through the platform",
-    "patients": "Electronic Medical Files",
-    "patients_desc": "For registered patients with protection and encryption",
-    "performance_indicator": "Performance Indicator"
+    "operational_pillar": "Operational Pillar",
+    "quota_governance": "Quota Governance",
+    "quota_governance_highlight": "Appointment-Bound",
+    "quota_governance_desc": "Quota consumption strictly bound to confirmed appointments with center balance protection",
+    "national_directory": "National Directory",
+    "national_directory_highlight": "Official Master Data",
+    "national_directory_desc": "Official administrative division of Algeria for structured healthcare facilities",
+    "data_security": "Medical Data Security",
+    "data_security_highlight": "Least Privilege",
+    "data_security_desc": "Strict role-based access control and encryption to safeguard patient medical privacy",
+    "care_coordination": "Care Coordination",
+    "care_coordination_highlight": "Synchronized Care",
+    "care_coordination_desc": "Digital workflow connecting physicians, assistants, laboratories, and radiology centers",
+    "performance_indicator": "Operational Pillar"
   },
   "features": {
     "section_badge": "Structural Platform Functions",
@@ -525,12 +530,40 @@
     "clear_filters": "Clear Filters",
     "specialty_label": "Specialty",
     "book_now": "Book Now",
+    "generic_doctor_name": "Certified Doctor",
+    "doctor_role_title": "Certified Doctor",
+    "clinic_role_title": "Certified Healthcare Facility",
+    "verified_practitioner": "Verified Practitioner",
+    "loading_directory": "Loading unified directory...",
+    "error_loading": "Failed to connect to the public directory",
+    "retry": "Retry",
+    "join_network_cta": "Join the Healthcare Network",
+    "contact_clinic": "Contact Facility",
     "no_results_title": "Sorry, no matching results found",
     "no_results_desc": "Try changing search terms or state for better results",
     "view_all": "View All Results",
+    "view_category_all": "View more in this category",
+    "pagination_summary": "Total search results: {total} (page {page} of {lastPage})",
+    "prev_page": "Previous Page",
+    "next_page": "Next Page",
+    "categories": {
+      "doctors": "Latest Certified Doctors",
+      "clinics": "Latest Healthcare Clinics",
+      "booking_centers": "Certified Booking Centers",
+      "labs": "Medical Laboratories",
+      "radiology": "Medical Imaging & Radiology Centers"
+    },
+    "accreditation": {
+      "booking_centers_desc": "Certified national network for coordinating patient appointments and quota governance, available for accredited centers.",
+      "labs_desc": "Integrated digital system linking medical lab test results directly to the patient record with physician consent.",
+      "radiology_desc": "Digital imaging and radiology archive (DICOM/PACS) operating under certified medical standards with high security.",
+      "apply_cta": "Request Facility Accreditation",
+      "login_cta": "Facility Login"
+    },
     "tabs": {
       "all": "All",
       "doctor": "Doctors",
+      "clinic": "Clinics",
       "booking_center": "Booking Centers",
       "lab": "Labs",
       "radiology": "Radiology"
@@ -653,31 +686,82 @@
     },
     "all_specialties": "All Specialties"
   },
+  "testimonials": {
+    "section_badge": "Typical Operational Scenarios",
+    "title": "Platform Utilization Pathways",
+    "subtitle": "Across Healthcare Roles",
+    "description": "Operational models demonstrating how each role interacts with Aafiya services under approved platform rules and governance.",
+    "sample_scenario_badge": "Standard Scenario",
+    "scenario_booking_center_name": "Accredited Booking Centers",
+    "scenario_booking_center_role": "Patient Appointment Flow Orchestration",
+    "scenario_booking_center_entity": "Official Operational Partner",
+    "scenario_booking_center_comment": "Receiving patient requests and coordinating appointments digitally with full quota transparency, deducting only upon physician approval.",
+    "scenario_doctor_name": "Clinics and Physicians",
+    "scenario_doctor_role": "Clinic Scheduling & Assistant Delegation",
+    "scenario_doctor_entity": "Accredited Medical Practice",
+    "scenario_doctor_comment": "Reviewing booking requests against daily capacity and delegating reception and arrival check-ins to authorized medical assistants.",
+    "scenario_patient_name": "Registered Patient",
+    "scenario_patient_role": "Health History & Prescription Access",
+    "scenario_patient_entity": "Unified Patient Account (UUID)",
+    "scenario_patient_comment": "Seamless access to digital prescriptions and laboratory results via personal account without having to retain physical paper copies.",
+    "scenario_diagnostic_name": "Diagnostic Labs & Imaging Centers",
+    "scenario_diagnostic_role": "Direct Result Upload by Order ID",
+    "scenario_diagnostic_entity": "Diagnostic & Radiology Lab",
+    "scenario_diagnostic_comment": "Delivering lab and radiology reports directly into the patient EMR via accredited order ID to eliminate record conflicts and expedite follow-ups."
+  },
+  "medical_file": {
+    "demo_watermark": "Demonstrative Showcase Model — Not an actual patient record",
+    "demo_patient_initials": "S.P",
+    "demo_patient_name": "Sample Patient Model",
+    "demo_patient_sub": "Digital EMR Identifier Simulation",
+    "encryption_standard": "AES-256 Encrypted",
+    "latest_medical_event": "Standard Medical History",
+    "status_active": "Active",
+    "simulated_consultation_title": "Documented Medical Consultation (Simulation)",
+    "sample_record_label": "Demo Record",
+    "simulated_consultation_desc": "Automated logging of diagnosis, approved prescriptions, and lab results within the unified EMR.",
+    "prescription_approved": "Approved Prescription",
+    "lab_results_uploaded": "Test Results Uploaded",
+    "immutability_note": "Clause 7.10: Historical medical records cannot be altered; any corrections require a new complementary record.",
+    "section_badge": "Medical Record Architecture",
+    "title": "Electronic Medical Record (EMR)",
+    "subtitle": "Unified Digital Health Record",
+    "desc": "The Electronic Medical Record is created when a patient registers on Aafiya, assigned a unique internal identifier (UUID) ensuring care continuity.",
+    "points": {
+      "emr_history_title": "Trusted Cumulative Health Record",
+      "emr_history_desc": "Diagnoses, prescriptions, and test results are automatically linked to your trajectory without risk of losing paper records.",
+      "least_privilege_title": "Complete Confidentiality & Least Privilege",
+      "least_privilege_desc": "Access is restricted strictly to the treating physician during the confirmed visit, with full encryption and audit logging.",
+      "guest_patient_title": "Guest Patient (Walk-in)",
+      "guest_patient_desc": "Guest patients receive physical printed documents immediately without opening a permanent electronic health record."
+    },
+    "create_account_cta": "Register Patient Account (UUID)"
+  },
   "news": {
-    "section_badge": "Latest Updates and Research",
-    "title": "Platform News and",
-    "subtitle": "Digital Health Transformation",
-    "view_all": "All Articles and News",
-    "read_more": "Read Details",
+    "section_badge": "Platform Guides & Healthcare Transformation",
+    "title": "Platform Operational Guides",
+    "subtitle": "Clinical & Operational Standards",
+    "view_all": "Frequently Asked Questions",
+    "read_more": "View Platform Guide",
     "categories": {
-      "digital_health": "Digital Health",
-      "platform_updates": "Platform Updates",
-      "medical_research": "Medical Research"
+      "operational_guide": "Operational Guide",
+      "clinical_governance": "Clinical Governance",
+      "data_privacy": "Data Governance"
     },
-    "article_1": {
-      "title": "Launching the first version of the unified electronic medical file in Algeria",
-      "summary": "Aafiya has officially started activating the digital medical file feature linked to citizens' national identity, facilitating secure treatment history tracking.",
-      "readTime": "5 min read"
+    "guide_booking_center": {
+      "title": "Booking Center Operations & Quota Management Guide",
+      "summary": "Complete walkthrough of booking request creation, quota deduction and refund terms, and distinguishing guest from registered patients.",
+      "readTime": "Operational Guide"
     },
-    "article_2": {
-      "title": "How to choose the right operational package for your booking center?",
-      "summary": "A comprehensive guide for certified booking centers on the mechanism of buying wholesale operation credits and achieving the highest operational return from direct service fees.",
-      "readTime": "4 min read"
+    "guide_clinics": {
+      "title": "Physician Clinic Scheduling & Assistant Delegation Rules",
+      "summary": "Approved standards for configuring practice working hours, managing breaks and leaves, and assigning reception roles to clinic assistants.",
+      "readTime": "Governance Guide"
     },
-    "article_3": {
-      "title": "Importance of digitizing medical prescriptions in reducing medication errors",
-      "summary": "A study showing how the Aafiya system contributes to converting paper prescriptions into accurate digital records that prevent drug interactions and protect the patient.",
-      "readTime": "6 min read"
+    "guide_emr_privacy": {
+      "title": "EMR Security, Encryption, and Access Standards",
+      "summary": "Architectural principles for storing medical records under least-privilege access and governing diagnostic report sharing across stakeholders.",
+      "readTime": "Security Guide"
     }
   },
   "cta": {
@@ -2158,7 +2242,27 @@
       "preparationTitle": "Preparation Instructions:",
       "viewPass": "View Visit Pass",
       "reschedule": "Reschedule",
-      "cancel": "Cancel Appointment"
+      "cancel": "Cancel Appointment",
+      "rescheduleModal": {
+        "title": "Reschedule Medical Appointment",
+        "subtitle": "Choose an available alternative date and time slot to reschedule your appointment",
+        "currentAppointment": "Current Appointment",
+        "newAppointment": "Proposed New Appointment",
+        "selectDate": "New Appointment Date",
+        "selectSlot": "Available Time Slot",
+        "loadingSlots": "Loading available slots...",
+        "noSlots": "No available slots on this date (doctor may be on vacation or clinic is closed).",
+        "doctor": "Doctor:",
+        "clinic": "Clinic:",
+        "notesLabel": "Additional Notes (Optional)",
+        "notesPlaceholder": "Enter any additional notes regarding the reschedule...",
+        "cancel": "Back",
+        "confirm": "Confirm Reschedule",
+        "submitting": "Rescheduling...",
+        "successMessage": "Medical appointment rescheduled successfully.",
+        "sameSlotWarning": "Selected date and time slot are identical to your current appointment.",
+        "incompleteData": "Clinic or doctor data is incomplete for automated rescheduling."
+      }
     }
   },
   "bookingCenter": {
@@ -3217,5 +3321,57 @@
     "loadingSpecialties": "Loading medical specialties...",
     "errorSpecialties": "Failed to load medical specialties",
     "allSpecialties": "All Specialties"
+  },
+  "sharedRecordViewer": {
+    "title": "Encrypted Unified Medical Record",
+    "subtitle": "Secure Verification & PIN Authentication Gateway",
+    "pinPrompt": "Please enter the security PIN to access the shared medical record",
+    "pinPlaceholder": "Enter PIN code (4 to 8 digits)",
+    "submitButton": "Decrypt & View Record",
+    "verifying": "Verifying and decrypting...",
+    "remainingAttempts": "Remaining attempts: {count}",
+    "missingTokenTitle": "Invalid or Missing Share Link",
+    "missingTokenDesc": "No share token was detected in the link. Please ensure you opened the complete encrypted link as provided by the patient.",
+    "invalidPin": "Incorrect security PIN.",
+    "lockedTitle": "Link Temporarily Locked",
+    "lockedDesc": "The link has been temporarily locked for 15 minutes due to consecutive failed attempts. Please try again later.",
+    "expiredTitle": "Share Link Expired",
+    "expiredDesc": "The validity period for this share link has expired. Please request a new link from the patient.",
+    "revokedTitle": "Share Link Revoked",
+    "revokedDesc": "The patient has revoked access to this share link, and it is no longer valid.",
+    "notFoundTitle": "Share Link Not Found",
+    "notFoundDesc": "The share link is invalid or could not be found.",
+    "rateLimitTitle": "Rate Limit Exceeded",
+    "rateLimitDesc": "Too many verification attempts. Please wait a moment and try again.",
+    "networkError": "Connection failed. Please check your internet connection.",
+    "patientInfo": "Patient Demographics",
+    "mrn": "Medical Record Number (MRN)",
+    "fullName": "Full Name",
+    "gender": "Gender",
+    "male": "Male",
+    "female": "Female",
+    "dateOfBirth": "Date of Birth",
+    "bloodGroup": "Blood Group",
+    "allergiesTitle": "Documented Allergies",
+    "noAllergies": "No recorded allergies",
+    "allergen": "Allergen",
+    "severity": "Severity",
+    "reaction": "Reaction",
+    "chronicConditionsTitle": "Chronic Conditions",
+    "noConditions": "No recorded chronic conditions",
+    "conditionName": "Condition",
+    "icd10": "ICD-10 Code",
+    "diagnosedDate": "Diagnosed Date",
+    "currentMedicationsTitle": "Current Medications",
+    "noMedications": "No recorded current medications",
+    "medicationName": "Medication",
+    "dosage": "Dosage",
+    "frequency": "Frequency",
+    "metadataTitle": "Share Metadata & Scope",
+    "scope": "Authorized Scope",
+    "allEmrScope": "Authorized Unified Medical Record (PII & Contact Info Excluded)",
+    "expiresAt": "Expires At",
+    "accessGrantedAt": "Access Granted At",
+    "securityNotice": "Strict data minimization applied for privacy: contact info and national ID are completely excluded."
   }
 }
