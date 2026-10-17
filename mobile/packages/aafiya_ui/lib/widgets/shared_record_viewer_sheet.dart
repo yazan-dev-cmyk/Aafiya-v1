@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:aafiya_core/aafiya_core.dart';
-import 'package:aafiya_core/models/shared_patient_record.dart';
-import 'package:aafiya_core/services/shared_record_service.dart';
 
 import '../tokens/aafiya_colors.dart';
 import '../tokens/aafiya_radius.dart';
@@ -200,78 +198,88 @@ class _SharedRecordViewerSheetState extends State<SharedRecordViewerSheet> {
   Widget build(BuildContext context) {
     final strings = LocalizedStrings.of(context);
     final mediaQuery = MediaQuery.of(context);
+    final bottomInset = mediaQuery.viewInsets.bottom;
+    final availableHeight = mediaQuery.size.height - bottomInset;
 
-    return Container(
-      constraints: BoxConstraints(
-        maxHeight: mediaQuery.size.height * 0.90,
-      ),
-      decoration: const BoxDecoration(
-        color: AafiyaColors.pureWhite,
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AafiyaRadius.lg),
+    return Padding(
+      padding: EdgeInsets.only(bottom: bottomInset),
+      child: Container(
+        constraints: BoxConstraints(
+          maxHeight: availableHeight * 0.90,
         ),
-      ),
-      child: SafeArea(
-        top: false,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Drag handle pill
-            Center(
-              child: Container(
-                margin: const EdgeInsets.symmetric(vertical: AafiyaSpacing.sm),
-                width: 44,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AafiyaColors.border,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-
-            // Header title
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AafiyaSpacing.lg,
-                vertical: AafiyaSpacing.sm,
-              ),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.lock_person_outlined,
-                    color: AafiyaColors.primaryBlue,
-                    size: 24,
-                  ),
-                  const SizedBox(width: AafiyaSpacing.sm),
-                  Expanded(
-                    child: Text(
-                      strings.sharedRecordViewerTitle,
-                      style: AafiyaTypography.titleMedium.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: AafiyaColors.primaryBlue,
-                      ),
+        decoration: const BoxDecoration(
+          color: AafiyaColors.pureWhite,
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(AafiyaRadius.lg),
+          ),
+        ),
+        child: GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          behavior: HitTestBehavior.opaque,
+          child: SafeArea(
+            top: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Drag handle pill
+                Center(
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(vertical: AafiyaSpacing.sm),
+                    width: 44,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: AafiyaColors.border,
+                      borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.close, color: AafiyaColors.secondaryText),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ],
-              ),
-            ),
-            const Divider(height: 1, color: AafiyaColors.border),
+                ),
 
-            // Main body
-            Flexible(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(AafiyaSpacing.lg),
-                child: _record != null
-                    ? _buildRecordView(context, _record!, strings)
-                    : _buildResolutionForm(context, strings),
-              ),
+                // Header title
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AafiyaSpacing.lg,
+                    vertical: AafiyaSpacing.sm,
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.lock_person_outlined,
+                        color: AafiyaColors.primaryBlue,
+                        size: 24,
+                      ),
+                      const SizedBox(width: AafiyaSpacing.sm),
+                      Expanded(
+                        child: Text(
+                          strings.sharedRecordViewerTitle,
+                          style: AafiyaTypography.titleMedium.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: AafiyaColors.primaryBlue,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: AafiyaColors.secondaryText),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ],
+                  ),
+                ),
+                const Divider(height: 1, color: AafiyaColors.border),
+
+                // Main body
+                Flexible(
+                  child: SingleChildScrollView(
+                    keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                    padding: const EdgeInsets.all(AafiyaSpacing.lg),
+                    child: _record != null
+                        ? _buildRecordView(context, _record!, strings)
+                        : _buildResolutionForm(context, strings),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

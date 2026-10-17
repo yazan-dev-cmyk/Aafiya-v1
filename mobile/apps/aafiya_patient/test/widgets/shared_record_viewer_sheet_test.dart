@@ -304,5 +304,36 @@ void main() {
       expect(find.textContaining('national_id'), findsNothing);
       expect(find.textContaining('address'), findsNothing);
     });
+
+    testWidgets('handles keyboard viewInsets and renders token input when initialToken is null', (tester) async {
+      final mockClient = MockClient((_) async => http.Response('{}', 200));
+      final apiClient = ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
+
+      await tester.pumpWidget(
+        buildTestApp(
+          child: Builder(
+            builder: (context) => MediaQuery(
+              data: MediaQuery.of(context).copyWith(
+                viewInsets: const EdgeInsets.only(bottom: 300),
+              ),
+              child: SharedRecordViewerSheet(
+                apiClient: apiClient,
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('عرض السجل الطبي المشفر'), findsOneWidget);
+      expect(find.text('رمز أو رابط المشاركة'), findsOneWidget);
+      expect(find.byType(TextField), findsNWidgets(2)); // Token and PIN
+
+      // Verify Padding bottom inset is applied
+      final paddingFinder = find.byWidgetPredicate(
+        (w) => w is Padding && w.padding == const EdgeInsets.only(bottom: 300),
+      );
+      expect(paddingFinder, findsOneWidget);
+    });
   });
 }
