@@ -23,7 +23,6 @@ class DoctorAgendaTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final strings = LocalizedStrings.of(context);
-    final statusColor = _statusColor(appointment.status);
     final statusText = _statusText(appointment.status, strings);
 
     return Padding(
@@ -54,7 +53,7 @@ class DoctorAgendaTile extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    appointment.timeSlot ?? '--:--',
+                    '\u200E${appointment.timeSlot ?? "--:--"}\u200E',
                     style: AafiyaTypography.titleMedium.copyWith(
                       color: AafiyaColors.healthBlue,
                       fontWeight: FontWeight.bold,
@@ -84,20 +83,10 @@ class DoctorAgendaTile extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      // Status Badge
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: statusColor.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(AafiyaRadius.sm),
-                        ),
-                        child: Text(
-                          statusText,
-                          style: AafiyaTypography.caption.copyWith(
-                            color: statusColor,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                      // Standardized Accessible Status Chip
+                      AafiyaStatusChip(
+                        label: statusText,
+                        type: _statusType(appointment.status),
                       ),
                       if (onTap != null) ...[
                         const SizedBox(width: 6),
@@ -113,7 +102,7 @@ class DoctorAgendaTile extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        '${strings.bookingRefLabel}: ${appointment.bookingReference}',
+                        '${strings.bookingRefLabel}: \u200E${appointment.bookingReference}\u200E',
                         style: AafiyaTypography.caption.copyWith(
                           color: AafiyaColors.secondaryText,
                         ),
@@ -156,15 +145,15 @@ class DoctorAgendaTile extends StatelessWidget {
     );
   }
 
-  Color _statusColor(AppointmentStatus status) {
+  AafiyaStatusType _statusType(AppointmentStatus status) {
     return switch (status) {
-      AppointmentStatus.confirmed => AafiyaColors.healthBlue,
-      AppointmentStatus.attended => AafiyaColors.healingGreen,
-      AppointmentStatus.pending => AafiyaColors.warning,
-      AppointmentStatus.noShow => AafiyaColors.error,
+      AppointmentStatus.confirmed => AafiyaStatusType.confirmed,
+      AppointmentStatus.attended => AafiyaStatusType.concluded,
+      AppointmentStatus.pending => AafiyaStatusType.pending,
+      AppointmentStatus.noShow => AafiyaStatusType.urgent,
       AppointmentStatus.cancelled || AppointmentStatus.rejected || AppointmentStatus.expired =>
-        AafiyaColors.secondaryText,
-      _ => AafiyaColors.primaryText,
+        AafiyaStatusType.urgent,
+      _ => AafiyaStatusType.concluded,
     };
   }
 

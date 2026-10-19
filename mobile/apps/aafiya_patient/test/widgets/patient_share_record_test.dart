@@ -16,6 +16,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   const jsonHeaders = {'content-type': 'application/json; charset=utf-8'};
+  final futureExpiry = DateTime.now().add(const Duration(days: 2)).toIso8601String();
 
   final mockCreateResponse = {
     'message': 'تم إنشاء رابط المشاركة الآمن والمشفر بنجاح.',
@@ -24,7 +25,7 @@ void main() {
       'token': 'pst_mockSecretToken1234567890abcdef',
       'scope': 'all_emr',
       'duration': '24h',
-      'expires_at': '2026-10-17T10:00:00.000Z',
+      'expires_at': futureExpiry,
       'share_url': 'http://localhost:3000/records/view#token=pst_mockSecretToken1234567890abcdef',
       'has_pin': true,
       'status': 'active',
@@ -40,7 +41,7 @@ void main() {
         'failed_attempts': 0,
         'access_count': 3,
         'last_accessed_at': '2026-10-16T12:00:00.000Z',
-        'expires_at': '2026-10-17T10:00:00.000Z',
+        'expires_at': futureExpiry,
         'revoked_at': null,
         'created_at': '2026-10-16T10:00:00.000Z',
       },
@@ -51,7 +52,7 @@ void main() {
         'failed_attempts': 0,
         'access_count': 0,
         'last_accessed_at': null,
-        'expires_at': '2026-10-17T10:00:00.000Z',
+        'expires_at': futureExpiry,
         'revoked_at': '2026-10-16T11:00:00.000Z',
         'created_at': '2026-10-16T09:00:00.000Z',
       },
@@ -311,7 +312,10 @@ void main() {
       await tester.pumpAndSettle();
 
       // Navigate to Tab 2: Medical Records Hub via bottom navigation bar
-      await tester.tap(find.byIcon(Icons.folder_shared_outlined));
+      await tester.tap(find.descendant(
+        of: find.byType(NavigationBar),
+        matching: find.byIcon(Icons.folder_shared_outlined),
+      ));
       await tester.pumpAndSettle();
 
       // Verify Sender card is present

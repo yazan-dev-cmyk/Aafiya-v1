@@ -102,7 +102,7 @@ class QueuePatientTile extends StatelessWidget {
                     borderRadius: BorderRadius.circular(AafiyaRadius.sm),
                   ),
                   child: Text(
-                    appointment.timeSlot ?? '--:--',
+                    '\u200E${appointment.timeSlot ?? "--:--"}\u200E',
                     style: AafiyaTypography.caption.copyWith(
                       fontWeight: FontWeight.bold,
                       color: AafiyaColors.healthBlue,
@@ -204,7 +204,7 @@ class QueuePatientTile extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  '${strings.bookingRefLabel} ${appointment.bookingReference}',
+                  '${strings.bookingRefLabel} \u200E${appointment.bookingReference}\u200E',
                   style: AafiyaTypography.caption.copyWith(
                     color: AafiyaColors.secondaryText,
                   ),
@@ -292,12 +292,13 @@ class QueuePatientTile extends StatelessWidget {
                             : const Icon(Icons.check_circle_outline, size: 18),
                         label: Text(strings.markAttendedAction),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AafiyaColors.healingGreen,
+                          backgroundColor: AafiyaColors.actionGreen,
                           foregroundColor: AafiyaColors.pureWhite,
                           elevation: 0,
+                          minimumSize: const Size(0, 48),
                           padding: const EdgeInsets.symmetric(
                             horizontal: AafiyaSpacing.sm,
-                            vertical: 10,
+                            vertical: 12,
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(AafiyaRadius.sm),
@@ -320,9 +321,10 @@ class QueuePatientTile extends StatelessWidget {
                           foregroundColor: AafiyaColors.error,
                           side: const BorderSide(color: AafiyaColors.error),
                           elevation: 0,
+                          minimumSize: const Size(0, 48),
                           padding: const EdgeInsets.symmetric(
                             horizontal: AafiyaSpacing.sm,
-                            vertical: 10,
+                            vertical: 12,
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(AafiyaRadius.sm),
@@ -356,12 +358,13 @@ class QueuePatientTile extends StatelessWidget {
                           : const Icon(Icons.check_circle_rounded, size: 18),
                       label: Text(strings.confirmAppointmentAction),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AafiyaColors.healingGreen,
+                        backgroundColor: AafiyaColors.actionGreen,
                         foregroundColor: AafiyaColors.pureWhite,
                         elevation: 0,
+                        minimumSize: const Size(0, 48),
                         padding: const EdgeInsets.symmetric(
                           horizontal: AafiyaSpacing.sm,
-                          vertical: 10,
+                          vertical: 12,
                         ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(AafiyaRadius.sm),
@@ -384,31 +387,15 @@ class QueuePatientTile extends StatelessWidget {
     AppointmentStatus status,
     LocalizedStrings strings,
   ) {
-    final (label, color) = switch (status) {
-      AppointmentStatus.confirmed => (strings.filterConfirmed, AafiyaColors.healthBlue),
-      AppointmentStatus.attended => (strings.filterAttended, AafiyaColors.healingGreen),
-      AppointmentStatus.noShow => (strings.filterNoShow, AafiyaColors.error),
-      AppointmentStatus.pending => (strings.pendingCheckInLabel, AafiyaColors.warning),
-      _ => (status.key, AafiyaColors.secondaryText),
+    final (label, type) = switch (status) {
+      AppointmentStatus.confirmed => (strings.filterConfirmed, AafiyaStatusType.confirmed),
+      AppointmentStatus.attended => (strings.filterAttended, AafiyaStatusType.concluded),
+      AppointmentStatus.noShow => (strings.filterNoShow, AafiyaStatusType.urgent),
+      AppointmentStatus.pending => (strings.pendingCheckInLabel, AafiyaStatusType.pending),
+      _ => (status.key, AafiyaStatusType.concluded),
     };
 
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AafiyaSpacing.sm,
-        vertical: AafiyaSpacing.xs,
-      ),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AafiyaRadius.sm),
-      ),
-      child: Text(
-        label,
-        style: AafiyaTypography.caption.copyWith(
-          color: color,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
+    return AafiyaStatusChip(label: label, type: type);
   }
 
   String _formatTime(String isoString) {

@@ -169,7 +169,7 @@ void main() {
       expect(find.text('المتوقع حضورهم'), findsOneWidget);
       expect(find.text('عمر بن الخطاب'), findsOneWidget);
       expect(find.textContaining('MS-2026-0001'), findsOneWidget);
-      expect(find.text('08:00'), findsOneWidget);
+      expect(find.text('\u200E08:00\u200E'), findsOneWidget);
       expect(find.text('في الانتظار'), findsOneWidget);
 
       // Verify ZERO attendance action buttons for already attended patients
@@ -182,7 +182,7 @@ void main() {
 
       expect(find.text('فاطمة الزهراء'), findsOneWidget);
       expect(find.textContaining('MS-2026-0002'), findsOneWidget);
-      expect(find.text('09:00'), findsOneWidget);
+      expect(find.text('\u200E09:00\u200E'), findsOneWidget);
       expect(find.text('متابعة كشف سابقة'), findsOneWidget);
 
       // Verify Operational Action buttons ARE present for confirmed patients
@@ -593,10 +593,10 @@ void main() {
       await tester.pumpAndSettle();
 
       // Waiting Room badge must reflect authoritative total (25), not items.length (15)
-      expect(find.text('25'), findsOneWidget);
+      expect(find.text('\u200E25\u200E'), findsOneWidget);
 
       // Expected Arrivals badge must reflect authoritative total (42), not items.length (15)
-      expect(find.text('42'), findsOneWidget);
+      expect(find.text('\u200E42\u200E'), findsOneWidget);
     });
 
     testWidgets('DA-03.2: Infinite scroll pagination deduplicates items by ID and retains authoritative total',
@@ -697,7 +697,7 @@ void main() {
 
       expect(find.text('مريض 1'), findsOneWidget);
       expect(find.text('مريض 2'), findsOneWidget);
-      expect(find.text('3'), findsOneWidget); // badge total = 3
+      expect(find.text('\u200E3\u200E'), findsOneWidget); // badge total = 3
 
       // Trigger scroll to load page 2
       final scrollableFinder = find.byType(Scrollable);
@@ -711,7 +711,7 @@ void main() {
       // If duplicate was NOT prevented, 'مريض 2' would have appeared 2 times.
       // With deduplication, 'مريض 2' appears exactly once.
       expect(find.text('مريض 2'), findsOneWidget);
-      expect(find.text('3'), findsOneWidget);
+      expect(find.text('\u200E3\u200E'), findsOneWidget);
     });
 
     testWidgets('DA-03.3: Attend action authoritatively re-syncs queue statistics for both tabs',
@@ -808,8 +808,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Before attendance: Waiting Room = 0, Expected = 1
-      expect(find.text('0'), findsOneWidget);
-      expect(find.text('1'), findsOneWidget);
+      expect(find.text('\u200E0\u200E'), findsOneWidget);
+      expect(find.text('\u200E1\u200E'), findsOneWidget);
 
       // Switch to Expected tab
       await tester.tap(find.text('المتوقع حضورهم'));
@@ -827,8 +827,8 @@ void main() {
       expect(attendCallCount, greaterThan(0));
 
       // After attendance: Expected becomes 0, Waiting Room becomes 1
-      expect(find.text('0'), findsOneWidget);
-      expect(find.text('1'), findsOneWidget);
+      expect(find.text('\u200E0\u200E'), findsOneWidget);
+      expect(find.text('\u200E1\u200E'), findsOneWidget);
     });
 
     testWidgets('DA-03.4: No-show action authoritatively re-syncs expected queue statistics',
@@ -905,7 +905,7 @@ void main() {
       await tester.tap(find.text('المتوقع حضورهم'));
       await tester.pumpAndSettle();
 
-      expect(find.text('1'), findsOneWidget); // Expected total = 1
+      expect(find.text('\u200E1\u200E'), findsOneWidget); // Expected total = 1
 
       // Tap no-show
       await tester.tap(find.text('لم يحضر'));
@@ -918,7 +918,7 @@ void main() {
       expect(noShowRecorded, isTrue);
 
       // Now Expected total becomes 0
-      expect(find.text('0'), findsNWidgets(2)); // Both tabs are 0
+      expect(find.text('\u200E0\u200E'), findsNWidgets(2)); // Both tabs are 0
     });
 
     testWidgets('DA-03.5: API failure on initial load displays "-" indicator rather than misleading 0 and recovers on retry',
@@ -976,7 +976,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Now badges recover and reflect authoritative total 7
-      expect(find.text('7'), findsNWidgets(2));
+      expect(find.text('\u200E7\u200E'), findsNWidgets(2));
       expect(find.text('مريض بعد التعافي'), findsOneWidget);
     });
 
@@ -1027,7 +1027,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Clinic 01 initial state: total = 11
-      expect(find.text('11'), findsNWidgets(2));
+      expect(find.text('\u200E11\u200E'), findsNWidgets(2));
       expect(find.text('مريض الجزائر'), findsOneWidget);
 
       // Switch to Clinic 07
@@ -1035,7 +1035,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Clinic 07 state: total = 3
-      expect(find.text('3'), findsNWidgets(2));
+      expect(find.text('\u200E3\u200E'), findsNWidgets(2));
       expect(find.text('مريض وهران'), findsOneWidget);
       expect(find.text('مريض الجزائر'), findsNothing);
     });

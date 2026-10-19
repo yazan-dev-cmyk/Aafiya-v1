@@ -13,6 +13,8 @@ void main() {
     const validDuration = '24h';
     const jsonHeaders = {'content-type': 'application/json; charset=utf-8'};
 
+    final futureExpiry = DateTime.now().toUtc().add(const Duration(hours: 24)).toIso8601String();
+
     final validCreateResponseJson = {
       'message': 'تم إنشاء رابط المشاركة الآمن والمشفر بنجاح.',
       'data': {
@@ -20,7 +22,7 @@ void main() {
         'token': 'pst_mockSecretToken1234567890abcdefghijklmnopqrstuvwxyz',
         'scope': 'all_emr',
         'duration': '24h',
-        'expires_at': '2026-10-17T10:00:00.000Z',
+        'expires_at': futureExpiry,
         'share_url': 'http://localhost:3000/records/view#token=pst_mockSecretToken1234567890abcdefghijklmnopqrstuvwxyz',
         'has_pin': true,
         'status': 'active',
@@ -36,7 +38,7 @@ void main() {
           'failed_attempts': 0,
           'access_count': 2,
           'last_accessed_at': '2026-10-16T12:00:00.000Z',
-          'expires_at': '2026-10-17T10:00:00.000Z',
+          'expires_at': futureExpiry,
           'revoked_at': null,
           'created_at': '2026-10-16T10:00:00.000Z',
         },

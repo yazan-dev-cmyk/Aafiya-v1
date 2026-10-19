@@ -33,6 +33,13 @@ class LocalizedStrings {
   String get signIn => isArabic ? 'تسجيل الدخول' : isFrench ? 'Connexion' : 'Sign In';
   String get signUp => isArabic ? 'إنشاء حساب' : isFrench ? 'Créer un compte' : 'Create Account';
   String get signOut => isArabic ? 'تسجيل الخروج' : isFrench ? 'Déconnexion' : 'Sign Out';
+  String get signOutConfirmTitle =>
+      isArabic ? 'تأكيد تسجيل الخروج' : isFrench ? 'Confirmer la déconnexion' : 'Confirm Sign Out';
+  String get signOutConfirmMessage => isArabic
+      ? 'هل أنت متأكد من رغبتك في تسجيل الخروج من حسابك؟'
+      : isFrench
+          ? 'Êtes-vous sûr de vouloir vous déconnecter ?'
+          : 'Are you sure you want to sign out of your account?';
   String get emailLabel => isArabic ? 'البريد الإلكتروني' : isFrench ? 'Adresse e-mail' : 'Email Address';
   String get passwordLabel => isArabic ? 'كلمة المرور' : isFrench ? 'Mot de passe' : 'Password';
   String get fullNameLabel => isArabic ? 'الاسم الكامل' : isFrench ? 'Nom complet' : 'Full Name';
@@ -212,6 +219,15 @@ class LocalizedStrings {
       : isFrench
           ? 'Aucun rendez-vous passé enregistré.'
           : 'No past appointments on record.';
+  String get emptyAppointmentTitle =>
+      isArabic ? 'ليس لديك موعد قادم' : isFrench ? 'Aucun rendez-vous à venir' : 'No Upcoming Appointments';
+  String get emptyAppointmentDescription => isArabic
+      ? 'تُحجز المواعيد عبر مراكز الحجز المعتمدة. اعثر على أقرب مركز إليك.'
+      : isFrench
+          ? 'Les rendez-vous sont pris via les centres de réservation agréés. Trouvez le centre le plus proche.'
+          : 'Appointments are booked through authorized booking centers. Find your nearest center.';
+  String get findBookingCenterAction =>
+      isArabic ? 'ابحث عن مركز حجز' : isFrench ? 'Trouver un centre' : 'Find Booking Center';
   String get appointmentConfirmedAt =>
       isArabic ? 'تم التأكيد بتاريخ' : isFrench ? 'Confirmé le' : 'Confirmed on';
   String get appointmentCheckedInAt =>
@@ -267,6 +283,8 @@ class LocalizedStrings {
   String get statusRescheduled =>
       isArabic ? 'معاد جدولته' : isFrench ? 'Reprogrammé' : 'Rescheduled';
   String get statusUnknown => isArabic ? 'غير محدد' : isFrench ? 'Inconnu' : 'Unknown';
+  String get statusPastAppointment =>
+      isArabic ? 'موعد سابق' : isFrench ? 'Rendez-vous passé' : 'Past Appointment';
 
   String statusLabel(AppointmentStatus status) => switch (status) {
         AppointmentStatus.pending => statusPending,
@@ -336,6 +354,10 @@ class LocalizedStrings {
   String get filterByWilaya => isArabic ? 'تصفية بالولاية' : isFrench ? 'Filtrer par wilaya' : 'Filter by Wilaya';
   String get allSpecialties => isArabic ? 'جميع التخصصات' : isFrench ? 'Toutes les spécialités' : 'All Specialties';
   String get allWilayas => isArabic ? 'جميع الولايات' : isFrench ? 'Toutes les wilayas' : 'All Wilayas';
+  String get tabDoctors => isArabic ? 'الأطباء' : isFrench ? 'Médecins' : 'Doctors';
+  String get tabClinics => isArabic ? 'العيادات' : isFrench ? 'Cliniques' : 'Clinics';
+  String get tabCenters => isArabic ? 'مراكز الحجز' : isFrench ? 'Centres de réservation' : 'Booking Centers';
+  String get viewAll => isArabic ? 'عرض الكل' : isFrench ? 'Voir tout' : 'View All';
 
   // Master Data (TASK-MD-09 & TASK-MD-12)
   String get selectSpecialty => isArabic ? 'اختر التخصص' : isFrench ? 'Sélectionner la spécialité' : 'Select Specialty';

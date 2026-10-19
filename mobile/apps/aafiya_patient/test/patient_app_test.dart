@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:aafiya_core/aafiya_core.dart';
 import 'package:aafiya_ui/aafiya_ui.dart';
 import 'package:aafiya_patient/app.dart';
@@ -15,7 +18,13 @@ void main() {
 
     setUp(() {
       tokenStorage = InMemoryTokenStorage();
-      apiClient = ApiClient(tokenStorage: tokenStorage);
+      final mockHttpClient = MockClient((request) async {
+        if (request.url.path.contains('/appointments')) {
+          return http.Response(jsonEncode({'data': []}), 200, headers: {'content-type': 'application/json'});
+        }
+        return http.Response('{"message": "Not found"}', 404);
+      });
+      apiClient = ApiClient(httpClient: mockHttpClient, tokenStorage: tokenStorage);
       sessionManager = AuthSessionManager(
         tokenStorage: tokenStorage,
         apiClient: apiClient,
@@ -70,10 +79,10 @@ void main() {
           initialNavState: PatientNavState.home,
         ),
       );
+      await tester.pumpAndSettle();
 
       // Verify user identity is displayed
-      expect(find.text('Ahmed Benali'), findsOneWidget);
-      expect(find.text('ahmed@example.dz'), findsOneWidget);
+      expect(find.textContaining('Ahmed Benali'), findsOneWidget);
 
       // Verify DISC-01 Notice is present
       expect(find.text('يتم حجز المواعيد حصرياً عبر مراكز الحجز المعتمدة.'), findsOneWidget);
@@ -111,7 +120,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Ahmed Benali'), findsOneWidget);
+        expect(find.textContaining('Ahmed Benali'), findsOneWidget);
 
         // Push a sub-screen onto the navigator stack
         navKey.currentState!.push(

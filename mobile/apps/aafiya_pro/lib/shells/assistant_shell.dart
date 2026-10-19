@@ -56,8 +56,17 @@ class AssistantShell extends StatelessWidget {
             icon: const Icon(Icons.logout_rounded),
             tooltip: strings.signOut,
             onPressed: () async {
-              await sessionManager.logout();
-              onSignOut();
+              final confirmed = await AafiyaSignOutDialog.show(
+                context,
+                title: strings.signOutConfirmTitle,
+                message: strings.signOutConfirmMessage,
+                cancelLabel: strings.cancel,
+                confirmLabel: strings.signOut,
+              );
+              if (confirmed == true) {
+                await sessionManager.logout();
+                onSignOut();
+              }
             },
           ),
         ],

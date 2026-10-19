@@ -24,6 +24,9 @@ void main() {
       roles: [UserRole.patient],
     );
 
+    final upcomingDate = DateTime.now().add(const Duration(days: 7)).toIso8601String().split('T').first;
+    final pendingUpcomingDate = DateTime.now().add(const Duration(days: 10)).toIso8601String().split('T').first;
+
     final mockUpcomingAppointmentJson = {
       'id': 'app-upcoming-1',
       'booking_reference': 'BK-20261015-001',
@@ -43,7 +46,7 @@ void main() {
         'name': 'مراد قادري',
         'phone': '0555333444',
       },
-      'appointment_date': '2026-10-15',
+      'appointment_date': upcomingDate,
       'time_slot': '10:30',
       'status': 'confirmed',
       'notes': 'يرجى إحضار التحاليل السابقة',
@@ -66,7 +69,7 @@ void main() {
         'name': 'د. نادية منصوري',
         'specialty': 'طب الأطفال',
       },
-      'appointment_date': '2026-10-20',
+      'appointment_date': pendingUpcomingDate,
       'time_slot': '14:00',
       'status': 'pending',
       'notes': null,
@@ -219,7 +222,7 @@ void main() {
       expect(find.text('د. كريم بلقاسم'), findsOneWidget);
       expect(find.text('أمراض القلب'), findsOneWidget);
       expect(find.text('عيادة الشفاء التخصصية (الجزائر)'), findsOneWidget);
-      expect(find.text('2026-10-15'), findsOneWidget);
+      expect(find.text(upcomingDate), findsOneWidget);
       expect(find.text('10:30'), findsOneWidget);
       expect(find.text('مؤكد'), findsOneWidget);
       expect(find.text('رقم الحجز: #BK-20261015-001'), findsOneWidget);

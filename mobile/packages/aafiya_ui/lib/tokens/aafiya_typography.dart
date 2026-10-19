@@ -159,6 +159,77 @@ abstract final class AafiyaTypography {
     height: 1.25,
   );
 
+  // Prototype Specific Typography Tokens (aafiya-home-prototype.html)
+  static final TextStyle heroGreeting = _style(
+    fontSize: 26,
+    fontWeight: FontWeight.w700,
+    color: AafiyaColors.pureWhite,
+    height: 1.35,
+  );
+
+  static final TextStyle heroSubtitle = _style(
+    fontSize: 15.5,
+    fontWeight: FontWeight.w500,
+    color: AafiyaColors.pureWhite.withValues(alpha: 0.9),
+    height: 1.4,
+  );
+
+  static final TextStyle ticketDoctorName = _style(
+    fontSize: 17,
+    fontWeight: FontWeight.w700,
+    color: AafiyaColors.primaryText,
+    height: 1.35,
+  );
+
+  static final TextStyle ticketDoctorSpecialty = _style(
+    fontSize: 14.5,
+    fontWeight: FontWeight.normal,
+    color: AafiyaColors.secondaryText,
+    height: 1.4,
+  );
+
+  static final TextStyle sectionHeader = _style(
+    fontSize: 18,
+    fontWeight: FontWeight.w700,
+    color: AafiyaColors.primaryText,
+    height: 1.35,
+  );
+
+  static final TextStyle shortcutLabel = _style(
+    fontSize: 14,
+    fontWeight: FontWeight.w500,
+    color: AafiyaColors.primaryText,
+    height: 1.3,
+  );
+
+  static final TextStyle directoryCardTitle = _style(
+    fontSize: 15,
+    fontWeight: FontWeight.w600,
+    color: AafiyaColors.primaryText,
+    height: 1.4,
+  );
+
+  static final TextStyle directoryCardSubtitle = _style(
+    fontSize: 14,
+    fontWeight: FontWeight.normal,
+    color: AafiyaColors.secondaryText,
+    height: 1.35,
+  );
+
+  static final TextStyle bottomNavLabel = _style(
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+    color: AafiyaColors.secondaryText,
+    height: 1.2,
+  );
+
+  static final TextStyle bottomNavLabelActive = _style(
+    fontSize: 14,
+    fontWeight: FontWeight.w700,
+    color: AafiyaColors.tealInk,
+    height: 1.2,
+  );
+
   /// Material 3 TextTheme mapped with light palette colors and local IBM Plex typography.
   static TextTheme get textTheme => TextTheme(
     displayLarge: displayLarge,

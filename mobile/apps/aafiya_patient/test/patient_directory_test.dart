@@ -932,13 +932,14 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        // Verify discovery header and cards exist on Home overview
+        // Verify discovery header and shortcuts exist on Home overview
         expect(find.text('دليل الأطباء والعيادات'), findsOneWidget);
-        expect(find.text('دليل الأطباء'), findsOneWidget);
-        expect(find.text('دليل العيادات'), findsOneWidget);
+        expect(find.byType(AafiyaShortcutTile), findsWidgets);
 
-        // Tap Doctor Directory card
-        await tester.tap(find.text('دليل الأطباء'));
+        // Tap Doctor Directory shortcut tile
+        final doctorShortcut = find.widgetWithText(AafiyaShortcutTile, 'ابحث عن طبيب');
+        await tester.ensureVisible(doctorShortcut);
+        await tester.tap(doctorShortcut);
         await tester.pumpAndSettle();
 
         // Navigated to DoctorDirectoryScreen
@@ -948,9 +949,14 @@ void main() {
         Navigator.of(tester.element(find.byType(DoctorDirectoryScreen))).pop();
         await tester.pumpAndSettle();
 
-        // Tap Clinic Directory card
-        await tester.ensureVisible(find.text('دليل العيادات'));
-        await tester.tap(find.text('دليل العيادات'));
+        // Select Clinics tab and tap View All
+        final clinicsTab = find.text('العيادات');
+        await tester.ensureVisible(clinicsTab);
+        await tester.tap(clinicsTab);
+        await tester.pumpAndSettle();
+        final viewAllBtn = find.text('عرض الكل');
+        await tester.ensureVisible(viewAllBtn);
+        await tester.tap(viewAllBtn);
         await tester.pumpAndSettle();
 
         // Navigated to ClinicDirectoryScreen

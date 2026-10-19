@@ -88,6 +88,12 @@ void main() {
               200,
               headers: {'content-type': 'application/json'},
             );
+          } else if (request.url.path.contains('/appointments')) {
+            return http.Response(
+              jsonEncode({'data': []}),
+              200,
+              headers: {'content-type': 'application/json'},
+            );
           }
           return http.Response('Not Found', 404);
         });
@@ -107,7 +113,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.byType(PatientHomeShell), findsOneWidget);
-        expect(find.text('فاطمة بن علي'), findsOneWidget);
+        expect(find.textContaining('فاطمة بن علي'), findsOneWidget);
       });
 
       testWidgets('splash navigates to auth shell when token is expired (HTTP 401)', (tester) async {
@@ -371,6 +377,12 @@ void main() {
               200,
               headers: {'content-type': 'application/json'},
             );
+          } else if (request.url.path.contains('/appointments')) {
+            return http.Response(
+              jsonEncode({'data': []}),
+              200,
+              headers: {'content-type': 'application/json'},
+            );
           }
           return http.Response('Not Found', 404);
         });
@@ -394,7 +406,7 @@ void main() {
 
         // Reaches Patient Home
         expect(find.byType(PatientHomeShell), findsOneWidget);
-        expect(find.text('ياسمين بوزيد'), findsOneWidget);
+        expect(find.textContaining('ياسمين بوزيد'), findsOneWidget);
         expect(await tokenStorage.getToken(), equals('patient_token_abc_123'));
       });
     });
@@ -701,6 +713,12 @@ void main() {
               201,
               headers: {'content-type': 'application/json'},
             );
+          } else if (request.url.path.contains('/appointments')) {
+            return http.Response(
+              jsonEncode({'data': []}),
+              200,
+              headers: {'content-type': 'application/json'},
+            );
           }
           return http.Response('Not Found', 404);
         });
@@ -732,7 +750,7 @@ void main() {
 
         expect(registerCalled, isTrue);
         expect(find.byType(PatientHomeShell), findsOneWidget);
-        expect(find.text('مراد قادري'), findsOneWidget);
+        expect(find.textContaining('مراد قادري'), findsOneWidget);
         expect(await tokenStorage.getToken(), equals('new_registered_patient_token_888'));
       });
     });

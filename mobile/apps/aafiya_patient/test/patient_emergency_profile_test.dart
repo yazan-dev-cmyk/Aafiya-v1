@@ -299,9 +299,12 @@ void main() {
         expect(find.byType(PatientHomeShell), findsOneWidget);
 
         // Also test AppBar emergency button (1 tap everywhere!)
-        final appBarEmergencyFinder = find.byIcon(Icons.health_and_safety_rounded);
-        expect(appBarEmergencyFinder, findsWidgets);
-        await tester.tap(appBarEmergencyFinder.first);
+        final appBarEmergencyFinder = find.descendant(
+          of: find.byType(AafiyaAppBar),
+          matching: find.byIcon(Icons.health_and_safety_rounded),
+        );
+        expect(appBarEmergencyFinder, findsOneWidget);
+        await tester.tap(appBarEmergencyFinder);
         await tester.pumpAndSettle();
 
         expect(find.byType(EmergencyProfileScreen), findsOneWidget);

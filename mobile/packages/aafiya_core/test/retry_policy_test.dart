@@ -55,7 +55,7 @@ void main() {
       expect(policy.isRetryableException(const SocketException('abort')), isTrue);
       expect(policy.isRetryableException(http.ClientException('abort')), isTrue);
       expect(policy.isRetryableException(TimeoutException('timeout')), isTrue);
-      expect(policy.isRetryableException(FormatException('invalid json')), isFalse);
+      expect(policy.isRetryableException(const FormatException('invalid json')), isFalse);
       expect(policy.isRetryableException(StateError('bad state')), isFalse);
     });
 
@@ -244,7 +244,7 @@ void main() {
       service.setOnline(false);
       service.setOnline(true);
 
-      await Future.delayed(Duration.zero);
+      await Future<void>.delayed(Duration.zero);
       expect(states, equals([false, true]));
       expect(await service.checkConnectivity(), isTrue);
 

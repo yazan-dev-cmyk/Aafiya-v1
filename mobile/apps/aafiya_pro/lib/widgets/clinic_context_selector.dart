@@ -81,6 +81,7 @@ class ClinicContextSelector extends StatelessWidget {
                       final isSelected = clinic.id == sessionManager.activeClinicId;
 
                       return ListTile(
+                        minVerticalPadding: 12,
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: AafiyaSpacing.xs,
                           vertical: AafiyaSpacing.xs,
@@ -282,8 +283,8 @@ class ClinicContextSelector extends StatelessWidget {
                       icon: const Icon(Icons.swap_horiz_rounded, size: 18),
                       label: Text(strings.changeClinic),
                       style: OutlinedButton.styleFrom(
-                        visualDensity: VisualDensity.compact,
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        minimumSize: const Size(0, 48),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                         foregroundColor: AafiyaColors.healthBlue,
                         side: const BorderSide(color: AafiyaColors.healthBlue),
                         shape: RoundedRectangleBorder(

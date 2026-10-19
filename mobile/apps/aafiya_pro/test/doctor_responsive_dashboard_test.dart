@@ -150,11 +150,11 @@ void main() {
 
           // All 5 metric cards must be rendered
           expect(find.byType(DoctorMetricCard), findsNWidgets(5));
-          expect(find.text('18'), findsOneWidget); // today_total
-          expect(find.text('4'), findsOneWidget);  // in_waiting_room
-          expect(find.text('5'), findsOneWidget);  // pending_check_in
-          expect(find.text('8'), findsOneWidget);  // completed_today
-          expect(find.text('1'), findsOneWidget);  // no_show_today
+          expect(find.text('\u200E18\u200E'), findsOneWidget); // today_total
+          expect(find.text('\u200E4\u200E'), findsOneWidget);  // in_waiting_room
+          expect(find.text('\u200E5\u200E'), findsOneWidget);  // pending_check_in
+          expect(find.text('\u200E8\u200E'), findsOneWidget);  // completed_today
+          expect(find.text('\u200E1\u200E'), findsOneWidget);  // no_show_today
 
           // Verify text widgets inside metric cards have maxLines: 2
           final textWidgets = tester.widgetList<Text>(

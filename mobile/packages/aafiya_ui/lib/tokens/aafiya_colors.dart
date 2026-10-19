@@ -47,4 +47,52 @@ abstract final class AafiyaColors {
   static const Color darkBorder = Color(0xFF334155);
   static const Color darkPrimaryText = Color(0xFFF8FAFC);
   static const Color darkSecondaryText = Color(0xFF94A3B8);
+
+  // Prototype Visual Palette (aafiya-home-prototype.html)
+  static const Color navy = Color(0xFF023E73);
+  static const Color royalBlue = Color(0xFF0077B6);
+  static const Color tealAccent = Color(0xFF0E9F8E);
+  static const Color tealDeep = Color(0xFF0B8074);
+  static const Color tealButton = Color(0xFF0B8074);
+  static const Color tealInk = Color(0xFF0A6F64);
+  static const Color tealSoft = Color(0xFFE0F5F2);
+  static const Color scaffoldBg = Color(0xFFF4F8FB);
+  static const Color cardBg = Color(0xFFFFFFFF);
+  static const Color lineDivider = Color(0xFFDCE6EE);
+  static const Color ticketDottedLine = Color(0xFFC3D3E0);
+
+  // Accessible Status Tokens (WCAG 2.1 AA Compliant >= 4.5:1)
+  static const Color statusConfirmedBg = Color(0xFFE3F6EA);
+  static const Color statusConfirmedInk = Color(0xFF166534); // CR: 6.33:1
+
+  static const Color statusPendingBg = Color(0xFFFEF1DC);
+  static const Color statusPendingInk = Color(0xFF92400E); // CR: 6.36:1
+
+  static const Color statusConcludedBg = Color(0xFFF1F5F9);
+  static const Color statusConcludedInk = Color(0xFF475569); // CR: 6.92:1
+
+  static const Color statusUrgentBg = Color(0xFFFDECEC);
+  static const Color statusUrgentInk = Color(0xFFB91C1C); // CR: 5.66:1 (WCAG AA compliant for normal text)
+  static const Color statusUrgentAccent = Color(0xFFDC2626); // Preserved for large text/icons (CR: 4.23:1)
+
+  // Gradients
+  static const LinearGradient heroGradient = LinearGradient(
+    begin: AlignmentDirectional.topStart,
+    end: AlignmentDirectional.bottomEnd,
+    colors: [
+      Color(0xFF023E73),
+      Color(0xFF04569A),
+      Color(0xFF0069A8),
+    ],
+    stops: [0.0, 0.6, 1.0],
+  );
+
+  static const LinearGradient brandMarkGradient = LinearGradient(
+    begin: AlignmentDirectional.topStart,
+    end: AlignmentDirectional.bottomEnd,
+    colors: [
+      Color(0xFF27C3B1),
+      Color(0xFF0B8074),
+    ],
+  );
 }

@@ -4,7 +4,6 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
 import 'package:aafiya_core/aafiya_core.dart';
-import 'package:aafiya_core/services/shared_record_service.dart';
 
 void main() {
   group('ApiClient Clinic Header Isolation & Regression Tests', () {

@@ -323,8 +323,17 @@ class _DoctorShellState extends State<DoctorShell> {
             icon: const Icon(Icons.logout_rounded),
             tooltip: strings.signOut,
             onPressed: () async {
-              await widget.sessionManager.logout();
-              widget.onSignOut();
+              final confirmed = await AafiyaSignOutDialog.show(
+                context,
+                title: strings.signOutConfirmTitle,
+                message: strings.signOutConfirmMessage,
+                cancelLabel: strings.cancel,
+                confirmLabel: strings.signOut,
+              );
+              if (confirmed == true) {
+                await widget.sessionManager.logout();
+                widget.onSignOut();
+              }
             },
           ),
         ],
@@ -401,8 +410,17 @@ class _DoctorShellState extends State<DoctorShell> {
                 label: strings.signOut,
                 variant: AafiyaButtonVariant.secondary,
                 onPressed: () async {
-                  await widget.sessionManager.logout();
-                  widget.onSignOut();
+                  final confirmed = await AafiyaSignOutDialog.show(
+                    context,
+                    title: strings.signOutConfirmTitle,
+                    message: strings.signOutConfirmMessage,
+                    cancelLabel: strings.cancel,
+                    confirmLabel: strings.signOut,
+                  );
+                  if (confirmed == true) {
+                    await widget.sessionManager.logout();
+                    widget.onSignOut();
+                  }
                 },
               ),
             ],
@@ -536,8 +554,8 @@ class _DoctorShellState extends State<DoctorShell> {
                             }
                           },
                           style: OutlinedButton.styleFrom(
-                            visualDensity: VisualDensity.compact,
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            minimumSize: const Size(0, 48),
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                             foregroundColor: AafiyaColors.healthBlue,
                             side: const BorderSide(color: AafiyaColors.healthBlue),
                             shape: RoundedRectangleBorder(
@@ -625,6 +643,10 @@ class _DoctorShellState extends State<DoctorShell> {
                           TextButton.icon(
                             icon: const Icon(Icons.store_mall_directory_outlined, size: 16),
                             label: Text(strings.clinicOperatingHoursTitle),
+                            style: TextButton.styleFrom(
+                              minimumSize: const Size(0, 48),
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            ),
                             onPressed: () {
                               Navigator.of(context).push(
                                 ClinicOperatingHoursScreen.route(
@@ -638,6 +660,10 @@ class _DoctorShellState extends State<DoctorShell> {
                         TextButton.icon(
                           icon: const Icon(Icons.schedule_rounded, size: 16),
                           label: Text(strings.doctorWorkingHoursTitle),
+                          style: TextButton.styleFrom(
+                            minimumSize: const Size(0, 48),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          ),
                           onPressed: () {
                             Navigator.of(context).push(
                               DoctorWorkingHoursScreen.route(

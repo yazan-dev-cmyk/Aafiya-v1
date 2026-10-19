@@ -47,7 +47,7 @@ class DoctorMetricCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      count.toString(),
+                      '\u200E$count\u200E',
                       style: AafiyaTypography.headlineMedium.copyWith(
                         color: color,
                         fontWeight: FontWeight.bold,

@@ -348,7 +348,7 @@ class _DoctorDashboardViewState extends State<DoctorDashboardView> {
       label: strings.inWaitingRoomLabel,
       count: stats.inWaitingRoom,
       icon: Icons.meeting_room_rounded,
-      color: AafiyaColors.healingGreen,
+      color: AafiyaColors.actionGreen,
     );
     final pendingCard = DoctorMetricCard(
       label: strings.pendingCheckInLabel,
@@ -455,6 +455,8 @@ class _DoctorDashboardViewState extends State<DoctorDashboardView> {
     return FilterChip(
       selected: isSelected,
       label: Text(label),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      materialTapTargetSize: MaterialTapTargetSize.padded,
       labelStyle: AafiyaTypography.caption.copyWith(
         color: isSelected ? AafiyaColors.pureWhite : AafiyaColors.primaryText,
         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,

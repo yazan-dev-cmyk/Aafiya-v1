@@ -453,6 +453,7 @@ class _DoctorQueueScreenState extends State<DoctorQueueScreen> {
         onTap: onTap,
         borderRadius: BorderRadius.circular(AafiyaRadius.md),
         child: Container(
+          constraints: const BoxConstraints(minHeight: 48),
           padding: const EdgeInsets.symmetric(
             horizontal: AafiyaSpacing.sm,
             vertical: AafiyaSpacing.sm,
@@ -485,7 +486,7 @@ class _DoctorQueueScreenState extends State<DoctorQueueScreen> {
                   shape: BoxShape.circle,
                 ),
                 child: Text(
-                  count != null ? '$count' : '-',
+                  count != null ? '\u200E$count\u200E' : '-',
                   style: AafiyaTypography.caption.copyWith(
                     color: isSelected ? AafiyaColors.pureWhite : AafiyaColors.secondaryText,
                     fontWeight: FontWeight.bold,

@@ -198,16 +198,16 @@ void main() {
 
       // Verify KPI Metric Cards
       expect(find.byType(DoctorMetricCard), findsNWidgets(5));
-      expect(find.text('15'), findsOneWidget); // today_total
-      expect(find.text('3'), findsOneWidget); // in_waiting_room
-      expect(find.text('5'), findsOneWidget); // pending_check_in
-      expect(find.text('6'), findsOneWidget); // completed_today
-      expect(find.text('1'), findsOneWidget); // no_show_today
+      expect(find.text('\u200E15\u200E'), findsOneWidget); // today_total
+      expect(find.text('\u200E3\u200E'), findsOneWidget); // in_waiting_room
+      expect(find.text('\u200E5\u200E'), findsOneWidget); // pending_check_in
+      expect(find.text('\u200E6\u200E'), findsOneWidget); // completed_today
+      expect(find.text('\u200E1\u200E'), findsOneWidget); // no_show_today
 
       // Verify Agenda Items
       expect(find.byType(DoctorAgendaTile), findsNWidgets(2));
-      expect(find.text('08:30'), findsOneWidget);
-      expect(find.text('09:00'), findsOneWidget);
+      expect(find.text('\u200E08:30\u200E'), findsOneWidget);
+      expect(find.text('\u200E09:00\u200E'), findsOneWidget);
       expect(find.text('مريض اختباري الأول'), findsOneWidget);
       expect(find.text('مريض اختباري الثاني'), findsOneWidget);
       expect(find.textContaining('MS-2026-001'), findsWidgets);
@@ -272,7 +272,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Metrics show 0
-      expect(find.text('0'), findsNWidgets(5));
+      expect(find.text('\u200E0\u200E'), findsNWidgets(5));
 
       // Empty view displayed
       expect(find.byType(AafiyaEmptyView), findsOneWidget);
@@ -342,7 +342,7 @@ void main() {
 
       // Now successful
       expect(find.byType(AafiyaErrorView), findsNothing);
-      expect(find.text('2'), findsOneWidget);
+      expect(find.text('\u200E2\u200E'), findsOneWidget);
     });
 
     testWidgets('5. Clinic Context Switch: switching active clinic reloads dashboard data with new header', (tester) async {
@@ -399,7 +399,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Initially Clinic 1: today_total = 11
-      expect(find.text('11'), findsOneWidget);
+      expect(find.text('\u200E11\u200E'), findsOneWidget);
       expect(lastClinicIdHeader, 'clinic-001');
 
       // Switch to Clinic 2 via sessionManager
@@ -407,7 +407,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Now Clinic 2: today_total = 77
-      expect(find.text('77'), findsOneWidget);
+      expect(find.text('\u200E77\u200E'), findsOneWidget);
       expect(lastClinicIdHeader, 'clinic-002');
     });
 
@@ -464,7 +464,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify Clinic 2 data loaded
-      expect(find.text('99'), findsOneWidget);
+      expect(find.text('\u200E99\u200E'), findsOneWidget);
 
       // Now Clinic 1 finally completes late
       clinic1StatsCompleter.complete(
@@ -484,8 +484,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // State MUST remain 99 (Clinic 2), 555 from Clinic 1 was safely discarded!
-      expect(find.text('99'), findsOneWidget);
-      expect(find.text('555'), findsNothing);
+      expect(find.text('\u200E99\u200E'), findsOneWidget);
+      expect(find.text('\u200E555\u200E'), findsNothing);
     });
 
     testWidgets('7. Trilingual Localization: renders properly in English and French', (tester) async {
