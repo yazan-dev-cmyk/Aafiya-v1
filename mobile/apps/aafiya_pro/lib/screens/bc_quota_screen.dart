@@ -437,6 +437,7 @@ class _BcQuotaScreenState extends State<BcQuotaScreen>
     return Scaffold(
       appBar: AafiyaAppBar(
         title: strings.bookingCenterDashboardTitle,
+        showBrandMark: true,
         leading: widget.onBackToDashboard != null
             ? IconButton(
                 icon: const Icon(Icons.arrow_back_rounded),

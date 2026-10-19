@@ -378,20 +378,34 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
                 padding: AafiyaSpacing.insetAllMd,
                 child: Column(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: statusColor.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(AafiyaRadius.sm),
-                        border: Border.all(color: statusColor.withValues(alpha: 0.4)),
-                      ),
-                      child: Text(
-                        strings.statusLabel(appointment.status),
-                        style: AafiyaTypography.titleMedium.copyWith(
-                          color: statusColor,
-                          fontWeight: FontWeight.bold,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        AafiyaBrandMark(
+                          markSize: 26,
+                          showWordmark: true,
+                          titleStyle: AafiyaTypography.titleMedium.copyWith(
+                            color: AafiyaColors.primaryText,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: statusColor.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(AafiyaRadius.sm),
+                            border: Border.all(color: statusColor.withValues(alpha: 0.4)),
+                          ),
+                          child: Text(
+                            strings.statusLabel(appointment.status),
+                            style: AafiyaTypography.titleMedium.copyWith(
+                              color: statusColor,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 12),
                     Text(

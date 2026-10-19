@@ -425,6 +425,7 @@ class _BcAppointmentBookingScreenState extends State<BcAppointmentBookingScreen>
     return Scaffold(
       appBar: AafiyaAppBar(
         title: strings.newBookingAction,
+        showBrandMark: true,
         leading: BackButton(
           onPressed: () => Navigator.of(context).pop(),
         ),

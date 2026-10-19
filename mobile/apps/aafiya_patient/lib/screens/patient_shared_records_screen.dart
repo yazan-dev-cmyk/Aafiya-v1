@@ -165,6 +165,7 @@ class _PatientSharedRecordsScreenState extends State<PatientSharedRecordsScreen>
     return Scaffold(
       appBar: AafiyaAppBar(
         title: strings.activeSharesTitle,
+        showBrandMark: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_rounded),

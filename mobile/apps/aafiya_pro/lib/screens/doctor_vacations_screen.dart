@@ -233,6 +233,7 @@ class _DoctorVacationsScreenState extends State<DoctorVacationsScreen> {
     return Scaffold(
       appBar: AafiyaAppBar(
         title: strings.doctorVacationsTitle,
+        showBrandMark: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.assignment_late_outlined),

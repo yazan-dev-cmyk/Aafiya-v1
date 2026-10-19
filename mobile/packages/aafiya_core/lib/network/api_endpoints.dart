@@ -18,6 +18,7 @@ abstract final class ApiEndpoints {
   // Public Directory (Read-only discovery)
   static const String doctors = '/doctors';
   static const String clinics = '/clinics';
+  static const String bookingCenters = '/booking-centers';
 
   // Master Data (TASK-MD-09 & TASK-MD-12)
   static const String masterWilayas = '/master/wilayas';

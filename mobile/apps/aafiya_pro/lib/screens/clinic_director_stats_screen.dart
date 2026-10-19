@@ -424,19 +424,7 @@ class _ClinicDirectorStatsScreenState extends State<ClinicDirectorStatsScreen> {
         children: [
           Row(
             children: [
-              Container(
-                width: 42,
-                height: 42,
-                decoration: BoxDecoration(
-                  color: AafiyaColors.healthBlue.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AafiyaRadius.md),
-                ),
-                child: const Icon(
-                  Icons.trending_up_rounded,
-                  color: AafiyaColors.healthBlue,
-                  size: 24,
-                ),
-              ),
+              const AafiyaBrandMark(markSize: 32, showWordmark: false),
               const SizedBox(width: AafiyaSpacing.sm),
               Expanded(
                 child: Column(

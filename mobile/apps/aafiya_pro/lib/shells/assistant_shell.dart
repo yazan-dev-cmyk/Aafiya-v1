@@ -38,6 +38,7 @@ class AssistantShell extends StatelessWidget {
     return Scaffold(
       appBar: AafiyaAppBar(
         title: '${strings.assistantRoleTitle}: ${user.name}',
+        showBrandMark: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.assignment_late_outlined),

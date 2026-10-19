@@ -161,6 +161,7 @@ class _DoctorShellState extends State<DoctorShell> {
     return Scaffold(
       appBar: AafiyaAppBar(
         title: '${strings.doctorRoleTitle}: ${widget.user.name}',
+        showBrandMark: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_rounded),

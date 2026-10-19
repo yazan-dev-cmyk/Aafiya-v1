@@ -292,8 +292,14 @@ void main() {
 
       // 3. Verify AlertDialog
       expect(find.byType(AlertDialog), findsOneWidget);
-      expect(find.text('إلغاء الموعد الطبي'), findsOneWidget);
-      expect(find.textContaining('سليمان بن عيسى'), findsOneWidget);
+      expect(
+        find.descendant(of: find.byType(AlertDialog), matching: find.text('إلغاء الموعد الطبي')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: find.byType(AlertDialog), matching: find.textContaining('سليمان بن عيسى')),
+        findsOneWidget,
+      );
 
       // 4. Enter cancellation reason in TextField
       final reasonField = find.byType(TextField);

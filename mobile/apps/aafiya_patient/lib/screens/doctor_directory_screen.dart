@@ -210,6 +210,7 @@ class _DoctorDirectoryScreenState extends State<DoctorDirectoryScreen> {
     return Scaffold(
       appBar: AafiyaAppBar(
         title: strings.doctorDirectory,
+        showBrandMark: true,
       ),
       body: SafeArea(
         child: Column(

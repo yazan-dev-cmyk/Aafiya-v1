@@ -3,6 +3,7 @@ import 'package:aafiya_core/aafiya_core.dart';
 import 'package:aafiya_ui/aafiya_ui.dart';
 
 import '../screens/appointment_detail_screen.dart';
+import '../screens/booking_center_directory_screen.dart';
 import '../screens/clinic_directory_screen.dart';
 import '../screens/doctor_directory_screen.dart';
 import '../screens/emergency_profile_screen.dart';
@@ -246,7 +247,7 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
                         buttonLabel: strings.findBookingCenterAction,
                         onButtonPressed: () {
                           setState(() => _selectedDirectoryTab = 'centers');
-                          ClinicDirectoryScreen.show(context, apiClient: widget.apiClient);
+                          BookingCenterDirectoryScreen.show(context, apiClient: widget.apiClient);
                         },
                       ),
               ),
@@ -349,7 +350,9 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
                         ),
                         TextButton(
                           onPressed: () {
-                            if (_selectedDirectoryTab == 'clinics' || _selectedDirectoryTab == 'centers') {
+                            if (_selectedDirectoryTab == 'centers') {
+                              BookingCenterDirectoryScreen.show(context, apiClient: widget.apiClient);
+                            } else if (_selectedDirectoryTab == 'clinics') {
                               ClinicDirectoryScreen.show(context, apiClient: widget.apiClient);
                             } else {
                               DoctorDirectoryScreen.show(context, apiClient: widget.apiClient);
@@ -725,7 +728,9 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
             location: item.location,
             icon: item.icon,
             onTap: () {
-              if (_selectedDirectoryTab == 'clinics' || _selectedDirectoryTab == 'centers') {
+              if (_selectedDirectoryTab == 'centers') {
+                BookingCenterDirectoryScreen.show(context, apiClient: widget.apiClient);
+              } else if (_selectedDirectoryTab == 'clinics') {
                 ClinicDirectoryScreen.show(context, apiClient: widget.apiClient);
               } else {
                 DoctorDirectoryScreen.show(context, apiClient: widget.apiClient);

@@ -73,6 +73,7 @@ class _EmergencyProfileScreenState extends State<EmergencyProfileScreen> {
     return Scaffold(
       appBar: AafiyaAppBar(
         title: strings.emergencyProfileTitle,
+        showBrandMark: true,
         leading: BackButton(
           onPressed: () => Navigator.of(context).pop(),
         ),

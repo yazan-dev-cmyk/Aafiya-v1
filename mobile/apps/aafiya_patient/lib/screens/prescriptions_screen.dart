@@ -133,6 +133,7 @@ class _PrescriptionsScreenState extends State<PrescriptionsScreen> {
     return Scaffold(
       appBar: AafiyaAppBar(
         title: strings.prescriptionsTitle,
+        showBrandMark: true,
         leading: BackButton(
           onPressed: () => Navigator.of(context).pop(),
         ),

@@ -347,6 +347,7 @@ class _ClinicOperatingHoursScreenState extends State<ClinicOperatingHoursScreen>
     return Scaffold(
       appBar: AafiyaAppBar(
         title: strings.clinicOperatingHoursTitle,
+        showBrandMark: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_rounded),

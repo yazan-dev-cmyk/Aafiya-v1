@@ -280,6 +280,7 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
     return Scaffold(
       appBar: AafiyaAppBar(
         title: strings.doctorWorkingHoursTitle,
+        showBrandMark: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_rounded),

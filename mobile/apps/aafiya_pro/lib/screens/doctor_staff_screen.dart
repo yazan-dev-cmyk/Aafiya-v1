@@ -214,6 +214,8 @@ class _DoctorStaffScreenState extends State<DoctorStaffScreen>
               color: AafiyaColors.lightBackground,
               child: Row(
                 children: [
+                  const AafiyaBrandMark(markSize: 24, showWordmark: false),
+                  const SizedBox(width: AafiyaSpacing.xs),
                   CircleAvatar(
                     radius: 16,
                     backgroundColor: AafiyaColors.healthBlue.withValues(alpha: 0.1),

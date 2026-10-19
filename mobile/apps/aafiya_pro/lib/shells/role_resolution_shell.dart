@@ -64,6 +64,7 @@ class RoleResolutionShell extends StatelessWidget {
       RoleDestination.webOnly => Scaffold(
           appBar: AafiyaAppBar(
             title: strings.proAppTitle,
+            showBrandMark: true,
             actions: [
               IconButton(
                 icon: const Icon(Icons.logout_rounded),
@@ -90,6 +91,7 @@ class RoleResolutionShell extends StatelessWidget {
       RoleDestination.patient || RoleDestination.unauthorized => Scaffold(
           appBar: AafiyaAppBar(
             title: strings.proAppTitle,
+            showBrandMark: true,
             actions: [
               IconButton(
                 icon: const Icon(Icons.logout_rounded),

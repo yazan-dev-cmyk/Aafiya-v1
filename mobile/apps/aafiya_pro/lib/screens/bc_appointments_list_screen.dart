@@ -263,6 +263,7 @@ class _BcAppointmentsListScreenState extends State<BcAppointmentsListScreen> {
     return Scaffold(
       appBar: AafiyaAppBar(
         title: strings.centerAppointmentsTitle,
+        showBrandMark: true,
         leading: BackButton(
           onPressed: () => Navigator.of(context).pop(),
         ),

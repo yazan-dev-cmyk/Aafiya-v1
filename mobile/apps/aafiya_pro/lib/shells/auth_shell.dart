@@ -144,10 +144,16 @@ class _ProAuthShellState extends State<ProAuthShell> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(
-                      strings.proAppTitle,
-                      style: AafiyaTypography.headlineMedium,
-                      textAlign: TextAlign.center,
+                    Center(
+                      child: AafiyaBrandMark(
+                        markSize: 48,
+                        title: strings.proAppTitle,
+                        showWordmark: true,
+                        titleStyle: AafiyaTypography.headlineLarge.copyWith(
+                          color: AafiyaColors.primaryText,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Text(

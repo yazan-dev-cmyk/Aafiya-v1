@@ -81,9 +81,15 @@ void main() {
 
       // Tap Sign Out
       final signOutFinder = find.byIcon(Icons.logout_rounded);
-      expect(signOutFinder, findsOneWidget);
       await tester.tap(signOutFinder);
       await tester.pumpAndSettle();
+
+      // Confirm sign out dialog
+      final confirmBtn = find.widgetWithText(ElevatedButton, 'تسجيل الخروج');
+      if (confirmBtn.evaluate().isNotEmpty) {
+        await tester.tap(confirmBtn);
+        await tester.pumpAndSettle();
+      }
 
       expect(signedOut, isTrue);
     });

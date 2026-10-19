@@ -132,6 +132,7 @@ class _BookingCenterShellState extends State<BookingCenterShell> {
     return Scaffold(
       appBar: AafiyaAppBar(
         title: '${strings.bookingCenterRoleTitle}: ${widget.user.name}',
+        showBrandMark: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.logout_rounded),

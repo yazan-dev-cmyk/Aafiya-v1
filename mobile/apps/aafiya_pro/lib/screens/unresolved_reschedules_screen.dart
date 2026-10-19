@@ -207,6 +207,7 @@ class _UnresolvedReschedulesScreenState extends State<UnresolvedReschedulesScree
     return Scaffold(
       appBar: AafiyaAppBar(
         title: strings.unresolvedReschedulesTitle,
+        showBrandMark: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_rounded),

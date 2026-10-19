@@ -512,6 +512,7 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
       return Scaffold(
         appBar: AafiyaAppBar(
           title: strings.assistantBookingTitle,
+          showBrandMark: true,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_rounded),
             onPressed: () => Navigator.of(context).pop(),
@@ -532,6 +533,7 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
     return Scaffold(
       appBar: AafiyaAppBar(
         title: strings.assistantBookingTitle,
+        showBrandMark: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
           onPressed: () => Navigator.of(context).pop(),

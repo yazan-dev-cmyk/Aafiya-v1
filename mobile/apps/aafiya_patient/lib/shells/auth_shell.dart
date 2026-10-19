@@ -367,6 +367,19 @@ class _PatientAuthShellState extends State<PatientAuthShell> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    // Brand Mark Header
+                    Center(
+                      child: AafiyaBrandMark(
+                        markSize: 48,
+                        showWordmark: true,
+                        titleStyle: AafiyaTypography.headlineLarge.copyWith(
+                          color: AafiyaColors.primaryText,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
                     // Mode Toggle (Login / Register)
                     SegmentedButton<AuthMode>(
                       segments: [

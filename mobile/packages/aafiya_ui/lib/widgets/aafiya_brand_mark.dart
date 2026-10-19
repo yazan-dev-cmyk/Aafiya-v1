@@ -13,9 +13,10 @@ class AafiyaBrandMark extends StatelessWidget {
     super.key,
     this.title = 'عافية',
     this.showWordmark = true,
-    this.markSize = 40.0,
+    double? size,
+    double markSize = 40.0,
     this.titleStyle,
-  });
+  }) : markSize = size ?? markSize;
 
   /// The text wordmark displayed alongside the mark.
   final String title;
@@ -72,9 +73,12 @@ class AafiyaBrandMark extends StatelessWidget {
       children: [
         markContainer,
         const SizedBox(width: 10),
-        Text(
-          title,
-          style: effectiveTitleStyle,
+        Flexible(
+          child: Text(
+            title,
+            style: effectiveTitleStyle,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       ],
     );

@@ -332,9 +332,20 @@ class LocalizedStrings {
   String get quotaBalanceLabel =>
       isArabic ? 'رصيد الحصص' : isFrench ? 'Solde de quota' : 'Quota Balance';
 
-  // Doctor & Clinic Directory (TASK-03-03)
   String get doctorDirectory => isArabic ? 'دليل الأطباء' : isFrench ? 'Annuaire des médecins' : 'Doctor Directory';
   String get clinicDirectory => isArabic ? 'دليل العيادات' : isFrench ? 'Annuaire des cliniques' : 'Clinic Directory';
+  String get bookingCenterDirectoryTitle => isArabic ? 'دليل مراكز الحجز المعتمدة' : isFrench ? 'Centres de réservation agréés' : 'Authorized Booking Centers';
+  String get searchBookingCentersHint =>
+      isArabic ? 'ابحث باسم المركز أو الولاية...' : isFrench ? 'Rechercher par nom de centre ou wilaya...' : 'Search by center name or wilaya...';
+  String get noBookingCentersFound =>
+      isArabic ? 'لم يتم العثور على مراكز حجز مطابقة للبحث.' : isFrench ? 'Aucun centre de réservation trouvé.' : 'No booking centers found matching search.';
+  String get verifiedBookingCenter => isArabic ? 'مركز حجز معتمد' : isFrench ? 'Centre agréé' : 'Authorized Booking Center';
+  String get disc01Notice =>
+      isArabic
+          ? 'دليل استعلامي فقط — الحجز المباشر عبر مراكز الحجز المعتمدة'
+          : isFrench
+              ? 'Annuaire informatif uniquement — Réservation via centres agréés'
+              : 'Informational directory only — Direct booking through authorized centers';
   String get directorySearchHint =>
       isArabic ? 'ابحث عن طبيب أو عيادة أو ولاية...' : isFrench ? 'Rechercher médecin, clinique, wilaya...' : 'Search doctor, clinic, wilaya...';
   String get searchDoctorsHint =>

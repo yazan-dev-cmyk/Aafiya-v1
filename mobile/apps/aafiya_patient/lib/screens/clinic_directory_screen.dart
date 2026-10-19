@@ -203,6 +203,7 @@ class _ClinicDirectoryScreenState extends State<ClinicDirectoryScreen> {
     return Scaffold(
       appBar: AafiyaAppBar(
         title: strings.clinicDirectory,
+        showBrandMark: true,
       ),
       body: SafeArea(
         child: Column(

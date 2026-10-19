@@ -11,6 +11,7 @@ export 'models/user_role.dart';
 export 'models/appointment.dart';
 export 'models/doctor.dart';
 export 'models/clinic.dart';
+export 'models/booking_center.dart';
 export 'models/prescription.dart';
 export 'models/emergency_profile.dart';
 export 'models/doctor_clinic.dart';
