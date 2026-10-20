@@ -33,7 +33,7 @@ abstract final class AafiyaColors {
   static const Color secondaryText = Color(0xFF475569);
   static const Color lightBackground = Color(0xFFF5F5F5);
   static const Color pureWhite = Color(0xFFFFFFFF);
-  static const Color border = Color(0xFFE2E8F0);
+  static const Color border = Color(0xFFDCE6EE);
 
   // Semantic Status Colors
   static const Color success = Color(0xFF16A34A);
@@ -72,8 +72,10 @@ abstract final class AafiyaColors {
   static const Color statusConcludedInk = Color(0xFF475569); // CR: 6.92:1
 
   static const Color statusUrgentBg = Color(0xFFFDECEC);
-  static const Color statusUrgentInk = Color(0xFFB91C1C); // CR: 5.66:1 (WCAG AA compliant for normal text)
-  static const Color statusUrgentAccent = Color(0xFFDC2626); // Preserved for large text/icons (CR: 4.23:1)
+  static const Color statusUrgentInk =
+      Color(0xFFB91C1C); // CR: 5.66:1 (WCAG AA compliant for normal text)
+  static const Color statusUrgentAccent =
+      Color(0xFFDC2626); // Preserved for large text/icons (CR: 4.23:1)
 
   // Gradients
   static const LinearGradient heroGradient = LinearGradient(

@@ -16,7 +16,7 @@ void main() {
       expect(AafiyaColors.secondaryText.toARGB32(), equals(0xFF475569));
       expect(AafiyaColors.lightBackground.toARGB32(), equals(0xFFF5F5F5));
       expect(AafiyaColors.pureWhite.toARGB32(), equals(0xFFFFFFFF));
-      expect(AafiyaColors.border.toARGB32(), equals(0xFFE2E8F0));
+      expect(AafiyaColors.border.toARGB32(), equals(0xFFDCE6EE));
     });
 
     test('brand aliases map directly to official colors', () {

@@ -105,9 +105,11 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
         title: strings.patientAppTitle,
         actions: [
           IconButton(
-            icon: const Icon(Icons.health_and_safety_rounded, color: AafiyaColors.error),
+            icon: const Icon(Icons.health_and_safety_rounded,
+                color: AafiyaColors.error),
             tooltip: strings.emergencyProfileTitle,
-            onPressed: () => EmergencyProfileScreen.show(context, apiClient: widget.apiClient),
+            onPressed: () => EmergencyProfileScreen.show(context,
+                apiClient: widget.apiClient),
           ),
           IconButton(
             icon: const Icon(Icons.logout_rounded),
@@ -139,7 +141,8 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedTabIndex,
-        onDestinationSelected: (index) => setState(() => _selectedTabIndex = index),
+        onDestinationSelected: (index) =>
+            setState(() => _selectedTabIndex = index),
         destinations: [
           NavigationDestination(
             icon: const Icon(Icons.home_outlined),
@@ -185,17 +188,24 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
     return switch (status) {
       AppointmentStatus.confirmed => AafiyaStatusType.confirmed,
       AppointmentStatus.pending => AafiyaStatusType.pending,
-      AppointmentStatus.attended || AppointmentStatus.expired => AafiyaStatusType.concluded,
+      AppointmentStatus.attended ||
+      AppointmentStatus.expired =>
+        AafiyaStatusType.concluded,
       AppointmentStatus.cancelled ||
       AppointmentStatus.rejected ||
       AppointmentStatus.noShow =>
         AafiyaStatusType.urgent,
-      AppointmentStatus.rescheduled || AppointmentStatus.unknown => AafiyaStatusType.custom,
+      AppointmentStatus.rescheduled ||
+      AppointmentStatus.unknown =>
+        AafiyaStatusType.custom,
     };
   }
 
-  Widget _buildHomeOverviewTab(BuildContext context, LocalizedStrings strings, User? user) {
-    if (_isLoading && _upcomingAppointments.isEmpty && _pastAppointments.isEmpty) {
+  Widget _buildHomeOverviewTab(
+      BuildContext context, LocalizedStrings strings, User? user) {
+    if (_isLoading &&
+        _upcomingAppointments.isEmpty &&
+        _pastAppointments.isEmpty) {
       return AafiyaLoadingView(message: strings.loadingAppointments);
     }
 
@@ -209,13 +219,18 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
 
     final hasUpcoming = _upcomingAppointments.isNotEmpty;
     final topAppointment = hasUpcoming ? _upcomingAppointments.first : null;
-    final isEligible = topAppointment != null && _isCheckInEligible(topAppointment);
+    final isEligible =
+        topAppointment != null && _isCheckInEligible(topAppointment);
 
-    final userName = user != null && user.name.isNotEmpty ? user.name : strings.appBrandName;
-    final greetingTitle = strings.isArabic ? 'مرحباً، $userName' : 'Welcome, $userName';
+    final userName =
+        user != null && user.name.isNotEmpty ? user.name : strings.appBrandName;
+    final greetingTitle =
+        strings.isArabic ? 'مرحباً، $userName' : 'Welcome, $userName';
     final heroSubtitle = hasUpcoming
         ? (strings.isArabic ? 'موعدك القادم' : strings.upcomingAppointments)
-        : (strings.isArabic ? 'نتمنى لك دوام الصحة والعافية' : strings.brandGatewaySlogan);
+        : (strings.isArabic
+            ? 'نتمنى لك دوام الصحة والعافية'
+            : strings.brandGatewaySlogan);
 
     return RefreshIndicator(
       onRefresh: _fetchAppointments,
@@ -231,23 +246,69 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
               title: greetingTitle,
               subtitle: heroSubtitle,
               brandTitle: strings.appBrandName,
-              bottomPadding: 68.0,
+              bottomPadding: 84.0,
+              trailingAction: Semantics(
+                button: true,
+                label: strings.emergencyProfileTitle,
+                child: InkWell(
+                  onTap: () => EmergencyProfileScreen.show(context,
+                      apiClient: widget.apiClient),
+                  borderRadius: BorderRadius.circular(15.0),
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.14),
+                      borderRadius: BorderRadius.circular(15.0),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.28),
+                        width: 1.0,
+                      ),
+                    ),
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      alignment: Alignment.center,
+                      children: [
+                        const Icon(
+                          Icons.notifications_none_rounded,
+                          color: Colors.white,
+                          size: 22,
+                        ),
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: Container(
+                            width: 8,
+                            height: 8,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFF59E0B),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ),
 
-            // 2. Overlapping Slot: Ticket Card or Empty State
+            // 2. Overlapping Slot: Ticket Card or Empty State (Aligned to -62px Prototype Specification)
             Transform.translate(
-              offset: const Offset(0, -48.0),
+              offset: const Offset(0, -62.0),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: hasUpcoming && topAppointment != null
-                    ? _buildTicketCard(context, strings, topAppointment, isEligible)
+                    ? _buildTicketCard(
+                        context, strings, topAppointment, isEligible)
                     : AafiyaEmptyState(
                         title: strings.emptyAppointmentTitle,
                         description: strings.emptyAppointmentDescription,
                         buttonLabel: strings.findBookingCenterAction,
                         onButtonPressed: () {
                           setState(() => _selectedDirectoryTab = 'centers');
-                          BookingCenterDirectoryScreen.show(context, apiClient: widget.apiClient);
+                          BookingCenterDirectoryScreen.show(context,
+                              apiClient: widget.apiClient);
                         },
                       ),
               ),
@@ -255,7 +316,7 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
 
             // 3. Shortcuts (4-grid icons matching prototype)
             Transform.translate(
-              offset: const Offset(0, -32.0),
+              offset: const Offset(0, -44.0),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12.0),
                 child: Row(
@@ -264,11 +325,14 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
                   children: [
                     Expanded(
                       child: AafiyaShortcutTile(
-                        label: strings.isArabic ? 'ابحث عن طبيب' : strings.doctorDirectory,
+                        label: strings.isArabic
+                            ? 'ابحث عن طبيب'
+                            : strings.doctorDirectory,
                         icon: Icons.search_rounded,
                         backgroundColor: const Color(0xFFE6F1F9),
                         iconColor: AafiyaColors.royalBlue,
-                        onTap: () => DoctorDirectoryScreen.show(context, apiClient: widget.apiClient),
+                        onTap: () => DoctorDirectoryScreen.show(context,
+                            apiClient: widget.apiClient),
                       ),
                     ),
                     Expanded(
@@ -277,7 +341,8 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
                         icon: Icons.receipt_long_rounded,
                         backgroundColor: AafiyaColors.tealSoft,
                         iconColor: AafiyaColors.tealInk,
-                        onTap: () => PrescriptionsScreen.show(context, apiClient: widget.apiClient),
+                        onTap: () => PrescriptionsScreen.show(context,
+                            apiClient: widget.apiClient),
                       ),
                     ),
                     Expanded(
@@ -296,7 +361,8 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
                         backgroundColor: AafiyaColors.statusUrgentBg,
                         iconColor: AafiyaColors.statusUrgentInk,
                         textColor: AafiyaColors.statusUrgentInk,
-                        onTap: () => EmergencyProfileScreen.show(context, apiClient: widget.apiClient),
+                        onTap: () => EmergencyProfileScreen.show(context,
+                            apiClient: widget.apiClient),
                       ),
                     ),
                   ],
@@ -306,7 +372,7 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
 
             // 4. Mandatory Business Model Notice Card (DISC-01)
             Transform.translate(
-              offset: const Offset(0, -20.0),
+              offset: const Offset(0, -28.0),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: AafiyaCard(
@@ -316,7 +382,8 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(Icons.info_outline_rounded, color: AafiyaColors.info, size: 24),
+                      const Icon(Icons.info_outline_rounded,
+                          color: AafiyaColors.info, size: 24),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
@@ -335,12 +402,13 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
 
             // 5. Public Medical Directory Carousel Section
             Transform.translate(
-              offset: const Offset(0, -10.0),
+              offset: const Offset(0, -14.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20.0, vertical: 8.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -351,11 +419,14 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
                         TextButton(
                           onPressed: () {
                             if (_selectedDirectoryTab == 'centers') {
-                              BookingCenterDirectoryScreen.show(context, apiClient: widget.apiClient);
+                              BookingCenterDirectoryScreen.show(context,
+                                  apiClient: widget.apiClient);
                             } else if (_selectedDirectoryTab == 'clinics') {
-                              ClinicDirectoryScreen.show(context, apiClient: widget.apiClient);
+                              ClinicDirectoryScreen.show(context,
+                                  apiClient: widget.apiClient);
                             } else {
-                              DoctorDirectoryScreen.show(context, apiClient: widget.apiClient);
+                              DoctorDirectoryScreen.show(context,
+                                  apiClient: widget.apiClient);
                             }
                           },
                           child: Text(
@@ -390,7 +461,8 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
                       ),
                     ],
                     selectedValue: _selectedDirectoryTab,
-                    onChanged: (val) => setState(() => _selectedDirectoryTab = val),
+                    onChanged: (val) =>
+                        setState(() => _selectedDirectoryTab = val),
                   ),
                   const SizedBox(height: 14.0),
 
@@ -477,7 +549,8 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
             children: [
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12.0, vertical: 10.0),
                   decoration: BoxDecoration(
                     color: AafiyaColors.scaffoldBg,
                     borderRadius: BorderRadius.circular(AafiyaRadius.button),
@@ -511,7 +584,8 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
               const SizedBox(width: 10.0),
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12.0, vertical: 10.0),
                   decoration: BoxDecoration(
                     color: AafiyaColors.scaffoldBg,
                     borderRadius: BorderRadius.circular(AafiyaRadius.button),
@@ -545,7 +619,8 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
           const SizedBox(height: 12.0),
 
           // Clinic Location
-          if (appointment.clinic.name != null && appointment.clinic.name!.isNotEmpty)
+          if (appointment.clinic.name != null &&
+              appointment.clinic.name!.isNotEmpty)
             Row(
               children: [
                 const Icon(
@@ -574,9 +649,12 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
                 // Mini QR code with tap to enlarge affordance
                 Semantics(
                   button: true,
-                  label: strings.isArabic ? 'تكبير رمز تصريح الزيارة' : 'Enlarge visit pass QR code',
+                  label: strings.isArabic
+                      ? 'تكبير رمز تصريح الزيارة'
+                      : 'Enlarge visit pass QR code',
                   child: InkWell(
-                    onTap: () => PatientQrDialog.show(context, appointment: appointment),
+                    onTap: () =>
+                        PatientQrDialog.show(context, appointment: appointment),
                     borderRadius: BorderRadius.circular(AafiyaRadius.sm),
                     child: Container(
                       width: 48.0,
@@ -585,7 +663,8 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
                       decoration: BoxDecoration(
                         color: AafiyaColors.pureWhite,
                         borderRadius: BorderRadius.circular(AafiyaRadius.sm),
-                        border: Border.all(color: AafiyaColors.lineDivider, width: 1.5),
+                        border: Border.all(
+                            color: AafiyaColors.lineDivider, width: 1.5),
                       ),
                       child: QrImageView(
                         data: appointment.secureToken!,
@@ -603,10 +682,15 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
                 Expanded(
                   flex: 3,
                   child: AafiyaButton(
-                    label: strings.isArabic ? 'تصريح الزيارة' : strings.isFrench ? 'Pass de visite' : 'Visit Pass',
+                    label: strings.isArabic
+                        ? 'تصريح الزيارة'
+                        : strings.isFrench
+                            ? 'Pass de visite'
+                            : 'Visit Pass',
                     icon: const Icon(Icons.qr_code_2_rounded),
                     variant: AafiyaButtonVariant.primary,
-                    onPressed: () => PatientQrDialog.show(context, appointment: appointment),
+                    onPressed: () =>
+                        PatientQrDialog.show(context, appointment: appointment),
                   ),
                 ),
                 const SizedBox(width: 10.0),
@@ -648,24 +732,30 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
     );
   }
 
-  Widget _buildDirectoryCarousel(BuildContext context, LocalizedStrings strings) {
+  Widget _buildDirectoryCarousel(
+      BuildContext context, LocalizedStrings strings) {
     // Verified items matching the prototype directory structure without unverified badges (EXCL-02)
     final items = switch (_selectedDirectoryTab) {
       'clinics' => [
           (
-            title: strings.isArabic ? 'عيادة شفاء الجزائر' : 'Clinique Chifa Alger',
+            title: strings.isArabic
+                ? 'عيادة شفاء الجزائر'
+                : 'Clinique Chifa Alger',
             subtitle: strings.isArabic ? 'متعددة التخصصات' : 'Polyclinique',
             location: strings.isArabic ? 'الجزائر العاصمة' : 'Alger',
             icon: Icons.local_hospital_rounded,
           ),
           (
-            title: strings.isArabic ? 'عيادة الأمل وهران' : 'Clinique El Amal Oran',
+            title: strings.isArabic
+                ? 'عيادة الأمل وهران'
+                : 'Clinique El Amal Oran',
             subtitle: strings.isArabic ? 'متعددة التخصصات' : 'Polyclinique',
             location: strings.isArabic ? 'وهران' : 'Oran',
             icon: Icons.local_hospital_rounded,
           ),
           (
-            title: strings.isArabic ? 'عيادة النور قسنطينة' : 'Clinique En-Nour',
+            title:
+                strings.isArabic ? 'عيادة النور قسنطينة' : 'Clinique En-Nour',
             subtitle: strings.isArabic ? 'جراحة عامة وتخصصية' : 'Chirurgie',
             location: strings.isArabic ? 'قسنطينة' : 'Constantine',
             icon: Icons.local_hospital_rounded,
@@ -673,13 +763,17 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
         ],
       'centers' => [
           (
-            title: strings.isArabic ? 'مركز حجز الجزائر الوسطى' : 'Centre Alger Centre',
+            title: strings.isArabic
+                ? 'مركز حجز الجزائر الوسطى'
+                : 'Centre Alger Centre',
             subtitle: strings.isArabic ? 'مركز حجز معتمد' : 'Centre Agréé',
             location: strings.isArabic ? 'الجزائر العاصمة' : 'Alger',
             icon: Icons.apartment_rounded,
           ),
           (
-            title: strings.isArabic ? 'مركز حجز سطيف المعتمد' : 'Centre Sétif Agréé',
+            title: strings.isArabic
+                ? 'مركز حجز سطيف المعتمد'
+                : 'Centre Sétif Agréé',
             subtitle: strings.isArabic ? 'مركز حجز معتمد' : 'Centre Agréé',
             location: strings.isArabic ? 'سطيف' : 'Sétif',
             icon: Icons.apartment_rounded,
@@ -700,7 +794,8 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
           ),
           (
             title: strings.isArabic ? 'د. مريم قدور' : 'Dr. Meriem Kaddour',
-            subtitle: strings.isArabic ? 'أمراض القلب والشرايين' : 'Cardiologie',
+            subtitle:
+                strings.isArabic ? 'أمراض القلب والشرايين' : 'Cardiologie',
             location: strings.isArabic ? 'وهران' : 'Oran',
             icon: Icons.person_rounded,
           ),
@@ -729,11 +824,14 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
             icon: item.icon,
             onTap: () {
               if (_selectedDirectoryTab == 'centers') {
-                BookingCenterDirectoryScreen.show(context, apiClient: widget.apiClient);
+                BookingCenterDirectoryScreen.show(context,
+                    apiClient: widget.apiClient);
               } else if (_selectedDirectoryTab == 'clinics') {
-                ClinicDirectoryScreen.show(context, apiClient: widget.apiClient);
+                ClinicDirectoryScreen.show(context,
+                    apiClient: widget.apiClient);
               } else {
-                DoctorDirectoryScreen.show(context, apiClient: widget.apiClient);
+                DoctorDirectoryScreen.show(context,
+                    apiClient: widget.apiClient);
               }
             },
           );
@@ -767,7 +865,8 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
                 icon: const Icon(Icons.calendar_month_outlined, size: 18),
                 label: Text(
                   '${strings.upcomingAppointments} (${_upcomingAppointments.length})',
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                      fontSize: 13, fontWeight: FontWeight.w600),
                 ),
               ),
               ButtonSegment<int>(
@@ -775,12 +874,14 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
                 icon: const Icon(Icons.history_rounded, size: 18),
                 label: Text(
                   '${strings.pastAppointments} (${_pastAppointments.length})',
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                      fontSize: 13, fontWeight: FontWeight.w600),
                 ),
               ),
             ],
             selected: {_selectedAppointmentSubTab},
-            onSelectionChanged: (set) => setState(() => _selectedAppointmentSubTab = set.first),
+            onSelectionChanged: (set) =>
+                setState(() => _selectedAppointmentSubTab = set.first),
           ),
         ),
 
@@ -852,7 +953,8 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
     );
   }
 
-  Widget _buildMedicalRecordsTab(BuildContext context, LocalizedStrings strings) {
+  Widget _buildMedicalRecordsTab(
+      BuildContext context, LocalizedStrings strings) {
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
       padding: AafiyaSpacing.insetScreen,
@@ -868,7 +970,8 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
               children: [
                 Text(
                   strings.medicalHubTitle,
-                  style: AafiyaTypography.titleLarge.copyWith(color: AafiyaColors.pureWhite),
+                  style: AafiyaTypography.titleLarge
+                      .copyWith(color: AafiyaColors.pureWhite),
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -887,12 +990,16 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
             child: ListTile(
               leading: const CircleAvatar(
                 backgroundColor: AafiyaColors.lightBackground,
-                child: Icon(Icons.receipt_long_rounded, color: AafiyaColors.healthBlue),
+                child: Icon(Icons.receipt_long_rounded,
+                    color: AafiyaColors.healthBlue),
               ),
-              title: Text(strings.prescriptionsTitle, style: AafiyaTypography.titleMedium),
-              subtitle: Text(strings.viewPrescriptions, style: AafiyaTypography.caption),
+              title: Text(strings.prescriptionsTitle,
+                  style: AafiyaTypography.titleMedium),
+              subtitle: Text(strings.viewPrescriptions,
+                  style: AafiyaTypography.caption),
               trailing: const Icon(Icons.chevron_right_rounded),
-              onTap: () => PrescriptionsScreen.show(context, apiClient: widget.apiClient),
+              onTap: () => PrescriptionsScreen.show(context,
+                  apiClient: widget.apiClient),
             ),
           ),
           const SizedBox(height: 12),
@@ -902,12 +1009,16 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
             child: ListTile(
               leading: CircleAvatar(
                 backgroundColor: AafiyaColors.error.withValues(alpha: 0.1),
-                child: const Icon(Icons.health_and_safety_rounded, color: AafiyaColors.error),
+                child: const Icon(Icons.health_and_safety_rounded,
+                    color: AafiyaColors.error),
               ),
-              title: Text(strings.emergencyProfileTitle, style: AafiyaTypography.titleMedium),
-              subtitle: Text(strings.viewEmergencyProfile, style: AafiyaTypography.caption),
+              title: Text(strings.emergencyProfileTitle,
+                  style: AafiyaTypography.titleMedium),
+              subtitle: Text(strings.viewEmergencyProfile,
+                  style: AafiyaTypography.caption),
               trailing: const Icon(Icons.chevron_right_rounded),
-              onTap: () => EmergencyProfileScreen.show(context, apiClient: widget.apiClient),
+              onTap: () => EmergencyProfileScreen.show(context,
+                  apiClient: widget.apiClient),
             ),
           ),
           const SizedBox(height: 12),
@@ -917,12 +1028,16 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
             child: ListTile(
               leading: const CircleAvatar(
                 backgroundColor: AafiyaColors.lightBackground,
-                child: Icon(Icons.share_rounded, color: AafiyaColors.healthBlue),
+                child:
+                    Icon(Icons.share_rounded, color: AafiyaColors.healthBlue),
               ),
-              title: Text(strings.shareMedicalRecordTitle, style: AafiyaTypography.titleMedium),
-              subtitle: Text(strings.shareMedicalRecordSubtitle, style: AafiyaTypography.caption),
+              title: Text(strings.shareMedicalRecordTitle,
+                  style: AafiyaTypography.titleMedium),
+              subtitle: Text(strings.shareMedicalRecordSubtitle,
+                  style: AafiyaTypography.caption),
               trailing: const Icon(Icons.chevron_right_rounded),
-              onTap: () => PatientSharedRecordsScreen.show(context, apiClient: widget.apiClient),
+              onTap: () => PatientSharedRecordsScreen.show(context,
+                  apiClient: widget.apiClient),
             ),
           ),
           const SizedBox(height: 12),
@@ -932,12 +1047,16 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
             child: ListTile(
               leading: CircleAvatar(
                 backgroundColor: AafiyaColors.healthBlue.withValues(alpha: 0.1),
-                child: const Icon(Icons.lock_open_rounded, color: AafiyaColors.healthBlue),
+                child: const Icon(Icons.lock_open_rounded,
+                    color: AafiyaColors.healthBlue),
               ),
-              title: Text(strings.viewSharedRecordHubTitle, style: AafiyaTypography.titleMedium),
-              subtitle: Text(strings.viewSharedRecordHubSubtitle, style: AafiyaTypography.caption),
+              title: Text(strings.viewSharedRecordHubTitle,
+                  style: AafiyaTypography.titleMedium),
+              subtitle: Text(strings.viewSharedRecordHubSubtitle,
+                  style: AafiyaTypography.caption),
               trailing: const Icon(Icons.chevron_right_rounded),
-              onTap: () => SharedRecordViewerSheet.show(context, apiClient: widget.apiClient),
+              onTap: () => SharedRecordViewerSheet.show(context,
+                  apiClient: widget.apiClient),
             ),
           ),
         ],
@@ -945,7 +1064,8 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
     );
   }
 
-  Widget _buildProfileTab(BuildContext context, LocalizedStrings strings, User? user) {
+  Widget _buildProfileTab(
+      BuildContext context, LocalizedStrings strings, User? user) {
     return SingleChildScrollView(
       padding: AafiyaSpacing.insetScreen,
       child: Column(
@@ -954,13 +1074,15 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
             child: Column(
               children: [
                 ListTile(
-                  leading: const Icon(Icons.person, color: AafiyaColors.healthBlue),
+                  leading:
+                      const Icon(Icons.person, color: AafiyaColors.healthBlue),
                   title: Text(user?.name ?? ''),
                   subtitle: Text(user?.email ?? ''),
                 ),
                 const Divider(color: AafiyaColors.border),
                 ListTile(
-                  leading: const Icon(Icons.phone, color: AafiyaColors.secondaryText),
+                  leading: const Icon(Icons.phone,
+                      color: AafiyaColors.secondaryText),
                   title: Text(user?.phone ?? '-'),
                 ),
               ],
@@ -971,12 +1093,16 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
             child: ListTile(
               leading: CircleAvatar(
                 backgroundColor: AafiyaColors.error.withValues(alpha: 0.1),
-                child: const Icon(Icons.health_and_safety_rounded, color: AafiyaColors.error),
+                child: const Icon(Icons.health_and_safety_rounded,
+                    color: AafiyaColors.error),
               ),
-              title: Text(strings.emergencyProfileTitle, style: AafiyaTypography.titleMedium),
-              subtitle: Text(strings.viewEmergencyProfile, style: AafiyaTypography.caption),
+              title: Text(strings.emergencyProfileTitle,
+                  style: AafiyaTypography.titleMedium),
+              subtitle: Text(strings.viewEmergencyProfile,
+                  style: AafiyaTypography.caption),
               trailing: const Icon(Icons.chevron_right_rounded),
-              onTap: () => EmergencyProfileScreen.show(context, apiClient: widget.apiClient),
+              onTap: () => EmergencyProfileScreen.show(context,
+                  apiClient: widget.apiClient),
             ),
           ),
         ],

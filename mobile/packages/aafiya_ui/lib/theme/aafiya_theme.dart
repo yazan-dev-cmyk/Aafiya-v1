@@ -57,7 +57,8 @@ abstract final class AafiyaTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AafiyaColors.pureWhite,
-        contentPadding: const EdgeInsetsDirectional.symmetric(horizontal: 16, vertical: 14),
+        contentPadding:
+            const EdgeInsetsDirectional.symmetric(horizontal: 16, vertical: 14),
         border: const OutlineInputBorder(
           borderRadius: AafiyaRadius.borderMd,
           borderSide: BorderSide(color: AafiyaColors.border),
@@ -75,6 +76,31 @@ abstract final class AafiyaTheme {
           borderSide: BorderSide(color: AafiyaColors.error),
         ),
         hintStyle: AafiyaTypography.bodyMedium,
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: AafiyaColors.pureWhite,
+        indicatorColor: AafiyaColors.tealSoft,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const IconThemeData(color: AafiyaColors.tealInk, size: 24);
+          }
+          return const IconThemeData(
+              color: AafiyaColors.secondaryText, size: 24);
+        }),
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AafiyaTypography.bodySmall.copyWith(
+              color: AafiyaColors.tealInk,
+              fontWeight: FontWeight.w700,
+            );
+          }
+          return AafiyaTypography.bodySmall.copyWith(
+            color: AafiyaColors.secondaryText,
+            fontWeight: FontWeight.w500,
+          );
+        }),
       ),
     );
   }

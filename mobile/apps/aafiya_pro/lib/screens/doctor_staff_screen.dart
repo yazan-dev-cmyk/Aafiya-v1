@@ -125,7 +125,8 @@ class _DoctorStaffScreenState extends State<DoctorStaffScreen>
       builder: (dialogCtx) => AlertDialog(
         title: Text(
           strings.confirmCancelInvitationTitle,
-          style: AafiyaTypography.titleMedium.copyWith(fontWeight: FontWeight.bold),
+          style: AafiyaTypography.titleMedium
+              .copyWith(fontWeight: FontWeight.bold),
         ),
         content: Text(
           strings.confirmCancelInvitationMessage,
@@ -136,13 +137,10 @@ class _DoctorStaffScreenState extends State<DoctorStaffScreen>
             onPressed: () => Navigator.of(dialogCtx).pop(false),
             child: Text(strings.cancel),
           ),
-          ElevatedButton(
+          AafiyaButton(
+            label: strings.cancelInvitation,
+            variant: AafiyaButtonVariant.outline,
             onPressed: () => Navigator.of(dialogCtx).pop(true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AafiyaColors.error,
-              foregroundColor: AafiyaColors.pureWhite,
-            ),
-            child: Text(strings.cancelInvitation),
           ),
         ],
       ),
@@ -218,7 +216,8 @@ class _DoctorStaffScreenState extends State<DoctorStaffScreen>
                   const SizedBox(width: AafiyaSpacing.xs),
                   CircleAvatar(
                     radius: 16,
-                    backgroundColor: AafiyaColors.healthBlue.withValues(alpha: 0.1),
+                    backgroundColor:
+                        AafiyaColors.healthBlue.withValues(alpha: 0.1),
                     foregroundColor: AafiyaColors.healthBlue,
                     child: const Icon(Icons.apartment_rounded, size: 18),
                   ),
@@ -350,7 +349,9 @@ class _DoctorStaffScreenState extends State<DoctorStaffScreen>
   Widget _buildBody(
       BuildContext context, LocalizedStrings strings, String clinicId) {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return AafiyaLoadingView(
+        message: strings.loading,
+      );
     }
 
     if (_errorMessage != null) {
@@ -409,50 +410,51 @@ class _DoctorStaffScreenState extends State<DoctorStaffScreen>
                   borderColor: AafiyaColors.warning.withValues(alpha: 0.3),
                   padding: AafiyaSpacing.insetAllMd,
                   child: Row(
-                  children: [
-                    CircleAvatar(
-                      backgroundColor:
-                          AafiyaColors.warning.withValues(alpha: 0.15),
-                      foregroundColor: AafiyaColors.warning,
-                      child: const Icon(Icons.schedule_send_rounded, size: 20),
-                    ),
-                    const SizedBox(width: AafiyaSpacing.sm),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            inv.doctorName ?? inv.doctorEmail ?? '—',
-                            style: AafiyaTypography.titleSmall.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          if (inv.doctorEmail != null)
+                    children: [
+                      CircleAvatar(
+                        backgroundColor:
+                            AafiyaColors.warning.withValues(alpha: 0.15),
+                        foregroundColor: AafiyaColors.warning,
+                        child:
+                            const Icon(Icons.schedule_send_rounded, size: 20),
+                      ),
+                      const SizedBox(width: AafiyaSpacing.sm),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
                             Text(
-                              inv.doctorEmail!,
-                              style: AafiyaTypography.caption.copyWith(
-                                color: AafiyaColors.secondaryText,
+                              inv.doctorName ?? inv.doctorEmail ?? '—',
+                              style: AafiyaTypography.titleSmall.copyWith(
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                          if (inv.createdAt != null)
-                            Text(
-                              '${strings.invitedOnLabel}: ${inv.createdAt}',
-                              style: AafiyaTypography.caption,
-                            ),
-                        ],
+                            if (inv.doctorEmail != null)
+                              Text(
+                                inv.doctorEmail!,
+                                style: AafiyaTypography.caption.copyWith(
+                                  color: AafiyaColors.secondaryText,
+                                ),
+                              ),
+                            if (inv.createdAt != null)
+                              Text(
+                                '${strings.invitedOnLabel}: ${inv.createdAt}',
+                                style: AafiyaTypography.caption,
+                              ),
+                          ],
+                        ),
                       ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.cancel_outlined,
-                          color: AafiyaColors.error),
-                      tooltip: strings.cancelInvitation,
-                      onPressed: () => _cancelInvitation(inv),
-                    ),
-                  ],
+                      IconButton(
+                        icon: const Icon(Icons.cancel_outlined,
+                            color: AafiyaColors.error),
+                        tooltip: strings.cancelInvitation,
+                        onPressed: () => _cancelInvitation(inv),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            );
-          }),
+              );
+            }),
             const SizedBox(height: AafiyaSpacing.md),
           ],
 
@@ -535,64 +537,65 @@ class _DoctorStaffScreenState extends State<DoctorStaffScreen>
                                           : strings.doctorBadge,
                                       style: AafiyaTypography.caption.copyWith(
                                         color: doctor.isDirector
-                                          ? AafiyaColors.warning
-                                          : AafiyaColors.healthBlue,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                                if (doctor.isPrimary)
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 6, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: AafiyaColors.border,
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: Text(
-                                      strings.primaryBadge,
-                                      style: AafiyaTypography.caption.copyWith(
-                                        color: AafiyaColors.secondaryText,
+                                            ? AafiyaColors.warning
+                                            : AafiyaColors.healthBlue,
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                   ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 6, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: doctor.isActive
-                                        ? AafiyaColors.success
-                                            .withValues(alpha: 0.1)
-                                        : AafiyaColors.error
-                                            .withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  child: Text(
-                                    doctor.isActive
-                                        ? strings.activeStatus
-                                        : strings.suspendedStatus,
-                                    style: AafiyaTypography.caption.copyWith(
+                                  if (doctor.isPrimary)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 6, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: AafiyaColors.border,
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Text(
+                                        strings.primaryBadge,
+                                        style:
+                                            AafiyaTypography.caption.copyWith(
+                                          color: AafiyaColors.secondaryText,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
                                       color: doctor.isActive
                                           ? AafiyaColors.success
-                                          : AafiyaColors.error,
-                                      fontWeight: FontWeight.w600,
+                                              .withValues(alpha: 0.1)
+                                          : AafiyaColors.error
+                                              .withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: Text(
+                                      doctor.isActive
+                                          ? strings.activeStatus
+                                          : strings.suspendedStatus,
+                                      style: AafiyaTypography.caption.copyWith(
+                                        color: doctor.isActive
+                                            ? AafiyaColors.success
+                                            : AafiyaColors.error,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ],
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      const Icon(Icons.chevron_right_rounded,
-                          color: AafiyaColors.secondaryText),
-                    ],
+                        const Icon(Icons.chevron_right_rounded,
+                            color: AafiyaColors.secondaryText),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          }),
+              );
+            }),
         ],
       ),
     );
@@ -619,7 +622,6 @@ class _DoctorStaffScreenState extends State<DoctorStaffScreen>
             ],
           ),
           const SizedBox(height: AafiyaSpacing.sm),
-
           if (assistants.isEmpty)
             AafiyaEmptyView(
               title: strings.noStaffFound,
@@ -648,7 +650,8 @@ class _DoctorStaffScreenState extends State<DoctorStaffScreen>
                           backgroundColor:
                               AafiyaColors.healingGreen.withValues(alpha: 0.1),
                           foregroundColor: AafiyaColors.healingGreen,
-                          child: const Icon(Icons.support_agent_rounded, size: 22),
+                          child:
+                              const Icon(Icons.support_agent_rounded, size: 22),
                         ),
                         const SizedBox(width: AafiyaSpacing.sm),
                         Expanded(

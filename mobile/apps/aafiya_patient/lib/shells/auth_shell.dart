@@ -67,7 +67,8 @@ class _PatientAuthShellState extends State<PatientAuthShell> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AafiyaColors.pureWhite,
-        shape: const RoundedRectangleBorder(borderRadius: AafiyaRadius.borderLg),
+        shape:
+            const RoundedRectangleBorder(borderRadius: AafiyaRadius.borderLg),
         title: Row(
           children: [
             const Icon(Icons.error_outline_rounded, color: AafiyaColors.error),
@@ -75,7 +76,8 @@ class _PatientAuthShellState extends State<PatientAuthShell> {
             Expanded(
               child: Text(
                 title,
-                style: AafiyaTypography.titleLarge.copyWith(color: AafiyaColors.error),
+                style: AafiyaTypography.titleLarge
+                    .copyWith(color: AafiyaColors.error),
               ),
             ),
           ],
@@ -89,7 +91,8 @@ class _PatientAuthShellState extends State<PatientAuthShell> {
             onPressed: () => Navigator.of(ctx).pop(),
             child: Text(
               strings.ok,
-              style: AafiyaTypography.titleMedium.copyWith(color: AafiyaColors.healthBlue),
+              style: AafiyaTypography.titleMedium
+                  .copyWith(color: AafiyaColors.healthBlue),
             ),
           ),
         ],
@@ -157,7 +160,8 @@ class _PatientAuthShellState extends State<PatientAuthShell> {
           final user = User.fromJson(userJson);
 
           // Role Boundary Verification
-          final destination = const RoleResolver().resolvePatientDestination(user);
+          final destination =
+              const RoleResolver().resolvePatientDestination(user);
           if (destination == RoleResolutionResult.patient) {
             await widget.sessionManager.setAuthenticatedUser(
               token: token,
@@ -189,8 +193,12 @@ class _PatientAuthShellState extends State<PatientAuthShell> {
         setState(() => _isLoading = false);
         final errorMessage = switch (exception) {
           UnauthorizedException() => strings.invalidCredentials,
-          NetworkConnectionException() || NetworkTimeoutException() => strings.serverError,
-          _ => exception.message.isNotEmpty ? exception.message : strings.invalidCredentials,
+          NetworkConnectionException() ||
+          NetworkTimeoutException() =>
+            strings.serverError,
+          _ => exception.message.isNotEmpty
+              ? exception.message
+              : strings.invalidCredentials,
         };
         await _showErrorDialog(
           title: strings.authenticationFailedTitle,
@@ -210,7 +218,11 @@ class _PatientAuthShellState extends State<PatientAuthShell> {
     final confirmPassword = _confirmPasswordController.text;
 
     // Client-side validation
-    if (name.isEmpty || phone.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+    if (name.isEmpty ||
+        phone.isEmpty ||
+        email.isEmpty ||
+        password.isEmpty ||
+        confirmPassword.isEmpty) {
       await _showErrorDialog(
         title: strings.registrationFailedTitle,
         message: strings.fieldRequired,
@@ -284,7 +296,8 @@ class _PatientAuthShellState extends State<PatientAuthShell> {
           final user = User.fromJson(userJson);
 
           // Role Boundary Verification
-          final destination = const RoleResolver().resolvePatientDestination(user);
+          final destination =
+              const RoleResolver().resolvePatientDestination(user);
           if (destination == RoleResolutionResult.patient) {
             await widget.sessionManager.setAuthenticatedUser(
               token: token,
@@ -311,9 +324,15 @@ class _PatientAuthShellState extends State<PatientAuthShell> {
       case ApiFailure(:final exception):
         setState(() => _isLoading = false);
         final errorMessage = switch (exception) {
-          NetworkConnectionException() || NetworkTimeoutException() => strings.serverError,
-          ValidationException() => exception.message.isNotEmpty ? exception.message : strings.serverError,
-          _ => exception.message.isNotEmpty ? exception.message : strings.serverError,
+          NetworkConnectionException() ||
+          NetworkTimeoutException() =>
+            strings.serverError,
+          ValidationException() => exception.message.isNotEmpty
+              ? exception.message
+              : strings.serverError,
+          _ => exception.message.isNotEmpty
+              ? exception.message
+              : strings.serverError,
         };
         await _showErrorDialog(
           title: strings.registrationFailedTitle,
@@ -325,7 +344,8 @@ class _PatientAuthShellState extends State<PatientAuthShell> {
   @override
   Widget build(BuildContext context) {
     final strings = LocalizedStrings.of(context);
-    final activeLocale = widget.currentLocale ?? Localizations.localeOf(context);
+    final activeLocale =
+        widget.currentLocale ?? Localizations.localeOf(context);
 
     return Scaffold(
       appBar: AafiyaAppBar(
@@ -333,7 +353,8 @@ class _PatientAuthShellState extends State<PatientAuthShell> {
         actions: widget.onLocaleChanged != null
             ? [
                 PopupMenuButton<Locale>(
-                  icon: const Icon(Icons.language_rounded, color: AafiyaColors.healthBlue),
+                  icon: const Icon(Icons.language_rounded,
+                      color: AafiyaColors.healthBlue),
                   tooltip: strings.language,
                   initialValue: activeLocale,
                   onSelected: widget.onLocaleChanged,
@@ -381,27 +402,28 @@ class _PatientAuthShellState extends State<PatientAuthShell> {
                     const SizedBox(height: 20),
 
                     // Mode Toggle (Login / Register)
-                    SegmentedButton<AuthMode>(
-                      segments: [
-                        ButtonSegment(
-                          value: AuthMode.login,
-                          label: Text(strings.signIn),
-                          icon: const Icon(Icons.login_rounded),
-                        ),
-                        ButtonSegment(
-                          value: AuthMode.register,
-                          label: Text(strings.signUp),
-                          icon: const Icon(Icons.person_add_rounded),
-                        ),
-                      ],
-                      selected: {_mode},
-                      onSelectionChanged: _isLoading
-                          ? null
-                          : (selected) {
-                              if (selected.isNotEmpty) {
-                                setState(() => _mode = selected.first);
-                              }
-                            },
+                    Center(
+                      child: AafiyaSegmentedTabs<AuthMode>(
+                        padding: EdgeInsets.zero,
+                        items: [
+                          AafiyaTabItem(
+                            value: AuthMode.login,
+                            label: strings.signIn,
+                            icon: Icons.login_rounded,
+                          ),
+                          AafiyaTabItem(
+                            value: AuthMode.register,
+                            label: strings.signUp,
+                            icon: Icons.person_add_rounded,
+                          ),
+                        ],
+                        selectedValue: _mode,
+                        onChanged: _isLoading
+                            ? (_) {}
+                            : (selected) {
+                                setState(() => _mode = selected);
+                              },
+                      ),
                     ),
                     const SizedBox(height: 16),
                     Text(
@@ -456,10 +478,15 @@ class _PatientAuthShellState extends State<PatientAuthShell> {
                       enabled: !_isLoading,
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                          _obscurePassword
+                              ? Icons.visibility_outlined
+                              : Icons.visibility_off_outlined,
                         ),
-                        tooltip: _obscurePassword ? strings.showPassword : strings.hidePassword,
-                        onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                        tooltip: _obscurePassword
+                            ? strings.showPassword
+                            : strings.hidePassword,
+                        onPressed: () => setState(
+                            () => _obscurePassword = !_obscurePassword),
                       ),
                     ),
 
@@ -474,10 +501,16 @@ class _PatientAuthShellState extends State<PatientAuthShell> {
                         enabled: !_isLoading,
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _obscureConfirmPassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                            _obscureConfirmPassword
+                                ? Icons.visibility_outlined
+                                : Icons.visibility_off_outlined,
                           ),
-                          tooltip: _obscureConfirmPassword ? strings.showPassword : strings.hidePassword,
-                          onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+                          tooltip: _obscureConfirmPassword
+                              ? strings.showPassword
+                              : strings.hidePassword,
+                          onPressed: () => setState(() =>
+                              _obscureConfirmPassword =
+                                  !_obscureConfirmPassword),
                         ),
                       ),
                     ],
@@ -486,11 +519,15 @@ class _PatientAuthShellState extends State<PatientAuthShell> {
 
                     // Submit Button
                     AafiyaButton(
-                      label: _mode == AuthMode.login ? strings.signIn : strings.signUp,
+                      label: _mode == AuthMode.login
+                          ? strings.signIn
+                          : strings.signUp,
                       isLoading: _isLoading,
                       onPressed: _isLoading
                           ? null
-                          : (_mode == AuthMode.login ? _handleLogin : _handleRegister),
+                          : (_mode == AuthMode.login
+                              ? _handleLogin
+                              : _handleRegister),
                     ),
 
                     const SizedBox(height: 16),
@@ -501,11 +538,15 @@ class _PatientAuthShellState extends State<PatientAuthShell> {
                           ? null
                           : () {
                               setState(() {
-                                _mode = _mode == AuthMode.login ? AuthMode.register : AuthMode.login;
+                                _mode = _mode == AuthMode.login
+                                    ? AuthMode.register
+                                    : AuthMode.login;
                               });
                             },
                       child: Text(
-                        _mode == AuthMode.login ? strings.dontHaveAccount : strings.alreadyHaveAccount,
+                        _mode == AuthMode.login
+                            ? strings.dontHaveAccount
+                            : strings.alreadyHaveAccount,
                         style: AafiyaTypography.bodyMedium.copyWith(
                           color: AafiyaColors.healthBlue,
                           fontWeight: FontWeight.w600,

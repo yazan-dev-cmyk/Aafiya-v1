@@ -251,7 +251,8 @@ class _DoctorVacationsScreenState extends State<DoctorVacationsScreen> {
           IconButton(
             icon: const Icon(Icons.refresh_rounded),
             tooltip: strings.retry,
-            onPressed: _isLoading ? null : () => _loadVacations(isRefresh: true),
+            onPressed:
+                _isLoading ? null : () => _loadVacations(isRefresh: true),
           ),
         ],
       ),
@@ -268,9 +269,7 @@ class _DoctorVacationsScreenState extends State<DoctorVacationsScreen> {
 
   Widget _buildBody(BuildContext context, LocalizedStrings strings) {
     if (_isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return AafiyaLoadingView(message: strings.loading);
     }
 
     if (_errorMessage != null) {

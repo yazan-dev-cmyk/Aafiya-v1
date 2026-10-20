@@ -67,6 +67,7 @@ class PrescriptionDetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: AafiyaAppBar(
         title: strings.prescriptionDetailTitle,
+        showBrandMark: true,
         leading: BackButton(
           onPressed: () => Navigator.of(context).pop(),
         ),
@@ -83,7 +84,8 @@ class PrescriptionDetailScreen extends StatelessWidget {
               padding: AafiyaSpacing.insetAllMd,
               child: Row(
                 children: [
-                  const Icon(Icons.shield_outlined, color: AafiyaColors.info, size: 22),
+                  const Icon(Icons.shield_outlined,
+                      color: AafiyaColors.info, size: 22),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
@@ -120,7 +122,8 @@ class PrescriptionDetailScreen extends StatelessWidget {
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 5),
                         decoration: BoxDecoration(
                           color: statusBgColor,
                           borderRadius: BorderRadius.circular(12),
@@ -185,7 +188,8 @@ class PrescriptionDetailScreen extends StatelessWidget {
             // Prescribed Medications Header
             Row(
               children: [
-                const Icon(Icons.medication_liquid_outlined, color: AafiyaColors.healthBlue, size: 22),
+                const Icon(Icons.medication_liquid_outlined,
+                    color: AafiyaColors.healthBlue, size: 22),
                 const SizedBox(width: 8),
                 Text(
                   '${strings.medications} (${prescription.items.length})',
@@ -209,10 +213,12 @@ class PrescriptionDetailScreen extends StatelessWidget {
                 ),
               )
             else
-              ...prescription.items.map((item) => _buildMedicationCard(context, strings, item)),
+              ...prescription.items
+                  .map((item) => _buildMedicationCard(context, strings, item)),
 
             // Doctor's General Notes
-            if (prescription.notes != null && prescription.notes!.trim().isNotEmpty) ...[
+            if (prescription.notes != null &&
+                prescription.notes!.trim().isNotEmpty) ...[
               const SizedBox(height: 16),
               AafiyaCard(
                 padding: AafiyaSpacing.insetAllMd,
@@ -222,7 +228,8 @@ class PrescriptionDetailScreen extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.note_alt_outlined, size: 18, color: AafiyaColors.secondaryText),
+                        const Icon(Icons.note_alt_outlined,
+                            size: 18, color: AafiyaColors.secondaryText),
                         const SizedBox(width: 6),
                         Text(
                           strings.doctorNotes,
@@ -256,7 +263,8 @@ class PrescriptionDetailScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.qr_code_2_rounded, color: AafiyaColors.healthBlue, size: 24),
+                      const Icon(Icons.qr_code_2_rounded,
+                          color: AafiyaColors.healthBlue, size: 24),
                       const SizedBox(width: 8),
                       Text(
                         strings.qrVerification,
@@ -298,7 +306,8 @@ class PrescriptionDetailScreen extends StatelessWidget {
                   // Secure Token Display
                   if (prescription.secureToken.isNotEmpty) ...[
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color: AafiyaColors.lightBackground,
                         borderRadius: BorderRadius.circular(8),
@@ -396,7 +405,8 @@ class PrescriptionDetailScreen extends StatelessWidget {
                 ),
                 if (item.substitutionAllowed != null)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
                       color: item.substitutionAllowed!
                           ? AafiyaColors.success.withValues(alpha: 0.1)
@@ -446,7 +456,8 @@ class PrescriptionDetailScreen extends StatelessWidget {
             ),
 
             // Instructions
-            if (item.instructions != null && item.instructions!.trim().isNotEmpty) ...[
+            if (item.instructions != null &&
+                item.instructions!.trim().isNotEmpty) ...[
               const SizedBox(height: 8),
               Container(
                 width: double.infinity,
@@ -476,7 +487,8 @@ class PrescriptionDetailScreen extends StatelessWidget {
       children: [
         Text(
           '$label: ',
-          style: AafiyaTypography.caption.copyWith(color: AafiyaColors.secondaryText),
+          style: AafiyaTypography.caption
+              .copyWith(color: AafiyaColors.secondaryText),
         ),
         Text(
           value,

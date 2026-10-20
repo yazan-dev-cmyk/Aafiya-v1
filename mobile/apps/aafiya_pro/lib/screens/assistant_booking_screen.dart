@@ -61,7 +61,8 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
 
   late bool _isRegisteredPatient;
   PatientSearchResult? _selectedPatient;
-  final TextEditingController _patientSearchController = TextEditingController();
+  final TextEditingController _patientSearchController =
+      TextEditingController();
   bool _isSearchingPatients = false;
   List<PatientSearchResult> _patientResults = [];
   String? _patientSearchError;
@@ -75,14 +76,18 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
   void initState() {
     super.initState();
     _apiClient = widget.apiClient ?? widget.sessionManager.apiClient;
-    _bookingService = widget.bookingService ?? AssistantBookingService(apiClient: _apiClient);
+    _bookingService =
+        widget.bookingService ?? AssistantBookingService(apiClient: _apiClient);
 
     _isRegisteredPatient = widget.initialPatient != null;
     _selectedPatient = widget.initialPatient;
 
-    _nameController = TextEditingController(text: widget.initialPatient?.fullName ?? '');
-    _phoneController = TextEditingController(text: widget.initialPatient?.phone ?? '');
-    _mrnController = TextEditingController(text: widget.initialPatient?.mrn ?? '');
+    _nameController =
+        TextEditingController(text: widget.initialPatient?.fullName ?? '');
+    _phoneController =
+        TextEditingController(text: widget.initialPatient?.phone ?? '');
+    _mrnController =
+        TextEditingController(text: widget.initialPatient?.mrn ?? '');
     _notesController = TextEditingController();
 
     _loadDoctors();
@@ -336,8 +341,12 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
       patientName: _nameController.text.trim(),
       patientPhone: _phoneController.text.trim(),
       patientId: effectivePatientId,
-      patientMrn: _mrnController.text.trim().isNotEmpty ? _mrnController.text.trim() : null,
-      notes: _notesController.text.trim().isNotEmpty ? _notesController.text.trim() : null,
+      patientMrn: _mrnController.text.trim().isNotEmpty
+          ? _mrnController.text.trim()
+          : null,
+      notes: _notesController.text.trim().isNotEmpty
+          ? _notesController.text.trim()
+          : null,
     );
 
     if (!mounted) return;
@@ -351,7 +360,10 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
         _showSuccessDialog(data);
       case ApiFailure(:final exception):
         final message = exception.message.toLowerCase();
-        if (message.contains('slot') || message.contains('capacity') || message.contains('complet') || message.contains('ممتلئ')) {
+        if (message.contains('slot') ||
+            message.contains('capacity') ||
+            message.contains('complet') ||
+            message.contains('ممتلئ')) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(strings.slotAlreadyFullError),
@@ -360,7 +372,8 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
             ),
           );
           _loadSlots();
-        } else if (message.contains('duplicate') || message.contains('already has')) {
+        } else if (message.contains('duplicate') ||
+            message.contains('already has')) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(strings.duplicateBookingError),
@@ -387,15 +400,18 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AafiyaRadius.lg)),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AafiyaRadius.lg)),
         title: Row(
           children: [
-            const Icon(Icons.check_circle_rounded, color: AafiyaColors.healingGreen, size: 28),
+            const Icon(Icons.check_circle_rounded,
+                color: AafiyaColors.healingGreen, size: 28),
             const SizedBox(width: AafiyaSpacing.sm),
             Expanded(
               child: Text(
                 strings.bookingSuccessTitle,
-                style: AafiyaTypography.titleMedium.copyWith(fontWeight: FontWeight.bold),
+                style: AafiyaTypography.titleMedium
+                    .copyWith(fontWeight: FontWeight.bold),
               ),
             ),
           ],
@@ -422,7 +438,8 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
                   if (appointment.bookingReference.isNotEmpty) ...[
                     Text(
                       strings.bookingReferenceLabel,
-                      style: AafiyaTypography.caption.copyWith(color: AafiyaColors.secondaryText),
+                      style: AafiyaTypography.caption
+                          .copyWith(color: AafiyaColors.secondaryText),
                     ),
                     Text(
                       appointment.bookingReference,
@@ -432,15 +449,19 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
                         letterSpacing: 1.1,
                       ),
                     ),
-                    const Divider(height: AafiyaSpacing.md, color: AafiyaColors.border),
+                    const Divider(
+                        height: AafiyaSpacing.md, color: AafiyaColors.border),
                   ],
-                  _buildDetailRow(strings.selectDoctorLabel, _selectedDoctor?.name ?? ''),
+                  _buildDetailRow(
+                      strings.selectDoctorLabel, _selectedDoctor?.name ?? ''),
                   const SizedBox(height: 4),
                   _buildDetailRow(strings.selectDateLabel, _formattedDate),
                   const SizedBox(height: 4),
-                  _buildDetailRow(strings.selectTimeSlotLabel, _selectedSlot?.timeSlot ?? ''),
+                  _buildDetailRow(strings.selectTimeSlotLabel,
+                      _selectedSlot?.timeSlot ?? ''),
                   const SizedBox(height: 4),
-                  _buildDetailRow(strings.patientNameLabel, _nameController.text.trim()),
+                  _buildDetailRow(
+                      strings.patientNameLabel, _nameController.text.trim()),
                 ],
               ),
             ),
@@ -476,7 +497,8 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
       children: [
         Text(
           label,
-          style: AafiyaTypography.caption.copyWith(color: AafiyaColors.secondaryText),
+          style: AafiyaTypography.caption
+              .copyWith(color: AafiyaColors.secondaryText),
         ),
         Text(
           value,
@@ -567,40 +589,14 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
               const SizedBox(height: AafiyaSpacing.xl),
 
               // Section 5: Submit Button
-              ElevatedButton(
+              AafiyaButton(
                 key: const ValueKey('confirm_booking_button'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AafiyaColors.healingGreen,
-                  foregroundColor: AafiyaColors.pureWhite,
-                  padding: const EdgeInsets.symmetric(vertical: AafiyaSpacing.md),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AafiyaRadius.md),
-                  ),
-                ),
+                label: _isSubmitting
+                    ? strings.bookingInProgress
+                    : strings.confirmBookingButton,
+                isLoading: _isSubmitting,
                 onPressed: _isSubmitting ? null : _handleSubmit,
-                child: _isSubmitting
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: AafiyaColors.pureWhite,
-                            ),
-                          ),
-                          const SizedBox(width: AafiyaSpacing.sm),
-                          Text(strings.bookingInProgress),
-                        ],
-                      )
-                    : Text(
-                        strings.confirmBookingButton,
-                        style: AafiyaTypography.bodyMedium.copyWith(
-                          color: AafiyaColors.pureWhite,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                variant: AafiyaButtonVariant.primary,
               ),
               const SizedBox(height: AafiyaSpacing.xxl),
             ],
@@ -653,7 +649,8 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
   Widget _buildTypeBadge(LocalizedStrings strings) {
     final isReturn = _isReturnVisit;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AafiyaSpacing.md, vertical: 8),
+      padding:
+          const EdgeInsets.symmetric(horizontal: AafiyaSpacing.md, vertical: 8),
       decoration: BoxDecoration(
         color: isReturn
             ? AafiyaColors.healthBlue.withValues(alpha: 0.1)
@@ -667,14 +664,19 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
         children: [
           Icon(
             isReturn ? Icons.repeat_rounded : Icons.person_add_alt_1_rounded,
-            color: isReturn ? AafiyaColors.healthBlue : AafiyaColors.healingGreen,
+            color:
+                isReturn ? AafiyaColors.healthBlue : AafiyaColors.healingGreen,
             size: 20,
           ),
           const SizedBox(width: AafiyaSpacing.sm),
           Text(
-            isReturn ? strings.returnVisitPatientBadge : strings.walkInPatientBadge,
+            isReturn
+                ? strings.returnVisitPatientBadge
+                : strings.walkInPatientBadge,
             style: AafiyaTypography.bodyMedium.copyWith(
-              color: isReturn ? AafiyaColors.healthBlue : AafiyaColors.healingGreen,
+              color: isReturn
+                  ? AafiyaColors.healthBlue
+                  : AafiyaColors.healingGreen,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -689,7 +691,8 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
       children: [
         Text(
           strings.selectDoctorLabel,
-          style: AafiyaTypography.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+          style:
+              AafiyaTypography.bodyMedium.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: AafiyaSpacing.xs),
         if (_isLoadingDoctors)
@@ -706,12 +709,14 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
             ),
             child: Row(
               children: [
-                const Icon(Icons.error_outline, color: AafiyaColors.error, size: 18),
+                const Icon(Icons.error_outline,
+                    color: AafiyaColors.error, size: 18),
                 const SizedBox(width: AafiyaSpacing.sm),
                 Expanded(
                   child: Text(
                     _doctorsError!,
-                    style: AafiyaTypography.caption.copyWith(color: AafiyaColors.error),
+                    style: AafiyaTypography.caption
+                        .copyWith(color: AafiyaColors.error),
                   ),
                 ),
                 TextButton(
@@ -724,7 +729,8 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
         else if (_doctors.isEmpty)
           Text(
             strings.noDoctorsAvailable,
-            style: AafiyaTypography.caption.copyWith(color: AafiyaColors.secondaryText),
+            style: AafiyaTypography.caption
+                .copyWith(color: AafiyaColors.secondaryText),
           )
         else
           DropdownButtonFormField<ClinicDoctorStaff>(
@@ -765,7 +771,8 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
       children: [
         Text(
           strings.selectDateLabel,
-          style: AafiyaTypography.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+          style:
+              AafiyaTypography.bodyMedium.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: AafiyaSpacing.xs),
         InkWell(
@@ -794,7 +801,8 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
                     const SizedBox(width: AafiyaSpacing.sm),
                     Text(
                       _formattedDate,
-                      style: AafiyaTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+                      style: AafiyaTypography.bodyMedium
+                          .copyWith(fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),
@@ -816,7 +824,8 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
       children: [
         Text(
           strings.selectTimeSlotLabel,
-          style: AafiyaTypography.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+          style:
+              AafiyaTypography.bodyMedium.copyWith(fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: AafiyaSpacing.xs),
         if (_slotsError != null)
@@ -828,12 +837,14 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
             ),
             child: Row(
               children: [
-                const Icon(Icons.error_outline, color: AafiyaColors.error, size: 18),
+                const Icon(Icons.error_outline,
+                    color: AafiyaColors.error, size: 18),
                 const SizedBox(width: AafiyaSpacing.sm),
                 Expanded(
                   child: Text(
                     _slotsError!,
-                    style: AafiyaTypography.caption.copyWith(color: AafiyaColors.error),
+                    style: AafiyaTypography.caption
+                        .copyWith(color: AafiyaColors.error),
                   ),
                 ),
                 TextButton(
@@ -867,7 +878,8 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
       decoration: BoxDecoration(
         color: AafiyaColors.healingGreen.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(AafiyaRadius.md),
-        border: Border.all(color: AafiyaColors.healingGreen.withValues(alpha: 0.3)),
+        border:
+            Border.all(color: AafiyaColors.healingGreen.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -877,7 +889,8 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.check_circle_rounded, color: AafiyaColors.healingGreen, size: 18),
+                  const Icon(Icons.check_circle_rounded,
+                      color: AafiyaColors.healingGreen, size: 18),
                   const SizedBox(width: AafiyaSpacing.xs),
                   Text(
                     strings.selectedPatientLabel,
@@ -904,7 +917,8 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
           const SizedBox(height: AafiyaSpacing.xs),
           Text(
             patient.fullName,
-            style: AafiyaTypography.titleMedium.copyWith(fontWeight: FontWeight.bold),
+            style: AafiyaTypography.titleMedium
+                .copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 4),
           Wrap(
@@ -913,12 +927,14 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
               if (patient.mrn.isNotEmpty)
                 Text(
                   '${strings.patientMrnLabel}: ${patient.mrn}',
-                  style: AafiyaTypography.caption.copyWith(color: AafiyaColors.secondaryText),
+                  style: AafiyaTypography.caption
+                      .copyWith(color: AafiyaColors.secondaryText),
                 ),
               if (patient.phone != null && patient.phone!.isNotEmpty)
                 Text(
                   patient.phone!,
-                  style: AafiyaTypography.caption.copyWith(color: AafiyaColors.secondaryText),
+                  style: AafiyaTypography.caption
+                      .copyWith(color: AafiyaColors.secondaryText),
                 ),
             ],
           ),
@@ -959,7 +975,8 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
                         },
                       )
                     : null,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(AafiyaRadius.md)),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AafiyaRadius.md)),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: AafiyaSpacing.md,
               vertical: AafiyaSpacing.sm,
@@ -969,7 +986,6 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
           onSubmitted: _searchPatients,
         ),
         const SizedBox(height: AafiyaSpacing.sm),
-
         if (_patientSearchError != null)
           Container(
             padding: const EdgeInsets.all(AafiyaSpacing.sm),
@@ -980,10 +996,10 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
             ),
             child: Text(
               _patientSearchError!,
-              style: AafiyaTypography.caption.copyWith(color: AafiyaColors.error),
+              style:
+                  AafiyaTypography.caption.copyWith(color: AafiyaColors.error),
             ),
           ),
-
         if (_patientResults.isEmpty &&
             !_isSearchingPatients &&
             _patientSearchController.text.trim().length >= 2)
@@ -992,18 +1008,19 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
             child: Center(
               child: Text(
                 strings.noPatientsFound,
-                style: AafiyaTypography.caption.copyWith(color: AafiyaColors.secondaryText),
+                style: AafiyaTypography.caption
+                    .copyWith(color: AafiyaColors.secondaryText),
               ),
             ),
           ),
-
         if (_patientResults.isNotEmpty)
           ListView.separated(
             key: const ValueKey('patient_search_results_list'),
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: _patientResults.length,
-            separatorBuilder: (_, __) => const SizedBox(height: AafiyaSpacing.xs),
+            separatorBuilder: (_, __) =>
+                const SizedBox(height: AafiyaSpacing.xs),
             itemBuilder: (context, index) {
               final pat = _patientResults[index];
               return InkWell(
@@ -1020,9 +1037,12 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
                     children: [
                       CircleAvatar(
                         radius: 16,
-                        backgroundColor: AafiyaColors.healthBlue.withValues(alpha: 0.12),
+                        backgroundColor:
+                            AafiyaColors.healthBlue.withValues(alpha: 0.12),
                         child: Text(
-                          pat.firstName.isNotEmpty ? pat.firstName[0].toUpperCase() : 'P',
+                          pat.firstName.isNotEmpty
+                              ? pat.firstName[0].toUpperCase()
+                              : 'P',
                           style: AafiyaTypography.caption.copyWith(
                             color: AafiyaColors.healthBlue,
                             fontWeight: FontWeight.bold,
@@ -1036,7 +1056,8 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
                           children: [
                             Text(
                               pat.fullName,
-                              style: AafiyaTypography.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+                              style: AafiyaTypography.bodyMedium
+                                  .copyWith(fontWeight: FontWeight.bold),
                             ),
                             Wrap(
                               spacing: AafiyaSpacing.sm,
@@ -1044,19 +1065,22 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
                                 if (pat.mrn.isNotEmpty)
                                   Text(
                                     '${strings.patientMrnLabel}: ${pat.mrn}',
-                                    style: AafiyaTypography.caption.copyWith(color: AafiyaColors.secondaryText),
+                                    style: AafiyaTypography.caption.copyWith(
+                                        color: AafiyaColors.secondaryText),
                                   ),
                                 if (pat.phone != null && pat.phone!.isNotEmpty)
                                   Text(
                                     pat.phone!,
-                                    style: AafiyaTypography.caption.copyWith(color: AafiyaColors.secondaryText),
+                                    style: AafiyaTypography.caption.copyWith(
+                                        color: AafiyaColors.secondaryText),
                                   ),
                               ],
                             ),
                           ],
                         ),
                       ),
-                      const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AafiyaColors.secondaryText),
+                      const Icon(Icons.arrow_forward_ios_rounded,
+                          size: 14, color: AafiyaColors.secondaryText),
                     ],
                   ),
                 ),
@@ -1069,7 +1093,8 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
   }
 
   Widget _buildPatientForm(LocalizedStrings strings) {
-    final isPrefilled = _isReturnVisit || (_isRegisteredPatient && _selectedPatient != null);
+    final isPrefilled =
+        _isReturnVisit || (_isRegisteredPatient && _selectedPatient != null);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1089,7 +1114,8 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
           decoration: InputDecoration(
             labelText: strings.patientNameLabel,
             prefixIcon: const Icon(Icons.person_rounded, size: 20),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(AafiyaRadius.md)),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AafiyaRadius.md)),
           ),
           validator: (val) {
             if (val == null || val.trim().isEmpty) {
@@ -1112,7 +1138,8 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
           decoration: InputDecoration(
             labelText: strings.patientPhoneRequired,
             prefixIcon: const Icon(Icons.phone_rounded, size: 20),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(AafiyaRadius.md)),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AafiyaRadius.md)),
           ),
           validator: (val) {
             if (val == null || val.trim().isEmpty) {
@@ -1135,7 +1162,8 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
           decoration: InputDecoration(
             labelText: strings.patientMrnLabel,
             prefixIcon: const Icon(Icons.badge_rounded, size: 20),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(AafiyaRadius.md)),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AafiyaRadius.md)),
             helperText: _isReturnVisit
                 ? strings.returnVisitPatientBadge
                 : (_isRegisteredPatient && _selectedPatient != null)
@@ -1154,7 +1182,8 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
             labelText: strings.bookingNotesLabel,
             hintText: strings.bookingNotesHint,
             prefixIcon: const Icon(Icons.note_alt_outlined, size: 20),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(AafiyaRadius.md)),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AafiyaRadius.md)),
           ),
         ),
       ],

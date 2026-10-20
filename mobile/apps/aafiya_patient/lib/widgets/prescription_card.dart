@@ -63,10 +63,20 @@ class PrescriptionCard extends StatelessWidget {
               Expanded(
                 child: Row(
                   children: [
-                    const Icon(
-                      Icons.receipt_long_rounded,
-                      color: AafiyaColors.healthBlue,
-                      size: 20,
+                    Container(
+                      width: 32,
+                      height: 32,
+                      decoration: const BoxDecoration(
+                        color: AafiyaColors.tealSoft,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          Icons.receipt_long_rounded,
+                          color: AafiyaColors.tealInk,
+                          size: 18,
+                        ),
+                      ),
                     ),
                     const SizedBox(width: 8),
                     Flexible(
@@ -85,7 +95,8 @@ class PrescriptionCard extends StatelessWidget {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: statusBgColor,
                   borderRadius: BorderRadius.circular(12),

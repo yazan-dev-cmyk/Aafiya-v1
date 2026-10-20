@@ -52,7 +52,8 @@ class AppointmentDetailScreen extends StatefulWidget {
   }
 
   @override
-  State<AppointmentDetailScreen> createState() => _AppointmentDetailScreenState();
+  State<AppointmentDetailScreen> createState() =>
+      _AppointmentDetailScreenState();
 }
 
 class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
@@ -78,7 +79,8 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
   }
 
   DateTime? get _appointmentStartDateTime {
-    if (appointment.appointmentDate == null || appointment.appointmentDate!.isEmpty) {
+    if (appointment.appointmentDate == null ||
+        appointment.appointmentDate!.isEmpty) {
       return null;
     }
     try {
@@ -118,7 +120,8 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
     final start = _appointmentStartDateTime;
     if (start == null) return false;
 
-    final now = widget.currentTime != null ? widget.currentTime!() : DateTime.now();
+    final now =
+        widget.currentTime != null ? widget.currentTime!() : DateTime.now();
     return now.isBefore(start);
   }
 
@@ -141,11 +144,13 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
     final start = _appointmentStartDateTime;
     if (start == null) return false;
 
-    final now = widget.currentTime != null ? widget.currentTime!() : DateTime.now();
+    final now =
+        widget.currentTime != null ? widget.currentTime!() : DateTime.now();
     return now.isBefore(start);
   }
 
-  Future<String?> _showCancelDialog(BuildContext context, LocalizedStrings strings) async {
+  Future<String?> _showCancelDialog(
+      BuildContext context, LocalizedStrings strings) async {
     final reasonController = TextEditingController();
 
     return showDialog<String>(
@@ -153,7 +158,8 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
       builder: (ctx) => AlertDialog(
         title: Text(
           strings.cancelAppointmentTitle,
-          style: AafiyaTypography.titleMedium.copyWith(fontWeight: FontWeight.bold),
+          style: AafiyaTypography.titleMedium
+              .copyWith(fontWeight: FontWeight.bold),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -170,7 +176,8 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
               maxLines: 2,
               decoration: InputDecoration(
                 hintText: strings.cancellationReasonPrompt,
-                hintStyle: AafiyaTypography.caption.copyWith(color: AafiyaColors.secondaryText),
+                hintStyle: AafiyaTypography.caption
+                    .copyWith(color: AafiyaColors.secondaryText),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AafiyaRadius.sm),
                   borderSide: const BorderSide(color: AafiyaColors.border),
@@ -191,7 +198,8 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
               backgroundColor: AafiyaColors.error,
               foregroundColor: AafiyaColors.pureWhite,
             ),
-            onPressed: () => Navigator.of(ctx).pop(reasonController.text.trim()),
+            onPressed: () =>
+                Navigator.of(ctx).pop(reasonController.text.trim()),
             child: Text(strings.confirmCancelAction),
           ),
         ],
@@ -254,20 +262,25 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
             bookingReference: parsed.bookingReference.isNotEmpty
                 ? parsed.bookingReference
                 : appointment.bookingReference,
-            secureToken: (parsed.secureToken != null && parsed.secureToken!.isNotEmpty)
-                ? parsed.secureToken
-                : appointment.secureToken,
-            clinic: (parsed.clinic.name != null && parsed.clinic.name!.isNotEmpty)
-                ? parsed.clinic
-                : appointment.clinic,
-            doctor: (parsed.doctor.name != null && parsed.doctor.name!.isNotEmpty)
-                ? parsed.doctor
-                : appointment.doctor,
-            patient: (parsed.patient.name != null && parsed.patient.name!.isNotEmpty)
-                ? parsed.patient
-                : appointment.patient,
+            secureToken:
+                (parsed.secureToken != null && parsed.secureToken!.isNotEmpty)
+                    ? parsed.secureToken
+                    : appointment.secureToken,
+            clinic:
+                (parsed.clinic.name != null && parsed.clinic.name!.isNotEmpty)
+                    ? parsed.clinic
+                    : appointment.clinic,
+            doctor:
+                (parsed.doctor.name != null && parsed.doctor.name!.isNotEmpty)
+                    ? parsed.doctor
+                    : appointment.doctor,
+            patient:
+                (parsed.patient.name != null && parsed.patient.name!.isNotEmpty)
+                    ? parsed.patient
+                    : appointment.patient,
             bookingCenter: parsed.bookingCenter ?? appointment.bookingCenter,
-            appointmentDate: parsed.appointmentDate ?? appointment.appointmentDate,
+            appointmentDate:
+                parsed.appointmentDate ?? appointment.appointmentDate,
             timeSlot: parsed.timeSlot ?? appointment.timeSlot,
             status: AppointmentStatus.cancelled,
             notes: parsed.notes ?? appointment.notes,
@@ -373,49 +386,60 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // 1. Status & Reference Header Card
-              AafiyaCard(
-                padding: AafiyaSpacing.insetAllMd,
-                child: Column(
+              // 1. Status & Reference Header Ticket Card
+              AafiyaTicketCard(
+                dividerPositionFromBottom: 50.0,
+                topContent: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        AafiyaBrandMark(
-                          markSize: 26,
-                          showWordmark: true,
-                          titleStyle: AafiyaTypography.titleMedium.copyWith(
-                            color: AafiyaColors.primaryText,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: statusColor.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(AafiyaRadius.sm),
-                            border: Border.all(color: statusColor.withValues(alpha: 0.4)),
-                          ),
-                          child: Text(
-                            strings.statusLabel(appointment.status),
-                            style: AafiyaTypography.titleMedium.copyWith(
-                              color: statusColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
+                    AafiyaBrandMark(
+                      markSize: 26,
+                      showWordmark: true,
+                      titleStyle: AafiyaTypography.titleMedium.copyWith(
+                        color: AafiyaColors.primaryText,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    const SizedBox(height: 12),
-                    Text(
-                      '${strings.bookingReference}: #${appointment.bookingReference}',
-                      style: AafiyaTypography.bodyMedium.copyWith(
-                        color: AafiyaColors.secondaryText,
-                        fontWeight: FontWeight.w600,
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: statusColor.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(AafiyaRadius.sm),
+                        border: Border.all(
+                            color: statusColor.withValues(alpha: 0.4)),
+                      ),
+                      child: Text(
+                        strings.statusLabel(appointment.status),
+                        style: AafiyaTypography.titleMedium.copyWith(
+                          color: statusColor,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ],
+                ),
+                bottomContent: SizedBox(
+                  height: 20,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.confirmation_number_outlined,
+                        size: 16,
+                        color: AafiyaColors.secondaryText,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${strings.bookingReference}: #${appointment.bookingReference}',
+                        style: AafiyaTypography.bodyMedium.copyWith(
+                          color: AafiyaColors.secondaryText,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -575,7 +599,8 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
                               const SizedBox(height: 6),
                               Text(
                                 appointment.appointmentDate?.isNotEmpty == true
-                                    ? strings.formatDate(appointment.appointmentDate)
+                                    ? strings
+                                        .formatDate(appointment.appointmentDate)
                                     : '-',
                                 style: AafiyaTypography.titleMedium.copyWith(
                                   fontWeight: FontWeight.bold,
@@ -722,7 +747,8 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
                         ? 'Pass de visite digital (QR)'
                         : 'Digital Visit Pass (QR)',
                 icon: const Icon(Icons.qr_code_2_rounded, size: 20),
-                onPressed: () => VisitPassSheet.show(context, appointment: appointment),
+                onPressed: () =>
+                    VisitPassSheet.show(context, appointment: appointment),
                 variant: AafiyaButtonVariant.primary,
               ),
               const SizedBox(height: 12),
@@ -732,7 +758,8 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
                 AafiyaButton(
                   key: const Key('reschedule_appointment_button'),
                   label: strings.rescheduleAppointmentTitle,
-                  icon: const Icon(Icons.edit_calendar_outlined, size: 20, color: AafiyaColors.healthBlue),
+                  icon: const Icon(Icons.edit_calendar_outlined,
+                      size: 20, color: AafiyaColors.healthBlue),
                   onPressed: _isCancelling ? null : _handleReschedule,
                   variant: AafiyaButtonVariant.outline,
                 ),
@@ -744,7 +771,8 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
                 AafiyaButton(
                   key: const Key('cancel_appointment_button'),
                   label: strings.cancelAppointmentTitle,
-                  icon: const Icon(Icons.cancel_outlined, size: 20, color: AafiyaColors.error),
+                  icon: const Icon(Icons.cancel_outlined,
+                      size: 20, color: AafiyaColors.error),
                   onPressed: _isCancelling ? null : _handleCancel,
                   isLoading: _isCancelling,
                   variant: AafiyaButtonVariant.outline,
@@ -772,7 +800,9 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
       AppointmentStatus.confirmed => AafiyaColors.success,
       AppointmentStatus.attended => AafiyaColors.healthBlue,
       AppointmentStatus.noShow => AafiyaColors.warning,
-      AppointmentStatus.cancelled || AppointmentStatus.rejected => AafiyaColors.error,
+      AppointmentStatus.cancelled ||
+      AppointmentStatus.rejected =>
+        AafiyaColors.error,
       AppointmentStatus.expired => AafiyaColors.secondaryText,
       AppointmentStatus.rescheduled => AafiyaColors.info,
       AppointmentStatus.unknown => AafiyaColors.secondaryText,

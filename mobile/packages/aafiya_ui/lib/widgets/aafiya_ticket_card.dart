@@ -19,6 +19,7 @@ class AafiyaTicketCard extends StatelessWidget {
     this.cardRadius = AafiyaRadius.ticket,
     this.dividerColor = AafiyaColors.ticketDottedLine,
     this.elevation = 4.0,
+    this.dividerPositionFromBottom = 76.0,
   });
 
   /// The top section containing doctor, specialty, metadata, and clinic info.
@@ -39,6 +40,9 @@ class AafiyaTicketCard extends StatelessWidget {
   /// Shadow elevation.
   final double elevation;
 
+  /// Distance from the bottom of the card to the center of the notches and dashed divider.
+  final double dividerPositionFromBottom;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -57,6 +61,7 @@ class AafiyaTicketCard extends StatelessWidget {
         clipper: _TicketNotchClipper(
           notchRadius: notchRadius,
           cardRadius: cardRadius,
+          dividerPositionFromBottom: dividerPositionFromBottom,
         ),
         child: Container(
           color: AafiyaColors.pureWhite,
@@ -94,10 +99,12 @@ class _TicketNotchClipper extends CustomClipper<Path> {
   const _TicketNotchClipper({
     required this.notchRadius,
     required this.cardRadius,
+    required this.dividerPositionFromBottom,
   });
 
   final double notchRadius;
   final double cardRadius;
+  final double dividerPositionFromBottom;
 
   @override
   Path getClip(Size size) {
@@ -107,9 +114,8 @@ class _TicketNotchClipper extends CustomClipper<Path> {
     final r = cardRadius;
     final nr = notchRadius;
 
-    // Approximate divider position from bottom padding (bottom is approx 76px)
-    // We can compute notch Y accurately:
-    final notchY = size.height - 76.0;
+    // Divider position measured from bottom padding
+    final notchY = size.height - dividerPositionFromBottom;
 
     // Start from top-left after corner
     path.moveTo(r, 0);
@@ -132,7 +138,8 @@ class _TicketNotchClipper extends CustomClipper<Path> {
 
     // Right edge to bottom-right corner
     path.lineTo(size.width, size.height - r);
-    path.arcToPoint(Offset(size.width - r, size.height), radius: Radius.circular(r));
+    path.arcToPoint(Offset(size.width - r, size.height),
+        radius: Radius.circular(r));
 
     // Bottom edge
     path.lineTo(r, size.height);
@@ -160,7 +167,9 @@ class _TicketNotchClipper extends CustomClipper<Path> {
 
   @override
   bool shouldReclip(covariant _TicketNotchClipper oldClipper) {
-    return oldClipper.notchRadius != notchRadius || oldClipper.cardRadius != cardRadius;
+    return oldClipper.notchRadius != notchRadius ||
+        oldClipper.cardRadius != cardRadius ||
+        oldClipper.dividerPositionFromBottom != dividerPositionFromBottom;
   }
 }
 
