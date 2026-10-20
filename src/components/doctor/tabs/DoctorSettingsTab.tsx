@@ -52,6 +52,7 @@ import {
 interface DoctorSettingsTabProps {
   isDarkMode?: boolean;
   defaultSubTab?: string;
+  onClinicHoursUpdated?: () => void;
 }
 
 export interface ExceptionRecord {
@@ -89,7 +90,8 @@ export interface SettingsAuditLog {
 
 export const DoctorSettingsTab: React.FC<DoctorSettingsTabProps> = ({
   isDarkMode = false,
-  defaultSubTab = 'working-hours'
+  defaultSubTab = 'working-hours',
+  onClinicHoursUpdated,
 }) => {
   const t = useTranslations('doctor.settings');
   const locale = useLocale();
@@ -1358,6 +1360,7 @@ export const DoctorSettingsTab: React.FC<DoctorSettingsTabProps> = ({
               clinicId={effectiveClinicId}
               canManage={canManageSettings}
               isDarkMode={isDarkMode}
+              onConfiguredChange={() => onClinicHoursUpdated?.()}
             />
           )}
 

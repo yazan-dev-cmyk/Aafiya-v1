@@ -18,18 +18,21 @@ class ClinicOperatingHoursScreen extends StatefulWidget {
     this.clinicId,
     this.service,
     this.apiClient,
+    this.onSaved,
   });
 
   final AuthSessionManager sessionManager;
   final String? clinicId;
   final ClinicOperatingHoursService? service;
   final ApiClient? apiClient;
+  final VoidCallback? onSaved;
 
   static Route<void> route({
     required AuthSessionManager sessionManager,
     String? clinicId,
     ClinicOperatingHoursService? service,
     ApiClient? apiClient,
+    VoidCallback? onSaved,
   }) {
     return MaterialPageRoute<void>(
       builder: (_) => ClinicOperatingHoursScreen(
@@ -37,6 +40,7 @@ class ClinicOperatingHoursScreen extends StatefulWidget {
         clinicId: clinicId,
         service: service,
         apiClient: apiClient,
+        onSaved: onSaved,
       ),
     );
   }
@@ -295,6 +299,7 @@ class _ClinicOperatingHoursScreenState extends State<ClinicOperatingHoursScreen>
           _isConfigured = data.isConfigured;
           _successMessage = strings.clinicHoursSavedSuccess;
         });
+        widget.onSaved?.call();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(strings.clinicHoursSavedSuccess),

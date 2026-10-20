@@ -360,7 +360,9 @@ class DoctorWorkingHoursService
     protected function assertSlotsFitWithinClinicOperatingHours(string $clinicId, $openDays): void
     {
         if (! $this->clinicOperatingHoursService->isClinicConfigured($clinicId)) {
-            return;
+            throw ValidationException::withMessages([
+                'clinic_hours' => ['لا يمكن تفعيل جدول عمل الطبيب: ساعات تشغيل العيادة غير مهيأة بعد.'],
+            ]);
         }
 
         $clinicHours = ClinicOperatingHour::where('clinic_id', $clinicId)

@@ -368,4 +368,124 @@ class DoctorWeeklyWorkingHoursTest extends TestCase
         $this->assertEmpty($slots);
         $this->assertSame($initialSlotsCount, AppointmentSlot::count());
     }
+
+    public function test_doctor_can_show_save_draft_and_activate_using_me_route(): void
+    {
+        $this->configureFullClinicOperatingHours();
+
+        // 1. Show schedule using 'me'
+        $response = $this->actingAs($this->doctorUser, 'sanctum')
+            ->withHeader('X-Clinic-ID', $this->clinic->id)
+            ->getJson('/api/v1/doctors/me/working-hours');
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.doctor_id', $this->doctor->id);
+        $response->assertJsonPath('data.is_activated', false);
+
+        // 2. Save draft using 'me'
+        $draftResponse = $this->actingAs($this->doctorUser, 'sanctum')
+            ->withHeader('X-Clinic-ID', $this->clinic->id)
+            ->putJson('/api/v1/doctors/me/working-hours', [
+                'days' => $this->buildSampleSevenDays(),
+            ]);
+
+        $draftResponse->assertStatus(200);
+        $draftResponse->assertJsonPath('data.doctor_id', $this->doctor->id);
+
+        // 3. Activate schedule using 'me'
+        $activateResponse = $this->actingAs($this->doctorUser, 'sanctum')
+            ->withHeader('X-Clinic-ID', $this->clinic->id)
+            ->postJson('/api/v1/doctors/me/working-hours/activate');
+
+        $activateResponse->assertStatus(200);
+        $activateResponse->assertJsonPath('data.is_activated', true);
+
+        $this->assertDatabaseHas('doctor_clinic', [
+            'doctor_id' => $this->doctor->id,
+            'clinic_id' => $this->clinic->id,
+            'is_working_hours_activated' => true,
+        ]);
+    }
+
+    public function test_doctor_can_show_save_draft_and_activate_using_legacy_user_id(): void
+    {
+        $this->configureFullClinicOperatingHours();
+
+        // 1. Show schedule using own user_id
+        $response = $this->actingAs($this->doctorUser, 'sanctum')
+            ->withHeader('X-Clinic-ID', $this->clinic->id)
+            ->getJson("/api/v1/doctors/{$this->doctorUser->id}/working-hours");
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.doctor_id', $this->doctor->id);
+        $response->assertJsonPath('data.is_activated', false);
+
+        // 2. Save draft using own user_id
+        $draftResponse = $this->actingAs($this->doctorUser, 'sanctum')
+            ->withHeader('X-Clinic-ID', $this->clinic->id)
+            ->putJson("/api/v1/doctors/{$this->doctorUser->id}/working-hours", [
+                'days' => $this->buildSampleSevenDays(),
+            ]);
+
+        $draftResponse->assertStatus(200);
+        $draftResponse->assertJsonPath('data.doctor_id', $this->doctor->id);
+
+        // 3. Activate schedule using own user_id
+        $activateResponse = $this->actingAs($this->doctorUser, 'sanctum')
+            ->withHeader('X-Clinic-ID', $this->clinic->id)
+            ->postJson("/api/v1/doctors/{$this->doctorUser->id}/working-hours/activate");
+
+        $activateResponse->assertStatus(200);
+        $activateResponse->assertJsonPath('data.is_activated', true);
+
+        $this->assertDatabaseHas('doctor_clinic', [
+            'doctor_id' => $this->doctor->id,
+            'clinic_id' => $this->clinic->id,
+            'is_working_hours_activated' => true,
+        ]);
+    }
+
+    public function test_user_cannot_target_another_doctor_using_that_doctors_user_id(): void
+    {
+        $unrelatedUser = User::factory()->create();
+
+        // Attempting to target $this->doctor using $this->doctorUser->id from another user's session
+        $this->actingAs($unrelatedUser, 'sanctum')
+            ->withHeader('X-Clinic-ID', $this->clinic->id)
+            ->getJson("/api/v1/doctors/{$this->doctorUser->id}/working-hours")
+            ->assertStatus(404);
+
+        $this->actingAs($unrelatedUser, 'sanctum')
+            ->withHeader('X-Clinic-ID', $this->clinic->id)
+            ->postJson("/api/v1/doctors/{$this->doctorUser->id}/working-hours/activate")
+            ->assertStatus(403);
+    }
+
+    public function test_user_without_doctor_profile_cannot_use_me_route(): void
+    {
+        $userWithoutDoctor = User::factory()->create();
+
+        $this->actingAs($userWithoutDoctor, 'sanctum')
+            ->withHeader('X-Clinic-ID', $this->clinic->id)
+            ->getJson('/api/v1/doctors/me/working-hours')
+            ->assertStatus(403);
+    }
+
+    public function test_activation_fails_when_clinic_operating_hours_are_not_configured(): void
+    {
+        // Save doctor schedule draft without configuring clinic operating hours first
+        $this->actingAs($this->doctorUser, 'sanctum')
+            ->withHeader('X-Clinic-ID', $this->clinic->id)
+            ->putJson("/api/v1/doctors/{$this->doctor->id}/working-hours", [
+                'days' => $this->buildSampleSevenDays(),
+            ])->assertStatus(200);
+
+        // Attempt activation -> must fail with 422 clinic_hours validation error
+        $response = $this->actingAs($this->doctorUser, 'sanctum')
+            ->withHeader('X-Clinic-ID', $this->clinic->id)
+            ->postJson("/api/v1/doctors/{$this->doctor->id}/working-hours/activate");
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['clinic_hours']);
+    }
 }

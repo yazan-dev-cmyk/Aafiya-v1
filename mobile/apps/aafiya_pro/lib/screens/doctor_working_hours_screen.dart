@@ -20,6 +20,7 @@ class DoctorWorkingHoursScreen extends StatefulWidget {
     this.clinicId,
     this.service,
     this.apiClient,
+    this.onActivated,
   });
 
   final AuthSessionManager sessionManager;
@@ -27,6 +28,7 @@ class DoctorWorkingHoursScreen extends StatefulWidget {
   final String? clinicId;
   final DoctorWorkingHoursService? service;
   final ApiClient? apiClient;
+  final VoidCallback? onActivated;
 
   static Route<void> route({
     required AuthSessionManager sessionManager,
@@ -34,6 +36,7 @@ class DoctorWorkingHoursScreen extends StatefulWidget {
     String? clinicId,
     DoctorWorkingHoursService? service,
     ApiClient? apiClient,
+    VoidCallback? onActivated,
   }) {
     return MaterialPageRoute<void>(
       builder: (_) => DoctorWorkingHoursScreen(
@@ -42,12 +45,14 @@ class DoctorWorkingHoursScreen extends StatefulWidget {
         clinicId: clinicId,
         service: service,
         apiClient: apiClient,
+        onActivated: onActivated,
       ),
     );
   }
 
   @override
-  State<DoctorWorkingHoursScreen> createState() => _DoctorWorkingHoursScreenState();
+  State<DoctorWorkingHoursScreen> createState() =>
+      _DoctorWorkingHoursScreenState();
 }
 
 class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
@@ -75,11 +80,28 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
 
   bool get _isLocked => _scheduleData?.isActivated == true;
 
+  String? get _resolvedDoctorId {
+    final docId = widget.user.doctorId;
+    if (docId != null && docId.trim().isNotEmpty) {
+      return docId.trim();
+    }
+    return null;
+  }
+
   Future<void> _loadSchedule() async {
     if (_clinicId.isEmpty) {
       setState(() {
         _isLoading = false;
         _errorMessage = 'معرف العيادة غير متوفر. يرجى اختيار عيادة أولاً.';
+      });
+      return;
+    }
+
+    final doctorId = _resolvedDoctorId;
+    if (doctorId == null) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = 'معرف الطبيب غير متوفر في ملف الحساب. يرجى تسجيل الدخول بحساب طبيب معتمد.';
       });
       return;
     }
@@ -90,7 +112,7 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
     });
 
     final result = await _service.getSchedule(
-      doctorId: widget.user.id,
+      doctorId: doctorId,
       clinicId: _clinicId,
     );
 
@@ -188,15 +210,23 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
   Future<void> _handleSaveDraft() async {
     if (_isLocked || _isSavingDraft) return;
 
+    final strings = LocalizedStrings.of(context);
+    final doctorId = _resolvedDoctorId;
+    if (doctorId == null) {
+      setState(() {
+        _errorMessage = strings.doctorProfileNotFound;
+      });
+      return;
+    }
+
     setState(() {
       _isSavingDraft = true;
       _errorMessage = null;
       _successMessage = null;
     });
 
-    final strings = LocalizedStrings.of(context);
     final result = await _service.saveDraft(
-      doctorId: widget.user.id,
+      doctorId: doctorId,
       days: _days,
       clinicId: _clinicId,
     );
@@ -239,13 +269,32 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
     if (_isLocked) return;
 
     final strings = LocalizedStrings.of(context);
+    final doctorId = _resolvedDoctorId;
+    if (doctorId == null) {
+      setState(() {
+        _errorMessage = strings.doctorProfileNotFound;
+      });
+      return;
+    }
 
     await ScheduleActivationDialog.show(
       context,
       days: _days,
       onConfirm: () async {
+        // 1. Persist the current 7-day editor state as draft before activation
+        final draftResult = await _service.saveDraft(
+          doctorId: doctorId,
+          days: _days,
+          clinicId: _clinicId,
+        );
+
+        if (draftResult case ApiFailure(:final exception)) {
+          throw Exception(exception.message);
+        }
+
+        // 2. Atomically activate and permanently lock the schedule
         final result = await _service.activateSchedule(
-          doctorId: widget.user.id,
+          doctorId: doctorId,
           clinicId: _clinicId,
         );
 
@@ -258,6 +307,7 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
               _successMessage = strings.scheduleActivatedSuccess;
               _errorMessage = null;
             });
+            widget.onActivated?.call();
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(strings.scheduleActivatedSuccess),
@@ -290,34 +340,12 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? AafiyaLoadingView(message: strings.loading)
           : _errorMessage != null && _scheduleData == null
-              ? Center(
-                  child: Padding(
-                    padding: AafiyaSpacing.insetScreen,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.error_outline_rounded,
-                          size: 48,
-                          color: AafiyaColors.error,
-                        ),
-                        const SizedBox(height: AafiyaSpacing.md),
-                        Text(
-                          _errorMessage!,
-                          style: AafiyaTypography.bodyMedium,
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: AafiyaSpacing.md),
-                        AafiyaButton(
-                          label: strings.retry,
-                          variant: AafiyaButtonVariant.outline,
-                          onPressed: _loadSchedule,
-                        ),
-                      ],
-                    ),
-                  ),
+              ? AafiyaErrorView(
+                  message: _errorMessage!,
+                  retryLabel: strings.retry,
+                  onRetry: _loadSchedule,
                 )
               : _buildScheduleBody(context, strings),
       bottomNavigationBar: (!_isLoading && !_isLocked)
@@ -341,16 +369,19 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
             decoration: BoxDecoration(
               color: AafiyaColors.error.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AafiyaRadius.md),
-              border: Border.all(color: AafiyaColors.error.withValues(alpha: 0.3)),
+              border:
+                  Border.all(color: AafiyaColors.error.withValues(alpha: 0.3)),
             ),
             child: Row(
               children: [
-                const Icon(Icons.error_outline, color: AafiyaColors.error, size: 20),
+                const Icon(Icons.error_outline,
+                    color: AafiyaColors.error, size: 20),
                 const SizedBox(width: AafiyaSpacing.sm),
                 Expanded(
                   child: Text(
                     _errorMessage!,
-                    style: AafiyaTypography.caption.copyWith(color: AafiyaColors.error),
+                    style: AafiyaTypography.caption
+                        .copyWith(color: AafiyaColors.error),
                   ),
                 ),
               ],
@@ -365,16 +396,19 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
             decoration: BoxDecoration(
               color: AafiyaColors.success.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AafiyaRadius.md),
-              border: Border.all(color: AafiyaColors.success.withValues(alpha: 0.3)),
+              border: Border.all(
+                  color: AafiyaColors.success.withValues(alpha: 0.3)),
             ),
             child: Row(
               children: [
-                const Icon(Icons.check_circle_outline, color: AafiyaColors.success, size: 20),
+                const Icon(Icons.check_circle_outline,
+                    color: AafiyaColors.success, size: 20),
                 const SizedBox(width: AafiyaSpacing.sm),
                 Expanded(
                   child: Text(
                     _successMessage!,
-                    style: AafiyaTypography.caption.copyWith(color: AafiyaColors.success),
+                    style: AafiyaTypography.caption
+                        .copyWith(color: AafiyaColors.success),
                   ),
                 ),
               ],
@@ -396,7 +430,8 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
         decoration: BoxDecoration(
           color: AafiyaColors.success.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(AafiyaRadius.lg),
-          border: Border.all(color: AafiyaColors.success.withValues(alpha: 0.3)),
+          border:
+              Border.all(color: AafiyaColors.success.withValues(alpha: 0.3)),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -505,7 +540,9 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AafiyaRadius.md),
         side: BorderSide(
-          color: isOpen ? AafiyaColors.primaryBlue.withValues(alpha: 0.3) : AafiyaColors.border,
+          color: isOpen
+              ? AafiyaColors.primaryBlue.withValues(alpha: 0.3)
+              : AafiyaColors.border,
         ),
       ),
       child: Padding(
@@ -522,12 +559,15 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
                         dayName,
                         style: AafiyaTypography.titleMedium.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: isOpen ? AafiyaColors.primaryText : AafiyaColors.secondaryText,
+                          color: isOpen
+                              ? AafiyaColors.primaryText
+                              : AafiyaColors.secondaryText,
                         ),
                       ),
                       const SizedBox(width: AafiyaSpacing.sm),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
                           color: isOpen
                               ? AafiyaColors.healthBlue.withValues(alpha: 0.1)
@@ -539,7 +579,9 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
                               ? '${dayItem.slots.length} ${strings.slots}'
                               : strings.closedDayLabel,
                           style: AafiyaTypography.caption.copyWith(
-                            color: isOpen ? AafiyaColors.healthBlue : AafiyaColors.secondaryText,
+                            color: isOpen
+                                ? AafiyaColors.healthBlue
+                                : AafiyaColors.secondaryText,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -550,7 +592,9 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
                 Switch.adaptive(
                   value: isOpen,
                   activeTrackColor: AafiyaColors.healthBlue,
-                  onChanged: _isLocked ? null : (_) => _handleToggleDay(dayItem.dayOfWeek),
+                  onChanged: _isLocked
+                      ? null
+                      : (_) => _handleToggleDay(dayItem.dayOfWeek),
                 ),
               ],
             ),
@@ -568,14 +612,20 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
                     onSelected: _isLocked
                         ? null
                         : (_) => _handleToggleSlot(dayItem.dayOfWeek, slot),
-                    selectedColor: AafiyaColors.primaryBlue.withValues(alpha: 0.15),
+                    selectedColor:
+                        AafiyaColors.primaryBlue.withValues(alpha: 0.15),
                     checkmarkColor: AafiyaColors.primaryBlue,
                     labelStyle: AafiyaTypography.caption.copyWith(
-                      color: isSelected ? AafiyaColors.primaryBlue : AafiyaColors.primaryText,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      color: isSelected
+                          ? AafiyaColors.primaryBlue
+                          : AafiyaColors.primaryText,
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.normal,
                     ),
                     side: BorderSide(
-                      color: isSelected ? AafiyaColors.primaryBlue : AafiyaColors.border,
+                      color: isSelected
+                          ? AafiyaColors.primaryBlue
+                          : AafiyaColors.border,
                     ),
                   );
                 }).toList(),
@@ -614,7 +664,9 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
                       )
                     : const Icon(Icons.save_outlined, size: 18),
                 label: Text(
-                  _isSavingDraft ? strings.savingScheduleDraft : strings.saveScheduleDraft,
+                  _isSavingDraft
+                      ? strings.savingScheduleDraft
+                      : strings.saveScheduleDraft,
                 ),
                 onPressed: _isSavingDraft ? null : _handleSaveDraft,
                 style: OutlinedButton.styleFrom(

@@ -2426,6 +2426,12 @@ class LocalizedStrings {
           ? 'Planning activé et verrouillé avec succès ! Les réservations sont désormais ouvertes.'
           : 'Schedule successfully activated and permanently locked! Patient bookings are now open.';
 
+  String get doctorProfileNotFound => isArabic
+      ? 'معرف الطبيب غير متوفر في ملف الحساب. يرجى تسجيل الدخول بحساب طبيب معتمد.'
+      : isFrench
+          ? 'Identifiant médecin introuvable dans le profil. Veuillez vous connecter avec un compte médecin valide.'
+          : 'Doctor identity not found in user profile. Please log in with a valid doctor account.';
+
   String get activationDialogTitle => isArabic
       ? 'المراجعة النهائية والتفعيل النهائي للجدول'
       : isFrench
@@ -2605,6 +2611,127 @@ class LocalizedStrings {
       : isFrench
           ? 'Cette section est réservée au directeur médical ou gestionnaire autorisé.'
           : 'This section is reserved for the Medical Director or authorized settings manager.';
+
+  // Clinic Operating Hours & Doctor Schedule Onboarding Flow
+  String get onboardingBadge => isArabic
+      ? 'الإعداد والتهيئة التشغيلية'
+      : isFrench
+          ? 'Configuration opérationnelle'
+          : 'Operational Onboarding';
+
+  String get onboardingDirectorTitle => isArabic
+      ? 'تهيئة المنشأة وتفعيل جدول العمل'
+      : isFrench
+          ? 'Configuration de l’établissement et activation du planning'
+          : 'Clinic Setup & Schedule Activation';
+
+  String get onboardingEmployedTitle => isArabic
+      ? 'تفعيل جدول عمل الطبيب'
+      : isFrench
+          ? 'Activation du planning du médecin'
+          : 'Doctor Schedule Activation';
+
+  String get onboardingDirectorStep1Title => isArabic
+      ? 'الخطوة 1: ساعات تشغيل العيادة العامة'
+      : isFrench
+          ? "Étape 1 : Horaires d'ouverture de l'établissement"
+          : 'Step 1: Clinic Operating Hours';
+
+  String get onboardingDirectorStep1Desc => isArabic
+      ? 'يجب حفظ ساعات تشغيل العيادة أولاً لتمكين حجز المواعيد وتفعيل جداول الأطباء.'
+      : isFrench
+          ? "Les horaires d'ouverture de l'établissement doivent être configurés avant d'activer les plannings des médecins."
+          : 'Clinic operating hours must be configured first to enable bookings and doctor schedules.';
+
+  String get onboardingDirectorStep2Title => isArabic
+      ? 'الخطوة 2: جدول عمل الطبيب الأسبوعي'
+      : isFrench
+          ? 'Étape 2 : Planning hebdomadaire du médecin'
+          : 'Step 2: Personal Doctor Working Hours';
+
+  String get onboardingDirectorStep2Desc => isArabic
+      ? 'تم ضبط ساعات العيادة بنجاح. يرجى الآن ضبط وتفعيل جدول ساعات عملك الشخصي للأيام السبعة.'
+      : isFrench
+          ? 'Les horaires de la clinique sont configurés. Veuillez maintenant configurer et activer votre planning personnel.'
+          : 'Clinic operating hours are configured. Please now configure and activate your personal weekly schedule.';
+
+  String get onboardingEmployedWaitingTitle => isArabic
+      ? 'بانتظار تهيئة ساعات العيادة العامة'
+      : isFrench
+          ? "En attente de la configuration de l'établissement"
+          : 'Awaiting Clinic Operating Hours Setup';
+
+  String get onboardingEmployedWaitingDesc => isArabic
+      ? 'ساعات تشغيل العيادة غير مهيأة بعد من قبل الإدارة الطبية. لا يمكن تفعيل جدول عملك حتى يقوم مدير العيادة بتهيئة ساعات التشغيل.'
+      : isFrench
+          ? "Les horaires de la clinique ne sont pas encore configurés par la direction médicale. Votre planning ne peut être activé qu'après cette étape."
+          : 'Clinic operating hours have not been configured by the medical director yet. Your schedule cannot be activated until clinic hours are set up.';
+
+  String get onboardingEmployedReadyTitle => isArabic
+      ? 'تهيئة وتفعيل جدول عملك'
+      : isFrench
+          ? 'Configuration et activation de votre planning'
+          : 'Configure and Activate Your Schedule';
+
+  String get onboardingEmployedReadyDesc => isArabic
+      ? 'ساعات تشغيل العيادة مهيأة وجاهزة. يرجى إعداد وتفعيل جدول مواعيدك الأسبوعي لبدء استقبال الحجوزات.'
+      : isFrench
+          ? 'Les horaires de la clinique sont configurés. Veuillez configurer et activer votre planning hebdomadaire.'
+          : 'Clinic operating hours are ready. Please configure and activate your weekly working hours to enable bookings.';
+
+  String get onboardingConfigureClinicAction => isArabic
+      ? 'تهيئة ساعات العيادة'
+      : isFrench
+          ? 'Configurer les horaires'
+          : 'Configure Clinic Hours';
+
+  String get onboardingConfigureDoctorAction => isArabic
+      ? 'إعداد وتفعيل الجدول'
+      : isFrench
+          ? 'Configurer le planning'
+          : 'Configure & Activate Schedule';
+
+  String get onboardingLaterAction => isArabic
+      ? 'لاحقاً'
+      : isFrench
+          ? 'Plus tard'
+          : 'Later';
+
+  String get onboardingUnderstoodAction => isArabic
+      ? 'حسناً، فهمت'
+      : isFrench
+          ? "J'ai compris"
+          : 'Understood';
+
+  String get onboardingCheckingStatus => isArabic
+      ? 'جاري التحقق من الجاهزية التشغيلية...'
+      : isFrench
+          ? "Vérification de l'état opérationnel..."
+          : 'Checking operational readiness...';
+
+  String get onboardingErrorCheckingStatus => isArabic
+      ? 'تعذر التحقق من حالة ساعات العمل. انقر لإعادة المحاولة.'
+      : isFrench
+          ? 'Impossible de vérifier les horaires. Cliquez pour réessayer.'
+          : 'Failed to check schedule status. Tap to retry.';
+
+  String get onboardingDirectorReminderBanner => isArabic
+      ? 'تنبيه إداري: ساعات تشغيل العيادة غير مهيأة بعد. يجب إعدادها لتفعيل جداول الأطباء واستقبال الحجوزات.'
+      : isFrench
+          ? "Avertissement : Les horaires d'ouverture de l'établissement ne sont pas configurés. Veuillez les définir pour activer les plannings."
+          : 'Administrative Notice: Clinic operating hours are not configured. Set them up to enable doctor schedules and bookings.';
+
+  String get onboardingEmployedWaitingBanner => isArabic
+      ? 'تنبيه: بانتظار قيام إدارة العيادة بتهيئة ساعات التشغيل العامة قبل أن تتمكن من تفعيل جدولك.'
+      : isFrench
+          ? "Notice : En attente de la configuration des horaires de l'établissement par la direction avant de pouvoir activer votre planning."
+          : 'Notice: Waiting for clinic management to set up operating hours before you can activate your schedule.';
+
+  String get onboardingDoctorActivationBanner => isArabic
+      ? 'إجراء مطلوب: جدول ساعات عملك الشخصي غير مفعّل بعد. يرجى تفعيله لبدء حجز المواعيد.'
+      : isFrench
+          ? 'Action requise : Votre planning personnel n’est pas encore activé. Veuillez l’activer pour permettre les réservations.'
+          : 'Action Required: Your personal working hours schedule is not activated. Please activate it to enable patient bookings.';
 }
 
 

@@ -5,6 +5,11 @@ import 'package:aafiya_ui/aafiya_ui.dart';
 import 'clinic_context_selector.dart';
 import 'doctor_agenda_tile.dart';
 import 'doctor_metric_card.dart';
+import 'doctor_onboarding_dialog.dart';
+import 'doctor_onboarding_session.dart';
+import 'doctor_setup_reminder_banner.dart';
+import '../screens/clinic_operating_hours_screen.dart';
+import '../screens/doctor_working_hours_screen.dart';
 import '../screens/patient_summary_sheet.dart';
 
 /// Complete Doctor Operational Dashboard View for the current day.
@@ -22,12 +27,16 @@ class DoctorDashboardView extends StatefulWidget {
     required this.sessionManager,
     required this.user,
     this.dashboardService,
+    this.clinicOperatingHoursService,
+    this.doctorWorkingHoursService,
     this.apiClient,
   });
 
   final AuthSessionManager sessionManager;
   final User user;
   final DoctorDashboardService? dashboardService;
+  final ClinicOperatingHoursService? clinicOperatingHoursService;
+  final DoctorWorkingHoursService? doctorWorkingHoursService;
   final ApiClient? apiClient;
 
   @override
@@ -36,6 +45,8 @@ class DoctorDashboardView extends StatefulWidget {
 
 class _DoctorDashboardViewState extends State<DoctorDashboardView> {
   late final DoctorDashboardService _service;
+  late final ClinicOperatingHoursService _clinicHoursService;
+  late final DoctorWorkingHoursService _doctorWorkingHoursService;
   final ScrollController _scrollController = ScrollController();
 
   DoctorStats? _stats;
@@ -43,6 +54,12 @@ class _DoctorDashboardViewState extends State<DoctorDashboardView> {
   bool _isLoading = true;
   bool _isLoadingMore = false;
   String? _errorMessage;
+
+  // Role-aware working hours onboarding state
+  bool? _isClinicConfigured;
+  bool? _isScheduleActivated;
+  bool _isOnboardingLoading = false;
+  String? _onboardingError;
 
   int _currentPage = 1;
   int _lastPage = 1;
@@ -58,10 +75,19 @@ class _DoctorDashboardViewState extends State<DoctorDashboardView> {
         DoctorDashboardService(
           apiClient: widget.apiClient ?? widget.sessionManager.apiClient,
         );
+    _clinicHoursService = widget.clinicOperatingHoursService ??
+        ClinicOperatingHoursService(
+          apiClient: widget.apiClient ?? widget.sessionManager.apiClient,
+        );
+    _doctorWorkingHoursService = widget.doctorWorkingHoursService ??
+        DoctorWorkingHoursService(
+          apiClient: widget.apiClient ?? widget.sessionManager.apiClient,
+        );
 
     widget.sessionManager.addListener(_onClinicContextChanged);
     _scrollController.addListener(_onScroll);
     _loadDashboardData();
+    _checkOnboardingStatus();
   }
 
   @override
@@ -75,6 +101,7 @@ class _DoctorDashboardViewState extends State<DoctorDashboardView> {
     final currentClinicId = widget.sessionManager.activeClinicId;
     if (currentClinicId != _lastLoadedClinicId) {
       _loadDashboardData();
+      _checkOnboardingStatus();
     }
   }
 
@@ -188,6 +215,146 @@ class _DoctorDashboardViewState extends State<DoctorDashboardView> {
     _loadDashboardData();
   }
 
+  Future<void> _checkOnboardingStatus({bool showModalIfEligible = true}) async {
+    final activeClinic = widget.sessionManager.activeClinic;
+    final clinicId = activeClinic?.id;
+    final doctorId = widget.user.doctorId;
+
+    if (clinicId == null || clinicId.isEmpty || doctorId == null || doctorId.isEmpty) {
+      if (mounted) {
+        setState(() {
+          _isClinicConfigured = null;
+          _isScheduleActivated = null;
+          _isOnboardingLoading = false;
+          _onboardingError = null;
+        });
+      }
+      return;
+    }
+
+    if (mounted) {
+      setState(() {
+        _isOnboardingLoading = true;
+        _onboardingError = null;
+      });
+    }
+
+    final clinicHoursFuture =
+        _clinicHoursService.getOperatingHours(clinicId: clinicId);
+    final docScheduleFuture =
+        _doctorWorkingHoursService.getSchedule(doctorId: doctorId, clinicId: clinicId);
+
+    final results = await Future.wait([clinicHoursFuture, docScheduleFuture]);
+
+    if (!mounted) return;
+
+    // Stale clinic guard
+    if (widget.sessionManager.activeClinicId != clinicId) return;
+
+    final clinicRes = results[0] as ApiResult<ClinicOperatingHoursData>;
+    final docRes = results[1] as ApiResult<DoctorWorkingHoursData>;
+
+    bool? clinicConfigured;
+    bool? scheduleActivated;
+    String? error;
+
+    switch (clinicRes) {
+      case ApiSuccess(:final data):
+        clinicConfigured = data.isConfigured;
+      case ApiFailure(:final exception):
+        error = exception.message;
+    }
+
+    switch (docRes) {
+      case ApiSuccess(:final data):
+        scheduleActivated = data.isActivated;
+      case ApiFailure(:final exception):
+        error ??= exception.message;
+    }
+
+    setState(() {
+      _isOnboardingLoading = false;
+      _onboardingError = error;
+      _isClinicConfigured = clinicConfigured;
+      _isScheduleActivated = scheduleActivated;
+    });
+
+    // If an error occurred during loading, never assume complete or incomplete!
+    if (error != null) {
+      return;
+    }
+
+    final isDirector = activeClinic?.isMedicalDirector == true;
+    final isComplete =
+        (clinicConfigured == true) && (scheduleActivated == true);
+
+    if (!isComplete && showModalIfEligible) {
+      final isDeferred = DoctorOnboardingSession.instance.isDeferred(
+        clinicId: clinicId,
+        doctorId: doctorId,
+      );
+
+      if (!isDeferred && mounted) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          if (widget.sessionManager.activeClinicId != clinicId) return;
+          DoctorOnboardingDialog.show(
+            context,
+            isDirector: isDirector,
+            clinicName: activeClinic?.name ?? '',
+            isClinicConfigured: clinicConfigured ?? false,
+            isScheduleActivated: scheduleActivated ?? false,
+            onConfigureClinic: _navigateToClinicOperatingHours,
+            onConfigureDoctorSchedule: _navigateToDoctorWorkingHours,
+            onLater: () {
+              DoctorOnboardingSession.instance.defer(
+                clinicId: clinicId,
+                doctorId: doctorId,
+              );
+            },
+          );
+        });
+      }
+    }
+  }
+
+  Future<void> _navigateToClinicOperatingHours() async {
+    final activeClinicId = widget.sessionManager.activeClinicId;
+    await Navigator.of(context).push(
+      ClinicOperatingHoursScreen.route(
+        sessionManager: widget.sessionManager,
+        clinicId: activeClinicId,
+        service: _clinicHoursService,
+        apiClient: widget.apiClient,
+        onSaved: () {
+          _checkOnboardingStatus(showModalIfEligible: true);
+        },
+      ),
+    );
+    if (mounted) {
+      _checkOnboardingStatus(showModalIfEligible: false);
+    }
+  }
+
+  Future<void> _navigateToDoctorWorkingHours() async {
+    final activeClinicId = widget.sessionManager.activeClinicId;
+    await Navigator.of(context).push(
+      DoctorWorkingHoursScreen.route(
+        sessionManager: widget.sessionManager,
+        user: widget.user,
+        clinicId: activeClinicId,
+        service: _doctorWorkingHoursService,
+        apiClient: widget.apiClient,
+        onActivated: () {
+          _checkOnboardingStatus(showModalIfEligible: false);
+        },
+      ),
+    );
+    if (mounted) {
+      _checkOnboardingStatus(showModalIfEligible: false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final strings = LocalizedStrings.of(context);
@@ -223,7 +390,12 @@ class _DoctorDashboardViewState extends State<DoctorDashboardView> {
     }
 
     return RefreshIndicator(
-      onRefresh: _loadDashboardData,
+      onRefresh: () async {
+        await Future.wait([
+          _loadDashboardData(),
+          _checkOnboardingStatus(showModalIfEligible: false),
+        ]);
+      },
       child: CustomScrollView(
         controller: _scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
@@ -238,7 +410,21 @@ class _DoctorDashboardViewState extends State<DoctorDashboardView> {
                   ClinicContextSelector(sessionManager: widget.sessionManager),
                   const SizedBox(height: AafiyaSpacing.md),
 
-                  // 2. Operational KPI Statistics Cards
+                  // 2. Persistent Onboarding Reminder Banner
+                  DoctorSetupReminderBanner(
+                    isDirector:
+                        widget.sessionManager.activeClinic?.isMedicalDirector == true,
+                    isClinicConfigured: _isClinicConfigured,
+                    isScheduleActivated: _isScheduleActivated,
+                    isLoading: _isOnboardingLoading,
+                    errorMessage: _onboardingError,
+                    onConfigureClinic: _navigateToClinicOperatingHours,
+                    onConfigureDoctorSchedule: _navigateToDoctorWorkingHours,
+                    onRefresh: () =>
+                        _checkOnboardingStatus(showModalIfEligible: false),
+                  ),
+
+                  // 3. Operational KPI Statistics Cards
                   if (_stats != null) ...[
                     _buildKpiCards(context, strings, _stats!),
                     const SizedBox(height: AafiyaSpacing.lg),

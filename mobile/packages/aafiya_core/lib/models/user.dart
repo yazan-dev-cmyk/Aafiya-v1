@@ -13,6 +13,7 @@ class User {
     this.permissions = const [],
     this.clinic,
     this.clinics = const [],
+    this.doctorId,
   });
 
   final dynamic id;
@@ -24,6 +25,7 @@ class User {
   final List<String> permissions;
   final DoctorClinic? clinic;
   final List<DoctorClinic> clinics;
+  final String? doctorId;
 
   /// Primary role deduced from the user's role list.
   UserRole get primaryRole => roles.firstOrNull ?? UserRole.unknown;
@@ -74,6 +76,16 @@ class User {
       }
     }
 
+    final rawDoctor = json['doctor'];
+    String? parsedDoctorId;
+    if (rawDoctor is Map<String, dynamic>) {
+      parsedDoctorId = rawDoctor['id']?.toString();
+    } else if (rawDoctor is Map) {
+      parsedDoctorId = rawDoctor['id']?.toString();
+    } else if (json['doctor_id'] != null) {
+      parsedDoctorId = json['doctor_id']?.toString();
+    }
+
     return User(
       id: json['id'] ?? '',
       name: (json['name'] as String?) ?? '',
@@ -84,6 +96,7 @@ class User {
       permissions: parsedPermissions,
       clinic: parsedClinic,
       clinics: parsedClinics,
+      doctorId: parsedDoctorId,
     );
   }
 }

@@ -16,6 +16,7 @@ import { EhrSummaryTab } from './tabs/EhrSummaryTab';
 import { ClinicalAnalyticsTab } from './tabs/ClinicalAnalyticsTab';
 import { CategorizedNotificationsTab } from './tabs/CategorizedNotificationsTab';
 import { DoctorSettingsTab } from './tabs/DoctorSettingsTab';
+import { DoctorWorkingHoursEditor } from './tabs/DoctorWorkingHoursEditor';
 import { DoctorStaffTab } from './tabs/DoctorStaffTab';
 import { ClinicDirectorStatsTab } from './tabs/ClinicDirectorStatsTab';
 import { DoctorActivityLogTab } from './tabs/DoctorActivityLogTab';
@@ -31,6 +32,9 @@ import { DoctorClinicSelectorView } from './DoctorClinicSelectorView';
 import { DoctorNoClinicView } from './DoctorNoClinicView';
 import { DoctorInvitationsModal } from './invitations/DoctorInvitationsModal';
 import { clinicService } from '@/services/clinicService';
+import { workingHoursService } from '@/services/workingHoursService';
+import { DoctorOnboardingModal } from './onboarding/DoctorOnboardingModal';
+import { DoctorSetupReminderBanner } from './onboarding/DoctorSetupReminderBanner';
 
 // Icons
 import {
@@ -102,6 +106,72 @@ export const DoctorDashboard: React.FC<DoctorDashboardProps> = ({
   // Multi-clinic active affiliations evaluation
   const affiliatedClinics = user?.clinics || (user?.clinic ? [user.clinic] : []);
   const activeClinics = affiliatedClinics.filter((c) => c.is_active !== false);
+
+  // Clinic Operating Hours & Schedule Onboarding Gates
+  const [isClinicConfigured, setIsClinicConfigured] = useState<boolean | null>(null);
+  const [isScheduleActivated, setIsScheduleActivated] = useState<boolean | null>(null);
+  const [isOnboardingLoading, setIsOnboardingLoading] = useState<boolean>(false);
+  const [onboardingLoadError, setOnboardingLoadError] = useState<string | null>(null);
+  const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(false);
+  const [onboardingModalStep, setOnboardingModalStep] = useState<1 | 2>(1);
+
+  const effectiveClinicId = user?.clinic?.id;
+  const effectiveDoctorId = user?.doctor?.id;
+
+  const checkOnboardingStatus = React.useCallback(async (clinicId: string, doctorId: string) => {
+    setIsOnboardingLoading(true);
+    setOnboardingLoadError(null);
+    try {
+      const [clinicRes, docRes] = await Promise.all([
+        workingHoursService.getClinicOperatingHours(clinicId),
+        workingHoursService.getDoctorWorkingHours(doctorId, clinicId),
+      ]);
+
+      const clinicConfigured = Boolean(clinicRes.data?.is_configured);
+      const scheduleActivated = Boolean(docRes.data?.is_activated);
+
+      setIsClinicConfigured(clinicConfigured);
+      setIsScheduleActivated(scheduleActivated);
+
+      if (!clinicConfigured || !scheduleActivated) {
+        const storageKey = `aafiya_onboarding_deferred_${clinicId}_${doctorId}`;
+        const isDeferred = typeof window !== 'undefined' && sessionStorage.getItem(storageKey) === 'true';
+        if (!isDeferred) {
+          const isDirector = user?.clinic?.position === 'director' || user?.clinic?.is_director === true;
+          setOnboardingModalStep(!clinicConfigured && isDirector ? 1 : 2);
+          setShowOnboardingModal(true);
+        }
+      } else {
+        setShowOnboardingModal(false);
+      }
+    } catch (err: any) {
+      console.error('Failed to load clinic operating hours onboarding state:', err);
+      setOnboardingLoadError(err?.message || 'Failed to verify clinic configuration');
+      // Explicitly do NOT assume complete on failure!
+      setIsClinicConfigured(false);
+      setIsScheduleActivated(false);
+    } finally {
+      setIsOnboardingLoading(false);
+    }
+  }, [user?.clinic?.position, user?.clinic?.is_director]);
+
+  const handleDeferOnboarding = () => {
+    if (effectiveClinicId && effectiveDoctorId && typeof window !== 'undefined') {
+      const storageKey = `aafiya_onboarding_deferred_${effectiveClinicId}_${effectiveDoctorId}`;
+      sessionStorage.setItem(storageKey, 'true');
+    }
+    setShowOnboardingModal(false);
+  };
+
+  React.useEffect(() => {
+    if (effectiveClinicId && effectiveDoctorId && user?.doctor?.is_verified !== false) {
+      checkOnboardingStatus(effectiveClinicId, effectiveDoctorId);
+    } else {
+      setIsClinicConfigured(null);
+      setIsScheduleActivated(null);
+      setShowOnboardingModal(false);
+    }
+  }, [effectiveClinicId, effectiveDoctorId, user?.doctor?.is_verified, checkOnboardingStatus]);
 
   const fetchPendingInvitationsCount = async () => {
     try {
@@ -205,7 +275,9 @@ export const DoctorDashboard: React.FC<DoctorDashboardProps> = ({
     { id: 'analytics', label: t('tabs.analytics'), icon: BarChart3 },
     { id: 'notifications', label: t('tabs.notifications'), icon: Bell, badge: t('badges.urgent') },
     ...(hasStaffPermission ? [{ id: 'staff', label: t('tabs.staff'), icon: UserPlus }] : []),
-    ...(hasSettingsPermission ? [{ id: 'settings', label: t('tabs.settings'), icon: Settings, badge: t('badges.schedule') }] : []),
+    ...(hasSettingsPermission
+      ? [{ id: 'settings', label: t('tabs.settings'), icon: Settings, badge: t('badges.schedule') }]
+      : (user?.doctor?.id ? [{ id: 'working-hours', label: t('tabs.workingHours'), icon: Clock, badge: t('badges.schedule') }] : [])),
     ...(hasClinicStatsPermission ? [{ id: 'clinic-stats', label: t('tabs.clinicStats'), icon: TrendingUp }] : []),
     { id: 'activity-log', label: t('tabs.activityLog'), icon: ShieldCheck }
   ];
@@ -301,6 +373,27 @@ export const DoctorDashboard: React.FC<DoctorDashboardProps> = ({
         />
       }
     >
+      {/* Clinic Operating Hours & Schedule Setup Reminder Banner */}
+      {effectiveClinicId && effectiveDoctorId && isClinicConfigured !== null && isScheduleActivated !== null && (
+        <div className="mb-6">
+          <DoctorSetupReminderBanner
+            isDirector={isDoctorDirector}
+            isClinicConfigured={isClinicConfigured}
+            isScheduleActivated={isScheduleActivated}
+            onOpenSetup={(targetStep) => {
+              if (targetStep) setOnboardingModalStep(targetStep);
+              setShowOnboardingModal(true);
+            }}
+            onRefresh={() => {
+              if (effectiveClinicId && effectiveDoctorId) {
+                checkOnboardingStatus(effectiveClinicId, effectiveDoctorId);
+              }
+            }}
+            isDarkMode={isDarkMode}
+          />
+        </div>
+      )}
+
       {activeTab === 'dashboard' && (
         <DoctorOverviewTab
           onNavigateTab={handleTabChange}
@@ -390,10 +483,64 @@ export const DoctorDashboard: React.FC<DoctorDashboardProps> = ({
         )
       )}
 
-      {/* Settings & Working Hours Tab with Direct URL Guard */}
-      {(activeTab === 'settings' || activeTab === 'working-hours') && (
+      {/* Personal Working Hours Tab (Accessible to any affiliated doctor for their own schedule) */}
+      {activeTab === 'working-hours' && (
         hasSettingsPermission ? (
-          <DoctorSettingsTab isDarkMode={isDarkMode} defaultSubTab={activeTab === 'working-hours' ? 'working-hours' : undefined} />
+          <DoctorSettingsTab
+            isDarkMode={isDarkMode}
+            defaultSubTab="working-hours"
+            onClinicHoursUpdated={() => {
+              if (effectiveClinicId && effectiveDoctorId) {
+                checkOnboardingStatus(effectiveClinicId, effectiveDoctorId);
+              }
+            }}
+          />
+        ) : user?.doctor?.id && user?.clinic?.id ? (
+          <div className="space-y-6">
+            <DoctorWorkingHoursEditor
+              doctorId={user.doctor.id}
+              clinicId={user.clinic.id}
+              canManage={true}
+              isDarkMode={isDarkMode}
+              onActivated={() => {
+                if (effectiveClinicId && effectiveDoctorId) {
+                  checkOnboardingStatus(effectiveClinicId, effectiveDoctorId);
+                }
+              }}
+            />
+          </div>
+        ) : (
+          <div className={`${isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200/80 text-slate-900 shadow-xs'} rounded-2xl p-8 border text-center space-y-4 max-w-lg mx-auto my-12`}>
+            <div className="w-16 h-16 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center mx-auto">
+              <ShieldAlert className="w-8 h-8" />
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-lg font-bold">{t('unauthorized.title')}</h3>
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                {t('unauthorized.settingsMessage')}
+              </p>
+            </div>
+            <button
+              onClick={() => handleTabChange('dashboard')}
+              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer"
+            >
+              {t('unauthorized.backToDashboard')}
+            </button>
+          </div>
+        )
+      )}
+
+      {/* Settings Tab with Direct URL Guard (Clinic Director or clinic.manage_settings only) */}
+      {activeTab === 'settings' && (
+        hasSettingsPermission ? (
+          <DoctorSettingsTab
+            isDarkMode={isDarkMode}
+            onClinicHoursUpdated={() => {
+              if (effectiveClinicId && effectiveDoctorId) {
+                checkOnboardingStatus(effectiveClinicId, effectiveDoctorId);
+              }
+            }}
+          />
         ) : (
           <div className={`${isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200/80 text-slate-900 shadow-xs'} rounded-2xl p-8 border text-center space-y-4 max-w-lg mx-auto my-12`}>
             <div className="w-16 h-16 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center mx-auto">
@@ -454,6 +601,30 @@ export const DoctorDashboard: React.FC<DoctorDashboardProps> = ({
         }}
         isDarkMode={isDarkMode}
       />
+
+      {/* Role-Aware Working Hours Onboarding Modal */}
+      {effectiveClinicId && effectiveDoctorId && (
+        <DoctorOnboardingModal
+          isOpen={showOnboardingModal}
+          onClose={() => setShowOnboardingModal(false)}
+          onLater={handleDeferOnboarding}
+          isDirector={Boolean(user?.clinic?.position === 'director' || user?.clinic?.is_director === true)}
+          clinicId={effectiveClinicId}
+          doctorId={effectiveDoctorId}
+          clinicName={user?.clinic?.name}
+          isClinicConfigured={isClinicConfigured}
+          isScheduleActivated={isScheduleActivated}
+          initialStep={onboardingModalStep}
+          onClinicConfigured={() => {
+            checkOnboardingStatus(effectiveClinicId, effectiveDoctorId);
+          }}
+          onScheduleActivated={() => {
+            checkOnboardingStatus(effectiveClinicId, effectiveDoctorId);
+            setShowOnboardingModal(false);
+          }}
+          isDarkMode={isDarkMode}
+        />
+      )}
     </DashboardLayout>
   );
 };

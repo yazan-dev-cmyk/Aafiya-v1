@@ -1057,6 +1057,7 @@
       "analytics": "Clinical Analytics",
       "notifications": "Notification Center",
       "settings": "Settings & Schedule",
+      "workingHours": "Personal Working Hours",
       "activityLog": "Audit Log",
       "staff": "Clinic Staff & Assistants",
       "clinicStats": "Clinic Doctor Statistics"

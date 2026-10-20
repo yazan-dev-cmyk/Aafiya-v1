@@ -23,7 +23,8 @@ void main() {
   );
 
   const testDoctor = User(
-    id: 'doc-user-01',
+    id: 'user-uuid-001',
+    doctorId: 'doctor-canonical-uuid-999',
     name: 'د. يوسف التميمي',
     email: 'doctor@aafiya.test',
     phone: '+213555001122',
@@ -50,12 +51,15 @@ void main() {
     );
   }
 
-  Map<String, dynamic> createSampleScheduleJson({bool isActivated = false}) {
+  Map<String, dynamic> createSampleScheduleJson({
+    bool isActivated = false,
+    String doctorId = 'doctor-canonical-uuid-999',
+  }) {
     return {
       'status': 'success',
       'data': {
         'clinic_id': 'clinic-hours-01',
-        'doctor_id': 'doc-user-01',
+        'doctor_id': doctorId,
         'is_activated': isActivated,
         'activated_at': isActivated ? '2026-10-17T10:00:00Z' : null,
         'schedule_version': 1,
@@ -113,7 +117,7 @@ void main() {
       final model = DoctorWorkingHoursData.fromJson(sample['data'] as Map<String, dynamic>);
 
       expect(model.clinicId, 'clinic-hours-01');
-      expect(model.doctorId, 'doc-user-01');
+      expect(model.doctorId, 'doctor-canonical-uuid-999');
       expect(model.isActivated, isTrue);
       expect(model.activatedAt, isNotNull);
       expect(model.days.length, 7);
@@ -130,7 +134,8 @@ void main() {
     test('getSchedule sends X-Clinic-ID header and returns DoctorWorkingHoursData', () async {
       final mockClient = MockClient((request) async {
         expect(request.method, 'GET');
-        expect(request.url.path, contains('/doctors/doc-user-01/working-hours'));
+        expect(request.url.path, contains('/doctors/doctor-canonical-uuid-999/working-hours'));
+        expect(request.url.path, isNot(contains('user-uuid-001')));
         expect(request.headers['X-Clinic-ID'], 'clinic-hours-01');
 
         return http.Response(
@@ -144,7 +149,7 @@ void main() {
       final service = DoctorWorkingHoursService(apiClient: apiClient);
 
       final result = await service.getSchedule(
-        doctorId: 'doc-user-01',
+        doctorId: 'doctor-canonical-uuid-999',
         clinicId: 'clinic-hours-01',
       );
 
@@ -157,7 +162,8 @@ void main() {
     test('saveDraft sends PUT request with 7 days and handles success', () async {
       final mockClient = MockClient((request) async {
         expect(request.method, 'PUT');
-        expect(request.url.path, contains('/doctors/doc-user-01/working-hours'));
+        expect(request.url.path, contains('/doctors/doctor-canonical-uuid-999/working-hours'));
+        expect(request.url.path, isNot(contains('user-uuid-001')));
         expect(request.headers['X-Clinic-ID'], 'clinic-hours-01');
 
         final body = jsonDecode(request.body) as Map<String, dynamic>;
@@ -174,7 +180,7 @@ void main() {
       final service = DoctorWorkingHoursService(apiClient: apiClient);
 
       final result = await service.saveDraft(
-        doctorId: 'doc-user-01',
+        doctorId: 'doctor-canonical-uuid-999',
         days: DoctorWorkingHoursData.defaultDays(),
         clinicId: 'clinic-hours-01',
       );
@@ -198,7 +204,7 @@ void main() {
       final service = DoctorWorkingHoursService(apiClient: apiClient);
 
       final result = await service.saveDraft(
-        doctorId: 'doc-user-01',
+        doctorId: 'doctor-canonical-uuid-999',
         days: DoctorWorkingHoursData.defaultDays(),
         clinicId: 'clinic-hours-01',
       );
@@ -211,7 +217,8 @@ void main() {
     test('activateSchedule sends POST to activate endpoint and receives locked schedule', () async {
       final mockClient = MockClient((request) async {
         expect(request.method, 'POST');
-        expect(request.url.path, contains('/doctors/doc-user-01/working-hours/activate'));
+        expect(request.url.path, contains('/doctors/doctor-canonical-uuid-999/working-hours/activate'));
+        expect(request.url.path, isNot(contains('user-uuid-001')));
         expect(request.headers['X-Clinic-ID'], 'clinic-hours-01');
 
         return http.Response(
@@ -225,7 +232,7 @@ void main() {
       final service = DoctorWorkingHoursService(apiClient: apiClient);
 
       final result = await service.activateSchedule(
-        doctorId: 'doc-user-01',
+        doctorId: 'doctor-canonical-uuid-999',
         clinicId: 'clinic-hours-01',
       );
 
@@ -425,6 +432,48 @@ void main() {
       for (final s in switches) {
         expect(s.onChanged, isNull);
       }
+    });
+
+    testWidgets('Shows error and blocks API requests when User has no doctorId', (tester) async {
+      int requestCount = 0;
+      final mockClient = MockClient((request) async {
+        requestCount++;
+        return http.Response('{}', 500);
+      });
+
+      const userWithoutDoctor = User(
+        id: 'user-no-doc-01',
+        name: 'مستخدم بلا طبيب',
+        email: 'nodoc@aafiya.test',
+        roles: [UserRole.doctor],
+        clinics: [testClinic],
+        // doctorId is absent / null
+      );
+
+      final apiClient = ApiClient(httpClient: mockClient);
+      final sessionManager = AuthSessionManager(
+        apiClient: apiClient,
+        tokenStorage: InMemoryTokenStorage(),
+      );
+      sessionManager.setAuthorizedClinics([testClinic]);
+      sessionManager.switchActiveClinic('clinic-hours-01');
+
+      await tester.pumpWidget(
+        createTestWidget(
+          child: DoctorWorkingHoursScreen(
+            sessionManager: sessionManager,
+            user: userWithoutDoctor,
+            clinicId: 'clinic-hours-01',
+            apiClient: apiClient,
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(requestCount, 0); // Strictly 0 network requests
+      expect(find.byType(AafiyaErrorView), findsOneWidget);
+      expect(find.textContaining('معرف الطبيب غير متوفر في ملف الحساب'), findsOneWidget);
     });
   });
 }

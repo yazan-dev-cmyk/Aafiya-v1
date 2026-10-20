@@ -28,6 +28,7 @@ interface DoctorWorkingHoursEditorProps {
   clinicId: string;
   canManage: boolean;
   isDarkMode?: boolean;
+  onActivated?: () => void;
 }
 
 const DEFAULT_DOCTOR_DAYS: DoctorDayScheduleItem[] = WEEKDAYS_ORDER.map((d) => ({
@@ -44,6 +45,7 @@ export const DoctorWorkingHoursEditor: React.FC<DoctorWorkingHoursEditorProps> =
   clinicId,
   canManage,
   isDarkMode = false,
+  onActivated,
 }) => {
   const t = useTranslations('doctor.settings');
   const locale = useLocale();
@@ -55,6 +57,7 @@ export const DoctorWorkingHoursEditor: React.FC<DoctorWorkingHoursEditorProps> =
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSavingDraft, setIsSavingDraft] = useState<boolean>(false);
+  const [isActivating, setIsActivating] = useState<boolean>(false);
   const [isActivationModalOpen, setIsActivationModalOpen] = useState<boolean>(false);
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -181,7 +184,7 @@ export const DoctorWorkingHoursEditor: React.FC<DoctorWorkingHoursEditorProps> =
   };
 
   const handleSaveDraft = async () => {
-    if (isLocked || !canManage) return;
+    if (isLocked || !canManage || isSavingDraft || isActivating) return;
     setIsSavingDraft(true);
     setErrorMessage(null);
     setSuccessMessage(null);
@@ -213,17 +216,44 @@ export const DoctorWorkingHoursEditor: React.FC<DoctorWorkingHoursEditorProps> =
   };
 
   const handleConfirmActivation = async () => {
+    if (isLocked || !canManage || isActivating || isSavingDraft) return;
+    setIsActivating(true);
     setErrorMessage(null);
     setSuccessMessage(null);
 
-    const res = await workingHoursService.activateDoctorSchedule(doctorId, clinicId);
-    if (res.data) {
-      setScheduleData(res.data);
-      setSuccessMessage(
-        isRtl
-          ? 'تم تفعيل ساعات العمل وقفل الجدول نهائياً بنجاح! يمكن الآن للمرضى حجز المواعيد وفق هذا الجدول.'
-          : 'Schedule successfully activated and permanently locked! Bookings are now enabled.'
-      );
+    try {
+      // 1. Persist the current 7-day editor state to ensure doctor_day_schedules exist in DB
+      const draftRes = await workingHoursService.saveDoctorScheduleDraft(doctorId, days, clinicId);
+      if (draftRes.data) {
+        setScheduleData(draftRes.data);
+      }
+
+      // 2. Atomically activate and permanently lock the schedule
+      const res = await workingHoursService.activateDoctorSchedule(doctorId, clinicId);
+      if (res.data) {
+        setScheduleData(res.data);
+        setSuccessMessage(
+          isRtl
+            ? 'تم تفعيل ساعات العمل وقفل الجدول نهائياً بنجاح! يمكن الآن للمرضى حجز المواعيد وفق هذا الجدول.'
+            : 'Schedule successfully activated and permanently locked! Bookings are now enabled.'
+        );
+        onActivated?.();
+      }
+    } catch (err: any) {
+      const errorMsg =
+        err?.errors?.clinic_hours?.[0] ||
+        err?.errors?.schedule_conflict?.[0] ||
+        err?.errors?.containment?.[0] ||
+        err?.errors?.days?.[0] ||
+        err?.errors?.slots?.[0] ||
+        err?.message ||
+        (isRtl
+          ? 'فشل تفعيل ساعات العمل الأسبوعية. يرجى مراجعة قيود العيادة.'
+          : 'Schedule activation failed.');
+      setErrorMessage(errorMsg);
+      throw err;
+    } finally {
+      setIsActivating(false);
     }
   };
 
@@ -290,7 +320,7 @@ export const DoctorWorkingHoursEditor: React.FC<DoctorWorkingHoursEditorProps> =
                 <button
                   type="button"
                   onClick={handleSaveDraft}
-                  disabled={isSavingDraft}
+                  disabled={isSavingDraft || isActivating}
                   className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 disabled:opacity-50 text-slate-700 dark:text-slate-300 font-bold text-xs rounded-xl transition-all flex items-center gap-2 cursor-pointer"
                 >
                   {isSavingDraft ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
@@ -299,7 +329,7 @@ export const DoctorWorkingHoursEditor: React.FC<DoctorWorkingHoursEditorProps> =
 
                 <button
                   type="button"
-                  disabled={!isClinicConfigured || isSavingDraft}
+                  disabled={!isClinicConfigured || isSavingDraft || isActivating}
                   onClick={() => setIsActivationModalOpen(true)}
                   className="px-5 py-2.5 bg-teal-600 hover:bg-teal-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer"
                 >
