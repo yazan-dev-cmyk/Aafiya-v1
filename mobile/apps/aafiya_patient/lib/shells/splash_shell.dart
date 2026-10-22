@@ -47,11 +47,10 @@ class _PatientSplashShellState extends State<PatientSplashShell> {
 
   @override
   Widget build(BuildContext context) {
-    final strings = LocalizedStrings.of(context);
     final activeCode = (widget.currentLocale ?? Localizations.localeOf(context)).languageCode;
 
     return Scaffold(
-      backgroundColor: AafiyaColors.lightBackground,
+      backgroundColor: AafiyaColors.pureWhite,
       body: SafeArea(
         child: Stack(
           children: [
@@ -87,36 +86,14 @@ class _PatientSplashShellState extends State<PatientSplashShell> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Container(
-                      width: 96,
-                      height: 96,
-                      decoration: const BoxDecoration(
-                        color: AafiyaColors.healthBlue,
-                        borderRadius: AafiyaRadius.borderXl,
-                      ),
-                      child: const Center(
-                        child: Text(
-                          'ع',
-                          style: TextStyle(
-                            fontSize: 48,
-                            fontWeight: FontWeight.bold,
-                            color: AafiyaColors.pureWhite,
-                          ),
-                        ),
-                      ),
+                    Image.asset(
+                      'assets/branding/Aafiya_Logo_Full.png',
+                      package: 'aafiya_ui',
+                      width: 280,
+                      fit: BoxFit.contain,
+                      semanticLabel: 'AAFIYA — Your Gateway To Aafiya',
                     ),
-                    const SizedBox(height: 24),
-                    Text(
-                      strings.appBrandName,
-                      style: AafiyaTypography.displayLarge.copyWith(color: AafiyaColors.healthBlue),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      strings.brandGatewaySlogan,
-                      style: AafiyaTypography.bodyMedium,
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 32),
                     const AafiyaLoadingView(),
                   ],
                 ),
