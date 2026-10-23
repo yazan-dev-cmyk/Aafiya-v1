@@ -71,6 +71,6 @@ export const prescriptionService = {
   },
 
   verifyToken: async (token: string): Promise<ApiResponse<PrescriptionVerificationData>> => {
-    return api.get<PrescriptionVerificationData>(`/v/${token}`);
+    return api.publicGet<PrescriptionVerificationData>(`/v/${token}`);
   },
 };

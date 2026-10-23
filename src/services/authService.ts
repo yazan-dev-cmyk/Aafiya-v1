@@ -86,7 +86,7 @@ export interface AuthResponse {
 
 export const authService = {
   login: async (credentials: { email: string; password: string }): Promise<AuthResponse> => {
-    const response = await api.post<AuthResponse>('/auth/login', credentials);
+    const response = await api.publicPost<AuthResponse>('/auth/login', credentials);
     if (response.data?.token) {
       setStoredToken(response.data.token);
     }
@@ -110,7 +110,7 @@ export const authService = {
     address?: string;
     [key: string]: any;
   }): Promise<AuthResponse> => {
-    const response = await api.post<AuthResponse>('/auth/register', data);
+    const response = await api.publicPost<AuthResponse>('/auth/register', data);
     if (response.data?.token) {
       setStoredToken(response.data.token);
     }

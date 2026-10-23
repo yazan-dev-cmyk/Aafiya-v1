@@ -113,6 +113,7 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
   const [commune, setCommune] = useState('');
   const [mapsLink, setMapsLink] = useState('');
   const [commercialRegister, setCommercialRegister] = useState('');
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   const handleReset = () => {
     setSubmitted(false);
@@ -134,6 +135,7 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
     setCommune('');
     setMapsLink('');
     setCommercialRegister('');
+    setAcceptedTerms(false);
   };
 
   const handleClose = () => {
@@ -144,6 +146,12 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    if (isRegister && !acceptedTerms) {
+      setError(t('termsRequiredError') || 'يجب قبول شروط الخدمة والاطلاع على إشعار الخصوصية لإنشاء الحساب');
+      return;
+    }
+
     setLoading(true);
 
     if (!isRegister) {
@@ -176,6 +184,8 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
           password,
           password_confirmation: password,
           role: selectedRole,
+          accepted_terms: true,
+          terms_version: '2026.1',
           specialty_id: selectedRole === 'doctor' && specialtyId ? parseInt(specialtyId, 10) : undefined,
           specialty: specialty || undefined,
           license_number: licenseNumber || (selectedRole === 'doctor' ? `DZ-ALG-2026-DOC-001` : undefined),
@@ -467,15 +477,47 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2 cursor-pointer group">
-                <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary/20" />
-                <span className="text-xs text-slate-500 font-bold group-hover:text-slate-700 transition-colors">{t('rememberMe')}</span>
-              </label>
-              {!isRegister && (
+            {isRegister ? (
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                <label className="flex items-start gap-3 cursor-pointer group select-none">
+                  <input
+                    type="checkbox"
+                    required
+                    checked={acceptedTerms}
+                    onChange={(e) => setAcceptedTerms(e.target.checked)}
+                    className="mt-0.5 w-4 h-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500/20"
+                  />
+                  <span className="text-xs text-slate-600 font-medium leading-relaxed group-hover:text-slate-800 transition-colors">
+                    {t('acceptTermsPrefix')}{' '}
+                    <a
+                      href={`/${locale}/terms`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-teal-600 font-bold hover:underline"
+                    >
+                      {t('termsOfService')}
+                    </a>{' '}
+                    {t('andAcknowledge')}{' '}
+                    <a
+                      href={`/${locale}/privacy`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-teal-600 font-bold hover:underline"
+                    >
+                      {t('privacyPolicy')}
+                    </a>
+                  </span>
+                </label>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between">
+                <label className="flex items-center gap-2 cursor-pointer group">
+                  <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary/20" />
+                  <span className="text-xs text-slate-500 font-bold group-hover:text-slate-700 transition-colors">{t('rememberMe')}</span>
+                </label>
                 <button type="button" className="text-xs text-primary font-black hover:underline">{t('forgotPassword')}</button>
-              )}
-            </div>
+              </div>
+            )}
 
             <div className="space-y-3 pt-2">
               <Button type="submit" fullWidth size="lg" loading={loading}>

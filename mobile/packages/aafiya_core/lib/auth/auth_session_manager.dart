@@ -65,6 +65,15 @@ class AuthSessionManager extends ChangeNotifier {
   List<DoctorClinic> _authorizedClinics = const [];
   List<DoctorClinic> get authorizedClinics => _authorizedClinics;
 
+  int _sessionGeneration = 0;
+
+  /// Monotonically increasing generation counter representing the lifecycle of authenticated sessions.
+  ///
+  /// Increments on login, logout, session expiration, and authentication restoration.
+  /// Used by screens and consumers to discard in-flight asynchronous operations initiated
+  /// under a prior session/account.
+  int get sessionGeneration => _sessionGeneration;
+
   User? get currentUser => switch (_state) {
         Authenticated(:final user) => user,
         _ => null,
@@ -92,6 +101,7 @@ class AuthSessionManager extends ChangeNotifier {
 
     final token = await _tokenStorage.getToken();
     if (token == null || token.isEmpty) {
+      _sessionGeneration++;
       _state = const Unauthenticated();
       notifyListeners();
       return;
@@ -106,16 +116,20 @@ class AuthSessionManager extends ChangeNotifier {
         final userData = data['data'];
         if (userData is Map<String, dynamic>) {
           final user = User.fromJson(userData);
+          _sessionGeneration++;
           _state = Authenticated(user);
           _syncAssistantClinicContext(user);
         } else {
           await _tokenStorage.clearToken();
+          _sessionGeneration++;
           _state = const Unauthenticated('Invalid user profile response.');
         }
       case ApiFailure(:final exception):
         if (exception is UnauthorizedException) {
           await _tokenStorage.clearToken();
-          _state = const Unauthenticated('Session expired. Please sign in again.');
+          _sessionGeneration++;
+          _state =
+              const Unauthenticated('Session expired. Please sign in again.');
         } else {
           _state = AuthError(exception);
         }
@@ -131,6 +145,7 @@ class AuthSessionManager extends ChangeNotifier {
   }) async {
     _isSessionExpiring = false;
     await _tokenStorage.saveToken(token);
+    _sessionGeneration++;
     _state = Authenticated(user);
     _syncAssistantClinicContext(user);
     notifyListeners();
@@ -144,7 +159,8 @@ class AuthSessionManager extends ChangeNotifier {
   /// 3. Primary active clinic (`isPrimary == true && isActive == true`).
   /// 4. First active clinic in [clinics].
   /// 5. If zero active clinics, active clinic is cleared (`null`).
-  void setAuthorizedClinics(List<DoctorClinic> clinics, {String? preferredClinicId}) {
+  void setAuthorizedClinics(List<DoctorClinic> clinics,
+      {String? preferredClinicId}) {
     _authorizedClinics = List.unmodifiable(clinics);
     final activeClinics = _authorizedClinics.where((c) => c.isActive).toList();
 
@@ -157,11 +173,13 @@ class AuthSessionManager extends ChangeNotifier {
 
     DoctorClinic? resolved;
     if (preferredClinicId != null) {
-      resolved = activeClinics.where((c) => c.id == preferredClinicId).firstOrNull;
+      resolved =
+          activeClinics.where((c) => c.id == preferredClinicId).firstOrNull;
     }
 
     if (resolved == null && _activeClinic != null) {
-      resolved = activeClinics.where((c) => c.id == _activeClinic!.id).firstOrNull;
+      resolved =
+          activeClinics.where((c) => c.id == _activeClinic!.id).firstOrNull;
     }
 
     resolved ??= activeClinics.where((c) => c.isPrimary).firstOrNull;
@@ -178,7 +196,9 @@ class AuthSessionManager extends ChangeNotifier {
   /// Returns `true` if switch succeeded.
   /// Returns `false` if [clinicId] is not authorized or is inactive (fails closed).
   bool switchActiveClinic(String clinicId) {
-    final candidate = _authorizedClinics.where((c) => c.id == clinicId && c.isActive).firstOrNull;
+    final candidate = _authorizedClinics
+        .where((c) => c.id == clinicId && c.isActive)
+        .firstOrNull;
     if (candidate == null) {
       return false;
     }
@@ -198,6 +218,7 @@ class AuthSessionManager extends ChangeNotifier {
 
   /// Invalidates session locally and notifies backend via `/auth/logout`.
   Future<void> logout() async {
+    _isSessionExpiring = true;
     try {
       await _apiClient.post(ApiEndpoints.logout, allowRetry: true);
     } catch (_) {
@@ -210,7 +231,10 @@ class AuthSessionManager extends ChangeNotifier {
       _activeClinic = null;
       _authorizedClinics = const [];
       _apiClient.setActiveClinicId(null);
-      _state = const Unauthenticated();
+      if (_state is! Unauthenticated) {
+        _sessionGeneration++;
+        _state = const Unauthenticated();
+      }
       notifyListeners();
     }
   }
@@ -239,6 +263,9 @@ class AuthSessionManager extends ChangeNotifier {
     _activeClinic = null;
     _authorizedClinics = const [];
     _apiClient.setActiveClinicId(null);
+    if (_state is! Unauthenticated) {
+      _sessionGeneration++;
+    }
     _state = const Unauthenticated('Session expired.');
     notifyListeners();
   }

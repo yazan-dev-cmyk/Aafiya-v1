@@ -247,8 +247,8 @@ export const DoctorSearchSection: React.FC<DoctorSearchSectionProps> = ({ onOpen
       if (!isSearching) {
         // DEFAULT SHOWCASE MODE: Fetch up to 3 latest items per category
         const [docRes, clinicRes] = await Promise.all([
-          api.get<any[]>('/doctors?per_page=3').catch(() => null),
-          api.get<any[]>('/clinics?per_page=3').catch(() => null),
+          api.publicGet<any[]>('/doctors?per_page=3').catch(() => null),
+          api.publicGet<any[]>('/clinics?per_page=3').catch(() => null),
         ]);
 
         let bcRes = null;
@@ -287,7 +287,7 @@ export const DoctorSearchSection: React.FC<DoctorSearchSectionProps> = ({ onOpen
           docParams.append('per_page', String(perPage));
           docParams.append('page', String(currentPage));
 
-          const res = await api.get<any[]>(`/doctors?${docParams.toString()}`).catch(() => null);
+          const res = await api.publicGet<any[]>(`/doctors?${docParams.toString()}`).catch(() => null);
           if (res && Array.isArray(res.data)) {
             results = res.data.map(mapDoctorToItem);
             total = res.meta?.total ?? results.length;
@@ -300,7 +300,7 @@ export const DoctorSearchSection: React.FC<DoctorSearchSectionProps> = ({ onOpen
           clinicParams.append('per_page', String(perPage));
           clinicParams.append('page', String(currentPage));
 
-          const res = await api.get<any[]>(`/clinics?${clinicParams.toString()}`).catch(() => null);
+          const res = await api.publicGet<any[]>(`/clinics?${clinicParams.toString()}`).catch(() => null);
           if (res && Array.isArray(res.data)) {
             let mapped = res.data.map(mapClinicToItem);
             if (debouncedSearch.trim()) {
@@ -376,7 +376,7 @@ export const DoctorSearchSection: React.FC<DoctorSearchSectionProps> = ({ onOpen
           docParams.append('per_page', String(perPage));
           docParams.append('page', String(currentPage));
 
-          const res = await api.get<any[]>(`/doctors?${docParams.toString()}`).catch(() => null);
+          const res = await api.publicGet<any[]>(`/doctors?${docParams.toString()}`).catch(() => null);
           if (res && Array.isArray(res.data)) {
             results = res.data.map(mapDoctorToItem);
             total = res.meta?.total ?? results.length;

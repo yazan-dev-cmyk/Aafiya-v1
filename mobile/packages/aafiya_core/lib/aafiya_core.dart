@@ -54,4 +54,9 @@ export 'models/doctor_working_hours.dart';
 export 'services/doctor_working_hours_service.dart';
 export 'models/clinic_operating_hours.dart';
 export 'services/clinic_operating_hours_service.dart';
-
+export 'models/patient_notification.dart';
+export 'models/patient_notifications_response.dart';
+export 'models/clinic_escalation.dart';
+export 'models/clinic_escalations_response.dart';
+export 'services/patient_notification_service.dart';
+export 'services/clinic_notification_service.dart';

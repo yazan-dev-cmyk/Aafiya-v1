@@ -2583,7 +2583,12 @@
     "toggleRegister": "ليس لديك حساب؟ انضم إلينا الآن",
     "toggleLogin": "لديك حساب بالفعل؟ سجل دخولك",
     "encryption": "تشفير AES-256",
-    "compliance": "امتثال GDPR",
+    "compliance": "حماية المعطيات الشخصية",
+    "acceptTermsPrefix": "أوافق صراحة على",
+    "termsOfService": "شروط الاستخدام",
+    "andAcknowledge": "واطلعت على",
+    "privacyPolicy": "إشعار الخصوصية والبيانات",
+    "termsRequiredError": "يجب قبول شروط الخدمة والاطلاع على إشعار الخصوصية لإنشاء الحساب",
     "placeholderName": "أدخل الاسم هنا...",
     "placeholderEmail": "name@example.com",
     "placeholderPassword": "••••••••",
@@ -3375,5 +3380,30 @@
     "expiresAt": "تاريخ انتهاء الصلاحية",
     "accessGrantedAt": "وقت منح الوصول",
     "securityNotice": "تم تطبيق مبدأ تقليل البيانات لحماية الخصوصية: معلومات الاتصال والهوية الوطنية مستبعدة تماماً."
+  },
+  "appDownload": {
+    "sectionBadge": "تطبيقات الهواتف الذكية",
+    "title": "حمّل تطبيق عافية",
+    "titleAccent": "على هاتفك",
+    "subtitle": "وصول سريع وآمن إلى خدماتك الطبية ومواعيدك وسجلك الصحي في أي وقت ومن أي مكان.",
+    "desktopScanNotice": "امسح رمز الاستجابة السريعة (QR) بكاميرا هاتفك للتحميل المباشر",
+    "mobileNotice": "أو قم بالتحميل المباشر بصيغة APK لجهاز أندرويد",
+    "directDownload": "تحميل مباشر (APK)",
+    "scanWithPhone": "امسح بهاتفك للتحميل",
+    "officialBuild": "حزمة أندرويد رسمية موثقة",
+    "patient": {
+      "badge": "تطبيق المرضى",
+      "name": "AAFIYA",
+      "platform": "Android 7.0+ (APK)",
+      "description": "استعراض المواعيد، متابعة السجل الطبي الموحد، الاطلاع على الوصفات الرقمية وتلقي إشعارات المواعيد الفورية.",
+      "downloadButton": "تحميل تطبيق المرضى (APK)"
+    },
+    "pro": {
+      "badge": "تطبيق الأطباء والعيادات",
+      "name": "AAFIYA Pro",
+      "platform": "Android 7.0+ (APK)",
+      "description": "إدارة طابور الانتظار، متابعة حالات التصعيد، استعراض الملفات الطبية، والتواصل المهني السريري المعتمد.",
+      "downloadButton": "تحميل تطبيق AAFIYA Pro (APK)"
+    }
   }
 }

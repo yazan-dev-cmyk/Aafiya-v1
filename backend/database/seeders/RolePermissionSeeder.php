@@ -87,6 +87,7 @@ class RolePermissionSeeder extends Seeder
                 'platform.view_audit_logs',
                 'platform.manage_ads',
                 'platform.manage_master_data',
+                'platform.export_backup',
             ],
         ];
 

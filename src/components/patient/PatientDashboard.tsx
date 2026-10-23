@@ -53,6 +53,7 @@ import { appointmentService, AppointmentItem as ApiAppointmentItem } from '@/ser
 import { prescriptionService, PrescriptionRecord } from '@/services/prescriptionService';
 import { diagnosticService, DiagnosticOrderRecord } from '@/services/diagnosticService';
 import { ehrService, PatientRecord, ClinicalVisitRecord, PatientShareTokenCreated } from '@/services/ehrService';
+import { patientNotificationService, PatientNotificationItem } from '@/services/patientNotificationService';
 import QRCode from 'react-qr-code';
 import { MedicalDocumentCode } from '../shared/MedicalDocumentCode';
 import { ChangePasswordCard } from '../shared/ChangePasswordCard';
@@ -149,6 +150,8 @@ export interface MedicalNotification {
   date: string;
   type: 'lab' | 'rad' | 'prescription' | 'appointment' | 'critical';
   read: boolean;
+  isReal?: boolean;
+  acknowledged?: boolean;
 }
 
 export interface DownloadLogItem {
@@ -244,6 +247,8 @@ export function PatientDashboard({
   const [selectedRxForQr, setSelectedRxForQr] = useState<PrescriptionItem | null>(null);
   const [selectedAppForQr, setSelectedAppForQr] = useState<AppointmentItem | null>(null);
   const [selectedDiagnosticForQr, setSelectedDiagnosticForQr] = useState<{ id: string; order_reference?: string; secure_token?: string; order_type: string; title?: string } | null>(null);
+  const [realNotifications, setRealNotifications] = useState<PatientNotificationItem[]>([]);
+  const [acknowledgingId, setAcknowledgingId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Cancellation Modal States (FIX-PAT-01)
@@ -628,6 +633,16 @@ export function PatientDashboard({
           console.warn('Clinical visits fetch error:', e);
         }
 
+        // 8. In-App Notifications
+        try {
+          const notifRes = await patientNotificationService.getNotifications();
+          if (isMounted && notifRes && Array.isArray(notifRes.data)) {
+            setRealNotifications(notifRes.data);
+          }
+        } catch (e) {
+          console.warn('In-app notifications fetch error:', e);
+        }
+
       } finally {
         if (isMounted) setIsLoading(false);
       }
@@ -832,8 +847,45 @@ export function PatientDashboard({
   // Dynamic Critical Findings
   const criticalLab = labResults.find(l => l.isCritical);
 
+  const handleAcknowledgeNotification = async (id: string) => {
+    setAcknowledgingId(id);
+    try {
+      await patientNotificationService.acknowledgeNotification(id);
+      setRealNotifications(prev =>
+        prev.map(n => n.id === id ? { ...n, acknowledged_at: new Date().toISOString() } : n)
+      );
+    } catch (e) {
+      console.error('Failed to acknowledge notification:', e);
+    } finally {
+      setAcknowledgingId(null);
+    }
+  };
+
   // Dynamic Notifications List
   const notifications: MedicalNotification[] = [];
+
+  realNotifications.forEach((rn) => {
+    const isAck = !!rn.acknowledged_at;
+    const isReschedule = rn.template.includes('vacation_reschedule');
+    const title = isReschedule
+      ? (isRtl ? 'تنبيه: إعادة جدولة موعد بسبب إجازة الطبيب' : 'Appointment Rescheduled (Doctor Vacation)')
+      : (isRtl ? 'إشعار من العيادة' : 'Clinic Notification');
+    const msg = rn.payload.message || rn.payload.instruction || (isRtl ? 'يرجى مراجعة تفاصيل الموعد.' : 'Please review your appointment details.');
+    const dateStr = rn.created_at ? rn.created_at.substring(0, 10) : '';
+    const timeStr = rn.created_at ? rn.created_at.substring(11, 16) : '';
+
+    notifications.push({
+      id: rn.id,
+      title,
+      message: msg,
+      date: dateStr,
+      time: timeStr,
+      type: isReschedule ? 'appointment' : 'critical',
+      read: isAck,
+      isReal: true,
+      acknowledged: isAck,
+    });
+  });
   if (criticalLab) {
     notifications.push({
       id: 'notif-crit',
@@ -1177,6 +1229,23 @@ export function PatientDashboard({
                           <h4 className="text-sm font-black text-slate-900">{notif.title}</h4>
                           <p className="text-xs text-slate-600 mt-1 font-bold leading-relaxed">{notif.message}</p>
                           <span className="text-[10px] text-slate-400 font-mono mt-2 block">{notif.date} • {notif.time}</span>
+                          {notif.isReal && !notif.acknowledged && (
+                            <Button
+                              size="sm"
+                              variant="primary"
+                              disabled={acknowledgingId === notif.id}
+                              onClick={() => handleAcknowledgeNotification(notif.id)}
+                              className="mt-3 text-xs"
+                            >
+                              {acknowledgingId === notif.id ? (isRtl ? 'جاري التأكيد...' : 'Confirming...') : (isRtl ? 'إقرار وتأكيد العلم بالموعد البديل' : 'Acknowledge Replacement Slot')}
+                            </Button>
+                          )}
+                          {notif.isReal && notif.acknowledged && (
+                            <span className="text-[10px] font-bold text-emerald-600 mt-2 flex items-center gap-1">
+                              <CheckCircle2 className="w-3.5 h-3.5" />
+                              {isRtl ? 'تم تأكيد العلم بالموعد بنجاح' : 'Acknowledged successfully'}
+                            </span>
+                          )}
                         </div>
                       </div>
                       {!notif.read && <Badge variant="info" className="shrink-0">{isRtl ? 'جديد' : 'New'}</Badge>}

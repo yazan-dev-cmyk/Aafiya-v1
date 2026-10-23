@@ -3,6 +3,7 @@ import 'package:aafiya_core/aafiya_core.dart';
 import 'package:aafiya_ui/aafiya_ui.dart';
 
 import '../screens/assistant_queue_screen.dart';
+import '../screens/clinic_escalations_screen.dart';
 import '../screens/unresolved_reschedules_screen.dart';
 
 /// AAFIYA Pro — Clinic Assistant Operational Shell (TASK-05-01).
@@ -34,12 +35,28 @@ class AssistantShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final strings = LocalizedStrings.of(context);
     final effectiveClient = apiClient ?? sessionManager.apiClient;
+    final canManageQueue = sessionManager.activeClinicId != null &&
+        user.hasPermission('booking.manage_queue');
 
     return Scaffold(
       appBar: AafiyaAppBar(
         title: '${strings.assistantRoleTitle}: ${user.name}',
         showBrandMark: true,
         actions: [
+          if (canManageQueue)
+            IconButton(
+              icon: const Icon(Icons.notification_important_outlined),
+              tooltip: strings.clinicEscalationsTitle,
+              onPressed: () {
+                Navigator.of(context).push(
+                  ClinicEscalationsScreen.route(
+                    sessionManager: sessionManager,
+                    user: user,
+                    apiClient: effectiveClient,
+                  ),
+                );
+              },
+            ),
           IconButton(
             icon: const Icon(Icons.assignment_late_outlined),
             tooltip: strings.unresolvedReschedulesTitle,

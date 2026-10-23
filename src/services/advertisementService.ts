@@ -20,11 +20,11 @@ export interface AdvertisementItem {
 export const advertisementService = {
   getActiveAds: async (params?: Record<string, any>): Promise<ApiResponse<AdvertisementItem[]>> => {
     const query = new URLSearchParams(params).toString();
-    return api.get<AdvertisementItem[]>(`/advertisements${query ? `?${query}` : ''}`);
+    return api.publicGet<AdvertisementItem[]>(`/advertisements${query ? `?${query}` : ''}`);
   },
 
   recordClick: async (id: string): Promise<ApiResponse<{ target_url: string; clicks_count: number }>> => {
-    return api.post(`/advertisements/${id}/click`);
+    return api.publicPost(`/advertisements/${id}/click`);
   },
 
   getMyAds: async (): Promise<ApiResponse<AdvertisementItem[]>> => {

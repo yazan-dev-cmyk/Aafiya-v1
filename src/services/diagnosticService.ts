@@ -254,6 +254,6 @@ export const diagnosticService = {
    * Public verification of Diagnostic Order QR Token (No auth required, rate-limited).
    */
   verifyToken: async (token: string): Promise<ApiResponse<DiagnosticOrderPublicData>> => {
-    return api.get<DiagnosticOrderPublicData>(`/diagnostics/verify/${token}`);
+    return api.publicGet<DiagnosticOrderPublicData>(`/diagnostics/verify/${token}`);
   },
 };

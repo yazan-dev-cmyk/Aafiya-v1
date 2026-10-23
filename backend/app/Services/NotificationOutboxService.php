@@ -335,10 +335,22 @@ class NotificationOutboxService
 
             return true;
         } catch (QueryException $e) {
+            $errorCode = (int) ($e->errorInfo[1] ?? 0);
+
             // If duplicate key collision, skip safely
-            if (isset($e->errorInfo[1]) && (int) $e->errorInfo[1] === 1062) {
+            if ($errorCode === 1062) {
                 return false;
             }
+
+            // Lock wait timeout (1205) or Deadlock (1213) - log warning and skip so next cron run can retry
+            if (in_array($errorCode, [1205, 1213], true)) {
+                Log::warning('OUTBOX_ESCALATION_LOCK_CONTENTION: Transaction lock contention during SLA escalation, will retry on next schedule', [
+                    'original_outbox_id' => $outbox->id,
+                    'error_code'         => $errorCode,
+                ]);
+                return false;
+            }
+
             throw $e;
         }
     }

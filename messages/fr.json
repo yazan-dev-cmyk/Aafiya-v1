@@ -2580,7 +2580,12 @@
     "toggleRegister": "Vous n'avez pas de compte ? Rejoignez-nous",
     "toggleLogin": "Vous avez déjà un compte ? Connectez-vous",
     "encryption": "Cryptage AES-256",
-    "compliance": "Conformité GDPR",
+    "compliance": "Protection des Données",
+    "acceptTermsPrefix": "J'accepte expressément les",
+    "termsOfService": "Conditions d'Utilisation",
+    "andAcknowledge": "et j'ai pris connaissance de la",
+    "privacyPolicy": "Politique de Confidentialité",
+    "termsRequiredError": "Vous devez accepter les conditions d'utilisation et la politique de confidentialité pour créer un compte",
     "placeholderName": "Entrez le nom ici...",
     "placeholderEmail": "nom@exemple.com",
     "placeholderPassword": "••••••••",
@@ -3374,5 +3379,30 @@
     "expiresAt": "Expire le",
     "accessGrantedAt": "Accès accordé le",
     "securityNotice": "Minimisation stricte des données appliquée : les coordonnées et le numéro d'identification national sont totalement exclus pour la confidentialité."
+  },
+  "appDownload": {
+    "sectionBadge": "Applications Mobiles",
+    "title": "Téléchargez les applications AAFIYA",
+    "titleAccent": "sur votre téléphone",
+    "subtitle": "Accès rapide et sécurisé à vos rendez-vous médicaux, dossier de santé et suivi clinique à tout moment.",
+    "desktopScanNotice": "Scannez le code QR avec l’appareil photo de votre téléphone pour télécharger directement",
+    "mobileNotice": "Ou téléchargez directement le fichier APK sur votre appareil Android",
+    "directDownload": "Téléchargement direct (APK)",
+    "scanWithPhone": "Scannez avec votre téléphone",
+    "officialBuild": "Package Android officiel certifié",
+    "patient": {
+      "badge": "Application Patients",
+      "name": "AAFIYA",
+      "platform": "Android 7.0+ (APK)",
+      "description": "Consultez vos rendez-vous, accédez à votre dossier médical partagé, vérifiez vos ordonnances et recevez vos alertes.",
+      "downloadButton": "Télécharger l’application Patients (APK)"
+    },
+    "pro": {
+      "badge": "Application Clinique & Professionnels",
+      "name": "AAFIYA Pro",
+      "platform": "Android 7.0+ (APK)",
+      "description": "Gérez la file d’attente du cabinet, traitez les escalades de suivi, consultez le dossier patient et optimisez vos soins.",
+      "downloadButton": "Télécharger AAFIYA Pro (APK)"
+    }
   }
 }

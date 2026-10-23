@@ -20,7 +20,8 @@ void main() {
     test('AuthSessionManager sets authenticated user correctly', () async {
       final storage = InMemoryTokenStorage();
       final client = ApiClient(tokenStorage: storage);
-      final manager = AuthSessionManager(tokenStorage: storage, apiClient: client);
+      final manager =
+          AuthSessionManager(tokenStorage: storage, apiClient: client);
 
       expect(manager.isAuthenticated, isFalse);
       expect(manager.state, isA<AuthInitial>());
@@ -44,10 +45,12 @@ void main() {
       expect(await storage.getToken(), isNull);
     });
 
-    test('AuthSessionManager expireSession invalidates token and updates state', () async {
+    test('AuthSessionManager expireSession invalidates token and updates state',
+        () async {
       final storage = InMemoryTokenStorage('initial_token');
       final client = ApiClient(tokenStorage: storage);
-      final manager = AuthSessionManager(tokenStorage: storage, apiClient: client);
+      final manager =
+          AuthSessionManager(tokenStorage: storage, apiClient: client);
 
       const user = User(
         id: '11',
@@ -67,10 +70,13 @@ void main() {
       expect(unauth.message, contains('1440 minutes'));
     });
 
-    test('handleUnauthorized invalidates session, clears token, resets clinic context, and notifies listeners', () async {
+    test(
+        'handleUnauthorized invalidates session, clears token, resets clinic context, and notifies listeners',
+        () async {
       final storage = InMemoryTokenStorage('active_token');
       final client = ApiClient(tokenStorage: storage);
-      final manager = AuthSessionManager(tokenStorage: storage, apiClient: client);
+      final manager =
+          AuthSessionManager(tokenStorage: storage, apiClient: client);
 
       const user = User(
         id: '20',
@@ -94,7 +100,8 @@ void main() {
 
       expect(manager.isAuthenticated, isFalse);
       expect(manager.state, isA<Unauthenticated>());
-      expect((manager.state as Unauthenticated).message, equals('Session expired.'));
+      expect((manager.state as Unauthenticated).message,
+          equals('Session expired.'));
       expect(await storage.getToken(), isNull);
       expect(manager.activeClinic, isNull);
       expect(manager.authorizedClinics.isEmpty, isTrue);
@@ -103,10 +110,13 @@ void main() {
       expect(manager.isSessionExpiring, isTrue);
     });
 
-    test('concurrent calls to handleUnauthorized coalesce (single-flight serialized invalidation)', () async {
+    test(
+        'concurrent calls to handleUnauthorized coalesce (single-flight serialized invalidation)',
+        () async {
       final storage = InMemoryTokenStorage('token_concurrent');
       final client = ApiClient(tokenStorage: storage);
-      final manager = AuthSessionManager(tokenStorage: storage, apiClient: client);
+      final manager =
+          AuthSessionManager(tokenStorage: storage, apiClient: client);
 
       const user = User(
         id: '21',
@@ -126,15 +136,19 @@ void main() {
       }
       await Future<void>.delayed(Duration.zero);
 
-      expect(notifications, equals(1), reason: 'Concurrent 401s must coalesce into exactly one invalidation flow');
+      expect(notifications, equals(1),
+          reason:
+              'Concurrent 401s must coalesce into exactly one invalidation flow');
       expect(manager.isAuthenticated, isFalse);
       expect(manager.isSessionExpiring, isTrue);
     });
 
-    test('handleUnauthorized is a no-op when not in Authenticated state', () async {
+    test('handleUnauthorized is a no-op when not in Authenticated state',
+        () async {
       final storage = InMemoryTokenStorage();
       final client = ApiClient(tokenStorage: storage);
-      final manager = AuthSessionManager(tokenStorage: storage, apiClient: client);
+      final manager =
+          AuthSessionManager(tokenStorage: storage, apiClient: client);
 
       expect(manager.state, isA<AuthInitial>());
 
@@ -148,10 +162,13 @@ void main() {
       expect(manager.isSessionExpiring, isFalse);
     });
 
-    test('failure in TokenStorage.clearToken does not prevent state invalidation and context purge (failure-resilience)', () async {
+    test(
+        'failure in TokenStorage.clearToken does not prevent state invalidation and context purge (failure-resilience)',
+        () async {
       final faultyStorage = _FailingTokenStorage('valid_token');
       final client = ApiClient(tokenStorage: faultyStorage);
-      final manager = AuthSessionManager(tokenStorage: faultyStorage, apiClient: client);
+      final manager =
+          AuthSessionManager(tokenStorage: faultyStorage, apiClient: client);
 
       const user = User(
         id: '22',
@@ -175,18 +192,26 @@ void main() {
       // Must still transition to Unauthenticated and clear clinic context
       expect(manager.isAuthenticated, isFalse);
       expect(manager.state, isA<Unauthenticated>());
-      expect((manager.state as Unauthenticated).message, equals('Session expired.'));
+      expect((manager.state as Unauthenticated).message,
+          equals('Session expired.'));
       expect(manager.activeClinic, isNull);
       expect(manager.authorizedClinics.isEmpty, isTrue);
       expect(client.activeClinicId, isNull);
     });
 
-    test('setAuthenticatedUser resets _isSessionExpiring so future independent 401s work', () async {
+    test(
+        'setAuthenticatedUser resets _isSessionExpiring so future independent 401s work',
+        () async {
       final storage = InMemoryTokenStorage('token_1');
       final client = ApiClient(tokenStorage: storage);
-      final manager = AuthSessionManager(tokenStorage: storage, apiClient: client);
+      final manager =
+          AuthSessionManager(tokenStorage: storage, apiClient: client);
 
-      const user = User(id: '23', name: 'User 1', email: 'u1@aafiya.dz', roles: [UserRole.patient]);
+      const user = User(
+          id: '23',
+          name: 'User 1',
+          email: 'u1@aafiya.dz',
+          roles: [UserRole.patient]);
       await manager.setAuthenticatedUser(token: 'token_1', user: user);
 
       // First expiration
@@ -196,9 +221,14 @@ void main() {
       expect(manager.isAuthenticated, isFalse);
 
       // User logs in again
-      const user2 = User(id: '24', name: 'User 2', email: 'u2@aafiya.dz', roles: [UserRole.patient]);
+      const user2 = User(
+          id: '24',
+          name: 'User 2',
+          email: 'u2@aafiya.dz',
+          roles: [UserRole.patient]);
       await manager.setAuthenticatedUser(token: 'token_2', user: user2);
-      expect(manager.isSessionExpiring, isFalse, reason: 'Guard must be reset upon re-authentication');
+      expect(manager.isSessionExpiring, isFalse,
+          reason: 'Guard must be reset upon re-authentication');
       expect(manager.isAuthenticated, isTrue);
 
       // Second independent expiration must work
@@ -208,6 +238,63 @@ void main() {
       await Future<void>.delayed(Duration.zero);
       expect(notifications, equals(1));
       expect(manager.isAuthenticated, isFalse);
+    });
+
+    test(
+        'sessionGeneration increments monotonically across session lifecycle events and ignores clinic updates',
+        () async {
+      final storage = InMemoryTokenStorage();
+      final client = ApiClient(tokenStorage: storage);
+      final manager =
+          AuthSessionManager(tokenStorage: storage, apiClient: client);
+
+      expect(manager.sessionGeneration, equals(0));
+
+      const doctorClinic1 = DoctorClinic(
+          id: 'c1',
+          name: 'Clinic 1',
+          position: 'doctor',
+          isActive: true,
+          isPrimary: true);
+      const doctorClinic2 = DoctorClinic(
+          id: 'c2',
+          name: 'Clinic 2',
+          position: 'doctor',
+          isActive: true,
+          isPrimary: false);
+      const user1 = User(
+          id: '1',
+          name: 'User 1',
+          email: 'u1@aafiya.dz',
+          roles: [UserRole.doctor]);
+      const user2 = User(
+          id: '2',
+          name: 'User 2',
+          email: 'u2@aafiya.dz',
+          roles: [UserRole.doctor]);
+
+      // 1. First login -> generation 1
+      await manager.setAuthenticatedUser(token: 'token_1', user: user1);
+      expect(manager.sessionGeneration, equals(1));
+
+      // 2. Harmless clinic configuration within same session must NOT increment generation
+      manager.setAuthorizedClinics([doctorClinic1, doctorClinic2],
+          preferredClinicId: 'c1');
+      expect(manager.sessionGeneration, equals(1));
+      manager.switchActiveClinic('c2');
+      expect(manager.sessionGeneration, equals(1));
+
+      // 3. Logout -> generation 2
+      await manager.logout();
+      expect(manager.sessionGeneration, equals(2));
+
+      // 4. Second login (different account) -> generation 3
+      await manager.setAuthenticatedUser(token: 'token_2', user: user2);
+      expect(manager.sessionGeneration, equals(3));
+
+      // 5. Expiry -> generation 4
+      await manager.expireSession('Test expiry');
+      expect(manager.sessionGeneration, equals(4));
     });
   });
 }

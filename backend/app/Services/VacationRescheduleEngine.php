@@ -275,7 +275,7 @@ class VacationRescheduleEngine
                                 'message'                    => "تمت إعادة جدولة موعدكم بنجاح إلى تاريخ {$candidate['date']} الساعة {$candidate['time_slot']} نظراً لإجازة الطبيب المعتمدة.",
                             ],
                             'idempotency_key' => $idempotencyKey,
-                            'status'          => NotificationOutbox::STATUS_PENDING,
+                            'status'          => NotificationOutbox::STATUS_SENT,
                             'retry_count'     => 0,
                         ]);
                     }
@@ -620,7 +620,7 @@ class VacationRescheduleEngine
                                 'instruction'       => 'يرجى التواصل مع مركز الحجز أو العيادة لترتيب موعد بديل دون أي رسوم إضافية (Option B).',
                             ],
                             'idempotency_key' => $idempotencyKey,
-                            'status'          => NotificationOutbox::STATUS_PENDING,
+                            'status'          => NotificationOutbox::STATUS_SENT,
                             'retry_count'     => 0,
                         ]);
                     }

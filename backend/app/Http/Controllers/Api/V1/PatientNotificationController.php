@@ -115,6 +115,10 @@ class PatientNotificationController extends Controller
      */
     protected function authorizePatientOwnership($user, NotificationOutbox $outbox): void
     {
+        if ($outbox->recipient_type !== 'patient') {
+            abort(404, 'Notification not found.');
+        }
+
         $patient = $user->patient;
         $userPhone = $user->phone;
         $patientPhone = $patient?->phone;

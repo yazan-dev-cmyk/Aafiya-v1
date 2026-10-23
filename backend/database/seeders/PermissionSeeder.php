@@ -326,6 +326,12 @@ class PermissionSeeder extends Seeder
                 'category' => 'platform',
                 'description' => 'Create, edit, activate, and deactivate Medical Specialties and Wilayas.',
             ],
+            [
+                'name' => 'platform.export_backup',
+                'display_name' => 'Export Encrypted Database Backup',
+                'category' => 'platform',
+                'description' => 'Asynchronously export and securely download encrypted database backup artifacts.',
+            ],
         ];
 
         foreach ($permissions as $permissionData) {

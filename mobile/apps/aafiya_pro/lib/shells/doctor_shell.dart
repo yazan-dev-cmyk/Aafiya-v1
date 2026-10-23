@@ -3,6 +3,7 @@ import 'package:aafiya_core/aafiya_core.dart';
 import 'package:aafiya_ui/aafiya_ui.dart';
 
 import '../screens/clinic_director_stats_screen.dart';
+import '../screens/clinic_escalations_screen.dart';
 import '../screens/clinic_operating_hours_screen.dart';
 import '../screens/doctor_queue_screen.dart';
 import '../screens/doctor_staff_screen.dart';
@@ -195,6 +196,19 @@ class _DoctorShellState extends State<DoctorShell> {
             },
           ),
           IconButton(
+            icon: const Icon(Icons.notification_important_outlined),
+            tooltip: strings.clinicEscalationsTitle,
+            onPressed: () {
+              Navigator.of(context).push(
+                ClinicEscalationsScreen.route(
+                  sessionManager: widget.sessionManager,
+                  user: widget.user,
+                  apiClient: widget.apiClient,
+                ),
+              );
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.assignment_late_outlined),
             tooltip: strings.unresolvedReschedulesTitle,
             onPressed: () {
@@ -212,7 +226,8 @@ class _DoctorShellState extends State<DoctorShell> {
             tooltip: strings.viewSharedRecordHubTitle,
             onSelected: (value) async {
               if (value == 'shared_record') {
-                final client = widget.apiClient ?? widget.sessionManager.apiClient;
+                final client =
+                    widget.apiClient ?? widget.sessionManager.apiClient;
                 await SharedRecordViewerSheet.show(context, apiClient: client);
               } else if (value == 'doctor_vacations') {
                 Navigator.of(context).push(
@@ -339,7 +354,8 @@ class _DoctorShellState extends State<DoctorShell> {
           ),
         ],
       ),
-      body: _buildBody(context, strings, effectiveIndex, hasClinicStats, isDirector),
+      body: _buildBody(
+          context, strings, effectiveIndex, hasClinicStats, isDirector),
       bottomNavigationBar: NavigationBar(
         selectedIndex: effectiveIndex,
         onDestinationSelected: (i) => setState(() => _tabIndex = i),
@@ -452,7 +468,8 @@ class _DoctorShellState extends State<DoctorShell> {
     );
   }
 
-  Widget _buildOperationalDashboard(BuildContext context, LocalizedStrings strings) {
+  Widget _buildOperationalDashboard(
+      BuildContext context, LocalizedStrings strings) {
     return DoctorDashboardView(
       sessionManager: widget.sessionManager,
       user: widget.user,
@@ -470,7 +487,8 @@ class _DoctorShellState extends State<DoctorShell> {
     );
   }
 
-  Widget _buildClinicsDirectoryView(BuildContext context, LocalizedStrings strings) {
+  Widget _buildClinicsDirectoryView(
+      BuildContext context, LocalizedStrings strings) {
     return ListenableBuilder(
       listenable: widget.sessionManager,
       builder: (context, _) {
@@ -482,7 +500,8 @@ class _DoctorShellState extends State<DoctorShell> {
           separatorBuilder: (_, __) => const SizedBox(height: AafiyaSpacing.sm),
           itemBuilder: (context, index) {
             final clinic = clinics[index];
-            final isActiveContext = clinic.id == widget.sessionManager.activeClinicId;
+            final isActiveContext =
+                clinic.id == widget.sessionManager.activeClinicId;
 
             return AafiyaCard(
               borderColor: isActiveContext
@@ -501,7 +520,8 @@ class _DoctorShellState extends State<DoctorShell> {
                         foregroundColor: isActiveContext
                             ? AafiyaColors.pureWhite
                             : AafiyaColors.secondaryText,
-                        child: const Icon(Icons.local_hospital_rounded, size: 20),
+                        child:
+                            const Icon(Icons.local_hospital_rounded, size: 20),
                       ),
                       const SizedBox(width: AafiyaSpacing.sm),
                       Expanded(
@@ -527,9 +547,11 @@ class _DoctorShellState extends State<DoctorShell> {
                       ),
                       if (isActiveContext)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: AafiyaColors.healthBlue.withValues(alpha: 0.1),
+                            color:
+                                AafiyaColors.healthBlue.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
@@ -543,7 +565,8 @@ class _DoctorShellState extends State<DoctorShell> {
                       else if (clinic.isActive)
                         OutlinedButton(
                           onPressed: () {
-                            final success = widget.sessionManager.switchActiveClinic(clinic.id);
+                            final success = widget.sessionManager
+                                .switchActiveClinic(clinic.id);
                             if (success) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
@@ -556,11 +579,14 @@ class _DoctorShellState extends State<DoctorShell> {
                           },
                           style: OutlinedButton.styleFrom(
                             minimumSize: const Size(0, 48),
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 12),
                             foregroundColor: AafiyaColors.healthBlue,
-                            side: const BorderSide(color: AafiyaColors.healthBlue),
+                            side: const BorderSide(
+                                color: AafiyaColors.healthBlue),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(AafiyaRadius.sm),
+                              borderRadius:
+                                  BorderRadius.circular(AafiyaRadius.sm),
                             ),
                           ),
                           child: Text(strings.selectClinic),
@@ -574,7 +600,8 @@ class _DoctorShellState extends State<DoctorShell> {
                     children: [
                       if (clinic.isMedicalDirector)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
                             color: AafiyaColors.warning.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(4),
@@ -589,9 +616,11 @@ class _DoctorShellState extends State<DoctorShell> {
                         )
                       else
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: AafiyaColors.healthBlue.withValues(alpha: 0.1),
+                            color:
+                                AafiyaColors.healthBlue.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
@@ -604,7 +633,8 @@ class _DoctorShellState extends State<DoctorShell> {
                         ),
                       if (clinic.isPrimary)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
                             color: AafiyaColors.border,
                             borderRadius: BorderRadius.circular(4),
@@ -619,7 +649,8 @@ class _DoctorShellState extends State<DoctorShell> {
                         ),
                       if (!clinic.isActive)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
                             color: AafiyaColors.error.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(4),
@@ -642,11 +673,14 @@ class _DoctorShellState extends State<DoctorShell> {
                       children: [
                         if (clinic.isMedicalDirector)
                           TextButton.icon(
-                            icon: const Icon(Icons.store_mall_directory_outlined, size: 16),
+                            icon: const Icon(
+                                Icons.store_mall_directory_outlined,
+                                size: 16),
                             label: Text(strings.clinicOperatingHoursTitle),
                             style: TextButton.styleFrom(
                               minimumSize: const Size(0, 48),
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 8),
                             ),
                             onPressed: () {
                               Navigator.of(context).push(
@@ -663,7 +697,8 @@ class _DoctorShellState extends State<DoctorShell> {
                           label: Text(strings.doctorWorkingHoursTitle),
                           style: TextButton.styleFrom(
                             minimumSize: const Size(0, 48),
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 8),
                           ),
                           onPressed: () {
                             Navigator.of(context).push(

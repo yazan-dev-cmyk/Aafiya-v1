@@ -41,11 +41,21 @@ class NotificationOutboxTest extends TestCase
 
         $this->assertIsolationGate();
 
+        Carbon::setTestNow(Carbon::parse('2026-10-21 08:00:00', 'Africa/Algiers'));
+
+        $this->seed(\Database\Seeders\RoleSeeder::class);
+        $this->seed(\Database\Seeders\PermissionSeeder::class);
+        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+
         // Create Doctor user & profile
         $this->doctorUser = User::factory()->create([
             'email' => 'dr.outbox_' . Str::random(6) . '@aafiya.dz',
             'phone' => '0550' . rand(100000, 999999),
         ]);
+        $this->doctorUser->assignRole('doctor');
+
+        config(['booking.patient_booking_enabled' => true]);
+
         $this->doctor = Doctor::create([
             'id' => (string) Str::uuid(),
             'user_id' => $this->doctorUser->id,
@@ -110,6 +120,7 @@ class NotificationOutboxTest extends TestCase
             'email' => 'patient.outbox_' . Str::random(6) . '@aafiya.dz',
             'phone' => '0555' . rand(100000, 999999),
         ]);
+        $this->patientUser->assignRole('patient_registered');
         $this->patient = Patient::create([
             'id' => (string) Str::uuid(),
             'user_id' => $this->patientUser->id,
@@ -218,7 +229,7 @@ class NotificationOutboxTest extends TestCase
         $this->assertSame($this->patientUser->phone, $outbox->recipient_phone);
         $this->assertSame('in_app', $outbox->channel);
         $this->assertSame('patient', $outbox->recipient_type);
-        $this->assertSame(NotificationOutbox::STATUS_PENDING, $outbox->status);
+        $this->assertSame(NotificationOutbox::STATUS_SENT, $outbox->status);
         $this->assertSame(0, $outbox->retry_count);
         $this->assertNull($outbox->acknowledged_at);
         $this->assertStringContainsString('reschedule_notice_rescheduled_', $outbox->idempotency_key);
@@ -469,4 +480,175 @@ class NotificationOutboxTest extends TestCase
         $this->assertEquals(0, $stats2['escalated']);
         $this->assertEquals(1, $stats2['skipped']);
     }
+
+    /**
+     * 8. Patient is strictly blocked from viewing or acknowledging staff escalation records (404).
+     */
+    public function test_patient_cannot_access_staff_escalation_records(): void
+    {
+        $bookingService = app(BookingService::class);
+        $appt = $bookingService->createAppointment([
+            'clinic_id' => $this->clinic->id,
+            'doctor_id' => $this->doctor->id,
+            'appointment_date' => '2026-10-22',
+            'time_slot' => '08:00',
+            'patient_id' => $this->patient->id,
+            'patient_name' => 'مريض إشعار الحماية',
+            'patient_phone' => $this->patientUser->phone,
+        ], $this->doctorUser);
+
+        $escalation = NotificationOutbox::create([
+            'id' => (string) Str::uuid(),
+            'appointment_id' => $appt->id,
+            'recipient_phone' => $this->clinic->phone,
+            'recipient_type' => 'clinic_staff',
+            'channel' => 'in_app',
+            'template' => 'clinic_staff_reschedule_escalation',
+            'payload' => ['appointment_id' => $appt->id],
+            'idempotency_key' => 'staff_esc_' . Str::random(8),
+            'status' => NotificationOutbox::STATUS_SENT,
+        ]);
+
+        // Attempting to show or acknowledge as patient must fail with 404
+        $respShow = $this->actingAs($this->patientUser, 'sanctum')
+            ->getJson("/api/v1/patient/notifications/{$escalation->id}");
+        $respShow->assertStatus(404);
+
+        $respAck = $this->actingAs($this->patientUser, 'sanctum')
+            ->postJson("/api/v1/patient/notifications/{$escalation->id}/acknowledge");
+        $respAck->assertStatus(404);
+    }
+
+    /**
+     * 9. Clinic escalation listing enforces multi-tenant isolation and 4D authorization.
+     */
+    public function test_clinic_escalations_listing_and_multi_tenant_isolation(): void
+    {
+        $bookingService = app(BookingService::class);
+        $appt = $bookingService->createAppointment([
+            'clinic_id' => $this->clinic->id,
+            'doctor_id' => $this->doctor->id,
+            'appointment_date' => '2026-10-22',
+            'time_slot' => '08:00',
+            'patient_id' => $this->patient->id,
+            'patient_name' => 'مريض عزل العيادات',
+            'patient_phone' => $this->patientUser->phone,
+        ], $this->doctorUser);
+
+        $escalation = NotificationOutbox::create([
+            'id' => (string) Str::uuid(),
+            'appointment_id' => $appt->id,
+            'recipient_phone' => $this->clinic->phone,
+            'recipient_type' => 'clinic_staff',
+            'channel' => 'in_app',
+            'template' => 'clinic_staff_reschedule_escalation',
+            'payload' => [
+                'clinic_id' => $this->clinic->id,
+                'clinic_name' => $this->clinic->name,
+                'patient_phone' => $this->patientUser->phone,
+                'escalation_reason' => 'PATIENT_UNREAD_SLA_EXPIRED_24H',
+                'instruction' => 'يرجى التواصل الهاتفي المباشر مع المريض.',
+            ],
+            'idempotency_key' => 'clinic_esc_list_' . Str::random(8),
+            'status' => NotificationOutbox::STATUS_SENT,
+        ]);
+
+        // Create Admin user
+        $adminUser = User::factory()->create([
+            'email' => 'admin_esc_' . Str::random(6) . '@aafiya.dz',
+            'phone' => '0551' . rand(100000, 999999),
+        ]);
+        $adminUser->assignRole('admin');
+
+        // A. Admin can view escalations with valid clinic header
+        $respAdmin = $this->actingAs($adminUser, 'sanctum')
+            ->withHeader('X-Clinic-ID', $this->clinic->id)
+            ->getJson('/api/v1/clinic/notifications/escalations');
+        $respAdmin->assertStatus(200);
+        $respAdmin->assertJsonFragment(['id' => $escalation->id]);
+
+        // B. Admin querying non-existent or inactive clinic fails closed (404)
+        $respAdminInvalid = $this->actingAs($adminUser, 'sanctum')
+            ->withHeader('X-Clinic-ID', (string) Str::uuid())
+            ->getJson('/api/v1/clinic/notifications/escalations');
+        $respAdminInvalid->assertStatus(404);
+
+        // C. Different clinic receives empty list (Multi-tenant isolation)
+        $otherClinic = Clinic::create([
+            'id' => (string) Str::uuid(),
+            'name' => 'Other Clinic ' . uniqid(),
+            'phone' => '021' . rand(100000, 999999),
+            'address' => 'Another clinic',
+            'wilaya' => '16',
+            'is_active' => true,
+        ]);
+
+        $respOther = $this->actingAs($adminUser, 'sanctum')
+            ->withHeader('X-Clinic-ID', $otherClinic->id)
+            ->getJson('/api/v1/clinic/notifications/escalations');
+        $respOther->assertStatus(200);
+        $this->assertEmpty($respOther->json('data'));
+
+        // Cleanup otherClinic & adminUser
+        $otherClinic->forceDelete();
+        $adminUser->forceDelete();
+    }
+
+    /**
+     * 10. Clinic staff escalation acknowledgment marks record closed and is idempotent.
+     */
+    public function test_clinic_escalation_acknowledgment_lifecycle(): void
+    {
+        $bookingService = app(BookingService::class);
+        $appt = $bookingService->createAppointment([
+            'clinic_id' => $this->clinic->id,
+            'doctor_id' => $this->doctor->id,
+            'appointment_date' => '2026-10-22',
+            'time_slot' => '08:00',
+            'patient_id' => $this->patient->id,
+            'patient_name' => 'مريض إقرار التصعيد',
+            'patient_phone' => $this->patientUser->phone,
+        ], $this->doctorUser);
+
+        $escalation = NotificationOutbox::create([
+            'id' => (string) Str::uuid(),
+            'appointment_id' => $appt->id,
+            'recipient_phone' => $this->clinic->phone,
+            'recipient_type' => 'clinic_staff',
+            'channel' => 'in_app',
+            'template' => 'clinic_staff_reschedule_escalation',
+            'payload' => [
+                'clinic_id' => $this->clinic->id,
+                'clinic_name' => $this->clinic->name,
+                'patient_phone' => $this->patientUser->phone,
+            ],
+            'idempotency_key' => 'clinic_ack_test_' . Str::random(8),
+            'status' => NotificationOutbox::STATUS_SENT,
+        ]);
+
+        $adminUser = User::factory()->create([
+            'email' => 'admin_ack_' . Str::random(6) . '@aafiya.dz',
+            'phone' => '0552' . rand(100000, 999999),
+        ]);
+        $adminUser->assignRole('admin');
+
+        // A. Successful acknowledgment
+        $respAck = $this->actingAs($adminUser, 'sanctum')
+            ->withHeader('X-Clinic-ID', $this->clinic->id)
+            ->postJson("/api/v1/clinic/notifications/escalations/{$escalation->id}/acknowledge");
+        $respAck->assertStatus(200);
+
+        $refreshed = $escalation->fresh();
+        $this->assertNotNull($refreshed->acknowledged_at);
+
+        // B. Re-acknowledgment is idempotent
+        $respReAck = $this->actingAs($adminUser, 'sanctum')
+            ->withHeader('X-Clinic-ID', $this->clinic->id)
+            ->postJson("/api/v1/clinic/notifications/escalations/{$escalation->id}/acknowledge");
+        $respReAck->assertStatus(200);
+        $this->assertSame('تم إقرار هذا التصعيد مسبقاً.', $respReAck->json('message'));
+
+        $adminUser->forceDelete();
+    }
 }
+

@@ -68,7 +68,7 @@ class MasterDataService {
 
     this.wilayasPromise = (async () => {
       try {
-        const response = await api.get<MasterDataApiResponse<Wilaya[]>>('/master/wilayas');
+        const response = await api.publicGet<MasterDataApiResponse<Wilaya[]>>('/master/wilayas');
         const items = Array.isArray(response.data) ? response.data : ((response as any).data?.data || []);
         this.wilayasCache = items;
         return items;
@@ -90,7 +90,7 @@ class MasterDataService {
       return this.getWilayas();
     }
 
-    const response = await api.get<MasterDataApiResponse<Wilaya[]>>(
+    const response = await api.publicGet<MasterDataApiResponse<Wilaya[]>>(
       `/master/wilayas?search=${encodeURIComponent(trimmed)}`
     );
     return Array.isArray(response.data) ? response.data : ((response as any).data?.data || []);
@@ -115,7 +115,7 @@ class MasterDataService {
 
     const promise = (async () => {
       try {
-        const response = await api.get<MasterDataApiResponse<Commune[]>>(
+        const response = await api.publicGet<MasterDataApiResponse<Commune[]>>(
           `/master/wilayas/${encodeURIComponent(formatted)}/communes`
         );
         const items = Array.isArray(response.data) ? response.data : ((response as any).data?.data || []);
@@ -145,7 +145,7 @@ class MasterDataService {
 
     this.specialtiesPromise = (async () => {
       try {
-        const response = await api.get<MasterDataApiResponse<MedicalSpecialty[]>>('/master/specialties');
+        const response = await api.publicGet<MasterDataApiResponse<MedicalSpecialty[]>>('/master/specialties');
         const items = Array.isArray(response.data) ? response.data : ((response as any).data?.data || []);
         this.specialtiesCache = items;
         return items;
@@ -167,7 +167,7 @@ class MasterDataService {
       return this.getSpecialties();
     }
 
-    const response = await api.get<MasterDataApiResponse<MedicalSpecialty[]>>(
+    const response = await api.publicGet<MasterDataApiResponse<MedicalSpecialty[]>>(
       `/master/specialties?search=${encodeURIComponent(trimmed)}`
     );
     return Array.isArray(response.data) ? response.data : ((response as any).data?.data || []);

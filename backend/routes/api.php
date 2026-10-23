@@ -155,6 +155,10 @@ Route::middleware(['auth:sanctum', 'throttle:api.general', 'active.clinic'])->gr
     Route::get('/patient/notifications/{id}', [\App\Http\Controllers\Api\V1\PatientNotificationController::class, 'show']);
     Route::post('/patient/notifications/{id}/acknowledge', [\App\Http\Controllers\Api\V1\PatientNotificationController::class, 'acknowledge']);
 
+    // Clinic Escalation Notifications (PHASE-COMMS-01 / DEC-02 / DEC-03)
+    Route::get('/clinic/notifications/escalations', [\App\Http\Controllers\Api\V1\ClinicNotificationController::class, 'index']);
+    Route::post('/clinic/notifications/escalations/{id}/acknowledge', [\App\Http\Controllers\Api\V1\ClinicNotificationController::class, 'acknowledge']);
+
     // Clinical Visits
     Route::get('/clinical-visits', [\App\Http\Controllers\Api\V1\ClinicalVisitController::class, 'index']);
     Route::post('/clinical-visits', [\App\Http\Controllers\Api\V1\ClinicalVisitController::class, 'store']);
@@ -264,6 +268,15 @@ Route::middleware(['auth:sanctum', 'throttle:api.general', 'active.clinic'])->gr
         Route::put('/wilayas/{id}', [\App\Http\Controllers\Api\V1\AdminMasterDataController::class, 'updateWilaya']);
         Route::put('/wilayas/{id}/status', [\App\Http\Controllers\Api\V1\AdminMasterDataController::class, 'toggleWilayaStatus']);
         Route::delete('/wilayas/{id}', [\App\Http\Controllers\Api\V1\AdminMasterDataController::class, 'deleteWilaya']);
+    });
+
+    // Admin Encrypted Database Backup Export (Admin & Authorized Assistant with platform.export_backup)
+    Route::prefix('admin/backups')->group(function () {
+        Route::post('/step-up-token', [\App\Http\Controllers\Api\V1\BackupExportController::class, 'createStepUpToken']);
+        Route::post('/export', [\App\Http\Controllers\Api\V1\BackupExportController::class, 'initiateExport']);
+        Route::get('/exports', [\App\Http\Controllers\Api\V1\BackupExportController::class, 'listExports']);
+        Route::get('/exports/{id}/status', [\App\Http\Controllers\Api\V1\BackupExportController::class, 'showExport'])->whereUuid('id');
+        Route::get('/exports/{id}/download', [\App\Http\Controllers\Api\V1\BackupExportController::class, 'downloadExport'])->whereUuid('id');
     });
 });
 

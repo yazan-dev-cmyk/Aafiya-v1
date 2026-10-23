@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\SharedPatientMedicalRecordResource;
 use App\Models\Patient;
 use App\Models\PatientShareToken;
+use App\Models\SecurityAuditLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -225,6 +226,18 @@ class PatientShareTokenController extends Controller
                 ->first();
 
             if (! $share) {
+                SecurityAuditLog::create([
+                    'actor_id' => null,
+                    'actor_role' => 'public_share_recipient',
+                    'event_category' => 'PATIENT_EMR_SHARE',
+                    'action' => 'RESOLVE_TOKEN_NOT_FOUND',
+                    'resource_type' => 'PatientShareToken',
+                    'resource_id' => null,
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                    'details' => ['outcome' => 'not_found'],
+                ]);
+
                 return response()->json([
                     'status' => 'error',
                     'code' => 404,
@@ -234,6 +247,18 @@ class PatientShareTokenController extends Controller
 
             // DEC-P05-02: Check immediate revocation status
             if ($share->isRevoked()) {
+                SecurityAuditLog::create([
+                    'actor_id' => null,
+                    'actor_role' => 'public_share_recipient',
+                    'event_category' => 'PATIENT_EMR_SHARE',
+                    'action' => 'RESOLVE_TOKEN_REVOKED',
+                    'resource_type' => 'PatientShareToken',
+                    'resource_id' => $share->id,
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                    'details' => ['patient_id' => $share->patient_id, 'outcome' => 'revoked'],
+                ]);
+
                 return response()->json([
                     'status' => 'error',
                     'code' => 410,
@@ -246,6 +271,18 @@ class PatientShareTokenController extends Controller
                 if ($share->status !== 'expired') {
                     $share->update(['status' => 'expired']);
                 }
+
+                SecurityAuditLog::create([
+                    'actor_id' => null,
+                    'actor_role' => 'public_share_recipient',
+                    'event_category' => 'PATIENT_EMR_SHARE',
+                    'action' => 'RESOLVE_TOKEN_EXPIRED',
+                    'resource_type' => 'PatientShareToken',
+                    'resource_id' => $share->id,
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                    'details' => ['patient_id' => $share->patient_id, 'outcome' => 'expired'],
+                ]);
 
                 return response()->json([
                     'status' => 'error',
@@ -263,6 +300,18 @@ class PatientShareTokenController extends Controller
                     'status' => 'active',
                 ]);
             } elseif ($share->isLocked()) {
+                SecurityAuditLog::create([
+                    'actor_id' => null,
+                    'actor_role' => 'public_share_recipient',
+                    'event_category' => 'PATIENT_EMR_SHARE',
+                    'action' => 'RESOLVE_TOKEN_LOCKED',
+                    'resource_type' => 'PatientShareToken',
+                    'resource_id' => $share->id,
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                    'details' => ['patient_id' => $share->patient_id, 'outcome' => 'locked'],
+                ]);
+
                 return response()->json([
                     'status' => 'error',
                     'code' => 423,
@@ -284,6 +333,23 @@ class PatientShareTokenController extends Controller
 
                 $remaining = max(0, $share->max_attempts - $newFailedAttempts);
 
+                SecurityAuditLog::create([
+                    'actor_id' => null,
+                    'actor_role' => 'public_share_recipient',
+                    'event_category' => 'PATIENT_EMR_SHARE',
+                    'action' => 'RESOLVE_TOKEN_FAILED_PIN',
+                    'resource_type' => 'PatientShareToken',
+                    'resource_id' => $share->id,
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                    'details' => [
+                        'patient_id' => $share->patient_id,
+                        'outcome' => 'invalid_pin',
+                        'failed_attempts' => $newFailedAttempts,
+                        'remaining_attempts' => $remaining,
+                    ],
+                ]);
+
                 return response()->json([
                     'status' => 'error',
                     'code' => 403,
@@ -299,6 +365,23 @@ class PatientShareTokenController extends Controller
                 'status' => 'active',
                 'access_count' => $share->access_count + 1,
                 'last_accessed_at' => now(),
+            ]);
+
+            // DEC-LEGAL: Record verified access audit event
+            SecurityAuditLog::create([
+                'actor_id' => null,
+                'actor_role' => 'public_share_recipient',
+                'event_category' => 'PATIENT_EMR_SHARE',
+                'action' => 'RESOLVE_TOKEN_SUCCESS',
+                'resource_type' => 'PatientShareToken',
+                'resource_id' => $share->id,
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+                'details' => [
+                    'patient_id' => $share->patient_id,
+                    'scope' => $share->scope,
+                    'access_count' => $share->access_count,
+                ],
             ]);
 
             // Retrieve verified clinical relationships

@@ -18,6 +18,7 @@ import { TestimonialsSection } from './components/TestimonialsSection';
 import { PartnersSection } from './components/PartnersSection';
 import { FaqSection } from './components/FaqSection';
 import { NewsSection } from './components/NewsSection';
+import { AppDownloadSection } from './components/AppDownloadSection';
 import { CtaSection } from './components/CtaSection';
 import { Footer } from './components/Footer';
 import { DoctorDashboard } from './components/doctor/DoctorDashboard';
@@ -191,6 +192,9 @@ export default function App() {
 
           {/* News & Updates */}
           <NewsSection />
+
+          {/* App Download */}
+          <AppDownloadSection />
 
           {/* Final Call to Action Banner */}
           <CtaSection

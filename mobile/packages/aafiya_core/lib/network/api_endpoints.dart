@@ -22,7 +22,8 @@ abstract final class ApiEndpoints {
 
   // Master Data (TASK-MD-09 & TASK-MD-12)
   static const String masterWilayas = '/master/wilayas';
-  static String masterCommunes(String wilayaCode) => '/master/wilayas/$wilayaCode/communes';
+  static String masterCommunes(String wilayaCode) =>
+      '/master/wilayas/$wilayaCode/communes';
   static const String masterSpecialties = '/master/specialties';
 
   // Prescriptions & Verification
@@ -38,11 +39,14 @@ abstract final class ApiEndpoints {
   static const String doctorClinics = '/doctor/clinics';
   static const String doctorStats = '/doctor/stats';
   static const String clinicDoctorStats = '/clinic/doctor-stats';
-  static const String clinicUnresolvedReschedules = '/clinic/reschedule-dashboard/unresolved';
+  static const String clinicUnresolvedReschedules =
+      '/clinic/reschedule-dashboard/unresolved';
   static const String doctorVacations = '/doctor/vacations';
   static String doctorVacation(String id) => '/doctor/vacations/$id';
-  static String doctorWorkingHours(String doctorId) => '/doctors/$doctorId/working-hours';
-  static String doctorWorkingHoursActivate(String doctorId) => '/doctors/$doctorId/working-hours/activate';
+  static String doctorWorkingHours(String doctorId) =>
+      '/doctors/$doctorId/working-hours';
+  static String doctorWorkingHoursActivate(String doctorId) =>
+      '/doctors/$doctorId/working-hours/activate';
   static const String clinicOperatingHours = '/clinic/operating-hours';
 
   // Appointment Attendance & Queue Actions (TASK-04-03 & TASK-05-04)
@@ -50,24 +54,30 @@ abstract final class ApiEndpoints {
   static String appointmentNoShow(String id) => '/appointments/$id/no-show';
   static String appointmentConfirm(String id) => '/appointments/$id/confirm';
   static String appointmentCancel(String id) => '/appointments/$id/cancel';
-  static String appointmentReschedule(String id) => '/appointments/$id/reschedule';
+  static String appointmentReschedule(String id) =>
+      '/appointments/$id/reschedule';
   static const String appointmentCheckIn = '/appointments/check-in';
 
   // Clinic Staff Management (TASK-04-05)
   static String clinic(String id) => '/clinics/$id';
   static String clinicDoctors(String clinicId) => '/clinics/$clinicId/doctors';
-  static String clinicDoctorLookup(String clinicId) => '/clinics/$clinicId/doctors/lookup';
-  static String clinicDoctorInvitations(String clinicId) => '/clinics/$clinicId/doctor-invitations';
-  static String clinicDoctorInvitationCancel(String clinicId, String invitationId) =>
+  static String clinicDoctorLookup(String clinicId) =>
+      '/clinics/$clinicId/doctors/lookup';
+  static String clinicDoctorInvitations(String clinicId) =>
+      '/clinics/$clinicId/doctor-invitations';
+  static String clinicDoctorInvitationCancel(
+          String clinicId, String invitationId) =>
       '/clinics/$clinicId/doctor-invitations/$invitationId/cancel';
   static String clinicDoctorStatus(String clinicId, String doctorId) =>
       '/clinics/$clinicId/doctors/$doctorId/status';
   static String clinicDoctorDetach(String clinicId, String doctorId) =>
       '/clinics/$clinicId/doctors/$doctorId';
-  static String clinicAssistants(String clinicId) => '/clinics/$clinicId/assistants';
+  static String clinicAssistants(String clinicId) =>
+      '/clinics/$clinicId/assistants';
   static String clinicAssistantStatus(String clinicId, String assistantId) =>
       '/clinics/$clinicId/assistants/$assistantId/status';
-  static String clinicAssistantPermissions(String clinicId, String assistantId) =>
+  static String clinicAssistantPermissions(
+          String clinicId, String assistantId) =>
       '/clinics/$clinicId/assistants/$assistantId/permissions';
   static String clinicAssistantDelete(String clinicId, String assistantId) =>
       '/clinics/$clinicId/assistants/$assistantId';
@@ -75,8 +85,19 @@ abstract final class ApiEndpoints {
       '/clinics/$clinicId/staff/$staffId';
 
   // Booking Centers & Commercial Quota (TASK-05-03)
-  static const String bookingCenterQuotaBalance = '/booking-centers/quota-balance';
+  static const String bookingCenterQuotaBalance =
+      '/booking-centers/quota-balance';
   static const String bookingPackages = '/booking-packages';
-  static const String bookingCenterPurchaseRequests = '/booking-centers/purchase-requests';
-  static const String bookingCenterTransactions = '/booking-centers/transactions';
+  static const String bookingCenterPurchaseRequests =
+      '/booking-centers/purchase-requests';
+  static const String bookingCenterTransactions =
+      '/booking-centers/transactions';
+
+  // Notifications & Escalations (PHASE-COMMS-02)
+  static const String patientNotifications = '/patient/notifications';
+  static String patientNotificationAcknowledge(String id) =>
+      '/patient/notifications/$id/acknowledge';
+  static const String clinicEscalations = '/clinic/notifications/escalations';
+  static String clinicEscalationAcknowledge(String id) =>
+      '/clinic/notifications/escalations/$id/acknowledge';
 }

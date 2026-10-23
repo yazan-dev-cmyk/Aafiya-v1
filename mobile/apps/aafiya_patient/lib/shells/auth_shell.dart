@@ -41,6 +41,7 @@ class _PatientAuthShellState extends State<PatientAuthShell> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _isLoading = false;
+  bool _acceptedTerms = false;
 
   @override
   void initState() {
@@ -270,6 +271,14 @@ class _PatientAuthShellState extends State<PatientAuthShell> {
       return;
     }
 
+    if (!_acceptedTerms) {
+      await _showErrorDialog(
+        title: strings.registrationFailedTitle,
+        message: strings.mustAcceptTermsError,
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
 
     // Registration is a non-idempotent mutation: allowRetry is strictly false
@@ -280,6 +289,8 @@ class _PatientAuthShellState extends State<PatientAuthShell> {
         'email': email,
         'phone': phone,
         'password': password,
+        'accepted_terms': true,
+        'terms_version': '2026.1',
       },
       requiresAuth: false,
       allowRetry: false,
@@ -511,6 +522,45 @@ class _PatientAuthShellState extends State<PatientAuthShell> {
                           onPressed: () => setState(() =>
                               _obscureConfirmPassword =
                                   !_obscureConfirmPassword),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: AafiyaColors.lightBackground,
+                          borderRadius: AafiyaRadius.borderMd,
+                          border: Border.all(color: AafiyaColors.border),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: Checkbox(
+                                value: _acceptedTerms,
+                                activeColor: AafiyaColors.healthBlue,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                onChanged: (val) {
+                                  setState(() => _acceptedTerms = val ?? false);
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                '${strings.acceptTermsPrefix} ${strings.termsOfService} ${strings.andAcknowledge} ${strings.privacyPolicy}',
+                                style: AafiyaTypography.bodySmall.copyWith(
+                                  color: AafiyaColors.secondaryText,
+                                  height: 1.4,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],

@@ -7,9 +7,11 @@ import '../screens/booking_center_directory_screen.dart';
 import '../screens/clinic_directory_screen.dart';
 import '../screens/doctor_directory_screen.dart';
 import '../screens/emergency_profile_screen.dart';
+import '../screens/notifications_screen.dart';
 import '../screens/patient_shared_records_screen.dart';
 import '../screens/prescriptions_screen.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import '../state/patient_notification_count_manager.dart';
 import '../widgets/appointment_card.dart';
 import '../widgets/patient_qr_dialog.dart';
 
@@ -25,17 +27,22 @@ class PatientHomeShell extends StatefulWidget {
     required this.sessionManager,
     required this.apiClient,
     required this.onSignOut,
+    this.notificationService,
+    this.countManager,
   });
 
   final AuthSessionManager sessionManager;
   final ApiClient apiClient;
   final VoidCallback onSignOut;
+  final PatientNotificationService? notificationService;
+  final PatientNotificationCountManager? countManager;
 
   @override
   State<PatientHomeShell> createState() => _PatientHomeShellState();
 }
 
-class _PatientHomeShellState extends State<PatientHomeShell> {
+class _PatientHomeShellState extends State<PatientHomeShell>
+    with WidgetsBindingObserver {
   int _selectedTabIndex = 0;
   int _selectedAppointmentSubTab = 0; // 0 = Upcoming, 1 = Past
   String _selectedDirectoryTab = 'doctors';
@@ -45,10 +52,44 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
   List<Appointment> _upcomingAppointments = [];
   List<Appointment> _pastAppointments = [];
 
+  late final PatientNotificationService _notificationService;
+  late final PatientNotificationCountManager _countManager;
+  bool _ownsCountManager = false;
+
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _notificationService = widget.notificationService ??
+        PatientNotificationService(apiClient: widget.apiClient);
+    if (widget.countManager != null) {
+      _countManager = widget.countManager!;
+      _ownsCountManager = false;
+    } else {
+      _countManager = PatientNotificationCountManager(
+        sessionManager: widget.sessionManager,
+        service: _notificationService,
+      );
+      _ownsCountManager = true;
+    }
     _fetchAppointments();
+    _countManager.refresh();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    if (_ownsCountManager) {
+      _countManager.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _countManager.refresh();
+    }
   }
 
   Future<void> _fetchAppointments() async {
@@ -104,6 +145,37 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
       appBar: AafiyaAppBar(
         title: strings.patientAppTitle,
         actions: [
+          ListenableBuilder(
+            listenable: _countManager,
+            builder: (context, _) {
+              final count = _countManager.unreadCount;
+              return IconButton(
+                icon: Badge(
+                  isLabelVisible: count > 0,
+                  label: Text(
+                    count > 99 ? '99+' : '$count',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  child: const Icon(Icons.notifications_outlined),
+                ),
+                tooltip: strings.patientNotificationsTitle,
+                onPressed: () async {
+                  await Navigator.of(context).push(
+                    NotificationsScreen.route(
+                      sessionManager: widget.sessionManager,
+                      apiClient: widget.apiClient,
+                      service: _notificationService,
+                      onNotificationAcknowledged:
+                          _countManager.markAcknowledged,
+                    ),
+                  );
+                  if (mounted) {
+                    _countManager.refresh();
+                  }
+                },
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.health_and_safety_rounded,
                 color: AafiyaColors.error),
@@ -233,7 +305,10 @@ class _PatientHomeShellState extends State<PatientHomeShell> {
             : strings.brandGatewaySlogan);
 
     return RefreshIndicator(
-      onRefresh: _fetchAppointments,
+      onRefresh: () => Future.wait<void>([
+        _fetchAppointments(),
+        _countManager.refresh(),
+      ]),
       color: AafiyaColors.tealDeep,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),

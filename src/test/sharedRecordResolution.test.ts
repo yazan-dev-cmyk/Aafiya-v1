@@ -12,18 +12,19 @@ async function runTests() {
   // 1. Contract Verification: ehrService.resolveSharedRecord exists and is a function
   assert.strictEqual(typeof ehrService.resolveSharedRecord, 'function', 'resolveSharedRecord must be a defined function');
 
+  const originalPublicPost = api.publicPost;
   const originalPost = api.post;
 
   let interceptedEndpoint = '';
   let interceptedPayload: any = null;
-  let interceptedHeaders: any = null;
+  let interceptedOptions: any = null;
 
   try {
     // --- Test 1: resolveSharedRecord calls POST /shared-records/resolve with token and pin in body ---
-    api.post = async <T = any>(endpoint: string, data?: any, headers?: any): Promise<any> => {
+    api.publicPost = async <T = any>(endpoint: string, data?: any, options?: any): Promise<any> => {
       interceptedEndpoint = endpoint;
       interceptedPayload = data;
-      interceptedHeaders = headers;
+      interceptedOptions = options;
 
       return {
         data: {
@@ -68,7 +69,12 @@ async function runTests() {
       { token: 'pst_testToken1234567890abcdef', pin: '4821' },
       'Token and PIN must be submitted in POST body'
     );
-    assert.strictEqual(interceptedHeaders?.['Authorization'], '', 'Must explicitly clear Authorization header for public recipient resolution');
+    // Verify that Authorization and X-Clinic-ID are strictly absent from public recipient resolution
+    const passedHeaders = interceptedOptions?.headers;
+    const authHeader = passedHeaders instanceof Headers ? passedHeaders.get('Authorization') : passedHeaders?.['Authorization'];
+    const clinicHeader = passedHeaders instanceof Headers ? passedHeaders.get('X-Clinic-ID') : passedHeaders?.['X-Clinic-ID'];
+    assert.strictEqual(authHeader, undefined, 'Authorization header must be absent from public recipient resolution');
+    assert.strictEqual(clinicHeader, undefined, 'X-Clinic-ID header must be absent from public recipient resolution');
     assert.strictEqual(res.data.scope, 'all_emr', 'Scope must be all_emr');
     assert.strictEqual(res.data.patient.full_name, 'ياسمين العربي', 'Must return patient full name');
     assert.strictEqual(res.data.patient.allergies.length, 1, 'Must return allergies list');
@@ -85,7 +91,7 @@ async function runTests() {
     console.log('✔ Test 1: resolveSharedRecord submits token and pin in POST body without credentials and returns minimized record');
 
     // --- Test 2: ApiError preserves responseData and remaining_attempts for PIN rejection (403) ---
-    api.post = async () => {
+    api.publicPost = async () => {
       throw new ApiError('رمز الحماية PIN غير صحيح.', 403, undefined, undefined, {
         status: 'error',
         code: 403,
@@ -107,7 +113,7 @@ async function runTests() {
     console.log('✔ Test 2: ApiError preserves remaining_attempts on 403 Forbidden');
 
     // --- Test 3: ApiError preserves lockout response (423) ---
-    api.post = async () => {
+    api.publicPost = async () => {
       throw new ApiError('تم قفل الرابط مؤقتاً بسبب تكرار المحاولات الخاطئة.', 423, undefined, undefined, {
         status: 'error',
         code: 423,
@@ -137,6 +143,7 @@ async function runTests() {
 
     console.log('\nAll TASK-PAR-PAT-05 Phase 2 tests passed successfully! (4/4 tests)');
   } finally {
+    api.publicPost = originalPublicPost;
     api.post = originalPost;
   }
 }

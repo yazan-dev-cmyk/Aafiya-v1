@@ -46,7 +46,8 @@ import {
   Globe,
   QrCode,
   Trash2,
-  Receipt
+  Receipt,
+  Database
 } from 'lucide-react';
 
 import { DocumentScanner } from '../shared/DocumentScanner';
@@ -55,6 +56,7 @@ import { AssistantPermissionsManager } from './AssistantPermissionsManager';
 import { MasterDataManagement } from './MasterDataManagement';
 import { AdvertisementManagement } from './AdvertisementManagement';
 import { AdminBookingPoliciesCard } from './AdminBookingPoliciesCard';
+import { BackupExportManagement } from './BackupExportManagement';
 import { ChangePasswordCard } from '../shared/ChangePasswordCard';
 import { DashboardLayout } from '../ui/DashboardLayout';
 import { NavItem } from '../ui/Sidebar';
@@ -90,6 +92,7 @@ export type AdminTab =
   | 'roles_permissions'
   | 'assistant_permissions'
   | 'master_data'
+  | 'backups'
   | 'system_settings'
   | 'notifications_center';
 
@@ -816,6 +819,7 @@ export function PlatformAdminDashboard({ onBackToMainPlatform, onOpenAssistantDa
     { id: 'roles_permissions', label: t('tabs.roles_permissions'), icon: KeyRound },
     { id: 'assistant_permissions', label: isRtl ? 'صلاحيات المساعد' : 'Assistant RBAC', icon: Sliders },
     { id: 'master_data', label: isRtl ? 'البيانات المرجعية' : 'Master Data', icon: Stethoscope },
+    { id: 'backups', label: isRtl ? 'النسخ الاحتياطي' : 'Database Backups', icon: Database },
     { id: 'system_settings', label: t('tabs.system_settings'), icon: Settings },
     { id: 'notifications_center', label: t('tabs.notifications_center'), icon: Bell },
   ];
@@ -2412,6 +2416,11 @@ export function PlatformAdminDashboard({ onBackToMainPlatform, onOpenAssistantDa
         {/* SECTION 14: ASSISTANT PERMISSIONS MANAGER */}
         {activeTab === 'assistant_permissions' && (
           <AssistantPermissionsManager />
+        )}
+
+        {/* SECTION: DATABASE BACKUPS & EXPORTS */}
+        {activeTab === 'backups' && (
+          <BackupExportManagement />
         )}
 
         {/* SECTION 15: SYSTEM SETTINGS */}

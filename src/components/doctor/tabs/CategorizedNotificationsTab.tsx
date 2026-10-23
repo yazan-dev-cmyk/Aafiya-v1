@@ -1,23 +1,65 @@
-import React, { useState } from 'react';
-import { Bell, AlertTriangle, Stethoscope, Building, Cpu, CheckCircle2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Bell, AlertTriangle, Stethoscope, Building, Cpu, CheckCircle2, Phone, Calendar, Clock, Loader2 } from 'lucide-react';
 import { useTranslations, useLocale } from 'next-intl';
+import { clinicNotificationService, ClinicEscalationItem } from '@/services/clinicNotificationService';
 
 interface CategorizedNotificationsTabProps {
   isDarkMode?: boolean;
+  clinicId?: string;
 }
 
-export const CategorizedNotificationsTab: React.FC<CategorizedNotificationsTabProps> = ({ isDarkMode = false }) => {
+export const CategorizedNotificationsTab: React.FC<CategorizedNotificationsTabProps> = ({
+  isDarkMode = false,
+  clinicId,
+}) => {
   const t = useTranslations('doctor.notifications');
   const locale = useLocale();
   const isRtl = locale === 'ar';
 
   const [activeCategory, setActiveCategory] = useState<'urgent' | 'clinical' | 'administrative' | 'system'>('urgent');
+  const [escalations, setEscalations] = useState<ClinicEscalationItem[]>([]);
+  const [isLoadingEscalations, setIsLoadingEscalations] = useState<boolean>(false);
+  const [acknowledgingId, setAcknowledgingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchEscalations = async () => {
+      setIsLoadingEscalations(true);
+      try {
+        const data = await clinicNotificationService.getEscalations(clinicId, 'pending');
+        if (isMounted) {
+          setEscalations(data);
+        }
+      } catch (err) {
+        console.warn('Failed to load clinic escalations:', err);
+      } finally {
+        if (isMounted) setIsLoadingEscalations(false);
+      }
+    };
+
+    fetchEscalations();
+    return () => {
+      isMounted = false;
+    };
+  }, [clinicId]);
+
+  const handleAcknowledgeEscalation = async (id: string) => {
+    setAcknowledgingId(id);
+    try {
+      await clinicNotificationService.acknowledgeEscalation(id, clinicId);
+      setEscalations((prev) => prev.filter((item) => item.id !== id));
+    } catch (err) {
+      console.error('Failed to acknowledge escalation:', err);
+    } finally {
+      setAcknowledgingId(null);
+    }
+  };
 
   const containerClass = isDarkMode
     ? "bg-slate-900 border-slate-800 text-white"
     : "bg-white border-slate-200/80 text-slate-900 shadow-xs";
 
-  const notifications = [
+  const staticNotifications = [
     {
       id: 'n1',
       category: 'urgent',
@@ -48,7 +90,7 @@ export const CategorizedNotificationsTab: React.FC<CategorizedNotificationsTabPr
     }
   ];
 
-  const filtered = notifications.filter((n) => n.category === activeCategory);
+  const filteredStatic = staticNotifications.filter((n) => n.category === activeCategory);
 
   return (
     <div className={`space-y-6 ${isRtl ? 'text-right' : 'text-left'}`} dir={isRtl ? 'rtl' : 'ltr'}>
@@ -66,11 +108,17 @@ export const CategorizedNotificationsTab: React.FC<CategorizedNotificationsTabPr
             </h2>
           </div>
         </div>
+        {escalations.length > 0 && (
+          <span className="px-3 py-1.5 rounded-xl bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold flex items-center gap-1.5">
+            <AlertTriangle className="w-4 h-4 text-rose-600 animate-pulse" />
+            <span>{isRtl ? `${escalations.length} تصعيد عاجل يتطلب المتابعة` : `${escalations.length} urgent escalations`}</span>
+          </span>
+        )}
       </div>
 
       <div className={`flex items-center gap-2 border-b pb-3 ${isDarkMode ? 'border-slate-800' : 'border-slate-200'}`}>
         {[
-          { id: 'urgent', label: t('categories.urgent'), icon: AlertTriangle, color: 'text-rose-600' },
+          { id: 'urgent', label: t('categories.urgent'), icon: AlertTriangle, color: 'text-rose-600', badge: escalations.length },
           { id: 'clinical', label: t('categories.clinical'), icon: Stethoscope, color: 'text-teal-600' },
           { id: 'administrative', label: t('categories.administrative'), icon: Building, color: 'text-blue-600' },
           { id: 'system', label: t('categories.system'), icon: Cpu, color: 'text-slate-600' }
@@ -90,13 +138,94 @@ export const CategorizedNotificationsTab: React.FC<CategorizedNotificationsTabPr
             >
               <Icon className="w-4 h-4" />
               <span>{cat.label}</span>
+              {Boolean(cat.badge) && cat.badge! > 0 && (
+                <span className="px-1.5 py-0.5 rounded-full bg-rose-600 text-white text-[10px] font-bold">
+                  {cat.badge}
+                </span>
+              )}
             </button>
           );
         })}
       </div>
 
+      {activeCategory === 'urgent' && escalations.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-black text-rose-600 flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4" />
+              <span>{isRtl ? 'طابور تصعيدات المواعيد المعلقة (تجاوز مهلة الـ 24 ساعة)' : 'Escalated Unread Appointments Queue (24h SLA Expired)'}</span>
+            </h3>
+          </div>
+
+          <div className="space-y-3">
+            {escalations.map((esc) => (
+              <div
+                key={esc.id}
+                className={`p-5 rounded-2xl border transition-all ${
+                  isDarkMode
+                    ? 'bg-rose-950/20 border-rose-900/40 text-white'
+                    : 'bg-rose-50/60 border-rose-200 text-slate-900'
+                }`}
+              >
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="px-2.5 py-0.5 rounded-lg bg-rose-600 text-white text-xs font-bold">
+                        {isRtl ? 'تصعيد موعد عاجل' : 'Urgent Escalation'}
+                      </span>
+                      <strong className="text-sm font-black">{esc.patient_name}</strong>
+                      <span className="text-xs font-mono text-slate-500 flex items-center gap-1">
+                        <Phone className="w-3.5 h-3.5" />
+                        <span dir="ltr">{esc.patient_phone}</span>
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-rose-800 font-bold leading-relaxed">
+                      {esc.instruction}
+                    </p>
+
+                    <div className="flex items-center gap-4 text-[11px] text-slate-500 flex-wrap">
+                      {esc.original_date && (
+                        <span className="flex items-center gap-1">
+                          <Calendar className="w-3 h-3 text-slate-400" />
+                          <span>{isRtl ? 'الموعد الأصلي:' : 'Original:'} {esc.original_date} ({esc.original_time_slot})</span>
+                        </span>
+                      )}
+                      {esc.new_date && (
+                        <span className="flex items-center gap-1 font-bold text-teal-700">
+                          <Clock className="w-3 h-3 text-teal-600" />
+                          <span>{isRtl ? 'الموعد البديل المقترح:' : 'Replacement:'} {esc.new_date} ({esc.new_slot})</span>
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <button
+                    disabled={acknowledgingId === esc.id}
+                    onClick={() => handleAcknowledgeEscalation(esc.id)}
+                    className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold cursor-pointer transition-all flex items-center gap-1.5 shrink-0 disabled:opacity-50"
+                  >
+                    {acknowledgingId === esc.id ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>{isRtl ? 'جاري الإقرار...' : 'Acknowledging...'}</span>
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle2 className="w-4 h-4" />
+                        <span>{isRtl ? 'إقرار المتابعة وإغلاق التصعيد' : 'Acknowledge & Close'}</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className={`${containerClass} rounded-2xl p-6 border space-y-3`}>
-        {filtered.map((item) => (
+        {filteredStatic.map((item) => (
           <div key={item.id} className={`p-4 rounded-xl border space-y-1 text-xs ${
             isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'
           }`}>

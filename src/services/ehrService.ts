@@ -164,7 +164,7 @@ export const ehrService = {
   },
 
   getSharedRecord: async (token: string): Promise<ApiResponse<any>> => {
-    return api.get(`/shared-records/${token}`);
+    return api.publicGet(`/shared-records/${token}`);
   },
 
   /**
@@ -174,8 +174,6 @@ export const ehrService = {
     token: string;
     pin: string;
   }): Promise<ApiResponse<SharedPatientMedicalRecord>> => {
-    return api.post<SharedPatientMedicalRecord>('/shared-records/resolve', data, {
-      'Authorization': '',
-    });
+    return api.publicPost<SharedPatientMedicalRecord>('/shared-records/resolve', data);
   },
 };

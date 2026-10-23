@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
+use App\Models\UserConsent;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -53,6 +54,8 @@ class AuthService
                     'wilaya' => $data['wilaya'] ?? 'الجزائر العاصمة',
                 ], $user);
 
+                $this->recordConsents($user, $data);
+
                 $token = $user->createToken('auth_token')->plainTextToken;
 
                 return [
@@ -96,6 +99,8 @@ class AuthService
 
             $result = $this->doctorProvisioningService->provisionDoctor($userData, $doctorData, $clinicData);
 
+            $this->recordConsents($result['user'], $data);
+
             return [
                 'user' => $result['user'],
                 'token' => $result['token'],
@@ -133,6 +138,8 @@ class AuthService
                 ], $user);
             }
 
+            $this->recordConsents($user, $data);
+
             $token = $user->createToken('auth_token')->plainTextToken;
 
             return [
@@ -140,6 +147,54 @@ class AuthService
                 'token' => $token,
             ];
         });
+    }
+
+    /**
+     * Record statutory consent and notices in an immutable append-only record.
+     *
+     * @param User $user
+     * @param array<string, mixed> $data
+     */
+    protected function recordConsents(User $user, array $data): void
+    {
+        $version = ! empty($data['terms_version']) ? (string) $data['terms_version'] : '2026.1';
+        $ip = request()?->ip();
+        $userAgent = request()?->userAgent();
+
+        // 1. Mandatory Terms of Service consent (Contractual Necessity)
+        UserConsent::create([
+            'user_id' => $user->id,
+            'subject_id' => $user->id,
+            'consent_type' => 'terms_of_service',
+            'document_version' => $version,
+            'is_granted' => true,
+            'ip_address' => $ip,
+            'user_agent' => $userAgent,
+        ]);
+
+        // 2. Mandatory Privacy Notice Acknowledgement (Transparency Duty - Law 18-07 Art. 32)
+        UserConsent::create([
+            'user_id' => $user->id,
+            'subject_id' => $user->id,
+            'consent_type' => 'privacy_notice_acknowledgement',
+            'document_version' => $version,
+            'is_granted' => true,
+            'ip_address' => $ip,
+            'user_agent' => $userAgent,
+        ]);
+
+        // 3. Separate Optional Consents (e.g. analytics/telemetry - not bundled with terms)
+        if (array_key_exists('optional_analytics_consent', $data)) {
+            UserConsent::create([
+                'user_id' => $user->id,
+                'subject_id' => $user->id,
+                'consent_type' => 'optional_analytics',
+                'document_version' => $version,
+                'is_granted' => (bool) $data['optional_analytics_consent'],
+                'ip_address' => $ip,
+                'user_agent' => $userAgent,
+            ]);
+        }
     }
 
     /**

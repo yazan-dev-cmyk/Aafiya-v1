@@ -2580,7 +2580,12 @@
     "toggleRegister": "Don't have an account? Join us now",
     "toggleLogin": "Already have an account? Login",
     "encryption": "AES-256 Encryption",
-    "compliance": "GDPR Compliance",
+    "compliance": "Data Protection",
+    "acceptTermsPrefix": "I expressly agree to the",
+    "termsOfService": "Terms of Service",
+    "andAcknowledge": "and acknowledge the",
+    "privacyPolicy": "Privacy Notice",
+    "termsRequiredError": "You must accept the Terms of Service and acknowledge the Privacy Notice to register",
     "placeholderName": "Enter name here...",
     "placeholderEmail": "name@example.com",
     "placeholderPassword": "••••••••",
@@ -3374,5 +3379,30 @@
     "expiresAt": "Expires At",
     "accessGrantedAt": "Access Granted At",
     "securityNotice": "Strict data minimization applied for privacy: contact info and national ID are completely excluded."
+  },
+  "appDownload": {
+    "sectionBadge": "Mobile Applications",
+    "title": "Download AAFIYA Apps",
+    "titleAccent": "on Your Phone",
+    "subtitle": "Fast and secure access to your medical appointments, health records, and clinical care anytime, anywhere.",
+    "desktopScanNotice": "Scan the QR code with your phone camera for instant download",
+    "mobileNotice": "Or download the APK package directly to your Android device",
+    "directDownload": "Direct Download (APK)",
+    "scanWithPhone": "Scan with your phone to download",
+    "officialBuild": "Official Verified Android Build",
+    "patient": {
+      "badge": "Patient Application",
+      "name": "AAFIYA",
+      "platform": "Android 7.0+ (APK)",
+      "description": "View appointments, access unified health records, inspect digital prescriptions, and receive real-time notices.",
+      "downloadButton": "Download Patient App (APK)"
+    },
+    "pro": {
+      "badge": "Clinical & Professional App",
+      "name": "AAFIYA Pro",
+      "platform": "Android 7.0+ (APK)",
+      "description": "Manage clinical queues, handle follow-up escalations, consult verified patient EHR, and streamline practice care.",
+      "downloadButton": "Download AAFIYA Pro (APK)"
+    }
   }
 }

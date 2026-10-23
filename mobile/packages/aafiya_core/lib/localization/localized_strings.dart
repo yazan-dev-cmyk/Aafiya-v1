@@ -29,23 +29,61 @@ class LocalizedStrings {
   String get proAppTitle => isArabic ? 'عافية للمهنيين' : 'AAFIYA Pro';
 
   // Navigation & Shells
-  String get splashLoading => isArabic ? 'جاري التحميل...' : isFrench ? 'Chargement...' : 'Loading...';
-  String get signIn => isArabic ? 'تسجيل الدخول' : isFrench ? 'Connexion' : 'Sign In';
-  String get signUp => isArabic ? 'إنشاء حساب' : isFrench ? 'Créer un compte' : 'Create Account';
-  String get signOut => isArabic ? 'تسجيل الخروج' : isFrench ? 'Déconnexion' : 'Sign Out';
-  String get signOutConfirmTitle =>
-      isArabic ? 'تأكيد تسجيل الخروج' : isFrench ? 'Confirmer la déconnexion' : 'Confirm Sign Out';
+  String get splashLoading => isArabic
+      ? 'جاري التحميل...'
+      : isFrench
+          ? 'Chargement...'
+          : 'Loading...';
+  String get signIn => isArabic
+      ? 'تسجيل الدخول'
+      : isFrench
+          ? 'Connexion'
+          : 'Sign In';
+  String get signUp => isArabic
+      ? 'إنشاء حساب'
+      : isFrench
+          ? 'Créer un compte'
+          : 'Create Account';
+  String get signOut => isArabic
+      ? 'تسجيل الخروج'
+      : isFrench
+          ? 'Déconnexion'
+          : 'Sign Out';
+  String get signOutConfirmTitle => isArabic
+      ? 'تأكيد تسجيل الخروج'
+      : isFrench
+          ? 'Confirmer la déconnexion'
+          : 'Confirm Sign Out';
   String get signOutConfirmMessage => isArabic
       ? 'هل أنت متأكد من رغبتك في تسجيل الخروج من حسابك؟'
       : isFrench
           ? 'Êtes-vous sûr de vouloir vous déconnecter ?'
           : 'Are you sure you want to sign out of your account?';
-  String get emailLabel => isArabic ? 'البريد الإلكتروني' : isFrench ? 'Adresse e-mail' : 'Email Address';
-  String get passwordLabel => isArabic ? 'كلمة المرور' : isFrench ? 'Mot de passe' : 'Password';
-  String get fullNameLabel => isArabic ? 'الاسم الكامل' : isFrench ? 'Nom complet' : 'Full Name';
-  String get phoneLabel => isArabic ? 'رقم الهاتف' : isFrench ? 'Numéro de téléphone' : 'Phone Number';
-  String get confirmPasswordLabel =>
-      isArabic ? 'تأكيد كلمة المرور' : isFrench ? 'Confirmer le mot de passe' : 'Confirm Password';
+  String get emailLabel => isArabic
+      ? 'البريد الإلكتروني'
+      : isFrench
+          ? 'Adresse e-mail'
+          : 'Email Address';
+  String get passwordLabel => isArabic
+      ? 'كلمة المرور'
+      : isFrench
+          ? 'Mot de passe'
+          : 'Password';
+  String get fullNameLabel => isArabic
+      ? 'الاسم الكامل'
+      : isFrench
+          ? 'Nom complet'
+          : 'Full Name';
+  String get phoneLabel => isArabic
+      ? 'رقم الهاتف'
+      : isFrench
+          ? 'Numéro de téléphone'
+          : 'Phone Number';
+  String get confirmPasswordLabel => isArabic
+      ? 'تأكيد كلمة المرور'
+      : isFrench
+          ? 'Confirmer le mot de passe'
+          : 'Confirm Password';
   String get showPassword => isArabic
       ? 'إظهار كلمة المرور'
       : isFrench
@@ -66,16 +104,68 @@ class LocalizedStrings {
       : isFrench
           ? "Vous n'avez pas de compte ? S'inscrire"
           : "Don't have an account? Sign Up";
-  String get retry => isArabic ? 'إعادة المحاولة' : isFrench ? 'Réessayer' : 'Retry';
-  String get cancel => isArabic ? 'إلغاء' : isFrench ? 'Annuler' : 'Cancel';
-  String get ok => isArabic ? 'حسناً' : isFrench ? 'OK' : 'OK';
-  String get dismiss => isArabic ? 'إغلاق' : isFrench ? 'Fermer' : 'Dismiss';
-  String get errorTitle => isArabic ? 'حدث خطأ' : isFrench ? 'Une erreur est survenue' : 'An error occurred';
-  String get emptyTitle => isArabic ? 'لا توجد بيانات' : isFrench ? 'Aucune donnée' : 'No Data Available';
+  String get acceptTermsPrefix => isArabic
+      ? 'أوافق صراحة على'
+      : isFrench
+          ? "J'accepte expressément les"
+          : 'I expressly agree to the';
+  String get termsOfService => isArabic
+      ? 'شروط الاستخدام'
+      : isFrench
+          ? "Conditions d'utilisation"
+          : 'Terms of Service';
+  String get andAcknowledge => isArabic
+      ? 'واطلعت على'
+      : isFrench
+          ? 'et'
+          : 'and';
+  String get privacyPolicy => isArabic
+      ? 'إشعار الخصوصية والبيانات'
+      : isFrench
+          ? 'Politique de confidentialité'
+          : 'Privacy Notice';
+  String get mustAcceptTermsError => isArabic
+      ? 'يجب إقرار وقبول شروط الخدمة والاطلاع على إشعار الخصوصية لإنشاء الحساب'
+      : isFrench
+          ? "Vous devez accepter les conditions d'utilisation et la politique de confidentialité pour créer un compte"
+          : 'You must accept the Terms of Service and acknowledge the Privacy Notice to register';
+  String get retry => isArabic
+      ? 'إعادة المحاولة'
+      : isFrench
+          ? 'Réessayer'
+          : 'Retry';
+  String get cancel => isArabic
+      ? 'إلغاء'
+      : isFrench
+          ? 'Annuler'
+          : 'Cancel';
+  String get ok => isArabic
+      ? 'حسناً'
+      : isFrench
+          ? 'OK'
+          : 'OK';
+  String get dismiss => isArabic
+      ? 'إغلاق'
+      : isFrench
+          ? 'Fermer'
+          : 'Dismiss';
+  String get errorTitle => isArabic
+      ? 'حدث خطأ'
+      : isFrench
+          ? 'Une erreur est survenue'
+          : 'An error occurred';
+  String get emptyTitle => isArabic
+      ? 'لا توجد بيانات'
+      : isFrench
+          ? 'Aucune donnée'
+          : 'No Data Available';
 
   // Reliability, Offline & Crash Boundaries (TASK-06-01)
-  String get offlineBannerTitle =>
-      isArabic ? 'لا يوجد اتصال بالإنترنت' : isFrench ? 'Aucune connexion Internet' : 'No Internet Connection';
+  String get offlineBannerTitle => isArabic
+      ? 'لا يوجد اتصال بالإنترنت'
+      : isFrench
+          ? 'Aucune connexion Internet'
+          : 'No Internet Connection';
   String get offlineBannerMessage => isArabic
       ? 'يرجى التحقق من اتصالك بالشبكة'
       : isFrench
@@ -86,17 +176,26 @@ class LocalizedStrings {
       : isFrench
           ? 'Connexion Internet rétablie'
           : 'Internet connection restored';
-  String get globalErrorTitle =>
-      isArabic ? 'حدث خطأ غير متوقع' : isFrench ? 'Une erreur inattendue est survenue' : 'An unexpected error occurred';
+  String get globalErrorTitle => isArabic
+      ? 'حدث خطأ غير متوقع'
+      : isFrench
+          ? 'Une erreur inattendue est survenue'
+          : 'An unexpected error occurred';
   String get globalErrorMessage => isArabic
       ? 'نعتذر عن هذا الخطأ. يمكنك إعادة المحاولة أو العودة للرئيسية.'
       : isFrench
           ? 'Une erreur est survenue. Veuillez réessayer ou retourner à l’accueil.'
           : 'Something went wrong. Please retry or return to the main screen.';
-  String get returnToHome =>
-      isArabic ? 'العودة للرئيسية' : isFrench ? 'Retour à l’accueil' : 'Return to Home';
-  String get restartApp =>
-      isArabic ? 'إعادة التشغيل' : isFrench ? 'Redémarrer' : 'Restart';
+  String get returnToHome => isArabic
+      ? 'العودة للرئيسية'
+      : isFrench
+          ? 'Retour à l’accueil'
+          : 'Return to Home';
+  String get restartApp => isArabic
+      ? 'إعادة التشغيل'
+      : isFrench
+          ? 'Redémarrer'
+          : 'Restart';
 
   // Session Expiration (TASK-06-02)
   String get sessionExpiredTitle => isArabic
@@ -118,7 +217,11 @@ class LocalizedStrings {
           : 'Sign In Again';
 
   // Validation & Feedback
-  String get fieldRequired => isArabic ? 'هذا الحقل مطلوب' : isFrench ? 'Ce champ est requis' : 'This field is required';
+  String get fieldRequired => isArabic
+      ? 'هذا الحقل مطلوب'
+      : isFrench
+          ? 'Ce champ est requis'
+          : 'This field is required';
   String get invalidEmail => isArabic
       ? 'يرجى إدخال بريد إلكتروني صالح'
       : isFrench
@@ -139,17 +242,26 @@ class LocalizedStrings {
       : isFrench
           ? 'Les mots de passe ne correspondent pas'
           : 'Passwords do not match';
-  String get authenticationFailedTitle =>
-      isArabic ? 'فشل تسجيل الدخول' : isFrench ? 'Échec de la connexion' : 'Authentication Failed';
-  String get registrationFailedTitle =>
-      isArabic ? 'فشل إنشاء الحساب' : isFrench ? "Échec de l'inscription" : 'Registration Failed';
+  String get authenticationFailedTitle => isArabic
+      ? 'فشل تسجيل الدخول'
+      : isFrench
+          ? 'Échec de la connexion'
+          : 'Authentication Failed';
+  String get registrationFailedTitle => isArabic
+      ? 'فشل إنشاء الحساب'
+      : isFrench
+          ? "Échec de l'inscription"
+          : 'Registration Failed';
   String get invalidCredentials => isArabic
       ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة.'
       : isFrench
           ? 'Adresse e-mail ou mot de passe incorrect.'
           : 'Invalid email address or password.';
-  String get registrationSuccessTitle =>
-      isArabic ? 'تم إنشاء الحساب بنجاح' : isFrench ? 'Compte créé avec succès' : 'Account Created Successfully';
+  String get registrationSuccessTitle => isArabic
+      ? 'تم إنشاء الحساب بنجاح'
+      : isFrench
+          ? 'Compte créé avec succès'
+          : 'Account Created Successfully';
   String get registrationSuccessMessage => isArabic
       ? 'مرحباً بك في منصة عافية. جاري توجيهك إلى حسابك...'
       : isFrench
@@ -162,19 +274,36 @@ class LocalizedStrings {
           : 'Unable to connect to server, please check your connection and retry.';
 
   // Language Switching
-  String get language => isArabic ? 'اللغة' : isFrench ? 'Langue' : 'Language';
+  String get language => isArabic
+      ? 'اللغة'
+      : isFrench
+          ? 'Langue'
+          : 'Language';
   String get languageArabic => 'العربية';
   String get languageEnglish => 'English';
   String get languageFrench => 'Français';
 
   // Patient Shell
-  String get patientHomeTitle => isArabic ? 'الرئيسية' : isFrench ? 'Accueil' : 'Home';
-  String get patientAppointmentsTitle =>
-      isArabic ? 'المواعيد' : isFrench ? 'Rendez-vous' : 'Appointments';
-  String get patientRecordsTitle =>
-      isArabic ? 'السجل الطبي' : isFrench ? 'Dossier médical' : 'Medical Records';
-  String get patientProfileTitle =>
-      isArabic ? 'الملف الشخصي' : isFrench ? 'Profil' : 'Profile';
+  String get patientHomeTitle => isArabic
+      ? 'الرئيسية'
+      : isFrench
+          ? 'Accueil'
+          : 'Home';
+  String get patientAppointmentsTitle => isArabic
+      ? 'المواعيد'
+      : isFrench
+          ? 'Rendez-vous'
+          : 'Appointments';
+  String get patientRecordsTitle => isArabic
+      ? 'السجل الطبي'
+      : isFrench
+          ? 'Dossier médical'
+          : 'Medical Records';
+  String get patientProfileTitle => isArabic
+      ? 'الملف الشخصي'
+      : isFrench
+          ? 'Profil'
+          : 'Profile';
   String get patientNoticeDirectBookingNotice => isArabic
       ? 'يتم حجز المواعيد حصرياً عبر مراكز الحجز المعتمدة.'
       : isFrench
@@ -182,23 +311,61 @@ class LocalizedStrings {
           : 'Appointments are arranged exclusively through registered Booking Centers.';
 
   // Appointments (TASK-03-02)
-  String get upcomingAppointments =>
-      isArabic ? 'المواعيد القادمة' : isFrench ? 'Rendez-vous à venir' : 'Upcoming Appointments';
-  String get pastAppointments =>
-      isArabic ? 'المواعيد السابقة' : isFrench ? 'Rendez-vous passés' : 'Past Appointments';
-  String get appointmentDetails =>
-      isArabic ? 'تفاصيل الموعد' : isFrench ? 'Détails du rendez-vous' : 'Appointment Details';
-  String get bookingReference =>
-      isArabic ? 'رقم الحجز' : isFrench ? 'Référence de réservation' : 'Booking Reference';
-  String get clinic => isArabic ? 'العيادة' : isFrench ? 'Clinique' : 'Clinic';
-  String get doctor => isArabic ? 'الطبيب' : isFrench ? 'Médecin' : 'Doctor';
-  String get specialty => isArabic ? 'التخصص' : isFrench ? 'Spécialité' : 'Specialty';
-  String get appointmentDate =>
-      isArabic ? 'تاريخ الموعد' : isFrench ? 'Date du rendez-vous' : 'Appointment Date';
-  String get timeSlot =>
-      isArabic ? 'التوقيت' : isFrench ? 'Créneau horaire' : 'Time Slot';
-  String get notes => isArabic ? 'ملاحظات' : isFrench ? 'Remarques' : 'Notes';
-  String get close => isArabic ? 'إغلاق' : isFrench ? 'Fermer' : 'Close';
+  String get upcomingAppointments => isArabic
+      ? 'المواعيد القادمة'
+      : isFrench
+          ? 'Rendez-vous à venir'
+          : 'Upcoming Appointments';
+  String get pastAppointments => isArabic
+      ? 'المواعيد السابقة'
+      : isFrench
+          ? 'Rendez-vous passés'
+          : 'Past Appointments';
+  String get appointmentDetails => isArabic
+      ? 'تفاصيل الموعد'
+      : isFrench
+          ? 'Détails du rendez-vous'
+          : 'Appointment Details';
+  String get bookingReference => isArabic
+      ? 'رقم الحجز'
+      : isFrench
+          ? 'Référence de réservation'
+          : 'Booking Reference';
+  String get clinic => isArabic
+      ? 'العيادة'
+      : isFrench
+          ? 'Clinique'
+          : 'Clinic';
+  String get doctor => isArabic
+      ? 'الطبيب'
+      : isFrench
+          ? 'Médecin'
+          : 'Doctor';
+  String get specialty => isArabic
+      ? 'التخصص'
+      : isFrench
+          ? 'Spécialité'
+          : 'Specialty';
+  String get appointmentDate => isArabic
+      ? 'تاريخ الموعد'
+      : isFrench
+          ? 'Date du rendez-vous'
+          : 'Appointment Date';
+  String get timeSlot => isArabic
+      ? 'التوقيت'
+      : isFrench
+          ? 'Créneau horaire'
+          : 'Time Slot';
+  String get notes => isArabic
+      ? 'ملاحظات'
+      : isFrench
+          ? 'Remarques'
+          : 'Notes';
+  String get close => isArabic
+      ? 'إغلاق'
+      : isFrench
+          ? 'Fermer'
+          : 'Close';
   String get retryLoadingAppointments => isArabic
       ? 'إعادة محاولة تحميل المواعيد'
       : isFrench
@@ -219,33 +386,75 @@ class LocalizedStrings {
       : isFrench
           ? 'Aucun rendez-vous passé enregistré.'
           : 'No past appointments on record.';
-  String get emptyAppointmentTitle =>
-      isArabic ? 'ليس لديك موعد قادم' : isFrench ? 'Aucun rendez-vous à venir' : 'No Upcoming Appointments';
+  String get emptyAppointmentTitle => isArabic
+      ? 'ليس لديك موعد قادم'
+      : isFrench
+          ? 'Aucun rendez-vous à venir'
+          : 'No Upcoming Appointments';
   String get emptyAppointmentDescription => isArabic
       ? 'تُحجز المواعيد عبر مراكز الحجز المعتمدة. اعثر على أقرب مركز إليك.'
       : isFrench
           ? 'Les rendez-vous sont pris via les centres de réservation agréés. Trouvez le centre le plus proche.'
           : 'Appointments are booked through authorized booking centers. Find your nearest center.';
-  String get findBookingCenterAction =>
-      isArabic ? 'ابحث عن مركز حجز' : isFrench ? 'Trouver un centre' : 'Find Booking Center';
-  String get appointmentConfirmedAt =>
-      isArabic ? 'تم التأكيد بتاريخ' : isFrench ? 'Confirmé le' : 'Confirmed on';
-  String get appointmentCheckedInAt =>
-      isArabic ? 'تم تسجيل الحضور بتاريخ' : isFrench ? 'Présence enregistrée le' : 'Checked in on';
+  String get findBookingCenterAction => isArabic
+      ? 'ابحث عن مركز حجز'
+      : isFrench
+          ? 'Trouver un centre'
+          : 'Find Booking Center';
+  String get appointmentConfirmedAt => isArabic
+      ? 'تم التأكيد بتاريخ'
+      : isFrench
+          ? 'Confirmé le'
+          : 'Confirmed on';
+  String get appointmentCheckedInAt => isArabic
+      ? 'تم تسجيل الحضور بتاريخ'
+      : isFrench
+          ? 'Présence enregistrée le'
+          : 'Checked in on';
 
   static const List<String> _arMonths = [
-    'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
-    'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+    'يناير',
+    'فبراير',
+    'مارس',
+    'أبريل',
+    'مايو',
+    'يونيو',
+    'يوليو',
+    'أغسطس',
+    'سبتمبر',
+    'أكتوبر',
+    'نوفمبر',
+    'ديسمبر'
   ];
 
   static const List<String> _frMonths = [
-    'janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin',
-    'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'
+    'janv.',
+    'févr.',
+    'mars',
+    'avr.',
+    'mai',
+    'juin',
+    'juil.',
+    'août',
+    'sept.',
+    'oct.',
+    'nov.',
+    'déc.'
   ];
 
   static const List<String> _enMonths = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec'
   ];
 
   /// Safely formats an ISO date or timestamp string into a localized date representation.
@@ -273,18 +482,56 @@ class LocalizedStrings {
   }
 
   // Appointment Statuses
-  String get statusPending => isArabic ? 'قيد الانتظار' : isFrench ? 'En attente' : 'Pending';
-  String get statusConfirmed => isArabic ? 'مؤكد' : isFrench ? 'Confirmé' : 'Confirmed';
-  String get statusAttended => isArabic ? 'تم الحضور' : isFrench ? 'Présent' : 'Attended';
-  String get statusNoShow => isArabic ? 'لم يحضر' : isFrench ? 'Non présenté' : 'No Show';
-  String get statusCancelled => isArabic ? 'ملغى' : isFrench ? 'Annulé' : 'Cancelled';
-  String get statusRejected => isArabic ? 'مرفوض' : isFrench ? 'Refusé' : 'Rejected';
-  String get statusExpired => isArabic ? 'منتهي' : isFrench ? 'Expiré' : 'Expired';
-  String get statusRescheduled =>
-      isArabic ? 'معاد جدولته' : isFrench ? 'Reprogrammé' : 'Rescheduled';
-  String get statusUnknown => isArabic ? 'غير محدد' : isFrench ? 'Inconnu' : 'Unknown';
-  String get statusPastAppointment =>
-      isArabic ? 'موعد سابق' : isFrench ? 'Rendez-vous passé' : 'Past Appointment';
+  String get statusPending => isArabic
+      ? 'قيد الانتظار'
+      : isFrench
+          ? 'En attente'
+          : 'Pending';
+  String get statusConfirmed => isArabic
+      ? 'مؤكد'
+      : isFrench
+          ? 'Confirmé'
+          : 'Confirmed';
+  String get statusAttended => isArabic
+      ? 'تم الحضور'
+      : isFrench
+          ? 'Présent'
+          : 'Attended';
+  String get statusNoShow => isArabic
+      ? 'لم يحضر'
+      : isFrench
+          ? 'Non présenté'
+          : 'No Show';
+  String get statusCancelled => isArabic
+      ? 'ملغى'
+      : isFrench
+          ? 'Annulé'
+          : 'Cancelled';
+  String get statusRejected => isArabic
+      ? 'مرفوض'
+      : isFrench
+          ? 'Refusé'
+          : 'Rejected';
+  String get statusExpired => isArabic
+      ? 'منتهي'
+      : isFrench
+          ? 'Expiré'
+          : 'Expired';
+  String get statusRescheduled => isArabic
+      ? 'معاد جدولته'
+      : isFrench
+          ? 'Reprogrammé'
+          : 'Rescheduled';
+  String get statusUnknown => isArabic
+      ? 'غير محدد'
+      : isFrench
+          ? 'Inconnu'
+          : 'Unknown';
+  String get statusPastAppointment => isArabic
+      ? 'موعد سابق'
+      : isFrench
+          ? 'Rendez-vous passé'
+          : 'Past Appointment';
 
   String statusLabel(AppointmentStatus status) => switch (status) {
         AppointmentStatus.pending => statusPending,
@@ -299,10 +546,21 @@ class LocalizedStrings {
       };
 
   // Pro Roles
-  String get doctorRoleTitle => isArabic ? 'طبيب' : isFrench ? 'Médecin' : 'Doctor';
-  String get assistantRoleTitle => isArabic ? 'مساعد عيادة' : isFrench ? 'Assistant' : 'Assistant';
-  String get bookingCenterRoleTitle =>
-      isArabic ? 'مركز حجز' : isFrench ? 'Centre de réservation' : 'Booking Center';
+  String get doctorRoleTitle => isArabic
+      ? 'طبيب'
+      : isFrench
+          ? 'Médecin'
+          : 'Doctor';
+  String get assistantRoleTitle => isArabic
+      ? 'مساعد عيادة'
+      : isFrench
+          ? 'Assistant'
+          : 'Assistant';
+  String get bookingCenterRoleTitle => isArabic
+      ? 'مركز حجز'
+      : isFrench
+          ? 'Centre de réservation'
+          : 'Booking Center';
   String get unauthorizedRoleMessage => isArabic
       ? 'الحساب الحالي غير مصرح له بالدخول إلى هذا التطبيق.'
       : isFrench
@@ -322,80 +580,267 @@ class LocalizedStrings {
           : 'Administrative and diagnostic functions must be accessed via the web console.';
 
   // Role Shell Placeholders
-  String get doctorDashboardTitle =>
-      isArabic ? 'لوحة تحكم الطبيب' : isFrench ? 'Tableau de bord médecin' : 'Doctor Operational Dashboard';
-  String get assistantDashboardTitle =>
-      isArabic ? 'لوحة تحكم المساعد' : isFrench ? 'Tableau de bord assistant' : 'Assistant Operational Dashboard';
-  String get bookingCenterDashboardTitle =>
-      isArabic ? 'لوحة مركز الحجز' : isFrench ? 'Tableau de bord centre de réservation' : 'Booking Center Operations';
+  String get doctorDashboardTitle => isArabic
+      ? 'لوحة تحكم الطبيب'
+      : isFrench
+          ? 'Tableau de bord médecin'
+          : 'Doctor Operational Dashboard';
+  String get assistantDashboardTitle => isArabic
+      ? 'لوحة تحكم المساعد'
+      : isFrench
+          ? 'Tableau de bord assistant'
+          : 'Assistant Operational Dashboard';
+  String get bookingCenterDashboardTitle => isArabic
+      ? 'لوحة مركز الحجز'
+      : isFrench
+          ? 'Tableau de bord centre de réservation'
+          : 'Booking Center Operations';
 
-  String get quotaBalanceLabel =>
-      isArabic ? 'رصيد الحصص' : isFrench ? 'Solde de quota' : 'Quota Balance';
+  String get quotaBalanceLabel => isArabic
+      ? 'رصيد الحصص'
+      : isFrench
+          ? 'Solde de quota'
+          : 'Quota Balance';
 
-  String get doctorDirectory => isArabic ? 'دليل الأطباء' : isFrench ? 'Annuaire des médecins' : 'Doctor Directory';
-  String get clinicDirectory => isArabic ? 'دليل العيادات' : isFrench ? 'Annuaire des cliniques' : 'Clinic Directory';
-  String get bookingCenterDirectoryTitle => isArabic ? 'دليل مراكز الحجز المعتمدة' : isFrench ? 'Centres de réservation agréés' : 'Authorized Booking Centers';
-  String get searchBookingCentersHint =>
-      isArabic ? 'ابحث باسم المركز أو الولاية...' : isFrench ? 'Rechercher par nom de centre ou wilaya...' : 'Search by center name or wilaya...';
-  String get noBookingCentersFound =>
-      isArabic ? 'لم يتم العثور على مراكز حجز مطابقة للبحث.' : isFrench ? 'Aucun centre de réservation trouvé.' : 'No booking centers found matching search.';
-  String get verifiedBookingCenter => isArabic ? 'مركز حجز معتمد' : isFrench ? 'Centre agréé' : 'Authorized Booking Center';
-  String get disc01Notice =>
-      isArabic
-          ? 'دليل استعلامي فقط — الحجز المباشر عبر مراكز الحجز المعتمدة'
-          : isFrench
-              ? 'Annuaire informatif uniquement — Réservation via centres agréés'
-              : 'Informational directory only — Direct booking through authorized centers';
-  String get directorySearchHint =>
-      isArabic ? 'ابحث عن طبيب أو عيادة أو ولاية...' : isFrench ? 'Rechercher médecin, clinique, wilaya...' : 'Search doctor, clinic, wilaya...';
-  String get searchDoctorsHint =>
-      isArabic ? 'ابحث بالاسم أو التخصص أو العيادة...' : isFrench ? 'Rechercher par nom, spécialité, clinique...' : 'Search by name, specialty, clinic...';
-  String get searchClinicsHint =>
-      isArabic ? 'ابحث عن اسم العيادة أو الولاية...' : isFrench ? 'Rechercher par nom de clinique ou wilaya...' : 'Search by clinic name or wilaya...';
-  String get search => isArabic ? 'بحث' : isFrench ? 'Rechercher' : 'Search';
-  String get verifiedDoctor => isArabic ? 'طبيب معتمد' : isFrench ? 'Médecin vérifié' : 'Verified Doctor';
-  String get affiliatedClinics => isArabic ? 'العيادات التابعة' : isFrench ? 'Cliniques affiliées' : 'Affiliated Clinics';
-  String get noAffiliatedClinics =>
-      isArabic ? 'لا توجد عيادات تابعة مسجلة.' : isFrench ? 'Aucune clinique affiliée enregistrée.' : 'No affiliated clinics registered.';
-  String get noDoctorsFound =>
-      isArabic ? 'لم يتم العثور على أطباء مطابقين للبحث.' : isFrench ? 'Aucun médecin trouvé.' : 'No doctors found matching search.';
-  String get noClinicsFound =>
-      isArabic ? 'لم يتم العثور على عيادات مطابقة للبحث.' : isFrench ? 'Aucune clinique trouvée.' : 'No clinics found matching search.';
-  String get filterBySpecialty => isArabic ? 'تصفية بالتخصص' : isFrench ? 'Filtrer par spécialité' : 'Filter by Specialty';
-  String get filterByWilaya => isArabic ? 'تصفية بالولاية' : isFrench ? 'Filtrer par wilaya' : 'Filter by Wilaya';
-  String get allSpecialties => isArabic ? 'جميع التخصصات' : isFrench ? 'Toutes les spécialités' : 'All Specialties';
-  String get allWilayas => isArabic ? 'جميع الولايات' : isFrench ? 'Toutes les wilayas' : 'All Wilayas';
-  String get tabDoctors => isArabic ? 'الأطباء' : isFrench ? 'Médecins' : 'Doctors';
-  String get tabClinics => isArabic ? 'العيادات' : isFrench ? 'Cliniques' : 'Clinics';
-  String get tabCenters => isArabic ? 'مراكز الحجز' : isFrench ? 'Centres de réservation' : 'Booking Centers';
-  String get viewAll => isArabic ? 'عرض الكل' : isFrench ? 'Voir tout' : 'View All';
+  String get doctorDirectory => isArabic
+      ? 'دليل الأطباء'
+      : isFrench
+          ? 'Annuaire des médecins'
+          : 'Doctor Directory';
+  String get clinicDirectory => isArabic
+      ? 'دليل العيادات'
+      : isFrench
+          ? 'Annuaire des cliniques'
+          : 'Clinic Directory';
+  String get bookingCenterDirectoryTitle => isArabic
+      ? 'دليل مراكز الحجز المعتمدة'
+      : isFrench
+          ? 'Centres de réservation agréés'
+          : 'Authorized Booking Centers';
+  String get searchBookingCentersHint => isArabic
+      ? 'ابحث باسم المركز أو الولاية...'
+      : isFrench
+          ? 'Rechercher par nom de centre ou wilaya...'
+          : 'Search by center name or wilaya...';
+  String get noBookingCentersFound => isArabic
+      ? 'لم يتم العثور على مراكز حجز مطابقة للبحث.'
+      : isFrench
+          ? 'Aucun centre de réservation trouvé.'
+          : 'No booking centers found matching search.';
+  String get verifiedBookingCenter => isArabic
+      ? 'مركز حجز معتمد'
+      : isFrench
+          ? 'Centre agréé'
+          : 'Authorized Booking Center';
+  String get disc01Notice => isArabic
+      ? 'دليل استعلامي فقط — الحجز المباشر عبر مراكز الحجز المعتمدة'
+      : isFrench
+          ? 'Annuaire informatif uniquement — Réservation via centres agréés'
+          : 'Informational directory only — Direct booking through authorized centers';
+  String get directorySearchHint => isArabic
+      ? 'ابحث عن طبيب أو عيادة أو ولاية...'
+      : isFrench
+          ? 'Rechercher médecin, clinique, wilaya...'
+          : 'Search doctor, clinic, wilaya...';
+  String get searchDoctorsHint => isArabic
+      ? 'ابحث بالاسم أو التخصص أو العيادة...'
+      : isFrench
+          ? 'Rechercher par nom, spécialité, clinique...'
+          : 'Search by name, specialty, clinic...';
+  String get searchClinicsHint => isArabic
+      ? 'ابحث عن اسم العيادة أو الولاية...'
+      : isFrench
+          ? 'Rechercher par nom de clinique ou wilaya...'
+          : 'Search by clinic name or wilaya...';
+  String get search => isArabic
+      ? 'بحث'
+      : isFrench
+          ? 'Rechercher'
+          : 'Search';
+  String get verifiedDoctor => isArabic
+      ? 'طبيب معتمد'
+      : isFrench
+          ? 'Médecin vérifié'
+          : 'Verified Doctor';
+  String get affiliatedClinics => isArabic
+      ? 'العيادات التابعة'
+      : isFrench
+          ? 'Cliniques affiliées'
+          : 'Affiliated Clinics';
+  String get noAffiliatedClinics => isArabic
+      ? 'لا توجد عيادات تابعة مسجلة.'
+      : isFrench
+          ? 'Aucune clinique affiliée enregistrée.'
+          : 'No affiliated clinics registered.';
+  String get noDoctorsFound => isArabic
+      ? 'لم يتم العثور على أطباء مطابقين للبحث.'
+      : isFrench
+          ? 'Aucun médecin trouvé.'
+          : 'No doctors found matching search.';
+  String get noClinicsFound => isArabic
+      ? 'لم يتم العثور على عيادات مطابقة للبحث.'
+      : isFrench
+          ? 'Aucune clinique trouvée.'
+          : 'No clinics found matching search.';
+  String get filterBySpecialty => isArabic
+      ? 'تصفية بالتخصص'
+      : isFrench
+          ? 'Filtrer par spécialité'
+          : 'Filter by Specialty';
+  String get filterByWilaya => isArabic
+      ? 'تصفية بالولاية'
+      : isFrench
+          ? 'Filtrer par wilaya'
+          : 'Filter by Wilaya';
+  String get allSpecialties => isArabic
+      ? 'جميع التخصصات'
+      : isFrench
+          ? 'Toutes les spécialités'
+          : 'All Specialties';
+  String get allWilayas => isArabic
+      ? 'جميع الولايات'
+      : isFrench
+          ? 'Toutes les wilayas'
+          : 'All Wilayas';
+  String get tabDoctors => isArabic
+      ? 'الأطباء'
+      : isFrench
+          ? 'Médecins'
+          : 'Doctors';
+  String get tabClinics => isArabic
+      ? 'العيادات'
+      : isFrench
+          ? 'Cliniques'
+          : 'Clinics';
+  String get tabCenters => isArabic
+      ? 'مراكز الحجز'
+      : isFrench
+          ? 'Centres de réservation'
+          : 'Booking Centers';
+  String get viewAll => isArabic
+      ? 'عرض الكل'
+      : isFrench
+          ? 'Voir tout'
+          : 'View All';
 
   // Master Data (TASK-MD-09 & TASK-MD-12)
-  String get selectSpecialty => isArabic ? 'اختر التخصص' : isFrench ? 'Sélectionner la spécialité' : 'Select Specialty';
-  String get loadingSpecialties => isArabic ? 'جاري تحميل التخصصات...' : isFrench ? 'Chargement des spécialités...' : 'Loading specialties...';
-  String get errorLoadingSpecialties => isArabic ? 'تعذر تحميل التخصصات' : isFrench ? 'Échec du chargement des spécialités' : 'Failed to load specialties';
-  String get noSpecialtiesFound => isArabic ? 'لا توجد تخصصات متاحة' : isFrench ? 'Aucune spécialité disponible' : 'No specialties available';
-  String get selectWilaya => isArabic ? 'اختر الولاية' : isFrench ? 'Sélectionner la wilaya' : 'Select Wilaya';
-  String get selectCommune => isArabic ? 'اختر البلدية' : isFrench ? 'Sélectionner la commune' : 'Select Commune';
-  String get selectWilayaFirst => isArabic ? 'اختر الولاية أولاً' : isFrench ? 'Sélectionnez d\'abord la wilaya' : 'Select Wilaya first';
-  String get loadingWilayas => isArabic ? 'جاري تحميل الولايات...' : isFrench ? 'Chargement des wilayas...' : 'Loading wilayas...';
-  String get loadingCommunes => isArabic ? 'جاري تحميل البلديات...' : isFrench ? 'Chargement des communes...' : 'Loading communes...';
-  String get errorLoadingWilayas => isArabic ? 'تعذر تحميل الولايات' : isFrench ? 'Échec du chargement des wilayas' : 'Failed to load wilayas';
-  String get errorLoadingCommunes => isArabic ? 'تعذر تحميل البلديات' : isFrench ? 'Échec du chargement des communes' : 'Failed to load communes';
-  String get noCommunesFound => isArabic ? 'لا توجد بلديات متاحة' : isFrench ? 'Aucune commune disponible' : 'No communes available';
-  String get allCommunes => isArabic ? 'جميع البلديات' : isFrench ? 'Toutes les communes' : 'All Communes';
-  String get communeLabel => isArabic ? 'البلدية' : isFrench ? 'Commune' : 'Commune';
-  String get wilayaLabel => isArabic ? 'الولاية' : isFrench ? 'Wilaya' : 'Wilaya';
-  String get postalCodeLabel => isArabic ? 'الرمز البريدي' : isFrench ? 'Code postal' : 'Postal Code';
+  String get selectSpecialty => isArabic
+      ? 'اختر التخصص'
+      : isFrench
+          ? 'Sélectionner la spécialité'
+          : 'Select Specialty';
+  String get loadingSpecialties => isArabic
+      ? 'جاري تحميل التخصصات...'
+      : isFrench
+          ? 'Chargement des spécialités...'
+          : 'Loading specialties...';
+  String get errorLoadingSpecialties => isArabic
+      ? 'تعذر تحميل التخصصات'
+      : isFrench
+          ? 'Échec du chargement des spécialités'
+          : 'Failed to load specialties';
+  String get noSpecialtiesFound => isArabic
+      ? 'لا توجد تخصصات متاحة'
+      : isFrench
+          ? 'Aucune spécialité disponible'
+          : 'No specialties available';
+  String get selectWilaya => isArabic
+      ? 'اختر الولاية'
+      : isFrench
+          ? 'Sélectionner la wilaya'
+          : 'Select Wilaya';
+  String get selectCommune => isArabic
+      ? 'اختر البلدية'
+      : isFrench
+          ? 'Sélectionner la commune'
+          : 'Select Commune';
+  String get selectWilayaFirst => isArabic
+      ? 'اختر الولاية أولاً'
+      : isFrench
+          ? 'Sélectionnez d\'abord la wilaya'
+          : 'Select Wilaya first';
+  String get loadingWilayas => isArabic
+      ? 'جاري تحميل الولايات...'
+      : isFrench
+          ? 'Chargement des wilayas...'
+          : 'Loading wilayas...';
+  String get loadingCommunes => isArabic
+      ? 'جاري تحميل البلديات...'
+      : isFrench
+          ? 'Chargement des communes...'
+          : 'Loading communes...';
+  String get errorLoadingWilayas => isArabic
+      ? 'تعذر تحميل الولايات'
+      : isFrench
+          ? 'Échec du chargement des wilayas'
+          : 'Failed to load wilayas';
+  String get errorLoadingCommunes => isArabic
+      ? 'تعذر تحميل البلديات'
+      : isFrench
+          ? 'Échec du chargement des communes'
+          : 'Failed to load communes';
+  String get noCommunesFound => isArabic
+      ? 'لا توجد بلديات متاحة'
+      : isFrench
+          ? 'Aucune commune disponible'
+          : 'No communes available';
+  String get allCommunes => isArabic
+      ? 'جميع البلديات'
+      : isFrench
+          ? 'Toutes les communes'
+          : 'All Communes';
+  String get communeLabel => isArabic
+      ? 'البلدية'
+      : isFrench
+          ? 'Commune'
+          : 'Commune';
+  String get wilayaLabel => isArabic
+      ? 'الولاية'
+      : isFrench
+          ? 'Wilaya'
+          : 'Wilaya';
+  String get postalCodeLabel => isArabic
+      ? 'الرمز البريدي'
+      : isFrench
+          ? 'Code postal'
+          : 'Postal Code';
 
   // Specialties (DEF-02 Stage A)
-  String get specialtyCardiology => isArabic ? 'أمراض القلب' : isFrench ? 'Cardiologie' : 'Cardiology';
-  String get specialtyPediatrics => isArabic ? 'طب الأطفال' : isFrench ? 'Pédiatrie' : 'Pediatrics';
-  String get specialtyOphthalmology => isArabic ? 'طب العيون' : isFrench ? 'Ophtalmologie' : 'Ophthalmology';
-  String get specialtyDentistry => isArabic ? 'طب وجراحة الأسنان' : isFrench ? 'Dentisterie' : 'Dentistry';
-  String get specialtyGeneralPractice => isArabic ? 'الطب العام' : isFrench ? 'Médecine générale' : 'General Practice';
-  String get specialtyOrthopedics => isArabic ? 'جراحة العظام' : isFrench ? 'Orthopédie' : 'Orthopedics';
-  String get specialtyDermatology => isArabic ? 'الأمراض الجلدية' : isFrench ? 'Dermatologie' : 'Dermatology';
+  String get specialtyCardiology => isArabic
+      ? 'أمراض القلب'
+      : isFrench
+          ? 'Cardiologie'
+          : 'Cardiology';
+  String get specialtyPediatrics => isArabic
+      ? 'طب الأطفال'
+      : isFrench
+          ? 'Pédiatrie'
+          : 'Pediatrics';
+  String get specialtyOphthalmology => isArabic
+      ? 'طب العيون'
+      : isFrench
+          ? 'Ophtalmologie'
+          : 'Ophthalmology';
+  String get specialtyDentistry => isArabic
+      ? 'طب وجراحة الأسنان'
+      : isFrench
+          ? 'Dentisterie'
+          : 'Dentistry';
+  String get specialtyGeneralPractice => isArabic
+      ? 'الطب العام'
+      : isFrench
+          ? 'Médecine générale'
+          : 'General Practice';
+  String get specialtyOrthopedics => isArabic
+      ? 'جراحة العظام'
+      : isFrench
+          ? 'Orthopédie'
+          : 'Orthopedics';
+  String get specialtyDermatology => isArabic
+      ? 'الأمراض الجلدية'
+      : isFrench
+          ? 'Dermatologie'
+          : 'Dermatology';
 
   /// Resolves localized specialty label from raw key or Arabic string.
   String specialtyName(String raw) {
@@ -436,13 +881,41 @@ class LocalizedStrings {
   }
 
   // Supported Wilayas (DEF-02 Stage A)
-  String get wilayaAlgiers => isArabic ? 'الجزائر' : isFrench ? 'Alger' : 'Algiers';
-  String get wilayaBlida => isArabic ? 'البليدة' : isFrench ? 'Blida' : 'Blida';
-  String get wilayaOran => isArabic ? 'وهران' : isFrench ? 'Oran' : 'Oran';
-  String get wilayaConstantine => isArabic ? 'قسنطينة' : isFrench ? 'Constantine' : 'Constantine';
-  String get wilayaSetif => isArabic ? 'سطيف' : isFrench ? 'Sétif' : 'Setif';
-  String get wilayaAnnaba => isArabic ? 'عنابة' : isFrench ? 'Annaba' : 'Annaba';
-  String get wilayaTlemcen => isArabic ? 'تلمسان' : isFrench ? 'Tlemcen' : 'Tlemcen';
+  String get wilayaAlgiers => isArabic
+      ? 'الجزائر'
+      : isFrench
+          ? 'Alger'
+          : 'Algiers';
+  String get wilayaBlida => isArabic
+      ? 'البليدة'
+      : isFrench
+          ? 'Blida'
+          : 'Blida';
+  String get wilayaOran => isArabic
+      ? 'وهران'
+      : isFrench
+          ? 'Oran'
+          : 'Oran';
+  String get wilayaConstantine => isArabic
+      ? 'قسنطينة'
+      : isFrench
+          ? 'Constantine'
+          : 'Constantine';
+  String get wilayaSetif => isArabic
+      ? 'سطيف'
+      : isFrench
+          ? 'Sétif'
+          : 'Setif';
+  String get wilayaAnnaba => isArabic
+      ? 'عنابة'
+      : isFrench
+          ? 'Annaba'
+          : 'Annaba';
+  String get wilayaTlemcen => isArabic
+      ? 'تلمسان'
+      : isFrench
+          ? 'Tlemcen'
+          : 'Tlemcen';
 
   /// Resolves localized Wilaya label from raw key or Arabic string.
   String wilayaName(String raw) {
@@ -482,158 +955,390 @@ class LocalizedStrings {
         return raw;
     }
   }
-  String get callClinic => isArabic ? 'الاتصال بالعيادة' : isFrench ? 'Appeler la clinique' : 'Call Clinic';
-  String get director => isArabic ? 'المدير الطبي' : isFrench ? 'Directeur médical' : 'Medical Director';
-  String get doctorsCount => isArabic ? 'عدد الأطباء' : isFrench ? 'Médecins' : 'Doctors';
-  String get loadMore => isArabic ? 'تحميل المزيد' : isFrench ? 'Charger plus' : 'Load More';
-  String get loadingMore => isArabic ? 'جاري تحميل المزيد...' : isFrench ? 'Chargement...' : 'Loading more...';
-  String get failedToLoadMore =>
-      isArabic ? 'فشل تحميل المزيد، انقر للمحاولة مجدداً.' : isFrench ? 'Échec du chargement, appuyez pour réessayer.' : 'Failed to load more. Tap to retry.';
-  String get endOfResults => isArabic ? 'تم عرض جميع النتائج.' : isFrench ? 'Toutes les résultats sont affichés.' : 'All results displayed.';
-  String get discoverDoctorsAndClinics =>
-      isArabic ? 'دليل الأطباء والعيادات' : isFrench ? 'Découvrir les médecins et cliniques' : 'Discover Doctors & Clinics';
-  String get discoverDirectorySubtitle =>
-      isArabic ? 'استكشف المراكز والعيادات المعتمدة وأطباء الشبكة' : isFrench ? 'Explorez les cliniques agréées et les médecins' : 'Explore affiliated clinics and licensed practitioners';
-  String get loading => isArabic ? 'جاري التحميل...' : isFrench ? 'Chargement...' : 'Loading...';
-  String get loadingDoctors => isArabic ? 'جاري تحميل قائمة الأطباء...' : isFrench ? 'Chargement des médecins...' : 'Loading doctors...';
-  String get loadingClinics => isArabic ? 'جاري تحميل قائمة العيادات...' : isFrench ? 'Chargement des cliniques...' : 'Loading clinics...';
+
+  String get callClinic => isArabic
+      ? 'الاتصال بالعيادة'
+      : isFrench
+          ? 'Appeler la clinique'
+          : 'Call Clinic';
+  String get director => isArabic
+      ? 'المدير الطبي'
+      : isFrench
+          ? 'Directeur médical'
+          : 'Medical Director';
+  String get doctorsCount => isArabic
+      ? 'عدد الأطباء'
+      : isFrench
+          ? 'Médecins'
+          : 'Doctors';
+  String get loadMore => isArabic
+      ? 'تحميل المزيد'
+      : isFrench
+          ? 'Charger plus'
+          : 'Load More';
+  String get loadingMore => isArabic
+      ? 'جاري تحميل المزيد...'
+      : isFrench
+          ? 'Chargement...'
+          : 'Loading more...';
+  String get failedToLoadMore => isArabic
+      ? 'فشل تحميل المزيد، انقر للمحاولة مجدداً.'
+      : isFrench
+          ? 'Échec du chargement, appuyez pour réessayer.'
+          : 'Failed to load more. Tap to retry.';
+  String get endOfResults => isArabic
+      ? 'تم عرض جميع النتائج.'
+      : isFrench
+          ? 'Toutes les résultats sont affichés.'
+          : 'All results displayed.';
+  String get discoverDoctorsAndClinics => isArabic
+      ? 'دليل الأطباء والعيادات'
+      : isFrench
+          ? 'Découvrir les médecins et cliniques'
+          : 'Discover Doctors & Clinics';
+  String get discoverDirectorySubtitle => isArabic
+      ? 'استكشف المراكز والعيادات المعتمدة وأطباء الشبكة'
+      : isFrench
+          ? 'Explorez les cliniques agréées et les médecins'
+          : 'Explore affiliated clinics and licensed practitioners';
+  String get loading => isArabic
+      ? 'جاري التحميل...'
+      : isFrench
+          ? 'Chargement...'
+          : 'Loading...';
+  String get loadingDoctors => isArabic
+      ? 'جاري تحميل قائمة الأطباء...'
+      : isFrench
+          ? 'Chargement des médecins...'
+          : 'Loading doctors...';
+  String get loadingClinics => isArabic
+      ? 'جاري تحميل قائمة العيادات...'
+      : isFrench
+          ? 'Chargement des cliniques...'
+          : 'Loading clinics...';
 
   // Prescriptions & Medical Records (TASK-03-04)
-  String get prescriptionsTitle =>
-      isArabic ? 'الوصفات الطبية' : isFrench ? 'Ordonnances médicales' : 'Prescriptions';
-  String get loadingPrescriptions =>
-      isArabic ? 'جاري تحميل الوصفات الطبية...' : isFrench ? 'Chargement des ordonnances...' : 'Loading prescriptions...';
-  String get emptyPrescriptions =>
-      isArabic ? 'لا توجد وصفات طبية مسجلة.' : isFrench ? 'Aucune ordonnance enregistrée.' : 'No prescriptions on record.';
-  String get emptyPrescriptionsFiltered =>
-      isArabic ? 'لا توجد وصفات تطابق هذا التصنيف.' : isFrench ? 'Aucune ordonnance pour ce filtre.' : 'No prescriptions match this filter.';
-  String get retryLoadingPrescriptions =>
-      isArabic ? 'إعادة تحميل الوصفات' : isFrench ? 'Réessayer le chargement' : 'Retry loading prescriptions';
-  String get prescriptionReference =>
-      isArabic ? 'الرقم المرجعي' : isFrench ? 'Référence' : 'Reference';
-  String get allPrescriptions =>
-      isArabic ? 'الكل' : isFrench ? 'Toutes' : 'All';
-  String get filterStatusActive =>
-      isArabic ? 'نشطة' : isFrench ? 'Actives' : 'Active';
-  String get filterStatusCompleted =>
-      isArabic ? 'مكتملة' : isFrench ? 'Terminées' : 'Completed';
-  String get filterStatusVoided =>
-      isArabic ? 'ملغاة' : isFrench ? 'Annulées' : 'Voided';
-  String get filterStatusExpired =>
-      isArabic ? 'منتهية' : isFrench ? 'Expirées' : 'Expired';
-  String get statusActive =>
-      isArabic ? 'نشطة' : isFrench ? 'Active' : 'Active';
-  String get statusVoided =>
-      isArabic ? 'ملغاة' : isFrench ? 'Annulée' : 'Voided';
-  String get validUntil =>
-      isArabic ? 'صالحة حتى' : isFrench ? "Valable jusqu'au" : 'Valid until';
-  String get issuedOn =>
-      isArabic ? 'تاريخ الإصدار' : isFrench ? 'Délivrée le' : 'Issued on';
-  String get expiresOn =>
-      isArabic ? 'تاريخ الانتهاء' : isFrench ? 'Expire le' : 'Expires on';
-  String get medicationsCount =>
-      isArabic ? 'الأدوية الموصوفة' : isFrench ? 'Médicaments prescrits' : 'Prescribed Medications';
+  String get prescriptionsTitle => isArabic
+      ? 'الوصفات الطبية'
+      : isFrench
+          ? 'Ordonnances médicales'
+          : 'Prescriptions';
+  String get loadingPrescriptions => isArabic
+      ? 'جاري تحميل الوصفات الطبية...'
+      : isFrench
+          ? 'Chargement des ordonnances...'
+          : 'Loading prescriptions...';
+  String get emptyPrescriptions => isArabic
+      ? 'لا توجد وصفات طبية مسجلة.'
+      : isFrench
+          ? 'Aucune ordonnance enregistrée.'
+          : 'No prescriptions on record.';
+  String get emptyPrescriptionsFiltered => isArabic
+      ? 'لا توجد وصفات تطابق هذا التصنيف.'
+      : isFrench
+          ? 'Aucune ordonnance pour ce filtre.'
+          : 'No prescriptions match this filter.';
+  String get retryLoadingPrescriptions => isArabic
+      ? 'إعادة تحميل الوصفات'
+      : isFrench
+          ? 'Réessayer le chargement'
+          : 'Retry loading prescriptions';
+  String get prescriptionReference => isArabic
+      ? 'الرقم المرجعي'
+      : isFrench
+          ? 'Référence'
+          : 'Reference';
+  String get allPrescriptions => isArabic
+      ? 'الكل'
+      : isFrench
+          ? 'Toutes'
+          : 'All';
+  String get filterStatusActive => isArabic
+      ? 'نشطة'
+      : isFrench
+          ? 'Actives'
+          : 'Active';
+  String get filterStatusCompleted => isArabic
+      ? 'مكتملة'
+      : isFrench
+          ? 'Terminées'
+          : 'Completed';
+  String get filterStatusVoided => isArabic
+      ? 'ملغاة'
+      : isFrench
+          ? 'Annulées'
+          : 'Voided';
+  String get filterStatusExpired => isArabic
+      ? 'منتهية'
+      : isFrench
+          ? 'Expirées'
+          : 'Expired';
+  String get statusActive => isArabic
+      ? 'نشطة'
+      : isFrench
+          ? 'Active'
+          : 'Active';
+  String get statusVoided => isArabic
+      ? 'ملغاة'
+      : isFrench
+          ? 'Annulée'
+          : 'Voided';
+  String get validUntil => isArabic
+      ? 'صالحة حتى'
+      : isFrench
+          ? "Valable jusqu'au"
+          : 'Valid until';
+  String get issuedOn => isArabic
+      ? 'تاريخ الإصدار'
+      : isFrench
+          ? 'Délivrée le'
+          : 'Issued on';
+  String get expiresOn => isArabic
+      ? 'تاريخ الانتهاء'
+      : isFrench
+          ? 'Expire le'
+          : 'Expires on';
+  String get medicationsCount => isArabic
+      ? 'الأدوية الموصوفة'
+      : isFrench
+          ? 'Médicaments prescrits'
+          : 'Prescribed Medications';
 
   // Prescription Details
-  String get prescriptionDetailTitle =>
-      isArabic ? 'تفاصيل الوصفة الطبية' : isFrench ? "Détails de l'ordonnance" : 'Prescription Details';
-  String get medications =>
-      isArabic ? 'الأدوية الموصوفة' : isFrench ? 'Médicaments prescrits' : 'Prescribed Medications';
+  String get prescriptionDetailTitle => isArabic
+      ? 'تفاصيل الوصفة الطبية'
+      : isFrench
+          ? "Détails de l'ordonnance"
+          : 'Prescription Details';
+  String get medications => isArabic
+      ? 'الأدوية الموصوفة'
+      : isFrench
+          ? 'Médicaments prescrits'
+          : 'Prescribed Medications';
   String get noPrescriptionItems => isArabic
       ? 'لا توجد أدوية مدرجة في هذه الوصفة'
       : isFrench
           ? 'Aucun médicament inscrit sur cette ordonnance'
           : 'No medications listed in this prescription';
-  String get dosage =>
-      isArabic ? 'الجرعة' : isFrench ? 'Dosage' : 'Dosage';
-  String get frequency =>
-      isArabic ? 'التكرار' : isFrench ? 'Fréquence' : 'Frequency';
-  String get duration =>
-      isArabic ? 'المدة' : isFrench ? 'Durée' : 'Duration';
-  String get instructions =>
-      isArabic ? 'تعليمات الاستعمال' : isFrench ? 'Instructions' : 'Instructions';
-  String get doctorNotes =>
-      isArabic ? 'ملاحظات الطبيب' : isFrench ? 'Notes du médecin' : "Doctor's Notes";
-  String get substitutionAllowed =>
-      isArabic ? 'يُسمح بالبديل' : isFrench ? 'Substitution autorisée' : 'Substitution Allowed';
-  String get substitutionNotAllowed =>
-      isArabic ? 'لا يُسمح بالبديل' : isFrench ? 'Substitution interdite' : 'Substitution Not Allowed';
-  String get readOnlyPrescriptionNotice =>
-      isArabic ? 'هذه الوصفة الطبية رقمية معتمدة ومخصصة للعرض فقط.' : isFrench ? 'Cette ordonnance numérique certifiée est en lecture seule.' : 'This verified digital prescription is read-only.';
+  String get dosage => isArabic
+      ? 'الجرعة'
+      : isFrench
+          ? 'Dosage'
+          : 'Dosage';
+  String get frequency => isArabic
+      ? 'التكرار'
+      : isFrench
+          ? 'Fréquence'
+          : 'Frequency';
+  String get duration => isArabic
+      ? 'المدة'
+      : isFrench
+          ? 'Durée'
+          : 'Duration';
+  String get instructions => isArabic
+      ? 'تعليمات الاستعمال'
+      : isFrench
+          ? 'Instructions'
+          : 'Instructions';
+  String get doctorNotes => isArabic
+      ? 'ملاحظات الطبيب'
+      : isFrench
+          ? 'Notes du médecin'
+          : "Doctor's Notes";
+  String get substitutionAllowed => isArabic
+      ? 'يُسمح بالبديل'
+      : isFrench
+          ? 'Substitution autorisée'
+          : 'Substitution Allowed';
+  String get substitutionNotAllowed => isArabic
+      ? 'لا يُسمح بالبديل'
+      : isFrench
+          ? 'Substitution interdite'
+          : 'Substitution Not Allowed';
+  String get readOnlyPrescriptionNotice => isArabic
+      ? 'هذه الوصفة الطبية رقمية معتمدة ومخصصة للعرض فقط.'
+      : isFrench
+          ? 'Cette ordonnance numérique certifiée est en lecture seule.'
+          : 'This verified digital prescription is read-only.';
 
   // QR Code Verification
-  String get qrVerification =>
-      isArabic ? 'التحقق الرقمي (QR)' : isFrench ? 'Vérification QR' : 'QR Verification';
-  String get scanQrNotice =>
-      isArabic ? 'امسح رمز الاستجابة السريعة لدى الصيدلية للتحقق الفوري من أصالة الوصفة.' : isFrench ? "Scannez ce code QR en pharmacie pour authentifier l'ordonnance." : 'Scan this QR code at the pharmacy to verify prescription authenticity.';
-  String get qrSecureToken =>
-      isArabic ? 'رمز التحقق الآمن' : isFrench ? 'Jeton sécurisé' : 'Secure Token';
-  String get copyVerificationLink =>
-      isArabic ? 'نسخ رابط التحقق' : isFrench ? 'Copier le lien' : 'Copy verification link';
-  String get linkCopied =>
-      isArabic ? 'تم نسخ رابط التحقق بنجاح' : isFrench ? 'Lien copié avec succès' : 'Verification link copied';
-  String get prescriptionAuthentic =>
-      isArabic ? 'وصفة طبية موثقة' : isFrench ? 'Ordonnance certifiée' : 'Certified Prescription';
+  String get qrVerification => isArabic
+      ? 'التحقق الرقمي (QR)'
+      : isFrench
+          ? 'Vérification QR'
+          : 'QR Verification';
+  String get scanQrNotice => isArabic
+      ? 'امسح رمز الاستجابة السريعة لدى الصيدلية للتحقق الفوري من أصالة الوصفة.'
+      : isFrench
+          ? "Scannez ce code QR en pharmacie pour authentifier l'ordonnance."
+          : 'Scan this QR code at the pharmacy to verify prescription authenticity.';
+  String get qrSecureToken => isArabic
+      ? 'رمز التحقق الآمن'
+      : isFrench
+          ? 'Jeton sécurisé'
+          : 'Secure Token';
+  String get copyVerificationLink => isArabic
+      ? 'نسخ رابط التحقق'
+      : isFrench
+          ? 'Copier le lien'
+          : 'Copy verification link';
+  String get linkCopied => isArabic
+      ? 'تم نسخ رابط التحقق بنجاح'
+      : isFrench
+          ? 'Lien copié avec succès'
+          : 'Verification link copied';
+  String get prescriptionAuthentic => isArabic
+      ? 'وصفة طبية موثقة'
+      : isFrench
+          ? 'Ordonnance certifiée'
+          : 'Certified Prescription';
 
   // Emergency Medical Profile
-  String get emergencyProfileTitle =>
-      isArabic ? 'الملف الطبي للطوارئ' : isFrench ? "Profil médical d'urgence" : 'Emergency Medical Profile';
-  String get bloodType =>
-      isArabic ? 'فصيلة الدم' : isFrench ? 'Groupe sanguin' : 'Blood Group';
-  String get unknownBloodType =>
-      isArabic ? 'غير محددة' : isFrench ? 'Non défini' : 'Not specified';
-  String get allergiesTitle =>
-      isArabic ? 'الحساسية الطبية' : isFrench ? 'Allergies médicales' : 'Medical Allergies';
-  String get noAllergies =>
-      isArabic ? 'لا توجد حالات حساسية مسجلة.' : isFrench ? 'Aucune allergie enregistrée.' : 'No documented allergies.';
-  String get chronicConditionsTitle =>
-      isArabic ? 'الأمراض والحالات المزمنة' : isFrench ? 'Affections chroniques' : 'Chronic Conditions';
-  String get noChronicConditions =>
-      isArabic ? 'لا توجد حالات مزمنة مسجلة.' : isFrench ? 'Aucune affection chronique enregistrée.' : 'No chronic conditions documented.';
-  String get isChronicPatient =>
-      isArabic ? 'مريض مصاب بأمراض مزمنة' : isFrench ? 'Affection chronique' : 'Chronic Condition';
-  String get notChronicPatient =>
-      isArabic ? 'لا توجد أمراض مزمنة مسجلة' : isFrench ? 'Aucune affection chronique' : 'No chronic conditions on file';
-  String get emergencyContactsTitle =>
-      isArabic ? 'جهات الاتصال في حالات الطوارئ' : isFrench ? "Contacts d'urgence" : 'Emergency Contacts';
-  String get noEmergencyContacts =>
-      isArabic ? 'لا توجد جهات اتصال طوارئ مسجلة.' : isFrench ? 'Aucun contact enregistré.' : 'No emergency contacts recorded.';
-  String get primaryContact =>
-      isArabic ? 'جهة اتصال رئيسية' : isFrench ? 'Contact principal' : 'Primary Contact';
-  String get call =>
-      isArabic ? 'اتصال' : isFrench ? 'Appeler' : 'Call';
-  String get relationship =>
-      isArabic ? 'صلة القرابة' : isFrench ? 'Relation' : 'Relationship';
-  String get readOnlyProfileNotice =>
-      isArabic ? 'هذا الملف مخصص للعرض في حالات الطوارئ. تعديل البيانات يتم حصراً عبر الطبيب أو العيادة المعتمدة.' : isFrench ? 'Ce profil est en lecture seule. Toute modification doit être effectuée par un professionnel de santé agréé.' : 'This emergency profile is read-only. Updates must be performed exclusively by authorized medical staff.';
-  String get loadingEmergencyProfile =>
-      isArabic ? 'جاري تحميل ملف الطوارئ...' : isFrench ? "Chargement du profil d'urgence..." : 'Loading emergency profile...';
-  String get retryLoadingProfile =>
-      isArabic ? 'إعادة تحميل الملف' : isFrench ? 'Réessayer' : 'Retry loading profile';
-  String get allergen =>
-      isArabic ? 'المسبب' : isFrench ? 'Allergène' : 'Allergen';
-  String get severity =>
-      isArabic ? 'درجة الخطورة' : isFrench ? 'Gravité' : 'Severity';
-  String get severitySevere =>
-      isArabic ? 'شديدة الخطورة' : isFrench ? 'Grave' : 'Severe';
-  String get severityModerate =>
-      isArabic ? 'متوسطة' : isFrench ? 'Modérée' : 'Moderate';
-  String get severityMild =>
-      isArabic ? 'خفيفة' : isFrench ? 'Légère' : 'Mild';
-  String get reaction =>
-      isArabic ? 'رد الفعل التحسسي' : isFrench ? 'Réaction' : 'Reaction';
-  String get diagnosedDate =>
-      isArabic ? 'تاريخ التشخيص' : isFrench ? 'Date de diagnostic' : 'Diagnosis Date';
-  String get medicalHubTitle =>
-      isArabic ? 'السجل الطبي' : isFrench ? 'Dossier Médical' : 'Medical Records';
-  String get medicalHubSubtitle =>
-      isArabic ? 'الوصفات الطبية، الحساسية، وملف الطوارئ' : isFrench ? "Ordonnances, allergies et profil d'urgence" : 'Prescriptions, allergies & emergency profile';
-  String get emergencyQuickAccess =>
-      isArabic ? 'الملف الطبي السريع للطوارئ' : isFrench ? "Profil médical d'urgence rapide" : 'Emergency Quick Profile';
-  String get viewPrescriptions =>
-      isArabic ? 'استعراض الوصفات الطبية' : isFrench ? 'Voir les ordonnances' : 'View Prescriptions';
-  String get viewEmergencyProfile =>
-      isArabic ? 'استعراض ملف الطوارئ' : isFrench ? 'Voir le profil d’urgence' : 'View Emergency Profile';
+  String get emergencyProfileTitle => isArabic
+      ? 'الملف الطبي للطوارئ'
+      : isFrench
+          ? "Profil médical d'urgence"
+          : 'Emergency Medical Profile';
+  String get bloodType => isArabic
+      ? 'فصيلة الدم'
+      : isFrench
+          ? 'Groupe sanguin'
+          : 'Blood Group';
+  String get unknownBloodType => isArabic
+      ? 'غير محددة'
+      : isFrench
+          ? 'Non défini'
+          : 'Not specified';
+  String get allergiesTitle => isArabic
+      ? 'الحساسية الطبية'
+      : isFrench
+          ? 'Allergies médicales'
+          : 'Medical Allergies';
+  String get noAllergies => isArabic
+      ? 'لا توجد حالات حساسية مسجلة.'
+      : isFrench
+          ? 'Aucune allergie enregistrée.'
+          : 'No documented allergies.';
+  String get chronicConditionsTitle => isArabic
+      ? 'الأمراض والحالات المزمنة'
+      : isFrench
+          ? 'Affections chroniques'
+          : 'Chronic Conditions';
+  String get noChronicConditions => isArabic
+      ? 'لا توجد حالات مزمنة مسجلة.'
+      : isFrench
+          ? 'Aucune affection chronique enregistrée.'
+          : 'No chronic conditions documented.';
+  String get isChronicPatient => isArabic
+      ? 'مريض مصاب بأمراض مزمنة'
+      : isFrench
+          ? 'Affection chronique'
+          : 'Chronic Condition';
+  String get notChronicPatient => isArabic
+      ? 'لا توجد أمراض مزمنة مسجلة'
+      : isFrench
+          ? 'Aucune affection chronique'
+          : 'No chronic conditions on file';
+  String get emergencyContactsTitle => isArabic
+      ? 'جهات الاتصال في حالات الطوارئ'
+      : isFrench
+          ? "Contacts d'urgence"
+          : 'Emergency Contacts';
+  String get noEmergencyContacts => isArabic
+      ? 'لا توجد جهات اتصال طوارئ مسجلة.'
+      : isFrench
+          ? 'Aucun contact enregistré.'
+          : 'No emergency contacts recorded.';
+  String get primaryContact => isArabic
+      ? 'جهة اتصال رئيسية'
+      : isFrench
+          ? 'Contact principal'
+          : 'Primary Contact';
+  String get call => isArabic
+      ? 'اتصال'
+      : isFrench
+          ? 'Appeler'
+          : 'Call';
+  String get relationship => isArabic
+      ? 'صلة القرابة'
+      : isFrench
+          ? 'Relation'
+          : 'Relationship';
+  String get readOnlyProfileNotice => isArabic
+      ? 'هذا الملف مخصص للعرض في حالات الطوارئ. تعديل البيانات يتم حصراً عبر الطبيب أو العيادة المعتمدة.'
+      : isFrench
+          ? 'Ce profil est en lecture seule. Toute modification doit être effectuée par un professionnel de santé agréé.'
+          : 'This emergency profile is read-only. Updates must be performed exclusively by authorized medical staff.';
+  String get loadingEmergencyProfile => isArabic
+      ? 'جاري تحميل ملف الطوارئ...'
+      : isFrench
+          ? "Chargement du profil d'urgence..."
+          : 'Loading emergency profile...';
+  String get retryLoadingProfile => isArabic
+      ? 'إعادة تحميل الملف'
+      : isFrench
+          ? 'Réessayer'
+          : 'Retry loading profile';
+  String get allergen => isArabic
+      ? 'المسبب'
+      : isFrench
+          ? 'Allergène'
+          : 'Allergen';
+  String get severity => isArabic
+      ? 'درجة الخطورة'
+      : isFrench
+          ? 'Gravité'
+          : 'Severity';
+  String get severitySevere => isArabic
+      ? 'شديدة الخطورة'
+      : isFrench
+          ? 'Grave'
+          : 'Severe';
+  String get severityModerate => isArabic
+      ? 'متوسطة'
+      : isFrench
+          ? 'Modérée'
+          : 'Moderate';
+  String get severityMild => isArabic
+      ? 'خفيفة'
+      : isFrench
+          ? 'Légère'
+          : 'Mild';
+  String get reaction => isArabic
+      ? 'رد الفعل التحسسي'
+      : isFrench
+          ? 'Réaction'
+          : 'Reaction';
+  String get diagnosedDate => isArabic
+      ? 'تاريخ التشخيص'
+      : isFrench
+          ? 'Date de diagnostic'
+          : 'Diagnosis Date';
+  String get medicalHubTitle => isArabic
+      ? 'السجل الطبي'
+      : isFrench
+          ? 'Dossier Médical'
+          : 'Medical Records';
+  String get medicalHubSubtitle => isArabic
+      ? 'الوصفات الطبية، الحساسية، وملف الطوارئ'
+      : isFrench
+          ? "Ordonnances, allergies et profil d'urgence"
+          : 'Prescriptions, allergies & emergency profile';
+  String get emergencyQuickAccess => isArabic
+      ? 'الملف الطبي السريع للطوارئ'
+      : isFrench
+          ? "Profil médical d'urgence rapide"
+          : 'Emergency Quick Profile';
+  String get viewPrescriptions => isArabic
+      ? 'استعراض الوصفات الطبية'
+      : isFrench
+          ? 'Voir les ordonnances'
+          : 'View Prescriptions';
+  String get viewEmergencyProfile => isArabic
+      ? 'استعراض ملف الطوارئ'
+      : isFrench
+          ? 'Voir le profil d’urgence'
+          : 'View Emergency Profile';
 
   // Doctor Navigation Labels (DEF-03 / TASK-B-03)
   String get waitingRoomTitle => isArabic
@@ -648,252 +1353,579 @@ class LocalizedStrings {
           : 'My Clinics';
 
   // Doctor Operational & Clinic Context (TASK-04-01)
-  String get activeClinic =>
-      isArabic ? 'العيادة النشطة' : isFrench ? 'Clinique active' : 'Active Clinic';
-  String get selectClinic =>
-      isArabic ? 'اختر العيادة' : isFrench ? 'Sélectionner une clinique' : 'Select Clinic';
-  String get switchClinic =>
-      isArabic ? 'تبديل العيادة' : isFrench ? 'Changer de clinique' : 'Switch Clinic';
-  String get availableClinics =>
-      isArabic ? 'العيادات المتاحة' : isFrench ? 'Cliniques disponibles' : 'Available Clinics';
-  String get noClinicsAssigned =>
-      isArabic ? 'لا توجد عيادة مرتبطة بحسابك حالياً. يرجى التواصل مع الإدارة.' : isFrench ? 'Aucune clinique associée à votre compte. Veuillez contacter l’administration.' : 'No clinic currently associated with your account. Please contact administration.';
-  String get clinicSwitchSuccess =>
-      isArabic ? 'تم تغيير العيادة النشطة بنجاح.' : isFrench ? 'Clinique active changée avec succès.' : 'Active clinic switched successfully.';
-  String get directorPosition =>
-      isArabic ? 'مدير طبي' : isFrench ? 'Directeur médical' : 'Medical Director';
-  String get doctorPosition =>
-      isArabic ? 'طبيب ممارس' : isFrench ? 'Médecin praticien' : 'Practicing Doctor';
-  String get primaryClinicBadge =>
-      isArabic ? 'رئيسية' : isFrench ? 'Principale' : 'Primary';
-  String get clinicSuspended =>
-      isArabic ? 'حسابك معلق في هذه العيادة' : isFrench ? 'Compte suspendu dans cette clinique' : 'Account suspended in this clinic';
-  String get changeClinic =>
-      isArabic ? 'تغيير' : isFrench ? 'Changer' : 'Change';
-  String get loadingDoctorClinics =>
-      isArabic ? 'جاري تحميل العيادات...' : isFrench ? 'Chargement des cliniques...' : 'Loading clinics...';
-  String get failedToLoadClinics =>
-      isArabic ? 'فشل تحميل قائمة العيادات.' : isFrench ? 'Échec du chargement des cliniques.' : 'Failed to load clinics.';
-  String get futureFeaturesNote =>
-      isArabic ? 'الميزات السريرية وإدارة المواعيد ستتوفر في المراحل القادمة.' : isFrench ? 'Les fonctionnalités cliniques et la gestion des rendez-vous seront disponibles prochainement.' : 'Clinical features and appointment management will be available in upcoming phases.';
+  String get activeClinic => isArabic
+      ? 'العيادة النشطة'
+      : isFrench
+          ? 'Clinique active'
+          : 'Active Clinic';
+  String get selectClinic => isArabic
+      ? 'اختر العيادة'
+      : isFrench
+          ? 'Sélectionner une clinique'
+          : 'Select Clinic';
+  String get switchClinic => isArabic
+      ? 'تبديل العيادة'
+      : isFrench
+          ? 'Changer de clinique'
+          : 'Switch Clinic';
+  String get availableClinics => isArabic
+      ? 'العيادات المتاحة'
+      : isFrench
+          ? 'Cliniques disponibles'
+          : 'Available Clinics';
+  String get noClinicsAssigned => isArabic
+      ? 'لا توجد عيادة مرتبطة بحسابك حالياً. يرجى التواصل مع الإدارة.'
+      : isFrench
+          ? 'Aucune clinique associée à votre compte. Veuillez contacter l’administration.'
+          : 'No clinic currently associated with your account. Please contact administration.';
+  String get clinicSwitchSuccess => isArabic
+      ? 'تم تغيير العيادة النشطة بنجاح.'
+      : isFrench
+          ? 'Clinique active changée avec succès.'
+          : 'Active clinic switched successfully.';
+  String get directorPosition => isArabic
+      ? 'مدير طبي'
+      : isFrench
+          ? 'Directeur médical'
+          : 'Medical Director';
+  String get doctorPosition => isArabic
+      ? 'طبيب ممارس'
+      : isFrench
+          ? 'Médecin praticien'
+          : 'Practicing Doctor';
+  String get primaryClinicBadge => isArabic
+      ? 'رئيسية'
+      : isFrench
+          ? 'Principale'
+          : 'Primary';
+  String get clinicSuspended => isArabic
+      ? 'حسابك معلق في هذه العيادة'
+      : isFrench
+          ? 'Compte suspendu dans cette clinique'
+          : 'Account suspended in this clinic';
+  String get changeClinic => isArabic
+      ? 'تغيير'
+      : isFrench
+          ? 'Changer'
+          : 'Change';
+  String get loadingDoctorClinics => isArabic
+      ? 'جاري تحميل العيادات...'
+      : isFrench
+          ? 'Chargement des cliniques...'
+          : 'Loading clinics...';
+  String get failedToLoadClinics => isArabic
+      ? 'فشل تحميل قائمة العيادات.'
+      : isFrench
+          ? 'Échec du chargement des cliniques.'
+          : 'Failed to load clinics.';
+  String get futureFeaturesNote => isArabic
+      ? 'الميزات السريرية وإدارة المواعيد ستتوفر في المراحل القادمة.'
+      : isFrench
+          ? 'Les fonctionnalités cliniques et la gestion des rendez-vous seront disponibles prochainement.'
+          : 'Clinical features and appointment management will be available in upcoming phases.';
 
   // Doctor Operational Dashboard & Today's Agenda (TASK-04-02)
-  String get todayTotalLabel =>
-      isArabic ? 'إجمالي مواعيد اليوم' : isFrench ? "Total des rendez-vous" : "Today's Total";
-  String get pendingCheckInLabel =>
-      isArabic ? 'بانتظار الحضور' : isFrench ? "En attente d'enregistrement" : 'Pending Check-in';
-  String get inWaitingRoomLabel =>
-      isArabic ? 'في قاعة الانتظار' : isFrench ? "En salle d'attente" : 'In Waiting Room';
-  String get completedTodayLabel =>
-      isArabic ? 'الكشوفات المكتملة' : isFrench ? 'Visites terminées' : 'Completed';
-  String get noShowTodayLabel =>
-      isArabic ? 'غياب / لم يحضر' : isFrench ? 'Rendez-vous manqués' : 'No-Show';
-  String get todayAgendaTitle =>
-      isArabic ? 'جدول مواعيد اليوم' : isFrench ? "Programme d'aujourd'hui" : "Today's Schedule";
-  String get noAppointmentsToday =>
-      isArabic ? 'لا توجد مواعيد مسجلة لهذا اليوم.' : isFrench ? "Aucun rendez-vous enregistré aujourd'hui." : 'No appointments scheduled for today.';
-  String get noAppointmentsFiltered =>
-      isArabic ? 'لا توجد مواعيد تطابق هذا الفلتر.' : isFrench ? 'Aucun rendez-vous pour ce filtre.' : 'No appointments match this filter.';
-  String get loadingDashboard =>
-      isArabic ? 'جاري تحميل جدول اليوم والمؤشرات...' : isFrench ? "Chargement du tableau de bord..." : "Loading today's schedule...";
-  String get failedToLoadDashboard =>
-      isArabic ? 'فشل تحميل بيانات لوحة التحكم.' : isFrench ? 'Échec du chargement du tableau de bord.' : 'Failed to load dashboard data.';
-  String get operationalSummary =>
-      isArabic ? 'ملخص العمليات اليومية' : isFrench ? 'Résumé opérationnel' : 'Operational Summary';
-  String get filterAll =>
-      isArabic ? 'الكل' : isFrench ? 'Tous' : 'All';
-  String get filterWaitingRoom =>
-      isArabic ? 'قاعة الانتظار' : isFrench ? "Salle d'attente" : 'Waiting Room';
-  String get filterConfirmed =>
-      isArabic ? 'مؤكدة' : isFrench ? 'Confirmés' : 'Confirmed';
-  String get filterAttended =>
-      isArabic ? 'حاضر' : isFrench ? 'Présents' : 'Attended';
-  String get filterNoShow =>
-      isArabic ? 'لم يحضر' : isFrench ? 'Absents' : 'No-Show';
-  String get filterCompleted =>
-      isArabic ? 'مكتمل' : isFrench ? 'Terminés' : 'Completed';
-  String get timeSlotLabel =>
-      isArabic ? 'التوقيت' : isFrench ? 'Horaire' : 'Time';
-  String get patientNameLabel =>
-      isArabic ? 'المريض' : isFrench ? 'Patient' : 'Patient';
-  String get bookingRefLabel =>
-      isArabic ? 'المرجع' : isFrench ? 'Réf.' : 'Ref.';
-  String get refreshDashboard =>
-      isArabic ? 'تحديث البيانات' : isFrench ? 'Actualiser' : 'Refresh';
+  String get todayTotalLabel => isArabic
+      ? 'إجمالي مواعيد اليوم'
+      : isFrench
+          ? "Total des rendez-vous"
+          : "Today's Total";
+  String get pendingCheckInLabel => isArabic
+      ? 'بانتظار الحضور'
+      : isFrench
+          ? "En attente d'enregistrement"
+          : 'Pending Check-in';
+  String get inWaitingRoomLabel => isArabic
+      ? 'في قاعة الانتظار'
+      : isFrench
+          ? "En salle d'attente"
+          : 'In Waiting Room';
+  String get completedTodayLabel => isArabic
+      ? 'الكشوفات المكتملة'
+      : isFrench
+          ? 'Visites terminées'
+          : 'Completed';
+  String get noShowTodayLabel => isArabic
+      ? 'غياب / لم يحضر'
+      : isFrench
+          ? 'Rendez-vous manqués'
+          : 'No-Show';
+  String get todayAgendaTitle => isArabic
+      ? 'جدول مواعيد اليوم'
+      : isFrench
+          ? "Programme d'aujourd'hui"
+          : "Today's Schedule";
+  String get noAppointmentsToday => isArabic
+      ? 'لا توجد مواعيد مسجلة لهذا اليوم.'
+      : isFrench
+          ? "Aucun rendez-vous enregistré aujourd'hui."
+          : 'No appointments scheduled for today.';
+  String get noAppointmentsFiltered => isArabic
+      ? 'لا توجد مواعيد تطابق هذا الفلتر.'
+      : isFrench
+          ? 'Aucun rendez-vous pour ce filtre.'
+          : 'No appointments match this filter.';
+  String get loadingDashboard => isArabic
+      ? 'جاري تحميل جدول اليوم والمؤشرات...'
+      : isFrench
+          ? "Chargement du tableau de bord..."
+          : "Loading today's schedule...";
+  String get failedToLoadDashboard => isArabic
+      ? 'فشل تحميل بيانات لوحة التحكم.'
+      : isFrench
+          ? 'Échec du chargement du tableau de bord.'
+          : 'Failed to load dashboard data.';
+  String get operationalSummary => isArabic
+      ? 'ملخص العمليات اليومية'
+      : isFrench
+          ? 'Résumé opérationnel'
+          : 'Operational Summary';
+  String get filterAll => isArabic
+      ? 'الكل'
+      : isFrench
+          ? 'Tous'
+          : 'All';
+  String get filterWaitingRoom => isArabic
+      ? 'قاعة الانتظار'
+      : isFrench
+          ? "Salle d'attente"
+          : 'Waiting Room';
+  String get filterConfirmed => isArabic
+      ? 'مؤكدة'
+      : isFrench
+          ? 'Confirmés'
+          : 'Confirmed';
+  String get filterAttended => isArabic
+      ? 'حاضر'
+      : isFrench
+          ? 'Présents'
+          : 'Attended';
+  String get filterNoShow => isArabic
+      ? 'لم يحضر'
+      : isFrench
+          ? 'Absents'
+          : 'No-Show';
+  String get filterCompleted => isArabic
+      ? 'مكتمل'
+      : isFrench
+          ? 'Terminés'
+          : 'Completed';
+  String get timeSlotLabel => isArabic
+      ? 'التوقيت'
+      : isFrench
+          ? 'Horaire'
+          : 'Time';
+  String get patientNameLabel => isArabic
+      ? 'المريض'
+      : isFrench
+          ? 'Patient'
+          : 'Patient';
+  String get bookingRefLabel => isArabic
+      ? 'المرجع'
+      : isFrench
+          ? 'Réf.'
+          : 'Ref.';
+  String get refreshDashboard => isArabic
+      ? 'تحديث البيانات'
+      : isFrench
+          ? 'Actualiser'
+          : 'Refresh';
 
   // Live Waiting Room Queue & Attendance Actions (TASK-04-03)
-  String get queueTitle =>
-      isArabic ? 'طابور الانتظار وقاعة الكشف' : isFrench ? "File d'attente et salle d'attente" : 'Waiting Queue & Clinical Flow';
-  String get waitingRoomTab =>
-      isArabic ? 'في قاعة الانتظار' : isFrench ? "En salle d'attente" : 'In Waiting Room';
-  String get expectedCheckInTab =>
-      isArabic ? 'المتوقع حضورهم' : isFrench ? "Arrivées attendues" : 'Expected Arrivals';
-  String get markAttendedAction =>
-      isArabic ? 'تسجيل حضور' : isFrench ? "Enregistrer l'arrivée" : 'Mark Attended';
-  String get markNoShowAction =>
-      isArabic ? 'لم يحضر' : isFrench ? 'Non présenté' : 'Mark No-Show';
-  String get confirmAttendanceTitle =>
-      isArabic ? 'تأكيد تسجيل الحضور' : isFrench ? "Confirmer l'arrivée" : 'Confirm Attendance';
-  String get confirmAttendancePrompt =>
-      isArabic ? 'هل ترغب في تسجيل حضور المريض للموعد؟ سيتم نقله مباشرة إلى قاعة الانتظار.' : isFrench ? "Voulez-vous enregistrer l'arrivée de ce patient ? Il sera placé en salle d'attente." : 'Do you want to mark this patient as attended? They will be moved to the waiting room.';
-  String get confirmNoShowTitle =>
-      isArabic ? 'تأكيد عدم الحضور (No-Show)' : isFrench ? "Confirmer l'absence (No-Show)" : 'Confirm No-Show';
-  String get confirmNoShowPrompt =>
-      isArabic ? 'هل أنت متأكد من تسجيل عدم حضور المريض للموعد؟ هذا الإجراء لا يمكن التراجع عنه.' : isFrench ? "Êtes-vous sûr de vouloir marquer ce patient comme non présenté ? Cette action est irréversible." : 'Are you sure you want to mark this patient as a no-show? This action cannot be undone.';
-  String get noShowReasonOptional =>
-      isArabic ? 'سبب عدم الحضور (اختياري)' : isFrench ? 'Motif de l’absence (optionnel)' : 'Reason for no-show (optional)';
-  String get attendanceSuccessMessage =>
-      isArabic ? 'تم تسجيل حضور المريض بنجاح ونقله لقاعة الانتظار.' : isFrench ? 'Arrivée du patient enregistrée avec succès.' : 'Patient marked as attended successfully.';
-  String get noShowSuccessMessage =>
-      isArabic ? 'تم تسجيل عدم حضور المريض للموعد (No-Show).' : isFrench ? 'Absence enregistrée avec succès.' : 'Patient marked as no-show successfully.';
-  String get emptyWaitingRoom =>
-      isArabic ? 'لا يوجد أي مريض في قاعة الانتظار حالياً.' : isFrench ? 'Aucun patient en salle d’attente actuellement.' : 'No patients currently in the waiting room.';
-  String get emptyExpectedQueue =>
-      isArabic ? 'لا توجد مواعيد مؤكدة أخرى متوقعة اليوم.' : isFrench ? 'Aucun autre rendez-vous attendu aujourd’hui.' : 'No other confirmed appointments expected today.';
-  String get actionProcessing =>
-      isArabic ? 'جاري المعالجة...' : isFrench ? 'Traitement en cours...' : 'Processing...';
-  String get patientInWaitingRoomBadge =>
-      isArabic ? 'في الانتظار' : isFrench ? 'En attente' : 'Waiting';
-  String get checkedInAtLabel =>
-      isArabic ? 'وقت الوصول' : isFrench ? 'Arrivé à' : 'Arrived at';
-  String get queuePositionLabel =>
-      isArabic ? 'الترتيب' : isFrench ? 'Rang' : 'Order';
+  String get queueTitle => isArabic
+      ? 'طابور الانتظار وقاعة الكشف'
+      : isFrench
+          ? "File d'attente et salle d'attente"
+          : 'Waiting Queue & Clinical Flow';
+  String get waitingRoomTab => isArabic
+      ? 'في قاعة الانتظار'
+      : isFrench
+          ? "En salle d'attente"
+          : 'In Waiting Room';
+  String get expectedCheckInTab => isArabic
+      ? 'المتوقع حضورهم'
+      : isFrench
+          ? "Arrivées attendues"
+          : 'Expected Arrivals';
+  String get markAttendedAction => isArabic
+      ? 'تسجيل حضور'
+      : isFrench
+          ? "Enregistrer l'arrivée"
+          : 'Mark Attended';
+  String get markNoShowAction => isArabic
+      ? 'لم يحضر'
+      : isFrench
+          ? 'Non présenté'
+          : 'Mark No-Show';
+  String get confirmAttendanceTitle => isArabic
+      ? 'تأكيد تسجيل الحضور'
+      : isFrench
+          ? "Confirmer l'arrivée"
+          : 'Confirm Attendance';
+  String get confirmAttendancePrompt => isArabic
+      ? 'هل ترغب في تسجيل حضور المريض للموعد؟ سيتم نقله مباشرة إلى قاعة الانتظار.'
+      : isFrench
+          ? "Voulez-vous enregistrer l'arrivée de ce patient ? Il sera placé en salle d'attente."
+          : 'Do you want to mark this patient as attended? They will be moved to the waiting room.';
+  String get confirmNoShowTitle => isArabic
+      ? 'تأكيد عدم الحضور (No-Show)'
+      : isFrench
+          ? "Confirmer l'absence (No-Show)"
+          : 'Confirm No-Show';
+  String get confirmNoShowPrompt => isArabic
+      ? 'هل أنت متأكد من تسجيل عدم حضور المريض للموعد؟ هذا الإجراء لا يمكن التراجع عنه.'
+      : isFrench
+          ? "Êtes-vous sûr de vouloir marquer ce patient comme non présenté ? Cette action est irréversible."
+          : 'Are you sure you want to mark this patient as a no-show? This action cannot be undone.';
+  String get noShowReasonOptional => isArabic
+      ? 'سبب عدم الحضور (اختياري)'
+      : isFrench
+          ? 'Motif de l’absence (optionnel)'
+          : 'Reason for no-show (optional)';
+  String get attendanceSuccessMessage => isArabic
+      ? 'تم تسجيل حضور المريض بنجاح ونقله لقاعة الانتظار.'
+      : isFrench
+          ? 'Arrivée du patient enregistrée avec succès.'
+          : 'Patient marked as attended successfully.';
+  String get noShowSuccessMessage => isArabic
+      ? 'تم تسجيل عدم حضور المريض للموعد (No-Show).'
+      : isFrench
+          ? 'Absence enregistrée avec succès.'
+          : 'Patient marked as no-show successfully.';
+  String get emptyWaitingRoom => isArabic
+      ? 'لا يوجد أي مريض في قاعة الانتظار حالياً.'
+      : isFrench
+          ? 'Aucun patient en salle d’attente actuellement.'
+          : 'No patients currently in the waiting room.';
+  String get emptyExpectedQueue => isArabic
+      ? 'لا توجد مواعيد مؤكدة أخرى متوقعة اليوم.'
+      : isFrench
+          ? 'Aucun autre rendez-vous attendu aujourd’hui.'
+          : 'No other confirmed appointments expected today.';
+  String get actionProcessing => isArabic
+      ? 'جاري المعالجة...'
+      : isFrench
+          ? 'Traitement en cours...'
+          : 'Processing...';
+  String get patientInWaitingRoomBadge => isArabic
+      ? 'في الانتظار'
+      : isFrench
+          ? 'En attente'
+          : 'Waiting';
+  String get checkedInAtLabel => isArabic
+      ? 'وقت الوصول'
+      : isFrench
+          ? 'Arrivé à'
+          : 'Arrived at';
+  String get queuePositionLabel => isArabic
+      ? 'الترتيب'
+      : isFrench
+          ? 'Rang'
+          : 'Order';
 
   // Read-Only Patient Medical Summary Viewer (TASK-04-04)
-  String get patientSummaryTitle =>
-      isArabic ? 'الملخص الطبي للمريض' : isFrench ? 'Résumé médical du patient' : 'Patient Medical Summary';
-  String get viewPatientSummary =>
-      isArabic ? 'الملخص الطبي' : isFrench ? 'Résumé médical' : 'Medical Summary';
-  String get loadingPatientSummary =>
-      isArabic ? 'جاري تحميل الملخص الطبي...' : isFrench ? 'Chargement du résumé médical...' : 'Loading medical summary...';
-  String get failedToLoadPatientSummary =>
-      isArabic ? 'فشل تحميل الملخص الطبي للمريض.' : isFrench ? 'Échec du chargement du résumé médical.' : 'Failed to load patient summary.';
-  String get accessDeniedPatientSummary =>
-      isArabic ? 'غير مصرح لك بعرض الملف الطبي لهذا المريض.' : isFrench ? 'Accès refusé au dossier médical de ce patient.' : 'Access denied to this patient\'s medical summary.';
-  String get readOnlySummaryNotice =>
-      isArabic ? 'هذا العرض مخصص للاطلاع السريري المباشر فقط (للقراءة فقط).' : isFrench ? 'Cet affichage est réservé à la consultation clinique directe (lecture seule).' : 'This view is strictly for direct clinical consultation (read-only).';
-  String get noKnownAllergies =>
-      isArabic ? 'لا توجد أي حساسيات مسجلة لهذا المريض.' : isFrench ? 'Aucune allergie connue enregistrée.' : 'No known allergies recorded.';
-  String get noKnownChronicConditions =>
-      isArabic ? 'لا توجد أي أمراض مزمنة مسجلة لهذا المريض.' : isFrench ? 'Aucune maladie chronique enregistrée.' : 'No chronic conditions recorded.';
-  String get noEmergencyContactsRecorded =>
-      isArabic ? 'لا توجد جهات اتصال للطوارئ مسجلة.' : isFrench ? 'Aucun contact d\'urgence enregistré.' : 'No emergency contacts recorded.';
-  String get primaryContactBadge =>
-      isArabic ? 'رئيسي' : isFrench ? 'Principal' : 'Primary';
-  String get severityLifeThreatening =>
-      isArabic ? 'مهددة للحياة' : isFrench ? 'Menace vitale' : 'Life-Threatening';
-  String get conditionStatusActive =>
-      isArabic ? 'نشط' : isFrench ? 'Actif' : 'Active';
-  String get conditionStatusManaged =>
-      isArabic ? 'تحت السيطرة' : isFrench ? 'Contrôlé' : 'Managed';
-  String get conditionStatusRemission =>
-      isArabic ? 'في هجوع' : isFrench ? 'En rémission' : 'In Remission';
-  String get conditionStatusResolved =>
-      isArabic ? 'شُفي / منتهي' : isFrench ? 'Résolu' : 'Resolved';
-  String get closeButtonLabel =>
-      isArabic ? 'إغلاق' : isFrench ? 'Fermer' : 'Close';
+  String get patientSummaryTitle => isArabic
+      ? 'الملخص الطبي للمريض'
+      : isFrench
+          ? 'Résumé médical du patient'
+          : 'Patient Medical Summary';
+  String get viewPatientSummary => isArabic
+      ? 'الملخص الطبي'
+      : isFrench
+          ? 'Résumé médical'
+          : 'Medical Summary';
+  String get loadingPatientSummary => isArabic
+      ? 'جاري تحميل الملخص الطبي...'
+      : isFrench
+          ? 'Chargement du résumé médical...'
+          : 'Loading medical summary...';
+  String get failedToLoadPatientSummary => isArabic
+      ? 'فشل تحميل الملخص الطبي للمريض.'
+      : isFrench
+          ? 'Échec du chargement du résumé médical.'
+          : 'Failed to load patient summary.';
+  String get accessDeniedPatientSummary => isArabic
+      ? 'غير مصرح لك بعرض الملف الطبي لهذا المريض.'
+      : isFrench
+          ? 'Accès refusé au dossier médical de ce patient.'
+          : 'Access denied to this patient\'s medical summary.';
+  String get readOnlySummaryNotice => isArabic
+      ? 'هذا العرض مخصص للاطلاع السريري المباشر فقط (للقراءة فقط).'
+      : isFrench
+          ? 'Cet affichage est réservé à la consultation clinique directe (lecture seule).'
+          : 'This view is strictly for direct clinical consultation (read-only).';
+  String get noKnownAllergies => isArabic
+      ? 'لا توجد أي حساسيات مسجلة لهذا المريض.'
+      : isFrench
+          ? 'Aucune allergie connue enregistrée.'
+          : 'No known allergies recorded.';
+  String get noKnownChronicConditions => isArabic
+      ? 'لا توجد أي أمراض مزمنة مسجلة لهذا المريض.'
+      : isFrench
+          ? 'Aucune maladie chronique enregistrée.'
+          : 'No chronic conditions recorded.';
+  String get noEmergencyContactsRecorded => isArabic
+      ? 'لا توجد جهات اتصال للطوارئ مسجلة.'
+      : isFrench
+          ? 'Aucun contact d\'urgence enregistré.'
+          : 'No emergency contacts recorded.';
+  String get primaryContactBadge => isArabic
+      ? 'رئيسي'
+      : isFrench
+          ? 'Principal'
+          : 'Primary';
+  String get severityLifeThreatening => isArabic
+      ? 'مهددة للحياة'
+      : isFrench
+          ? 'Menace vitale'
+          : 'Life-Threatening';
+  String get conditionStatusActive => isArabic
+      ? 'نشط'
+      : isFrench
+          ? 'Actif'
+          : 'Active';
+  String get conditionStatusManaged => isArabic
+      ? 'تحت السيطرة'
+      : isFrench
+          ? 'Contrôlé'
+          : 'Managed';
+  String get conditionStatusRemission => isArabic
+      ? 'في هجوع'
+      : isFrench
+          ? 'En rémission'
+          : 'In Remission';
+  String get conditionStatusResolved => isArabic
+      ? 'شُفي / منتهي'
+      : isFrench
+          ? 'Résolu'
+          : 'Resolved';
+  String get closeButtonLabel => isArabic
+      ? 'إغلاق'
+      : isFrench
+          ? 'Fermer'
+          : 'Close';
 
   // Clinic Director Staff Management (TASK-04-05)
-  String get clinicStaffTitle =>
-      isArabic ? 'طاقم العيادة' : isFrench ? 'Personnel' : 'Clinic Staff';
-  String get staffManagementTitle =>
-      isArabic ? 'إدارة طاقم العيادة' : isFrench ? 'Gestion du personnel' : 'Staff Management';
-  String get doctorsTab =>
-      isArabic ? 'الأطباء' : isFrench ? 'Médecins' : 'Doctors';
-  String get assistantsTab =>
-      isArabic ? 'المساعدون' : isFrench ? 'Assistants' : 'Assistants';
-  String get invitationsSection =>
-      isArabic ? 'الدعوات المعلقة' : isFrench ? 'Invitations en attente' : 'Pending Invitations';
-  String get addDoctor =>
-      isArabic ? 'إضافة طبيب' : isFrench ? 'Ajouter un médecin' : 'Add Doctor';
-  String get lookupDoctorTab =>
-      isArabic ? 'بحث ودعوة' : isFrench ? 'Rechercher et inviter' : 'Lookup & Invite';
-  String get createNewDoctorTab =>
-      isArabic ? 'إنشاء حساب جديد' : isFrench ? 'Créer un compte' : 'Create Account';
-  String get addAssistant =>
-      isArabic ? 'إضافة مساعد' : isFrench ? 'Ajouter un assistant' : 'Add Assistant';
-  String get specialtyLabel =>
-      isArabic ? 'التخصص' : isFrench ? 'Spécialité' : 'Specialty';
-  String get licenseNumberLabel =>
-      isArabic ? 'رقم الترخيص' : isFrench ? 'Numéro de licence' : 'License Number';
-  String get bioLabel =>
-      isArabic ? 'نبذة تعريفية' : isFrench ? 'Biographie' : 'Bio';
-  String get directorBadge =>
-      isArabic ? 'مدير' : isFrench ? 'Directeur' : 'Director';
-  String get doctorBadge =>
-      isArabic ? 'طبيب' : isFrench ? 'Médecin' : 'Doctor';
-  String get assistantBadge =>
-      isArabic ? 'مساعد' : isFrench ? 'Assistant' : 'Assistant';
-  String get primaryBadge =>
-      isArabic ? 'رئيسي' : isFrench ? 'Principal' : 'Primary';
-  String get activeStatus =>
-      isArabic ? 'نشط' : isFrench ? 'Actif' : 'Active';
-  String get suspendedStatus =>
-      isArabic ? 'معلق' : isFrench ? 'Suspendu' : 'Suspended';
-  String get staffStatusLabel =>
-      isArabic ? 'الحالة' : isFrench ? 'Statut' : 'Status';
-  String get suspendStaff =>
-      isArabic ? 'تعليق الحساب' : isFrench ? 'Suspendre le compte' : 'Suspend Account';
-  String get activateStaff =>
-      isArabic ? 'تنشيط الحساب' : isFrench ? 'Activer le compte' : 'Activate Account';
-  String get detachDoctor =>
-      isArabic ? 'فصل الطبيب من العيادة' : isFrench ? 'Détacher le médecin' : 'Detach Doctor';
-  String get deleteAssistant =>
-      isArabic ? 'حذف المساعد' : isFrench ? 'Supprimer l\'assistant' : 'Delete Assistant';
-  String get editPermissions =>
-      isArabic ? 'تعديل الصلاحيات' : isFrench ? 'Modifier les autorisations' : 'Edit Permissions';
-  String get permissionsLabel =>
-      isArabic ? 'الصلاحيات' : isFrench ? 'Autorisations' : 'Permissions';
-  String get cancelInvitation =>
-      isArabic ? 'إلغاء الدعوة' : isFrench ? 'Annuler l\'invitation' : 'Cancel Invitation';
-  String get sendInvitation =>
-      isArabic ? 'إرسال دعوة' : isFrench ? 'Envoyer une invitation' : 'Send Invitation';
-  String get invitationSent =>
-      isArabic ? 'تم إرسال الدعوة بنجاح' : isFrench ? 'Invitation envoyée avec succès' : 'Invitation sent successfully';
-  String get invitationCancelled =>
-      isArabic ? 'تم إلغاء الدعوة بنجاح' : isFrench ? 'Invitation annulée avec succès' : 'Invitation cancelled successfully';
-  String get staffStatusUpdated =>
-      isArabic ? 'تم تحديث حالة العضو بنجاح' : isFrench ? 'Statut mis à jour avec succès' : 'Staff status updated successfully';
-  String get permissionsUpdated =>
-      isArabic ? 'تم تحديث الصلاحيات بنجاح' : isFrench ? 'Autorisations mises à jour' : 'Permissions updated successfully';
-  String get doctorCreated =>
-      isArabic ? 'تم إنشاء حساب الطبيب بنجاح' : isFrench ? 'Compte médecin créé avec succès' : 'Doctor account created successfully';
-  String get assistantCreated =>
-      isArabic ? 'تم إنشاء حساب المساعد بنجاح' : isFrench ? 'Compte assistant créé avec succès' : 'Assistant account created successfully';
-  String get doctorDetached =>
-      isArabic ? 'تم فصل الطبيب من العيادة بنجاح' : isFrench ? 'Médecin détaché avec succès' : 'Doctor detached successfully';
-  String get assistantDeleted =>
-      isArabic ? 'تم حذف المساعد من العيادة بنجاح' : isFrench ? 'Assistant supprimé avec succès' : 'Assistant removed successfully';
-  String get confirmSuspendTitle =>
-      isArabic ? 'تأكيد تعليق الحساب' : isFrench ? 'Confirmer la suspension' : 'Confirm Suspension';
+  String get clinicStaffTitle => isArabic
+      ? 'طاقم العيادة'
+      : isFrench
+          ? 'Personnel'
+          : 'Clinic Staff';
+  String get staffManagementTitle => isArabic
+      ? 'إدارة طاقم العيادة'
+      : isFrench
+          ? 'Gestion du personnel'
+          : 'Staff Management';
+  String get doctorsTab => isArabic
+      ? 'الأطباء'
+      : isFrench
+          ? 'Médecins'
+          : 'Doctors';
+  String get assistantsTab => isArabic
+      ? 'المساعدون'
+      : isFrench
+          ? 'Assistants'
+          : 'Assistants';
+  String get invitationsSection => isArabic
+      ? 'الدعوات المعلقة'
+      : isFrench
+          ? 'Invitations en attente'
+          : 'Pending Invitations';
+  String get addDoctor => isArabic
+      ? 'إضافة طبيب'
+      : isFrench
+          ? 'Ajouter un médecin'
+          : 'Add Doctor';
+  String get lookupDoctorTab => isArabic
+      ? 'بحث ودعوة'
+      : isFrench
+          ? 'Rechercher et inviter'
+          : 'Lookup & Invite';
+  String get createNewDoctorTab => isArabic
+      ? 'إنشاء حساب جديد'
+      : isFrench
+          ? 'Créer un compte'
+          : 'Create Account';
+  String get addAssistant => isArabic
+      ? 'إضافة مساعد'
+      : isFrench
+          ? 'Ajouter un assistant'
+          : 'Add Assistant';
+  String get specialtyLabel => isArabic
+      ? 'التخصص'
+      : isFrench
+          ? 'Spécialité'
+          : 'Specialty';
+  String get licenseNumberLabel => isArabic
+      ? 'رقم الترخيص'
+      : isFrench
+          ? 'Numéro de licence'
+          : 'License Number';
+  String get bioLabel => isArabic
+      ? 'نبذة تعريفية'
+      : isFrench
+          ? 'Biographie'
+          : 'Bio';
+  String get directorBadge => isArabic
+      ? 'مدير'
+      : isFrench
+          ? 'Directeur'
+          : 'Director';
+  String get doctorBadge => isArabic
+      ? 'طبيب'
+      : isFrench
+          ? 'Médecin'
+          : 'Doctor';
+  String get assistantBadge => isArabic
+      ? 'مساعد'
+      : isFrench
+          ? 'Assistant'
+          : 'Assistant';
+  String get primaryBadge => isArabic
+      ? 'رئيسي'
+      : isFrench
+          ? 'Principal'
+          : 'Primary';
+  String get activeStatus => isArabic
+      ? 'نشط'
+      : isFrench
+          ? 'Actif'
+          : 'Active';
+  String get suspendedStatus => isArabic
+      ? 'معلق'
+      : isFrench
+          ? 'Suspendu'
+          : 'Suspended';
+  String get staffStatusLabel => isArabic
+      ? 'الحالة'
+      : isFrench
+          ? 'Statut'
+          : 'Status';
+  String get suspendStaff => isArabic
+      ? 'تعليق الحساب'
+      : isFrench
+          ? 'Suspendre le compte'
+          : 'Suspend Account';
+  String get activateStaff => isArabic
+      ? 'تنشيط الحساب'
+      : isFrench
+          ? 'Activer le compte'
+          : 'Activate Account';
+  String get detachDoctor => isArabic
+      ? 'فصل الطبيب من العيادة'
+      : isFrench
+          ? 'Détacher le médecin'
+          : 'Detach Doctor';
+  String get deleteAssistant => isArabic
+      ? 'حذف المساعد'
+      : isFrench
+          ? 'Supprimer l\'assistant'
+          : 'Delete Assistant';
+  String get editPermissions => isArabic
+      ? 'تعديل الصلاحيات'
+      : isFrench
+          ? 'Modifier les autorisations'
+          : 'Edit Permissions';
+  String get permissionsLabel => isArabic
+      ? 'الصلاحيات'
+      : isFrench
+          ? 'Autorisations'
+          : 'Permissions';
+  String get cancelInvitation => isArabic
+      ? 'إلغاء الدعوة'
+      : isFrench
+          ? 'Annuler l\'invitation'
+          : 'Cancel Invitation';
+  String get sendInvitation => isArabic
+      ? 'إرسال دعوة'
+      : isFrench
+          ? 'Envoyer une invitation'
+          : 'Send Invitation';
+  String get invitationSent => isArabic
+      ? 'تم إرسال الدعوة بنجاح'
+      : isFrench
+          ? 'Invitation envoyée avec succès'
+          : 'Invitation sent successfully';
+  String get invitationCancelled => isArabic
+      ? 'تم إلغاء الدعوة بنجاح'
+      : isFrench
+          ? 'Invitation annulée avec succès'
+          : 'Invitation cancelled successfully';
+  String get staffStatusUpdated => isArabic
+      ? 'تم تحديث حالة العضو بنجاح'
+      : isFrench
+          ? 'Statut mis à jour avec succès'
+          : 'Staff status updated successfully';
+  String get permissionsUpdated => isArabic
+      ? 'تم تحديث الصلاحيات بنجاح'
+      : isFrench
+          ? 'Autorisations mises à jour'
+          : 'Permissions updated successfully';
+  String get doctorCreated => isArabic
+      ? 'تم إنشاء حساب الطبيب بنجاح'
+      : isFrench
+          ? 'Compte médecin créé avec succès'
+          : 'Doctor account created successfully';
+  String get assistantCreated => isArabic
+      ? 'تم إنشاء حساب المساعد بنجاح'
+      : isFrench
+          ? 'Compte assistant créé avec succès'
+          : 'Assistant account created successfully';
+  String get doctorDetached => isArabic
+      ? 'تم فصل الطبيب من العيادة بنجاح'
+      : isFrench
+          ? 'Médecin détaché avec succès'
+          : 'Doctor detached successfully';
+  String get assistantDeleted => isArabic
+      ? 'تم حذف المساعد من العيادة بنجاح'
+      : isFrench
+          ? 'Assistant supprimé avec succès'
+          : 'Assistant removed successfully';
+  String get confirmSuspendTitle => isArabic
+      ? 'تأكيد تعليق الحساب'
+      : isFrench
+          ? 'Confirmer la suspension'
+          : 'Confirm Suspension';
   String get confirmSuspendMessage => isArabic
       ? 'هل أنت متأكد من تعليق هذا الحساب؟ لن يتمكن العضو من الوصول إلى هذه العيادة حتى إعادة التنشيط.'
       : isFrench
           ? 'Êtes-vous sûr de vouloir suspendre ce compte ? Le membre ne pourra plus accéder à cette clinique.'
           : 'Are you sure you want to suspend this account? The member will not be able to access this clinic until reactivated.';
-  String get confirmActivateTitle =>
-      isArabic ? 'تأكيد تنشيط الحساب' : isFrench ? 'Confirmer l\'activation' : 'Confirm Activation';
+  String get confirmActivateTitle => isArabic
+      ? 'تأكيد تنشيط الحساب'
+      : isFrench
+          ? 'Confirmer l\'activation'
+          : 'Confirm Activation';
   String get confirmActivateMessage => isArabic
       ? 'هل أنت متأكد من إعادة تنشيط هذا الحساب؟'
       : isFrench
           ? 'Êtes-vous sûr de vouloir réactiver ce compte ?'
           : 'Are you sure you want to reactivate this account?';
-  String get confirmDetachDoctorTitle =>
-      isArabic ? 'تأكيد فصل الطبيب' : isFrench ? 'Confirmer le détachement' : 'Confirm Detach Doctor';
+  String get confirmDetachDoctorTitle => isArabic
+      ? 'تأكيد فصل الطبيب'
+      : isFrench
+          ? 'Confirmer le détachement'
+          : 'Confirm Detach Doctor';
   String get confirmDetachDoctorMessage => isArabic
       ? 'هل أنت متأكد من فصل هذا الطبيب من العيادة؟ لن يؤثر هذا على حسابه الشخصي أو بياناته في عيادات أخرى.'
       : isFrench
           ? 'Êtes-vous sûr de vouloir détacher ce médecin de la clinique ? Cela n\'affectera pas son compte personnel.'
           : 'Are you sure you want to detach this doctor from the clinic? This will not affect their personal account or other clinics.';
-  String get confirmDeleteAssistantTitle =>
-      isArabic ? 'تأكيد حذف المساعد' : isFrench ? 'Confirmer la suppression' : 'Confirm Remove Assistant';
+  String get confirmDeleteAssistantTitle => isArabic
+      ? 'تأكيد حذف المساعد'
+      : isFrench
+          ? 'Confirmer la suppression'
+          : 'Confirm Remove Assistant';
   String get confirmDeleteAssistantMessage => isArabic
       ? 'هل أنت متأكد من حذف هذا المساعد من العيادة؟ سيتم إلغاء وصوله نهائياً.'
       : isFrench
           ? 'Êtes-vous sûr de vouloir supprimer cet assistant de la clinique ? Son accès sera révoqué.'
           : 'Are you sure you want to remove this assistant from the clinic? Their access will be revoked.';
-  String get confirmCancelInvitationTitle =>
-      isArabic ? 'تأكيد إلغاء الدعوة' : isFrench ? 'Confirmer l\'annulation' : 'Confirm Cancel Invitation';
+  String get confirmCancelInvitationTitle => isArabic
+      ? 'تأكيد إلغاء الدعوة'
+      : isFrench
+          ? 'Confirmer l\'annulation'
+          : 'Confirm Cancel Invitation';
   String get confirmCancelInvitationMessage => isArabic
       ? 'هل أنت متأكد من إلغاء دعوة هذا الطبيب؟'
       : isFrench
@@ -904,36 +1936,51 @@ class LocalizedStrings {
       : isFrench
           ? 'Vous ne pouvez pas suspendre ou détacher votre propre compte ou le directeur principal.'
           : 'You cannot suspend or detach your own account or the clinic\'s primary director.';
-  String get permManageQueueTitle =>
-      isArabic ? 'إدارة قائمة الانتظار' : isFrench ? 'Gérer la file d\'attente' : 'Manage Queue';
+  String get permManageQueueTitle => isArabic
+      ? 'إدارة قائمة الانتظار'
+      : isFrench
+          ? 'Gérer la file d\'attente'
+          : 'Manage Queue';
   String get permManageQueueDesc => isArabic
       ? 'ترتيب ونداء المرضى وتحديث حالة الحضور'
       : isFrench
           ? 'Ordonner et appeler les patients dans la file'
           : 'Reorder and call patients in the queue';
-  String get permConfirmAttendanceTitle =>
-      isArabic ? 'تأكيد الحضور' : isFrench ? 'Confirmer la présence' : 'Confirm Attendance';
+  String get permConfirmAttendanceTitle => isArabic
+      ? 'تأكيد الحضور'
+      : isFrench
+          ? 'Confirmer la présence'
+          : 'Confirm Attendance';
   String get permConfirmAttendanceDesc => isArabic
       ? 'تسجيل وصول المريض إلى العيادة'
       : isFrench
           ? 'Enregistrer l\'arrivée du patient à la clinique'
           : 'Register patient check-in at the clinic';
-  String get permCreateBookingTitle =>
-      isArabic ? 'إنشاء المواعيد' : isFrench ? 'Créer des rendez-vous' : 'Create Bookings';
+  String get permCreateBookingTitle => isArabic
+      ? 'إنشاء المواعيد'
+      : isFrench
+          ? 'Créer des rendez-vous'
+          : 'Create Bookings';
   String get permCreateBookingDesc => isArabic
       ? 'حجز مواعيد جديدة للمرضى'
       : isFrench
           ? 'Réserver de nouveaux créneaux pour les patients'
           : 'Book new appointments for patients';
-  String get permViewContactsTitle =>
-      isArabic ? 'عرض بيانات الاتصال' : isFrench ? 'Voir les coordonnées' : 'View Patient Contacts';
+  String get permViewContactsTitle => isArabic
+      ? 'عرض بيانات الاتصال'
+      : isFrench
+          ? 'Voir les coordonnées'
+          : 'View Patient Contacts';
   String get permViewContactsDesc => isArabic
       ? 'الاطلاع على أرقام هواتف وعناوين المرضى'
       : isFrench
           ? 'Consulter les téléphones et coordonnées des patients'
           : 'View patient phone numbers and contact details';
-  String get permConfirmBookingTitle =>
-      isArabic ? 'تأكيد المواعيد' : isFrench ? 'Confirmer les rendez-vous' : 'Confirm Appointments';
+  String get permConfirmBookingTitle => isArabic
+      ? 'تأكيد المواعيد'
+      : isFrench
+          ? 'Confirmer les rendez-vous'
+          : 'Confirm Appointments';
   String get permConfirmBookingDesc => isArabic
       ? 'تأكيد المواعيد المعلقة وخصم الحصة من رصيد العيادة'
       : isFrench
@@ -949,46 +1996,88 @@ class LocalizedStrings {
       : isFrench
           ? 'Aucun médecin trouvé.'
           : 'No doctors found matching query.';
-  String get alreadyEmployedBadge =>
-      isArabic ? 'عضو بالعيادة' : isFrench ? 'Déjà membre' : 'Already Member';
-  String get invitationPendingBadge =>
-      isArabic ? 'دعوة معلقة' : isFrench ? 'Invitation envoyée' : 'Invited';
-  String get joinedAtLabel =>
-      isArabic ? 'تاريخ الانضمام' : isFrench ? 'Rejoint le' : 'Joined';
-  String get noStaffFound =>
-      isArabic ? 'لا يوجد أعضاء مسجلين.' : isFrench ? 'Aucun membre enregistré.' : 'No staff members registered.';
-  String get noPendingInvitations =>
-      isArabic ? 'لا توجد دعوات معلقة.' : isFrench ? 'Aucune invitation en attente.' : 'No pending invitations.';
+  String get alreadyEmployedBadge => isArabic
+      ? 'عضو بالعيادة'
+      : isFrench
+          ? 'Déjà membre'
+          : 'Already Member';
+  String get invitationPendingBadge => isArabic
+      ? 'دعوة معلقة'
+      : isFrench
+          ? 'Invitation envoyée'
+          : 'Invited';
+  String get joinedAtLabel => isArabic
+      ? 'تاريخ الانضمام'
+      : isFrench
+          ? 'Rejoint le'
+          : 'Joined';
+  String get noStaffFound => isArabic
+      ? 'لا يوجد أعضاء مسجلين.'
+      : isFrench
+          ? 'Aucun membre enregistré.'
+          : 'No staff members registered.';
+  String get noPendingInvitations => isArabic
+      ? 'لا توجد دعوات معلقة.'
+      : isFrench
+          ? 'Aucune invitation en attente.'
+          : 'No pending invitations.';
   String get directorAccessOnly => isArabic
       ? 'هذه الميزة متاحة فقط لمدير العيادة.'
       : isFrench
           ? 'Cette fonctionnalité est réservée au directeur de la clinique.'
           : 'This feature is only accessible to the clinic director.';
-  String get invitedOnLabel =>
-      isArabic ? 'تاريخ الدعوة' : isFrench ? 'Invité le' : 'Invited on';
-  String get staffMemberDetails =>
-      isArabic ? 'تفاصيل العضو' : isFrench ? 'Détails du membre' : 'Staff Member Details';
-  String get savePermissions =>
-      isArabic ? 'حفظ الصلاحيات' : isFrench ? 'Enregistrer les autorisations' : 'Save Permissions';
+  String get invitedOnLabel => isArabic
+      ? 'تاريخ الدعوة'
+      : isFrench
+          ? 'Invité le'
+          : 'Invited on';
+  String get staffMemberDetails => isArabic
+      ? 'تفاصيل العضو'
+      : isFrench
+          ? 'Détails du membre'
+          : 'Staff Member Details';
+  String get savePermissions => isArabic
+      ? 'حفظ الصلاحيات'
+      : isFrench
+          ? 'Enregistrer les autorisations'
+          : 'Save Permissions';
 
   // Assistant Operational Flow (TASK-05-01)
-  String get assistantQueueTab =>
-      isArabic ? 'طابور الانتظار' : isFrench ? "File d'attente" : 'Live Queue';
-  String get assistantCheckInTab =>
-      isArabic ? 'تسجيل الحضور' : isFrench ? 'Enregistrement' : 'Check-In';
-  String get assistantPatientsTab =>
-      isArabic ? 'بحث المرضى' : isFrench ? 'Recherche patients' : 'Patient Search';
+  String get assistantQueueTab => isArabic
+      ? 'طابور الانتظار'
+      : isFrench
+          ? "File d'attente"
+          : 'Live Queue';
+  String get assistantCheckInTab => isArabic
+      ? 'تسجيل الحضور'
+      : isFrench
+          ? 'Enregistrement'
+          : 'Check-In';
+  String get assistantPatientsTab => isArabic
+      ? 'بحث المرضى'
+      : isFrench
+          ? 'Recherche patients'
+          : 'Patient Search';
   String get checkInCodePrompt => isArabic
       ? 'أدخل رمز تسجيل الحضور المكون من 64 حرفاً أو امسح رمز QR الموعد'
       : isFrench
           ? 'Entrez le code de présence ou scannez le QR code du rendez-vous'
           : 'Enter the 64-character appointment check-in token or scan QR code';
-  String get checkInTokenLabel =>
-      isArabic ? 'رمز حضور الموعد' : isFrench ? 'Code de présence' : 'Check-In Token';
-  String get checkInTokenHint =>
-      isArabic ? 'أدخل رمز الموعد...' : isFrench ? 'Saisir le code...' : 'Enter token...';
-  String get submitCheckIn =>
-      isArabic ? 'تأكيد الحضور الآن' : isFrench ? "Confirmer l'arrivée" : 'Confirm Check-In';
+  String get checkInTokenLabel => isArabic
+      ? 'رمز حضور الموعد'
+      : isFrench
+          ? 'Code de présence'
+          : 'Check-In Token';
+  String get checkInTokenHint => isArabic
+      ? 'أدخل رمز الموعد...'
+      : isFrench
+          ? 'Saisir le code...'
+          : 'Enter token...';
+  String get submitCheckIn => isArabic
+      ? 'تأكيد الحضور الآن'
+      : isFrench
+          ? "Confirmer l'arrivée"
+          : 'Confirm Check-In';
   String get checkInSuccess => isArabic
       ? 'تم تسجيل حضور المريض بنجاح ونقله لقاعة الانتظار.'
       : isFrench
@@ -1009,18 +2098,33 @@ class LocalizedStrings {
       : isFrench
           ? 'Aucun patient trouvé.'
           : 'No registered patients found matching query.';
-  String get patientMrnLabel =>
-      isArabic ? 'رقم الملف الطبي (MRN)' : isFrench ? 'Numéro IPP' : 'MRN';
-  String get patientPhoneLabel =>
-      isArabic ? 'الهاتف' : isFrench ? 'Téléphone' : 'Phone';
-  String get quickCheckInAction =>
-      isArabic ? 'تسجيل حضور سريع' : isFrench ? 'Enregistrement rapide' : 'Quick Check-In';
-  String get scanQrAction =>
-      isArabic ? 'مسح رمز QR' : isFrench ? 'Scanner QR' : 'Scan QR';
+  String get patientMrnLabel => isArabic
+      ? 'رقم الملف الطبي (MRN)'
+      : isFrench
+          ? 'Numéro IPP'
+          : 'MRN';
+  String get patientPhoneLabel => isArabic
+      ? 'الهاتف'
+      : isFrench
+          ? 'Téléphone'
+          : 'Phone';
+  String get quickCheckInAction => isArabic
+      ? 'تسجيل حضور سريع'
+      : isFrench
+          ? 'Enregistrement rapide'
+          : 'Quick Check-In';
+  String get scanQrAction => isArabic
+      ? 'مسح رمز QR'
+      : isFrench
+          ? 'Scanner QR'
+          : 'Scan QR';
 
   // In-Clinic Appointment Booking Flow (TASK-05-02)
-  String get assistantNewBookingAction =>
-      isArabic ? 'حجز موعد جديد' : isFrench ? 'Nouveau rendez-vous' : 'New Booking';
+  String get assistantNewBookingAction => isArabic
+      ? 'حجز موعد جديد'
+      : isFrench
+          ? 'Nouveau rendez-vous'
+          : 'New Booking';
   String get newBookingAction => assistantNewBookingAction;
   String get assistantBookingTitle => isArabic
       ? 'حجز موعد جديد في العيادة'
@@ -1067,8 +2171,11 @@ class LocalizedStrings {
       : isFrench
           ? '$available sur $total disponible'
           : '$available of $total available';
-  String get slotFullBadge =>
-      isArabic ? 'مكتمل' : isFrench ? 'Complet' : 'Full';
+  String get slotFullBadge => isArabic
+      ? 'مكتمل'
+      : isFrench
+          ? 'Complet'
+          : 'Full';
   String get patientNameRequired => isArabic
       ? 'يرجى إدخال اسم المريض'
       : isFrench
@@ -2486,13 +3593,41 @@ class LocalizedStrings {
           ? 'Total des créneaux'
           : 'Total Weekly Slots';
 
-  String get daySaturday => isArabic ? 'السبت' : isFrench ? 'Samedi' : 'Saturday';
-  String get daySunday => isArabic ? 'الأحد' : isFrench ? 'Dimanche' : 'Sunday';
-  String get dayMonday => isArabic ? 'الاثنين' : isFrench ? 'Lundi' : 'Monday';
-  String get dayTuesday => isArabic ? 'الثلاثاء' : isFrench ? 'Mardi' : 'Tuesday';
-  String get dayWednesday => isArabic ? 'الأربعاء' : isFrench ? 'Mercredi' : 'Wednesday';
-  String get dayThursday => isArabic ? 'الخميس' : isFrench ? 'Jeudi' : 'Thursday';
-  String get dayFriday => isArabic ? 'الجمعة' : isFrench ? 'Vendredi' : 'Friday';
+  String get daySaturday => isArabic
+      ? 'السبت'
+      : isFrench
+          ? 'Samedi'
+          : 'Saturday';
+  String get daySunday => isArabic
+      ? 'الأحد'
+      : isFrench
+          ? 'Dimanche'
+          : 'Sunday';
+  String get dayMonday => isArabic
+      ? 'الاثنين'
+      : isFrench
+          ? 'Lundi'
+          : 'Monday';
+  String get dayTuesday => isArabic
+      ? 'الثلاثاء'
+      : isFrench
+          ? 'Mardi'
+          : 'Tuesday';
+  String get dayWednesday => isArabic
+      ? 'الأربعاء'
+      : isFrench
+          ? 'Mercredi'
+          : 'Wednesday';
+  String get dayThursday => isArabic
+      ? 'الخميس'
+      : isFrench
+          ? 'Jeudi'
+          : 'Thursday';
+  String get dayFriday => isArabic
+      ? 'الجمعة'
+      : isFrench
+          ? 'Vendredi'
+          : 'Friday';
 
   String getDayName(int dayOfWeek) {
     switch (dayOfWeek) {
@@ -2732,18 +3867,117 @@ class LocalizedStrings {
       : isFrench
           ? 'Action requise : Votre planning personnel n’est pas encore activé. Veuillez l’activer pour permettre les réservations.'
           : 'Action Required: Your personal working hours schedule is not activated. Please activate it to enable patient bookings.';
+
+  // Notifications & Escalations (PHASE-COMMS-02)
+  String get patientNotificationsTitle => isArabic
+      ? 'الإشعارات'
+      : isFrench
+          ? 'Notifications'
+          : 'Notifications';
+  String get noPatientNotifications => isArabic
+      ? 'لا توجد إشعارات حالياً'
+      : isFrench
+          ? 'Aucune notification pour le moment'
+          : 'No notifications at this time';
+  String get notificationAcknowledgedStatus => isArabic
+      ? 'تم الاطلاع'
+      : isFrench
+          ? 'Lu'
+          : 'Acknowledged';
+  String get acknowledgeReceiptAction => isArabic
+      ? 'تأكيد الاطلاع'
+      : isFrench
+          ? 'Confirmer la lecture'
+          : 'Acknowledge';
+  String get acknowledgingReceiptAction => isArabic
+      ? 'جاري التأكيد...'
+      : isFrench
+          ? 'Confirmation...'
+          : 'Confirming...';
+  String get errorAcknowledgingNotification => isArabic
+      ? 'تعذر تأكيد الاطلاع على الإشعار، يرجى المحاولة لاحقاً.'
+      : isFrench
+          ? 'Impossible de confirmer la lecture.'
+          : 'Failed to acknowledge notification. Please try again.';
+  String get clinicEscalationsTitle => isArabic
+      ? 'تصعيدات المتابعة'
+      : isFrench
+          ? 'Escalades de suivi'
+          : 'Follow-up Escalations';
+  String get noClinicEscalations => isArabic
+      ? 'لا توجد حالات تصعيد متأخرة'
+      : isFrench
+          ? 'Aucune escalade en attente'
+          : 'No pending escalations';
+  String get escalationAcknowledgeAction => isArabic
+      ? 'إقرار المتابعة وإغلاق التنبيه'
+      : isFrench
+          ? 'Confirmer le suivi et fermer'
+          : 'Acknowledge & Close Alert';
+  String get escalationConfirmTitle => isArabic
+      ? 'تأكيد إقرار المتابعة'
+      : isFrench
+          ? 'Confirmation du suivi'
+          : 'Confirm Follow-up';
+  String get escalationConfirmMessage => isArabic
+      ? 'هل تؤكد إقرار متابعة هذا الإشعار وإغلاقه من قائمة تصعيدات العيادة؟'
+      : isFrench
+          ? 'Confirmez-vous le suivi de cette notification et sa clôture ?'
+          : 'Do you confirm follow-up on this notice and closing it from the clinic escalations list?';
+  String get escalationConfirmAction => isArabic
+      ? 'تأكيد الإغلاق'
+      : isFrench
+          ? 'Confirmer la clôture'
+          : 'Confirm Closure';
+  String get escalationAcknowledgedStatusPrefix => isArabic
+      ? 'تم إغلاق التنبيه من الطابور بتاريخ'
+      : isFrench
+          ? 'Alerte clôturée le'
+          : 'Alert closed from queue on';
+  String get patientPhoneCopied => isArabic
+      ? 'تم نسخ رقم هاتف المريض إلى الحافظة'
+      : isFrench
+          ? 'Numéro de téléphone copié'
+          : 'Patient phone number copied to clipboard';
+  String get escalationReasonLabel => isArabic
+      ? 'سبب التصعيد'
+      : isFrench
+          ? 'Motif de l’escalade'
+          : 'Escalation Reason';
+  String get instructionLabel => isArabic
+      ? 'التعليمات الإجرائية'
+      : isFrench
+          ? 'Instructions'
+          : 'Instructions';
+  String get originalAppointmentLabel => isArabic
+      ? 'الموعد الأصلي'
+      : isFrench
+          ? 'Rendez-vous initial'
+          : 'Original Appointment';
+  String get proposedAppointmentLabel => isArabic
+      ? 'الموعد البديل المقترح'
+      : isFrench
+          ? 'Rendez-vous de remplacement'
+          : 'Proposed Replacement';
+  String get errorAcknowledgingEscalation => isArabic
+      ? 'تعذر إقرار التصعيد، يرجى المحاولة لاحقاً.'
+      : isFrench
+          ? 'Impossible d’acquitter l’escalade.'
+          : 'Failed to acknowledge escalation. Please try again.';
 }
 
-
 /// Minimal LocalizationsDelegate for LocalizedStrings.
-class AafiyaLocalizationsDelegate extends LocalizationsDelegate<LocalizedStrings> {
+class AafiyaLocalizationsDelegate
+    extends LocalizationsDelegate<LocalizedStrings> {
   const AafiyaLocalizationsDelegate();
 
   @override
-  bool isSupported(Locale locale) => ['ar', 'en', 'fr'].contains(locale.languageCode);
+  bool isSupported(Locale locale) =>
+      ['ar', 'en', 'fr'].contains(locale.languageCode);
 
   @override
-  Future<LocalizedStrings> load(Locale locale) => SynchronousFuture<LocalizedStrings>(LocalizedStrings(locale));
+  Future<LocalizedStrings> load(Locale locale) =>
+      SynchronousFuture<LocalizedStrings>(LocalizedStrings(locale));
 
   @override
   bool shouldReload(AafiyaLocalizationsDelegate old) => false;

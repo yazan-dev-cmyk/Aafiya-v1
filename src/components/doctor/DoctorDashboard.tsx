@@ -456,7 +456,7 @@ export const DoctorDashboard: React.FC<DoctorDashboardProps> = ({
       {activeTab === 'radiology-results' && <RadiologyDicomTab isDarkMode={isDarkMode} />}
       {activeTab === 'ehr' && <EhrSummaryTab isDarkMode={isDarkMode} />}
       {activeTab === 'analytics' && <ClinicalAnalyticsTab isDarkMode={isDarkMode} />}
-      {activeTab === 'notifications' && <CategorizedNotificationsTab isDarkMode={isDarkMode} />}
+      {activeTab === 'notifications' && <CategorizedNotificationsTab isDarkMode={isDarkMode} clinicId={effectiveClinicId} />}
       
       {/* Staff Management Tab with Direct URL Guard */}
       {activeTab === 'staff' && (

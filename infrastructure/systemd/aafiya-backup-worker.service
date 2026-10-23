@@ -1,0 +1,44 @@
+# /etc/systemd/system/aafiya-backup-worker.service
+# ------------------------------------------------------------------------------
+# AAFIYA Dedicated Backup Export Queue Worker
+#
+# Processes strictly the 'backups' queue with:
+# - Single-job isolation per execution
+# - Safe timeout matching ExportDatabaseBackupJob (timeout=600s, systemd watchdog=660s)
+# - Zero interference with clinical jobs on the 'default' queue
+# ------------------------------------------------------------------------------
+
+[Unit]
+Description=AAFIYA Dedicated Backup Export Queue Worker
+After=network.target mysql.service redis-server.service
+Requires=mysql.service
+
+[Service]
+Type=simple
+User=yazan
+Group=yazan
+WorkingDirectory=/home/yazan/Downloads/Medi/mediservices/backend
+
+# Runs only the dedicated 'backups' queue with isolated configuration:
+# - queue=backups: Never processes default or clinical queues
+# - timeout=660: Grace window for 600-second job execution
+# - sleep=3: Poll interval when idle
+# - tries=1: No automatic re-tries for backup dumps to prevent duplicate disk usage
+# - max-jobs=50: Graceful worker recycling to avoid memory leaks
+ExecStart=/usr/bin/php /home/yazan/Downloads/Medi/mediservices/backend/artisan queue:work backups --queue=backups --timeout=660 --sleep=3 --tries=1 --max-jobs=50
+
+Restart=always
+RestartSec=5s
+KillMode=process
+KillSignal=SIGTERM
+TimeoutStopSec=680
+
+# Environment / Security Hardening
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=aafiya-backup-worker
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

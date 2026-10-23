@@ -37,6 +37,22 @@ class RegisterRequest extends FormRequest
             'manager_name' => ['nullable', 'string', 'max:255'],
             'wilaya' => ['nullable', 'string', 'max:100'],
             'address' => ['nullable', 'string', 'max:255'],
+            'accepted_terms' => ['required', 'accepted'],
+            'terms_version' => ['nullable', 'string', 'max:50'],
+            'optional_analytics_consent' => ['nullable', 'boolean'],
+        ];
+    }
+
+    /**
+     * Get custom messages for validator errors.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'accepted_terms.required' => 'يجب إقرار وقبول شروط الخدمة والاطلاع على إشعار الخصوصية لإتمام إنشاء الحساب.',
+            'accepted_terms.accepted' => 'يجب إقرار وقبول شروط الخدمة والاطلاع على إشعار الخصوصية لإتمام إنشاء الحساب.',
         ];
     }
 }

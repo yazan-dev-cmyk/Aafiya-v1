@@ -302,7 +302,41 @@ export const adminService = {
   deleteMasterWilaya: async (id: number): Promise<ApiResponse<{ message: string }>> => {
     return api.delete<{ message: string }>(`/admin/master/wilayas/${id}`);
   },
+
+  // Database Backup Export (Step-Up Authentication & Asynchronous Export)
+  requestBackupStepUpToken: async (password: string): Promise<ApiResponse<{ token: string; expires_at: string }>> => {
+    return api.post<{ token: string; expires_at: string }>('/admin/backups/step-up-token', { password });
+  },
+
+  initiateBackupExport: async (step_up_token: string): Promise<ApiResponse<{ id: string; status: string; created_at: string }>> => {
+    return api.post<{ id: string; status: string; created_at: string }>('/admin/backups/export', { step_up_token });
+  },
+
+  listBackupExports: async (): Promise<ApiResponse<BackupExportItem[]>> => {
+    return api.get<BackupExportItem[]>('/admin/backups/exports');
+  },
+
+  getBackupExportStatus: async (id: string): Promise<ApiResponse<BackupExportItem>> => {
+    return api.get<BackupExportItem>(`/admin/backups/exports/${id}/status`);
+  },
+
+  getBackupDownloadUrl: (id: string): string => {
+    return `/api/v1/admin/backups/exports/${id}/download`;
+  },
 };
+
+export interface BackupExportItem {
+  id: string;
+  status: 'pending' | 'processing' | 'completed' | 'failed' | 'expired';
+  filename?: string;
+  file_size_bytes?: number;
+  sha256_hash?: string;
+  error_message?: string;
+  expires_at?: string;
+  is_expired?: boolean;
+  downloaded_at?: string;
+  created_at?: string;
+}
 
 export interface AdminMasterSpecialtyItem {
   id: number;

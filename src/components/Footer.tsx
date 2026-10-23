@@ -113,9 +113,9 @@ export const Footer: React.FC<FooterProps> = ({ viewMode, onViewModeChange }) =>
             <span>{t('copyright_prefix')} <strong className="text-white font-satisfy">Aafiya Platforms Inc.</strong></span>
           </div>
           <div className="flex items-center gap-8">
-            <a href="#faq" className="hover:text-white transition-colors">{t('privacy')}</a>
-            <a href="#faq" className="hover:text-white transition-colors">{t('terms')}</a>
-            <a href="#faq" className="hover:text-white transition-colors">{t('compliance')}</a>
+            <a href={`/${locale}/privacy`} className="hover:text-white transition-colors">{t('privacy')}</a>
+            <a href={`/${locale}/terms`} className="hover:text-white transition-colors">{t('terms')}</a>
+            <a href={`/${locale}/privacy#data-security`} className="hover:text-white transition-colors">{t('compliance')}</a>
           </div>
         </div>
       </div>

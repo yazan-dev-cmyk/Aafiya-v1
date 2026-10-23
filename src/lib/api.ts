@@ -75,33 +75,62 @@ export const setActiveClinicId = (clinicId: string | null): void => {
   }
 };
 
+export interface RequestOptions extends Omit<RequestInit, 'headers'> {
+  headers?: HeadersInit;
+  requiresAuth?: boolean;
+  includeClinicContext?: boolean;
+}
+
+function normalizeOptions(options?: RequestOptions | Record<string, string>): RequestOptions {
+  if (!options) return {};
+  if ('headers' in options || 'requiresAuth' in options || 'includeClinicContext' in options || 'signal' in options || 'cache' in options) {
+    return options as RequestOptions;
+  }
+  return { headers: options as HeadersInit };
+}
+
 export async function apiClient<T = any>(
   endpoint: string,
-  options: RequestInit = {}
+  options: RequestOptions = {}
 ): Promise<ApiResponse<T>> {
+  const {
+    requiresAuth = true,
+    includeClinicContext = true,
+    headers: customHeaders,
+    ...fetchInit
+  } = options;
+
   const baseUrl = getApiBaseUrl();
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
   const url = `${baseUrl}${cleanEndpoint}`;
 
   const token = getStoredToken();
   const activeClinicId = getActiveClinicId();
-  const headers: Record<string, string> = {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json',
-    ...(options.headers as Record<string, string> || {}),
-  };
 
-  if (token && !headers['Authorization']) {
-    headers['Authorization'] = `Bearer ${token}`;
+  const headers = new Headers(customHeaders);
+
+  if (!headers.has('Accept')) {
+    headers.set('Accept', 'application/json');
+  }
+  if (!headers.has('Content-Type') && !(fetchInit.body instanceof FormData)) {
+    headers.set('Content-Type', 'application/json');
   }
 
-  if (activeClinicId && !headers['X-Clinic-ID']) {
-    headers['X-Clinic-ID'] = activeClinicId;
+  if (!requiresAuth) {
+    headers.delete('Authorization');
+  } else if (token && !headers.has('Authorization')) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
+
+  if (!includeClinicContext) {
+    headers.delete('X-Clinic-ID');
+  } else if (activeClinicId && !headers.has('X-Clinic-ID')) {
+    headers.set('X-Clinic-ID', activeClinicId);
   }
 
   try {
     const response = await fetch(url, {
-      ...options,
+      ...fetchInit,
       headers,
     });
 
@@ -109,7 +138,8 @@ export async function apiClient<T = any>(
     const data = isJson ? await response.json() : null;
 
     if (!response.ok) {
-      if (response.status === 401) {
+      const isAuthHandshake = cleanEndpoint.startsWith('/auth/login') || cleanEndpoint.startsWith('/auth/register');
+      if (response.status === 401 && requiresAuth && token && !isAuthHandshake) {
         setStoredToken(null);
       }
 
@@ -127,23 +157,40 @@ export async function apiClient<T = any>(
 }
 
 export const api = {
-  get: <T = any>(endpoint: string, headers?: Record<string, string>) =>
-    apiClient<T>(endpoint, { method: 'GET', headers }),
+  get: <T = any>(endpoint: string, options?: RequestOptions | Record<string, string>) =>
+    apiClient<T>(endpoint, { ...normalizeOptions(options), method: 'GET' }),
 
-  post: <T = any>(endpoint: string, body?: any, headers?: Record<string, string>) =>
+  post: <T = any>(endpoint: string, body?: any, options?: RequestOptions | Record<string, string>) =>
     apiClient<T>(endpoint, {
+      ...normalizeOptions(options),
       method: 'POST',
-      body: body ? JSON.stringify(body) : undefined,
-      headers,
+      body: body instanceof FormData ? body : (body !== undefined ? JSON.stringify(body) : undefined),
     }),
 
-  put: <T = any>(endpoint: string, body?: any, headers?: Record<string, string>) =>
+  put: <T = any>(endpoint: string, body?: any, options?: RequestOptions | Record<string, string>) =>
     apiClient<T>(endpoint, {
+      ...normalizeOptions(options),
       method: 'PUT',
-      body: body ? JSON.stringify(body) : undefined,
-      headers,
+      body: body instanceof FormData ? body : (body !== undefined ? JSON.stringify(body) : undefined),
     }),
 
-  delete: <T = any>(endpoint: string, headers?: Record<string, string>) =>
-    apiClient<T>(endpoint, { method: 'DELETE', headers }),
+  delete: <T = any>(endpoint: string, options?: RequestOptions | Record<string, string>) =>
+    apiClient<T>(endpoint, { ...normalizeOptions(options), method: 'DELETE' }),
+
+  publicGet: <T = any>(endpoint: string, options?: RequestOptions | Record<string, string>) =>
+    apiClient<T>(endpoint, {
+      ...normalizeOptions(options),
+      method: 'GET',
+      requiresAuth: false,
+      includeClinicContext: false,
+    }),
+
+  publicPost: <T = any>(endpoint: string, body?: any, options?: RequestOptions | Record<string, string>) =>
+    apiClient<T>(endpoint, {
+      ...normalizeOptions(options),
+      method: 'POST',
+      body: body instanceof FormData ? body : (body !== undefined ? JSON.stringify(body) : undefined),
+      requiresAuth: false,
+      includeClinicContext: false,
+    }),
 };
