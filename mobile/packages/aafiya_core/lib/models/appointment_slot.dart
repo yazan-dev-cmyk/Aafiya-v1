@@ -32,7 +32,8 @@ class AppointmentSlot {
   factory AppointmentSlot.fromJson(Map<String, dynamic> json) {
     final maxCap = (json['max_capacity'] as num?)?.toInt() ?? 10;
     final occ = (json['occupied'] as num?)?.toInt() ?? 0;
-    final avail = (json['available'] as num?)?.toInt() ?? (maxCap - occ).clamp(0, maxCap);
+    final avail =
+        (json['available'] as num?)?.toInt() ?? (maxCap - occ).clamp(0, maxCap);
     final isAvail = json['is_available'] as bool? ?? (avail > 0);
 
     return AppointmentSlot(
@@ -67,7 +68,8 @@ class AppointmentSlot {
           isAvailable == other.isAvailable;
 
   @override
-  int get hashCode => Object.hash(timeSlot, maxCapacity, occupied, available, isAvailable);
+  int get hashCode =>
+      Object.hash(timeSlot, maxCapacity, occupied, available, isAvailable);
 
   @override
   String toString() =>

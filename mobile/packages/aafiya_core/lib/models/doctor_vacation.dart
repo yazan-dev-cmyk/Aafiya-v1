@@ -145,7 +145,8 @@ class PaginatedDoctorVacations {
     final meta = json['meta'] as Map<String, dynamic>?;
     final currentPage = (meta?['current_page'] as num?)?.toInt() ?? 1;
     final lastPage = (meta?['last_page'] as num?)?.toInt() ?? 1;
-    final perPage = (meta?['per_page'] as num?)?.toInt() ?? (list.isEmpty ? 15 : list.length);
+    final perPage = (meta?['per_page'] as num?)?.toInt() ??
+        (list.isEmpty ? 15 : list.length);
     final total = (meta?['total'] as num?)?.toInt() ?? list.length;
 
     return PaginatedDoctorVacations(

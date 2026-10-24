@@ -28,7 +28,10 @@ enum UserRole {
     return switch (roleKey.toLowerCase().trim()) {
       'doctor' => UserRole.doctor,
       'doctor_assistant' => UserRole.doctorAssistant,
-      'booking_center' || 'booking-center' || 'bookingcenter' => UserRole.bookingCenter,
+      'booking_center' ||
+      'booking-center' ||
+      'bookingcenter' =>
+        UserRole.bookingCenter,
       'patient_registered' => UserRole.patientRegistered,
       'patient_guest' => UserRole.patientGuest,
       'admin' => UserRole.admin,
@@ -60,4 +63,3 @@ enum UserRole {
       this == UserRole.radiology ||
       this == UserRole.radAssistant;
 }
-

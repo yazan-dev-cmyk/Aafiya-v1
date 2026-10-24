@@ -61,7 +61,8 @@ void main() {
   }
 
   group('Doctor Live Waiting Room Queue Widget Tests', () {
-    testWidgets('1. Loading: displays loading indicator while requests in-flight',
+    testWidgets(
+        '1. Loading: displays loading indicator while requests in-flight',
         (tester) async {
       final mockClient = MockClient((request) async {
         // Delay response to inspect loading state
@@ -69,7 +70,12 @@ void main() {
         return http.Response(
           jsonEncode({
             'data': [],
-            'meta': {'current_page': 1, 'last_page': 1, 'per_page': 15, 'total': 0},
+            'meta': {
+              'current_page': 1,
+              'last_page': 1,
+              'per_page': 15,
+              'total': 0
+            },
           }),
           200,
           headers: {'content-type': 'application/json'},
@@ -94,7 +100,8 @@ void main() {
       await tester.pumpAndSettle();
     });
 
-    testWidgets('2. Loaded: renders Waiting Room and Expected Check-In lists with correct data',
+    testWidgets(
+        '2. Loaded: renders Waiting Room and Expected Check-In lists with correct data',
         (tester) async {
       final mockClient = MockClient((request) async {
         final status = request.url.queryParameters['status'];
@@ -118,7 +125,12 @@ void main() {
                   },
                 }
               ],
-              'meta': {'current_page': 1, 'last_page': 1, 'per_page': 15, 'total': 1},
+              'meta': {
+                'current_page': 1,
+                'last_page': 1,
+                'per_page': 15,
+                'total': 1
+              },
             }),
             200,
             headers: {'content-type': 'application/json'},
@@ -141,7 +153,12 @@ void main() {
                   'notes': 'متابعة كشف سابقة',
                 }
               ],
-              'meta': {'current_page': 1, 'last_page': 1, 'per_page': 15, 'total': 1},
+              'meta': {
+                'current_page': 1,
+                'last_page': 1,
+                'per_page': 15,
+                'total': 1
+              },
             }),
             200,
             headers: {'content-type': 'application/json'},
@@ -239,7 +256,12 @@ void main() {
                 },
               }
             ],
-            'meta': {'current_page': 1, 'last_page': 1, 'per_page': 15, 'total': 1},
+            'meta': {
+              'current_page': 1,
+              'last_page': 1,
+              'per_page': 15,
+              'total': 1
+            },
           }),
           200,
           headers: {'content-type': 'application/json'},
@@ -279,10 +301,12 @@ void main() {
 
       expect(attendCalled, isTrue);
       // SnackBar success feedback should be displayed
-      expect(find.text('تم تسجيل حضور المريض بنجاح ونقله لقاعة الانتظار.'), findsOneWidget);
+      expect(find.text('تم تسجيل حضور المريض بنجاح ونقله لقاعة الانتظار.'),
+          findsOneWidget);
     });
 
-    testWidgets('4. No-Show Action: confirms dialog with optional reason and calls /no-show',
+    testWidgets(
+        '4. No-Show Action: confirms dialog with optional reason and calls /no-show',
         (tester) async {
       bool noShowCalled = false;
       String? sentReason;
@@ -329,7 +353,12 @@ void main() {
                 },
               }
             ],
-            'meta': {'current_page': 1, 'last_page': 1, 'per_page': 15, 'total': 1},
+            'meta': {
+              'current_page': 1,
+              'last_page': 1,
+              'per_page': 15,
+              'total': 1
+            },
           }),
           200,
           headers: {'content-type': 'application/json'},
@@ -361,7 +390,8 @@ void main() {
       expect(find.text('تأكيد عدم الحضور (No-Show)'), findsOneWidget);
 
       // Enter optional reason
-      await tester.enterText(find.byType(TextField), 'تأخر لأكثر من ساعة ولم يجب');
+      await tester.enterText(
+          find.byType(TextField), 'تأخر لأكثر من ساعة ولم يجب');
       await tester.pumpAndSettle();
 
       // Tap confirm button in dialog
@@ -371,16 +401,23 @@ void main() {
 
       expect(noShowCalled, isTrue);
       expect(sentReason, 'تأخر لأكثر من ساعة ولم يجب');
-      expect(find.text('تم تسجيل عدم حضور المريض للموعد (No-Show).'), findsOneWidget);
+      expect(find.text('تم تسجيل عدم حضور المريض للموعد (No-Show).'),
+          findsOneWidget);
     });
 
-    testWidgets('5. Empty States: renders AafiyaEmptyView when queues are empty',
+    testWidgets(
+        '5. Empty States: renders AafiyaEmptyView when queues are empty',
         (tester) async {
       final mockClient = MockClient((request) async {
         return http.Response(
           jsonEncode({
             'data': [],
-            'meta': {'current_page': 1, 'last_page': 1, 'per_page': 15, 'total': 0},
+            'meta': {
+              'current_page': 1,
+              'last_page': 1,
+              'per_page': 15,
+              'total': 0
+            },
           }),
           200,
           headers: {'content-type': 'application/json'},
@@ -401,14 +438,16 @@ void main() {
       await tester.pumpAndSettle();
 
       // Waiting Room Empty View
-      expect(find.text('لا يوجد أي مريض في قاعة الانتظار حالياً.'), findsOneWidget);
+      expect(find.text('لا يوجد أي مريض في قاعة الانتظار حالياً.'),
+          findsOneWidget);
 
       // Switch to Expected Check-In Tab
       await tester.tap(find.text('المتوقع حضورهم'));
       await tester.pumpAndSettle();
 
       // Expected Queue Empty View
-      expect(find.text('لا توجد مواعيد مؤكدة أخرى متوقعة اليوم.'), findsOneWidget);
+      expect(
+          find.text('لا توجد مواعيد مؤكدة أخرى متوقعة اليوم.'), findsOneWidget);
     });
 
     testWidgets('6. Clinic Context Switch & Stale Response Protection',
@@ -424,17 +463,24 @@ void main() {
             'data': [
               {
                 'id': isClinic07 ? 'app-clinic-07' : 'app-clinic-01',
-                'booking_reference': isClinic07 ? 'MS-CLINIC-07' : 'MS-CLINIC-01',
+                'booking_reference':
+                    isClinic07 ? 'MS-CLINIC-07' : 'MS-CLINIC-01',
                 'status': 'attended',
                 'appointment_date': '2026-09-15',
                 'time_slot': '10:00',
                 'patient': {
                   'id': 'pat-007',
-                  'name': isClinic07 ? 'مريض عيادة وهران' : 'مريض عيادة الجزائر',
+                  'name':
+                      isClinic07 ? 'مريض عيادة وهران' : 'مريض عيادة الجزائر',
                 },
               }
             ],
-            'meta': {'current_page': 1, 'last_page': 1, 'per_page': 15, 'total': 1},
+            'meta': {
+              'current_page': 1,
+              'last_page': 1,
+              'per_page': 15,
+              'total': 1
+            },
           }),
           200,
           headers: {'content-type': 'application/json'},
@@ -465,13 +511,19 @@ void main() {
       expect(find.text('مريض عيادة الجزائر'), findsNothing);
     });
 
-    testWidgets('7. Trilingual Localization: renders properly in English and French',
+    testWidgets(
+        '7. Trilingual Localization: renders properly in English and French',
         (tester) async {
       final mockClient = MockClient((request) async {
         return http.Response(
           jsonEncode({
             'data': [],
-            'meta': {'current_page': 1, 'last_page': 1, 'per_page': 15, 'total': 0},
+            'meta': {
+              'current_page': 1,
+              'last_page': 1,
+              'per_page': 15,
+              'total': 0
+            },
           }),
           200,
           headers: {'content-type': 'application/json'},
@@ -497,7 +549,8 @@ void main() {
 
       expect(find.text('In Waiting Room'), findsNWidgets(2));
       expect(find.text('Expected Arrivals'), findsOneWidget);
-      expect(find.text('No patients currently in the waiting room.'), findsOneWidget);
+      expect(find.text('No patients currently in the waiting room.'),
+          findsOneWidget);
 
       // Test French (LTR)
       await tester.pumpWidget(createTestWidget(
@@ -508,12 +561,14 @@ void main() {
 
       expect(find.text('En salle d\'attente'), findsNWidgets(2));
       expect(find.text('Arrivées attendues'), findsOneWidget);
-      expect(find.text('Aucun patient en salle d’attente actuellement.'), findsOneWidget);
+      expect(find.text('Aucun patient en salle d’attente actuellement.'),
+          findsOneWidget);
     });
   });
 
   group('DA-03: Doctor Queue Statistics Synchronization Tests', () {
-    testWidgets('DA-03.1: Sub-tab badge displays authoritative total when total exceeds page size',
+    testWidgets(
+        'DA-03.1: Sub-tab badge displays authoritative total when total exceeds page size',
         (tester) async {
       final mockClient = MockClient((request) async {
         final status = request.url.queryParameters['status'];
@@ -599,11 +654,13 @@ void main() {
       expect(find.text('\u200E42\u200E'), findsOneWidget);
     });
 
-    testWidgets('DA-03.2: Infinite scroll pagination deduplicates items by ID and retains authoritative total',
+    testWidgets(
+        'DA-03.2: Infinite scroll pagination deduplicates items by ID and retains authoritative total',
         (tester) async {
       final mockClient = MockClient((request) async {
         final status = request.url.queryParameters['status'];
-        final page = int.tryParse(request.url.queryParameters['page'] ?? '1') ?? 1;
+        final page =
+            int.tryParse(request.url.queryParameters['page'] ?? '1') ?? 1;
 
         if (status == 'attended') {
           if (page == 1) {
@@ -675,7 +732,12 @@ void main() {
         return http.Response(
           jsonEncode({
             'data': [],
-            'meta': {'current_page': 1, 'last_page': 1, 'per_page': 15, 'total': 0},
+            'meta': {
+              'current_page': 1,
+              'last_page': 1,
+              'per_page': 15,
+              'total': 0
+            },
           }),
           200,
           headers: {'content-type': 'application/json'},
@@ -714,7 +776,8 @@ void main() {
       expect(find.text('\u200E3\u200E'), findsOneWidget);
     });
 
-    testWidgets('DA-03.3: Attend action authoritatively re-syncs queue statistics for both tabs',
+    testWidgets(
+        'DA-03.3: Attend action authoritatively re-syncs queue statistics for both tabs',
         (tester) async {
       int attendCallCount = 0;
       bool attended = false;
@@ -819,7 +882,8 @@ void main() {
       await tester.tap(find.text('تسجيل حضور'));
       await tester.pumpAndSettle();
 
-      final confirmButton = find.widgetWithText(ElevatedButton, 'تسجيل حضور').last;
+      final confirmButton =
+          find.widgetWithText(ElevatedButton, 'تسجيل حضور').last;
       await tester.tap(confirmButton);
       await tester.pumpAndSettle();
 
@@ -831,7 +895,8 @@ void main() {
       expect(find.text('\u200E1\u200E'), findsOneWidget);
     });
 
-    testWidgets('DA-03.4: No-show action authoritatively re-syncs expected queue statistics',
+    testWidgets(
+        'DA-03.4: No-show action authoritatively re-syncs expected queue statistics',
         (tester) async {
       bool noShowRecorded = false;
 
@@ -881,7 +946,12 @@ void main() {
         return http.Response(
           jsonEncode({
             'data': [],
-            'meta': {'current_page': 1, 'last_page': 1, 'per_page': 15, 'total': 0},
+            'meta': {
+              'current_page': 1,
+              'last_page': 1,
+              'per_page': 15,
+              'total': 0
+            },
           }),
           200,
           headers: {'content-type': 'application/json'},
@@ -921,7 +991,8 @@ void main() {
       expect(find.text('\u200E0\u200E'), findsNWidgets(2)); // Both tabs are 0
     });
 
-    testWidgets('DA-03.5: API failure on initial load displays "-" indicator rather than misleading 0 and recovers on retry',
+    testWidgets(
+        'DA-03.5: API failure on initial load displays "-" indicator rather than misleading 0 and recovers on retry',
         (tester) async {
       bool shouldFail = true;
 
@@ -946,7 +1017,12 @@ void main() {
                 'patient': {'id': 'p-rec', 'name': 'مريض بعد التعافي'},
               }
             ],
-            'meta': {'current_page': 1, 'last_page': 1, 'per_page': 15, 'total': 7},
+            'meta': {
+              'current_page': 1,
+              'last_page': 1,
+              'per_page': 15,
+              'total': 7
+            },
           }),
           200,
           headers: {'content-type': 'application/json'},
@@ -980,7 +1056,8 @@ void main() {
       expect(find.text('مريض بعد التعافي'), findsOneWidget);
     });
 
-    testWidgets('DA-03.6: Active clinic switch re-syncs queue statistics to target clinic without stale overlap',
+    testWidgets(
+        'DA-03.6: Active clinic switch re-syncs queue statistics to target clinic without stale overlap',
         (tester) async {
       final mockClient = MockClient((request) async {
         final clinicHeader = request.headers['X-Clinic-ID'];

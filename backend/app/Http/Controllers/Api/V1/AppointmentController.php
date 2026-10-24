@@ -154,14 +154,15 @@ class AppointmentController extends Controller
             'token' => ['required', 'string', 'max:64'],
         ]);
 
-        $appointment = $this->bookingService->checkInAppointmentByToken(
+        $result = $this->bookingService->checkInAppointmentByToken(
             $request->input('token'),
             $request->user()
         );
 
         return response()->json([
             'message' => 'تم تأكيد حضور الموعد بنجاح.',
-            'data' => new AppointmentResource($appointment),
+            'check_in_result' => $result['check_in_result'],
+            'data' => new AppointmentResource($result['appointment']),
         ]);
     }
 

@@ -64,7 +64,8 @@ class BookingCenterService {
     if (paymentMethod != null && paymentMethod.trim().isNotEmpty) {
       body['payment_method'] = paymentMethod.trim();
     }
-    if (transactionReference != null && transactionReference.trim().isNotEmpty) {
+    if (transactionReference != null &&
+        transactionReference.trim().isNotEmpty) {
       body['transaction_reference'] = transactionReference.trim();
     }
     if (receiptDocumentPath != null && receiptDocumentPath.trim().isNotEmpty) {
@@ -269,8 +270,7 @@ class BookingCenterService {
         'patient_id': patientId.trim(),
       if (patientMrn != null && patientMrn.trim().isNotEmpty)
         'patient_mrn': patientMrn.trim(),
-      if (notes != null && notes.trim().isNotEmpty)
-        'notes': notes.trim(),
+      if (notes != null && notes.trim().isNotEmpty) 'notes': notes.trim(),
     };
 
     final result = await _apiClient.post(
@@ -400,7 +400,8 @@ class BookingCenterService {
     }
   }
 
-  ApiResult<List<BookingPackage>> _parseBookingPackages(Map<String, dynamic> data) {
+  ApiResult<List<BookingPackage>> _parseBookingPackages(
+      Map<String, dynamic> data) {
     try {
       final payload = data['data'];
       if (payload is List) {
@@ -427,7 +428,8 @@ class BookingCenterService {
     }
   }
 
-  ApiResult<PackagePurchaseRequest> _parseSinglePurchaseRequest(Map<String, dynamic> data) {
+  ApiResult<PackagePurchaseRequest> _parseSinglePurchaseRequest(
+      Map<String, dynamic> data) {
     try {
       final payload = data['data'];
       if (payload is Map<String, dynamic>) {
@@ -450,7 +452,8 @@ class BookingCenterService {
     }
   }
 
-  ApiResult<List<PackagePurchaseRequest>> _parsePurchaseRequestsList(Map<String, dynamic> data) {
+  ApiResult<List<PackagePurchaseRequest>> _parsePurchaseRequestsList(
+      Map<String, dynamic> data) {
     try {
       final payload = data['data'];
       if (payload is List) {
@@ -477,7 +480,8 @@ class BookingCenterService {
     }
   }
 
-  ApiResult<List<BookingTransactionItem>> _parseTransactionsList(Map<String, dynamic> data) {
+  ApiResult<List<BookingTransactionItem>> _parseTransactionsList(
+      Map<String, dynamic> data) {
     try {
       final payload = data['data'];
       if (payload is List) {
@@ -504,7 +508,8 @@ class BookingCenterService {
     }
   }
 
-  ApiResult<List<PatientSearchResult>> _parsePatientsList(Map<String, dynamic> data) {
+  ApiResult<List<PatientSearchResult>> _parsePatientsList(
+      Map<String, dynamic> data) {
     try {
       final payload = data['data'];
       if (payload is List) {
@@ -591,7 +596,8 @@ class BookingCenterService {
     }
   }
 
-  ApiResult<List<Appointment>> _parseAppointmentsList(Map<String, dynamic> data) {
+  ApiResult<List<Appointment>> _parseAppointmentsList(
+      Map<String, dynamic> data) {
     try {
       final payload = data['data'];
       if (payload is List) {

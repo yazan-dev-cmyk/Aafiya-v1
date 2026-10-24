@@ -74,7 +74,8 @@ class ClinicStaffService {
   }
 
   /// 3. Looks up an existing doctor by email address.
-  Future<ApiResult<DoctorLookupResult>> lookupDoctor(String clinicId, String email) async {
+  Future<ApiResult<DoctorLookupResult>> lookupDoctor(
+      String clinicId, String email) async {
     final result = await _apiClient.get(
       ApiEndpoints.clinicDoctorLookup(clinicId),
       queryParameters: {'email': email.trim()},
@@ -109,8 +110,10 @@ class ClinicStaffService {
   }
 
   /// 5. Lists all invitations sent by the clinic.
-  Future<ApiResult<List<ClinicDoctorInvitation>>> fetchClinicInvitations(String clinicId) async {
-    final result = await _apiClient.get(ApiEndpoints.clinicDoctorInvitations(clinicId));
+  Future<ApiResult<List<ClinicDoctorInvitation>>> fetchClinicInvitations(
+      String clinicId) async {
+    final result =
+        await _apiClient.get(ApiEndpoints.clinicDoctorInvitations(clinicId));
 
     return switch (result) {
       ApiSuccess(:final data) => _parseInvitationsList(data),
@@ -119,7 +122,8 @@ class ClinicStaffService {
   }
 
   /// 6. Cancels a pending doctor invitation.
-  Future<ApiResult<bool>> cancelInvitation(String clinicId, String invitationId) async {
+  Future<ApiResult<bool>> cancelInvitation(
+      String clinicId, String invitationId) async {
     final result = await _apiClient.post(
       ApiEndpoints.clinicDoctorInvitationCancel(clinicId, invitationId),
     );
@@ -222,7 +226,8 @@ class ClinicStaffService {
   }
 
   /// 12. Soft-deletes / removes an assistant from the clinic.
-  Future<ApiResult<bool>> deleteAssistant(String clinicId, String assistantId) async {
+  Future<ApiResult<bool>> deleteAssistant(
+      String clinicId, String assistantId) async {
     final result = await _apiClient.delete(
       ApiEndpoints.clinicAssistantDelete(clinicId, assistantId),
     );
@@ -234,7 +239,8 @@ class ClinicStaffService {
   }
 
   /// 13. Retrieves unified details of a single staff member (doctor or assistant).
-  Future<ApiResult<StaffMemberDetail>> getStaffDetail(String clinicId, String staffId) async {
+  Future<ApiResult<StaffMemberDetail>> getStaffDetail(
+      String clinicId, String staffId) async {
     final result = await _apiClient.get(
       ApiEndpoints.clinicStaffDetail(clinicId, staffId),
     );
@@ -253,11 +259,13 @@ class ClinicStaffService {
       return ApiSuccess(ClinicStaffData.fromJson(raw));
     }
     return const ApiFailure(
-      GenericApiException(statusCode: 500, message: 'Invalid clinic staff response format.'),
+      GenericApiException(
+          statusCode: 500, message: 'Invalid clinic staff response format.'),
     );
   }
 
-  ApiResult<ClinicDoctorStaff> _parseDoctorFromCreation(Map<String, dynamic> response) {
+  ApiResult<ClinicDoctorStaff> _parseDoctorFromCreation(
+      Map<String, dynamic> response) {
     final raw = response['data'];
     if (raw is Map<String, dynamic>) {
       // Backend returns { 'user': UserResource, 'clinic': ClinicResource }
@@ -287,31 +295,37 @@ class ClinicStaffService {
       }
     }
     return const ApiFailure(
-      GenericApiException(statusCode: 500, message: 'Invalid created doctor response format.'),
+      GenericApiException(
+          statusCode: 500, message: 'Invalid created doctor response format.'),
     );
   }
 
-  ApiResult<DoctorLookupResult> _parseLookupResult(Map<String, dynamic> response) {
+  ApiResult<DoctorLookupResult> _parseLookupResult(
+      Map<String, dynamic> response) {
     final raw = response['data'] ?? response;
     if (raw is Map<String, dynamic>) {
       return ApiSuccess(DoctorLookupResult.fromJson(raw));
     }
     return const ApiFailure(
-      GenericApiException(statusCode: 500, message: 'Invalid doctor lookup response format.'),
+      GenericApiException(
+          statusCode: 500, message: 'Invalid doctor lookup response format.'),
     );
   }
 
-  ApiResult<ClinicDoctorInvitation> _parseInvitation(Map<String, dynamic> response) {
+  ApiResult<ClinicDoctorInvitation> _parseInvitation(
+      Map<String, dynamic> response) {
     final raw = response['data'] ?? response;
     if (raw is Map<String, dynamic>) {
       return ApiSuccess(ClinicDoctorInvitation.fromJson(raw));
     }
     return const ApiFailure(
-      GenericApiException(statusCode: 500, message: 'Invalid invitation response format.'),
+      GenericApiException(
+          statusCode: 500, message: 'Invalid invitation response format.'),
     );
   }
 
-  ApiResult<List<ClinicDoctorInvitation>> _parseInvitationsList(Map<String, dynamic> response) {
+  ApiResult<List<ClinicDoctorInvitation>> _parseInvitationsList(
+      Map<String, dynamic> response) {
     final raw = response['data'];
     if (raw is List) {
       final list = <ClinicDoctorInvitation>[];
@@ -325,23 +339,27 @@ class ClinicStaffService {
     return const ApiSuccess(<ClinicDoctorInvitation>[]);
   }
 
-  ApiResult<ClinicAssistantStaff> _parseAssistant(Map<String, dynamic> response) {
+  ApiResult<ClinicAssistantStaff> _parseAssistant(
+      Map<String, dynamic> response) {
     final raw = response['data'] ?? response;
     if (raw is Map<String, dynamic>) {
       return ApiSuccess(ClinicAssistantStaff.fromJson(raw));
     }
     return const ApiFailure(
-      GenericApiException(statusCode: 500, message: 'Invalid assistant response format.'),
+      GenericApiException(
+          statusCode: 500, message: 'Invalid assistant response format.'),
     );
   }
 
-  ApiResult<StaffMemberDetail> _parseStaffDetail(Map<String, dynamic> response) {
+  ApiResult<StaffMemberDetail> _parseStaffDetail(
+      Map<String, dynamic> response) {
     final raw = response['data'] ?? response;
     if (raw is Map<String, dynamic>) {
       return ApiSuccess(StaffMemberDetail.fromJson(raw));
     }
     return const ApiFailure(
-      GenericApiException(statusCode: 500, message: 'Invalid staff detail response format.'),
+      GenericApiException(
+          statusCode: 500, message: 'Invalid staff detail response format.'),
     );
   }
 }

@@ -6,7 +6,9 @@ import 'package:aafiya_core/aafiya_core.dart';
 
 void main() {
   group('DoctorStats Model Tests', () {
-    test('DoctorStats.fromJson correctly deserializes verified backend contract', () {
+    test(
+        'DoctorStats.fromJson correctly deserializes verified backend contract',
+        () {
       final json = {
         'today_total': 12,
         'pending_check_in': 4,
@@ -79,7 +81,9 @@ void main() {
   });
 
   group('PaginatedAppointments Model Tests', () {
-    test('PaginatedAppointments.fromJson correctly parses items and pagination meta', () {
+    test(
+        'PaginatedAppointments.fromJson correctly parses items and pagination meta',
+        () {
       final json = {
         'data': [
           {
@@ -238,7 +242,8 @@ void main() {
       expect(result, isA<ApiFailure<DoctorStats>>());
     });
 
-    test('fetchTodayAgenda queries /appointments with sorting and pagination', () async {
+    test('fetchTodayAgenda queries /appointments with sorting and pagination',
+        () async {
       final mockClient = MockClient((request) async {
         expect(request.url.path, endsWith('/appointments'));
         expect(request.url.queryParameters['sort_by'], 'time_slot');
@@ -292,7 +297,9 @@ void main() {
       expect(agenda.hasMore, isFalse);
     });
 
-    test('attendAppointment sends POST to /appointments/{id}/attend and returns updated appointment', () async {
+    test(
+        'attendAppointment sends POST to /appointments/{id}/attend and returns updated appointment',
+        () async {
       final mockClient = MockClient((request) async {
         expect(request.method, 'POST');
         expect(request.url.path, '/api/v1/appointments/app-123/attend');
@@ -331,7 +338,9 @@ void main() {
       expect(app.checkedInBy, 'د. طبيب اختباري');
     });
 
-    test('markNoShow sends POST to /appointments/{id}/no-show with optional reason', () async {
+    test(
+        'markNoShow sends POST to /appointments/{id}/no-show with optional reason',
+        () async {
       final mockClient = MockClient((request) async {
         expect(request.method, 'POST');
         expect(request.url.path, '/api/v1/appointments/app-456/no-show');
@@ -360,7 +369,8 @@ void main() {
       );
 
       final service = DoctorDashboardService(apiClient: apiClient);
-      final result = await service.markNoShow('app-456', reason: 'المريض لم يحضر بعد انتظار ساعة');
+      final result = await service.markNoShow('app-456',
+          reason: 'المريض لم يحضر بعد انتظار ساعة');
 
       expect(result, isA<ApiSuccess<Appointment>>());
       final app = (result as ApiSuccess<Appointment>).data;

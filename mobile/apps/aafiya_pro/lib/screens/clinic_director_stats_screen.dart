@@ -64,10 +64,10 @@ class _ClinicDirectorStatsScreenState extends State<ClinicDirectorStatsScreen> {
   void initState() {
     super.initState();
     final apiClient = widget.apiClient ?? widget.sessionManager.apiClient;
-    _statsService = widget.statsService ??
-        ClinicDoctorStatsService(apiClient: apiClient);
-    _staffService = widget.staffService ??
-        ClinicStaffService(apiClient: apiClient);
+    _statsService =
+        widget.statsService ?? ClinicDoctorStatsService(apiClient: apiClient);
+    _staffService =
+        widget.staffService ?? ClinicStaffService(apiClient: apiClient);
 
     final today = _formatDate(DateTime.now());
     _specificDate = today;
@@ -200,7 +200,9 @@ class _ClinicDirectorStatsScreenState extends State<ClinicDirectorStatsScreen> {
               ? exception.message
               : strings.invalidParamsStatsError;
         } else {
-          msg = exception.message.isNotEmpty ? exception.message : strings.generalStatsError;
+          msg = exception.message.isNotEmpty
+              ? exception.message
+              : strings.generalStatsError;
         }
 
         setState(() {
@@ -277,8 +279,8 @@ class _ClinicDirectorStatsScreenState extends State<ClinicDirectorStatsScreen> {
     final strings = LocalizedStrings.of(context);
     final isDirector =
         widget.sessionManager.activeClinic?.isMedicalDirector == true;
-    final hasPermission =
-        isDirector || (widget.user?.hasPermission('clinic.view_analytics') == true);
+    final hasPermission = isDirector ||
+        (widget.user?.hasPermission('clinic.view_analytics') == true);
 
     // Unauthorized direct screen defense
     if (!hasPermission) {
@@ -336,7 +338,8 @@ class _ClinicDirectorStatsScreenState extends State<ClinicDirectorStatsScreen> {
           const SizedBox(height: AafiyaSpacing.md),
 
           // 3. Selected Doctor Focused Card
-          if (_selectedDoctorId != null && _statsData?.selectedDoctor != null) ...[
+          if (_selectedDoctorId != null &&
+              _statsData?.selectedDoctor != null) ...[
             _buildSelectedDoctorCard(strings, _statsData!.selectedDoctor!),
             const SizedBox(height: AafiyaSpacing.md),
           ],
@@ -381,13 +384,15 @@ class _ClinicDirectorStatsScreenState extends State<ClinicDirectorStatsScreen> {
             const SizedBox(height: AafiyaSpacing.lg),
 
             // Doctor Breakdown List (All Doctors mode only)
-            if (!_statsData!.isSelectedDoctorMode && _statsData!.doctors.isNotEmpty) ...[
+            if (!_statsData!.isSelectedDoctorMode &&
+                _statsData!.doctors.isNotEmpty) ...[
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _buildSectionTitle(strings.doctorBreakdownSection),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
                       color: AafiyaColors.healthBlue.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(AafiyaRadius.sm),
@@ -498,7 +503,8 @@ class _ClinicDirectorStatsScreenState extends State<ClinicDirectorStatsScreen> {
           // Doctor Filter Selector
           Row(
             children: [
-              const Icon(Icons.people_outline_rounded, size: 16, color: AafiyaColors.healthBlue),
+              const Icon(Icons.people_outline_rounded,
+                  size: 16, color: AafiyaColors.healthBlue),
               const SizedBox(width: 6),
               Text(
                 strings.filterDoctorLabel,
@@ -529,21 +535,24 @@ class _ClinicDirectorStatsScreenState extends State<ClinicDirectorStatsScreen> {
                     for (final d in _statsData!.doctors) {
                       doctorOptions.putIfAbsent(
                         d.id,
-                        () => '${d.name}${d.specialty != null ? ' — ${d.specialty}' : ''} (${d.position == 'director' ? strings.directorPositionBadge : strings.doctorStaffPositionBadge})',
+                        () =>
+                            '${d.name}${d.specialty != null ? ' — ${d.specialty}' : ''} (${d.position == 'director' ? strings.directorPositionBadge : strings.doctorStaffPositionBadge})',
                       );
                     }
                     final sel = _statsData!.selectedDoctor;
                     if (sel != null) {
                       doctorOptions.putIfAbsent(
                         sel.id,
-                        () => '${sel.name}${sel.specialty != null ? ' — ${sel.specialty}' : ''} (${sel.position == 'director' ? strings.directorPositionBadge : strings.doctorStaffPositionBadge})',
+                        () =>
+                            '${sel.name}${sel.specialty != null ? ' — ${sel.specialty}' : ''} (${sel.position == 'director' ? strings.directorPositionBadge : strings.doctorStaffPositionBadge})',
                       );
                     }
                   }
 
-                  final effectiveValue = doctorOptions.containsKey(_selectedDoctorId)
-                      ? _selectedDoctorId
-                      : null;
+                  final effectiveValue =
+                      doctorOptions.containsKey(_selectedDoctorId)
+                          ? _selectedDoctorId
+                          : null;
 
                   return DropdownButton<String?>(
                     value: effectiveValue,
@@ -578,7 +587,8 @@ class _ClinicDirectorStatsScreenState extends State<ClinicDirectorStatsScreen> {
           // Date Presets Segmented Bar
           Row(
             children: [
-              const Icon(Icons.calendar_today_rounded, size: 16, color: AafiyaColors.healthBlue),
+              const Icon(Icons.calendar_today_rounded,
+                  size: 16, color: AafiyaColors.healthBlue),
               const SizedBox(width: 6),
               Text(
                 strings.filterDateModeLabel,
@@ -621,7 +631,8 @@ class _ClinicDirectorStatsScreenState extends State<ClinicDirectorStatsScreen> {
                   child: OutlinedButton(
                     onPressed: () => _selectRangeStart(context),
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 10),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(AafiyaRadius.md),
                       ),
@@ -646,7 +657,8 @@ class _ClinicDirectorStatsScreenState extends State<ClinicDirectorStatsScreen> {
                   child: OutlinedButton(
                     onPressed: () => _selectRangeEnd(context),
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 10),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(AafiyaRadius.md),
                       ),
@@ -672,7 +684,8 @@ class _ClinicDirectorStatsScreenState extends State<ClinicDirectorStatsScreen> {
               const SizedBox(height: 6),
               Row(
                 children: [
-                  const Icon(Icons.error_outline_rounded, size: 14, color: AafiyaColors.error),
+                  const Icon(Icons.error_outline_rounded,
+                      size: 14, color: AafiyaColors.error),
                   const SizedBox(width: 4),
                   Expanded(
                     child: Text(
@@ -720,7 +733,9 @@ class _ClinicDirectorStatsScreenState extends State<ClinicDirectorStatsScreen> {
           child: Text(
             label,
             style: AafiyaTypography.caption.copyWith(
-              color: isSelected ? AafiyaColors.pureWhite : AafiyaColors.primaryText,
+              color: isSelected
+                  ? AafiyaColors.pureWhite
+                  : AafiyaColors.primaryText,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
             ),
           ),
@@ -1033,7 +1048,8 @@ class _ClinicDirectorStatsScreenState extends State<ClinicDirectorStatsScreen> {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
                       color: doc.isDirector
                           ? const Color(0xFF9333EA).withValues(alpha: 0.1)

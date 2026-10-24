@@ -88,7 +88,8 @@ class PatientShareToken {
       status.toLowerCase() == 'active' && !isRevoked && !isExpired && !isLocked;
 
   /// Remaining PIN attempts before lockout.
-  int get remainingAttempts => (maxAttempts - failedAttempts).clamp(0, maxAttempts);
+  int get remainingAttempts =>
+      (maxAttempts - failedAttempts).clamp(0, maxAttempts);
 
   /// Parses a [PatientShareToken] from JSON payload.
   factory PatientShareToken.fromJson(Map<String, dynamic> json) {
@@ -133,7 +134,8 @@ class PatientShareToken {
       'access_count': accessCount,
       'expires_at': expiresAt.toIso8601String(),
       if (revokedAt != null) 'revoked_at': revokedAt!.toIso8601String(),
-      if (lastAccessedAt != null) 'last_accessed_at': lastAccessedAt!.toIso8601String(),
+      if (lastAccessedAt != null)
+        'last_accessed_at': lastAccessedAt!.toIso8601String(),
       if (createdAt != null) 'created_at': createdAt!.toIso8601String(),
     };
   }

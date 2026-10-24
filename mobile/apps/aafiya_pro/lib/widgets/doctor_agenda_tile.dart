@@ -109,7 +109,9 @@ class DoctorAgendaTile extends StatelessWidget {
                       ),
                       if (appointment.bookingCenter?.name != null) ...[
                         const SizedBox(width: 8),
-                        const Text('•', style: TextStyle(color: AafiyaColors.secondaryText)),
+                        const Text('•',
+                            style:
+                                TextStyle(color: AafiyaColors.secondaryText)),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
@@ -124,7 +126,8 @@ class DoctorAgendaTile extends StatelessWidget {
                       ],
                     ],
                   ),
-                  if (appointment.notes != null && appointment.notes!.isNotEmpty) ...[
+                  if (appointment.notes != null &&
+                      appointment.notes!.isNotEmpty) ...[
                     const SizedBox(height: 4),
                     Text(
                       appointment.notes!,
@@ -151,7 +154,9 @@ class DoctorAgendaTile extends StatelessWidget {
       AppointmentStatus.attended => AafiyaStatusType.concluded,
       AppointmentStatus.pending => AafiyaStatusType.pending,
       AppointmentStatus.noShow => AafiyaStatusType.urgent,
-      AppointmentStatus.cancelled || AppointmentStatus.rejected || AppointmentStatus.expired =>
+      AppointmentStatus.cancelled ||
+      AppointmentStatus.rejected ||
+      AppointmentStatus.expired =>
         AafiyaStatusType.urgent,
       _ => AafiyaStatusType.concluded,
     };

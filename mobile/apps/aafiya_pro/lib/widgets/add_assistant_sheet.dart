@@ -144,7 +144,8 @@ class _AddAssistantSheetState extends State<AddAssistantSheet> {
 
     return Material(
       color: AafiyaColors.pureWhite,
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(AafiyaRadius.lg)),
+      borderRadius:
+          const BorderRadius.vertical(top: Radius.circular(AafiyaRadius.lg)),
       child: Padding(
         padding: EdgeInsets.fromLTRB(
           AafiyaSpacing.lg,
@@ -153,194 +154,194 @@ class _AddAssistantSheetState extends State<AddAssistantSheet> {
           AafiyaSpacing.lg + bottomInset,
         ),
         child: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Drag Handle
-              Center(
-                child: Container(
-                  width: 36,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AafiyaColors.border,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: AafiyaSpacing.md),
-
-              // Header
-              Row(
-                children: [
-                  const CircleAvatar(
-                    backgroundColor: AafiyaColors.lightBackground,
-                    foregroundColor: AafiyaColors.healthBlue,
-                    child: Icon(Icons.person_add_alt_1_rounded),
-                  ),
-                  const SizedBox(width: AafiyaSpacing.sm),
-                  Expanded(
-                    child: Text(
-                      strings.addAssistant,
-                      style: AafiyaTypography.titleLarge.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Drag Handle
+                Center(
+                  child: Container(
+                    width: 36,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: AafiyaColors.border,
+                      borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.close_rounded),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ],
-              ),
-              const Divider(height: AafiyaSpacing.lg),
+                ),
+                const SizedBox(height: AafiyaSpacing.md),
 
-              if (_errorMessage != null) ...[
-                Container(
-                  padding: AafiyaSpacing.insetAllSm,
-                  decoration: BoxDecoration(
-                    color: AafiyaColors.error.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(AafiyaRadius.sm),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.error_outline_rounded,
-                          color: AafiyaColors.error, size: 20),
-                      const SizedBox(width: AafiyaSpacing.xs),
-                      Expanded(
-                        child: Text(
-                          _errorMessage!,
-                          style: AafiyaTypography.caption.copyWith(
-                            color: AafiyaColors.error,
-                          ),
+                // Header
+                Row(
+                  children: [
+                    const CircleAvatar(
+                      backgroundColor: AafiyaColors.lightBackground,
+                      foregroundColor: AafiyaColors.healthBlue,
+                      child: Icon(Icons.person_add_alt_1_rounded),
+                    ),
+                    const SizedBox(width: AafiyaSpacing.sm),
+                    Expanded(
+                      child: Text(
+                        strings.addAssistant,
+                        style: AafiyaTypography.titleLarge.copyWith(
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ],
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close_rounded),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                ),
+                const Divider(height: AafiyaSpacing.lg),
+
+                if (_errorMessage != null) ...[
+                  Container(
+                    padding: AafiyaSpacing.insetAllSm,
+                    decoration: BoxDecoration(
+                      color: AafiyaColors.error.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(AafiyaRadius.sm),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.error_outline_rounded,
+                            color: AafiyaColors.error, size: 20),
+                        const SizedBox(width: AafiyaSpacing.xs),
+                        Expanded(
+                          child: Text(
+                            _errorMessage!,
+                            style: AafiyaTypography.caption.copyWith(
+                              color: AafiyaColors.error,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+                  const SizedBox(height: AafiyaSpacing.sm),
+                ],
+
+                // Name
+                AafiyaTextField(
+                  label: strings.fullNameLabel,
+                  controller: _nameController,
+                  prefixIcon: const Icon(Icons.person_outline_rounded),
+                  validator: (val) {
+                    if (val == null || val.trim().isEmpty) {
+                      return strings.fieldRequired;
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: AafiyaSpacing.sm),
-              ],
 
-              // Name
-              AafiyaTextField(
-                label: strings.fullNameLabel,
-                controller: _nameController,
-                prefixIcon: const Icon(Icons.person_outline_rounded),
-                validator: (val) {
-                  if (val == null || val.trim().isEmpty) {
-                    return strings.fieldRequired;
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: AafiyaSpacing.sm),
-
-              // Email
-              AafiyaTextField(
-                label: strings.emailLabel,
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                prefixIcon: const Icon(Icons.email_outlined),
-                validator: (val) {
-                  if (val == null || val.trim().isEmpty) {
-                    return strings.fieldRequired;
-                  }
-                  if (!val.contains('@') || !val.contains('.')) {
-                    return strings.invalidEmail;
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: AafiyaSpacing.sm),
-
-              // Phone
-              AafiyaTextField(
-                label: strings.phoneLabel,
-                controller: _phoneController,
-                keyboardType: TextInputType.phone,
-                prefixIcon: const Icon(Icons.phone_outlined),
-                validator: (val) {
-                  if (val == null || val.trim().isEmpty) {
-                    return strings.fieldRequired;
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: AafiyaSpacing.sm),
-
-              // Password
-              AafiyaTextField(
-                label: strings.passwordLabel,
-                controller: _passwordController,
-                obscureText: true,
-                prefixIcon: const Icon(Icons.lock_outline_rounded),
-                validator: (val) {
-                  if (val == null || val.isEmpty) {
-                    return strings.fieldRequired;
-                  }
-                  if (val.length < 8) {
-                    return strings.passwordTooShort;
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: AafiyaSpacing.md),
-
-              // Permissions section
-              Text(
-                strings.permissionsLabel,
-                style: AafiyaTypography.titleMedium.copyWith(
-                  fontWeight: FontWeight.bold,
+                // Email
+                AafiyaTextField(
+                  label: strings.emailLabel,
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  prefixIcon: const Icon(Icons.email_outlined),
+                  validator: (val) {
+                    if (val == null || val.trim().isEmpty) {
+                      return strings.fieldRequired;
+                    }
+                    if (!val.contains('@') || !val.contains('.')) {
+                      return strings.invalidEmail;
+                    }
+                    return null;
+                  },
                 ),
-              ),
-              const SizedBox(height: AafiyaSpacing.xs),
+                const SizedBox(height: AafiyaSpacing.sm),
 
-              ...permissionsConfig.map((item) {
-                final isChecked = _selectedPermissions.contains(item.key);
-                return CheckboxListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: Text(
-                    item.title,
-                    style: AafiyaTypography.bodyMedium.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  subtitle: Text(
-                    item.desc,
-                    style: AafiyaTypography.caption.copyWith(
-                      color: AafiyaColors.secondaryText,
-                    ),
-                  ),
-                  activeColor: AafiyaColors.healthBlue,
-                  value: isChecked,
-                  onChanged: _isLoading
-                      ? null
-                      : (val) {
-                          setState(() {
-                            if (val == true) {
-                              _selectedPermissions.add(item.key);
-                            } else {
-                              _selectedPermissions.remove(item.key);
-                            }
-                          });
-                        },
-                );
-              }),
-              const SizedBox(height: AafiyaSpacing.lg),
+                // Phone
+                AafiyaTextField(
+                  label: strings.phoneLabel,
+                  controller: _phoneController,
+                  keyboardType: TextInputType.phone,
+                  prefixIcon: const Icon(Icons.phone_outlined),
+                  validator: (val) {
+                    if (val == null || val.trim().isEmpty) {
+                      return strings.fieldRequired;
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: AafiyaSpacing.sm),
 
-              // Submit Button
-              AafiyaButton(
-                label: strings.addAssistant,
-                isLoading: _isLoading,
-                onPressed: _isLoading ? null : _submit,
-              ),
-            ],
+                // Password
+                AafiyaTextField(
+                  label: strings.passwordLabel,
+                  controller: _passwordController,
+                  obscureText: true,
+                  prefixIcon: const Icon(Icons.lock_outline_rounded),
+                  validator: (val) {
+                    if (val == null || val.isEmpty) {
+                      return strings.fieldRequired;
+                    }
+                    if (val.length < 8) {
+                      return strings.passwordTooShort;
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: AafiyaSpacing.md),
+
+                // Permissions section
+                Text(
+                  strings.permissionsLabel,
+                  style: AafiyaTypography.titleMedium.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: AafiyaSpacing.xs),
+
+                ...permissionsConfig.map((item) {
+                  final isChecked = _selectedPermissions.contains(item.key);
+                  return CheckboxListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(
+                      item.title,
+                      style: AafiyaTypography.bodyMedium.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    subtitle: Text(
+                      item.desc,
+                      style: AafiyaTypography.caption.copyWith(
+                        color: AafiyaColors.secondaryText,
+                      ),
+                    ),
+                    activeColor: AafiyaColors.healthBlue,
+                    value: isChecked,
+                    onChanged: _isLoading
+                        ? null
+                        : (val) {
+                            setState(() {
+                              if (val == true) {
+                                _selectedPermissions.add(item.key);
+                              } else {
+                                _selectedPermissions.remove(item.key);
+                              }
+                            });
+                          },
+                  );
+                }),
+                const SizedBox(height: AafiyaSpacing.lg),
+
+                // Submit Button
+                AafiyaButton(
+                  label: strings.addAssistant,
+                  isLoading: _isLoading,
+                  onPressed: _isLoading ? null : _submit,
+                ),
+              ],
+            ),
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 }

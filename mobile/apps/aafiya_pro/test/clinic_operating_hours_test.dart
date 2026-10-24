@@ -181,7 +181,9 @@ void main() {
       expect(closedDay.periods, isEmpty);
     });
 
-    test('ClinicOperatingHoursData.unconfiguredDays generates 7 days from 0 (Saturday) to 6 (Friday)', () {
+    test(
+        'ClinicOperatingHoursData.unconfiguredDays generates 7 days from 0 (Saturday) to 6 (Friday)',
+        () {
       final days = ClinicOperatingHoursData.unconfiguredDays();
       expect(days.length, 7);
       for (int i = 0; i < 7; i++) {
@@ -191,7 +193,9 @@ void main() {
       }
     });
 
-    test('ClinicOperatingHoursData handles configured and unconfigured json parsing', () {
+    test(
+        'ClinicOperatingHoursData handles configured and unconfigured json parsing',
+        () {
       final jsonConfigured = createSampleOperatingHoursJson(isConfigured: true);
       final dataConfigured = ClinicOperatingHoursData.fromJson(
         jsonConfigured['data'] as Map<String, dynamic>,
@@ -207,14 +211,16 @@ void main() {
         'is_configured': false,
         'days': [],
       };
-      final dataUnconfigured = ClinicOperatingHoursData.fromJson(jsonUnconfigured);
+      final dataUnconfigured =
+          ClinicOperatingHoursData.fromJson(jsonUnconfigured);
       expect(dataUnconfigured.isConfigured, isFalse);
       expect(dataUnconfigured.days.length, 7);
     });
   });
 
   group('ClinicOperatingHoursService — HTTP Mock Client', () {
-    test('getOperatingHours sends X-Clinic-ID header and returns data', () async {
+    test('getOperatingHours sends X-Clinic-ID header and returns data',
+        () async {
       final mockClient = MockClient((request) async {
         expect(request.method, 'GET');
         expect(request.url.path, contains('/clinic/operating-hours'));
@@ -239,7 +245,9 @@ void main() {
       expect(data.days.length, 7);
     });
 
-    test('saveOperatingHours sends PUT request with 7 days and X-Clinic-ID header', () async {
+    test(
+        'saveOperatingHours sends PUT request with 7 days and X-Clinic-ID header',
+        () async {
       final mockClient = MockClient((request) async {
         expect(request.method, 'PUT');
         expect(request.url.path, contains('/clinic/operating-hours'));
@@ -265,7 +273,8 @@ void main() {
       final service = ClinicOperatingHoursService(apiClient: apiClient);
 
       final sampleDays = ClinicOperatingHoursData.fromJson(
-        createSampleOperatingHoursJson(isConfigured: true)['data'] as Map<String, dynamic>,
+        createSampleOperatingHoursJson(isConfigured: true)['data']
+            as Map<String, dynamic>,
       ).days;
 
       final result = await service.saveOperatingHours(
@@ -303,7 +312,8 @@ void main() {
   });
 
   group('ClinicOperatingHoursScreen — Widget Tests', () {
-    testWidgets('Renders 7 canonical weekdays and unconfigured warning banner', (tester) async {
+    testWidgets('Renders 7 canonical weekdays and unconfigured warning banner',
+        (tester) async {
       tester.view.physicalSize = const Size(1200, 3000);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {
@@ -355,7 +365,9 @@ void main() {
       expect(find.byKey(const Key('save_clinic_hours_button')), findsOneWidget);
     });
 
-    testWidgets('Non-director sees restriction banner and cannot see save button', (tester) async {
+    testWidgets(
+        'Non-director sees restriction banner and cannot see save button',
+        (tester) async {
       final mockClient = MockClient((request) async {
         return http.Response(
           jsonEncode(createSampleOperatingHoursJson(isConfigured: true)),
@@ -386,7 +398,8 @@ void main() {
 
       // Check restriction notice
       expect(
-        find.textContaining('هذه الشاشة مخصصة حصراً للمدير الطبي للعيادة أو الموظف المصرح له بإدارة الإعدادات.'),
+        find.textContaining(
+            'هذه الشاشة مخصصة حصراً للمدير الطبي للعيادة أو الموظف المصرح له بإدارة الإعدادات.'),
         findsOneWidget,
       );
 
@@ -442,7 +455,8 @@ void main() {
       expect(find.byKey(const Key('add_period_button_6')), findsOneWidget);
     });
 
-    testWidgets('Validates open_time < close_time locally and blocks save', (tester) async {
+    testWidgets('Validates open_time < close_time locally and blocks save',
+        (tester) async {
       tester.view.physicalSize = const Size(1200, 3000);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {
@@ -452,7 +466,8 @@ void main() {
 
       final mockClient = MockClient((request) async {
         return http.Response(
-          jsonEncode(createSampleOperatingHoursJson(isConfigured: true, invalidTimes: true)),
+          jsonEncode(createSampleOperatingHoursJson(
+              isConfigured: true, invalidTimes: true)),
           200,
           headers: {'content-type': 'application/json'},
         );
@@ -484,10 +499,12 @@ void main() {
       await tester.pumpAndSettle();
 
       // Local validation error message must be shown (in inline banner and floating snackbar)
-      expect(find.textContaining('وقت الفتح يجب أن يسبق وقت الإغلاق'), findsWidgets);
+      expect(find.textContaining('وقت الفتح يجب أن يسبق وقت الإغلاق'),
+          findsWidgets);
     });
 
-    testWidgets('Saving valid schedule sends PUT and displays success snackbar', (tester) async {
+    testWidgets('Saving valid schedule sends PUT and displays success snackbar',
+        (tester) async {
       tester.view.physicalSize = const Size(1200, 3000);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {
@@ -509,7 +526,8 @@ void main() {
             jsonEncode({
               'status': 'success',
               'message': 'تم حفظ ساعات عمل المنشأة بنجاح.',
-              'data': createSampleOperatingHoursJson(isConfigured: true)['data'],
+              'data':
+                  createSampleOperatingHoursJson(isConfigured: true)['data'],
             }),
             200,
             headers: {'content-type': 'application/json'},
@@ -545,7 +563,10 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(putCalled, isTrue);
-      expect(find.textContaining('تم حفظ وتحديث ساعات تشغيل العيادة بنجاح والتزامن مع النظام.'), findsWidgets);
+      expect(
+          find.textContaining(
+              'تم حفظ وتحديث ساعات تشغيل العيادة بنجاح والتزامن مع النظام.'),
+          findsWidgets);
     });
   });
 }

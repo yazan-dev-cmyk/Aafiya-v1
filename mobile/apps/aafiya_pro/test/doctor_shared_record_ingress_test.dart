@@ -51,7 +51,9 @@ void main() {
   };
 
   group('DoctorShell Encrypted Shared Medical Record Ingress Tests', () {
-    testWidgets('renders PopupMenuButton with viewSharedRecordHubTitle and opens SharedRecordViewerSheet', (tester) async {
+    testWidgets(
+        'renders PopupMenuButton with viewSharedRecordHubTitle and opens SharedRecordViewerSheet',
+        (tester) async {
       final mockClient = MockClient((request) async {
         if (request.url.path.contains('/clinics')) {
           return http.Response(
@@ -74,13 +76,17 @@ void main() {
             headers: {'content-type': 'application/json'},
           );
         }
-        return http.Response('{"data": {}}', 200, headers: {'content-type': 'application/json'});
+        return http.Response('{"data": {}}', 200,
+            headers: {'content-type': 'application/json'});
       });
 
       final tokenStorage = InMemoryTokenStorage();
-      final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
-      final sessionManager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
-      await sessionManager.setAuthenticatedUser(token: 'doc_token', user: doctorUser);
+      final apiClient =
+          ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+      final sessionManager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
+      await sessionManager.setAuthenticatedUser(
+          token: 'doc_token', user: doctorUser);
 
       await tester.pumpWidget(
         createTestApp(
@@ -112,7 +118,8 @@ void main() {
       // Verify SharedRecordViewerSheet is opened
       expect(find.byType(SharedRecordViewerSheet), findsOneWidget);
       expect(find.text('عرض السجل الطبي المشفر'), findsOneWidget);
-      expect(find.text('أدخل رمز الحماية PIN لفك تشفير السجل الطبي المشترك'), findsOneWidget);
+      expect(find.text('أدخل رمز الحماية PIN لفك تشفير السجل الطبي المشترك'),
+          findsOneWidget);
     });
   });
 }

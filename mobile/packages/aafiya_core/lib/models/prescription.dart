@@ -40,7 +40,8 @@ class PrescriptionItem {
         'frequency': frequency,
         'duration': duration,
         if (instructions != null) 'instructions': instructions,
-        if (substitutionAllowed != null) 'substitution_allowed': substitutionAllowed,
+        if (substitutionAllowed != null)
+          'substitution_allowed': substitutionAllowed,
       };
 }
 

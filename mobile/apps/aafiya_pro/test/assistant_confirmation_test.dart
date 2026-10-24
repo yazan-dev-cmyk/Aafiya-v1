@@ -111,7 +111,9 @@ void main() {
       expect(appt.status, equals(AppointmentStatus.confirmed));
     });
 
-    test('POSTs to /appointments/{id}/confirm with null body when reason is omitted', () async {
+    test(
+        'POSTs to /appointments/{id}/confirm with null body when reason is omitted',
+        () async {
       final mockClient = MockClient((request) async {
         expect(request.method, equals('POST'));
         expect(request.url.path, endsWith('/appointments/$apptId/confirm'));
@@ -139,7 +141,9 @@ void main() {
       expect(result, isA<ApiSuccess<Appointment>>());
     });
 
-    test('returns ApiFailure on 422 Unprocessable Entity with validation message', () async {
+    test(
+        'returns ApiFailure on 422 Unprocessable Entity with validation message',
+        () async {
       final mockClient = MockClient((request) async {
         return http.Response(
           jsonEncode({
@@ -161,7 +165,8 @@ void main() {
       expect(result, isA<ApiFailure<Appointment>>());
       final failure = result as ApiFailure<Appointment>;
       expect(failure.exception, isA<ValidationException>());
-      expect(failure.exception.message, contains('لا يمكن تأكيد موعد بحالة (cancelled)'));
+      expect(failure.exception.message,
+          contains('لا يمكن تأكيد موعد بحالة (cancelled)'));
     });
 
     test('returns ApiFailure on 403 Forbidden', () async {
@@ -224,7 +229,9 @@ void main() {
     });
   });
 
-  group('DA-04 AssistantQueueScreen Confirmation UI & State Mutation Widget Tests', () {
+  group(
+      'DA-04 AssistantQueueScreen Confirmation UI & State Mutation Widget Tests',
+      () {
     const pendingAppt = {
       'id': 'appt-pnd-da04',
       'booking_reference': 'BK-PND-DA04',
@@ -282,7 +289,10 @@ void main() {
         }
 
         return http.Response(
-          jsonEncode({'data': [], 'meta': {'current_page': 1, 'last_page': 1}}),
+          jsonEncode({
+            'data': [],
+            'meta': {'current_page': 1, 'last_page': 1}
+          }),
           200,
           headers: {'content-type': 'application/json'},
         );
@@ -376,7 +386,10 @@ void main() {
         }
 
         return http.Response(
-          jsonEncode({'data': [], 'meta': {'current_page': 1, 'last_page': 1}}),
+          jsonEncode({
+            'data': [],
+            'meta': {'current_page': 1, 'last_page': 1}
+          }),
           200,
           headers: {'content-type': 'application/json'},
         );
@@ -415,7 +428,8 @@ void main() {
       expect(confirmCalled, isTrue);
 
       // Verify Error SnackBar shown
-      expect(find.text('لا يمكن تأكيد الموعد: رصيد المركز غير كافٍ.'), findsOneWidget);
+      expect(find.text('لا يمكن تأكيد الموعد: رصيد المركز غير كافٍ.'),
+          findsOneWidget);
 
       // Verify Success SnackBar is NOT shown
       expect(find.text('تم تأكيد الموعد بنجاح.'), findsNothing);
@@ -448,7 +462,10 @@ void main() {
         }
 
         return http.Response(
-          jsonEncode({'data': [], 'meta': {'current_page': 1, 'last_page': 1}}),
+          jsonEncode({
+            'data': [],
+            'meta': {'current_page': 1, 'last_page': 1}
+          }),
           200,
           headers: {'content-type': 'application/json'},
         );
@@ -517,7 +534,10 @@ void main() {
         }
 
         return http.Response(
-          jsonEncode({'data': [], 'meta': {'current_page': 1, 'last_page': 1}}),
+          jsonEncode({
+            'data': [],
+            'meta': {'current_page': 1, 'last_page': 1}
+          }),
           200,
           headers: {'content-type': 'application/json'},
         );
@@ -552,7 +572,8 @@ void main() {
       );
       await tester.tap(dialogConfirmBtn);
       await tester.pump(); // dispatch tap and trigger pop
-      await tester.pump(const Duration(milliseconds: 400)); // complete pop route animation
+      await tester.pump(
+          const Duration(milliseconds: 400)); // complete pop route animation
 
       // Dialog is dismissed
       expect(find.byType(AlertDialog), findsNothing);
@@ -565,7 +586,8 @@ void main() {
       final tileBtn = find.widgetWithText(ElevatedButton, 'تأكيد الموعد');
       if (tileBtn.evaluate().isNotEmpty) {
         final buttonWidget = tester.widget<ElevatedButton>(tileBtn);
-        expect(buttonWidget.onPressed, isNull, reason: 'Button must be disabled during in-flight processing');
+        expect(buttonWidget.onPressed, isNull,
+            reason: 'Button must be disabled during in-flight processing');
       }
 
       // Complete the response
@@ -601,7 +623,10 @@ void main() {
         }
 
         return http.Response(
-          jsonEncode({'data': [], 'meta': {'current_page': 1, 'last_page': 1}}),
+          jsonEncode({
+            'data': [],
+            'meta': {'current_page': 1, 'last_page': 1}
+          }),
           200,
           headers: {'content-type': 'application/json'},
         );
@@ -648,7 +673,10 @@ void main() {
           );
         }
         return http.Response(
-          jsonEncode({'data': [], 'meta': {'current_page': 1, 'last_page': 1}}),
+          jsonEncode({
+            'data': [],
+            'meta': {'current_page': 1, 'last_page': 1}
+          }),
           200,
           headers: {'content-type': 'application/json'},
         );
@@ -714,7 +742,8 @@ void main() {
       expect(
         find.descendant(
           of: find.byType(AlertDialog),
-          matching: find.widgetWithText(ElevatedButton, 'Confirmer le rendez-vous'),
+          matching:
+              find.widgetWithText(ElevatedButton, 'Confirmer le rendez-vous'),
         ),
         findsOneWidget,
       );

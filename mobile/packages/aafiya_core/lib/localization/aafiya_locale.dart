@@ -6,7 +6,8 @@ enum AafiyaSupportedLocale {
   english(Locale('en'), TextDirection.ltr, 'English'),
   french(Locale('fr'), TextDirection.ltr, 'Français');
 
-  const AafiyaSupportedLocale(this.locale, this.textDirection, this.displayName);
+  const AafiyaSupportedLocale(
+      this.locale, this.textDirection, this.displayName);
 
   final Locale locale;
   final TextDirection textDirection;

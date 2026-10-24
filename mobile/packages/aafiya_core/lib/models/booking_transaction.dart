@@ -80,9 +80,8 @@ class BookingTransactionItem {
       appointmentPatientName: appointment is Map<String, dynamic>
           ? appointment['patient_name'] as String?
           : null,
-      packageName: package is Map<String, dynamic>
-          ? package['name'] as String?
-          : null,
+      packageName:
+          package is Map<String, dynamic> ? package['name'] as String? : null,
       packageCode: package is Map<String, dynamic>
           ? package['package_code'] as String?
           : null,

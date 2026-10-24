@@ -15,7 +15,8 @@ class ClinicRescheduleDashboardService {
   final ApiClient _apiClient;
 
   /// Fetches paginated unresolved appointment reschedules for the currently active clinic context.
-  Future<ApiResult<PaginatedUnresolvedReschedules>> fetchUnresolvedAppointments({
+  Future<ApiResult<PaginatedUnresolvedReschedules>>
+      fetchUnresolvedAppointments({
     int page = 1,
     int perPage = 20,
   }) async {

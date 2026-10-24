@@ -34,7 +34,8 @@ class ScheduleActivationDialog extends StatefulWidget {
   }
 
   @override
-  State<ScheduleActivationDialog> createState() => _ScheduleActivationDialogState();
+  State<ScheduleActivationDialog> createState() =>
+      _ScheduleActivationDialogState();
 }
 
 class _ScheduleActivationDialogState extends State<ScheduleActivationDialog> {
@@ -160,16 +161,20 @@ class _ScheduleActivationDialogState extends State<ScheduleActivationDialog> {
                 final dayName = strings.getDayName(d.dayOfWeek);
                 final isOpen = !d.isClosed;
                 return Chip(
-                  label: Text('$dayName (${isOpen ? d.slots.length : strings.closedDayLabel})'),
+                  label: Text(
+                      '$dayName (${isOpen ? d.slots.length : strings.closedDayLabel})'),
                   labelStyle: AafiyaTypography.caption.copyWith(
-                    color: isOpen ? AafiyaColors.healthBlue : AafiyaColors.secondaryText,
+                    color: isOpen
+                        ? AafiyaColors.healthBlue
+                        : AafiyaColors.secondaryText,
                     fontWeight: isOpen ? FontWeight.bold : FontWeight.normal,
                   ),
                   backgroundColor: isOpen
                       ? AafiyaColors.healthBlue.withValues(alpha: 0.1)
                       : AafiyaColors.lightBackground,
                   side: BorderSide(
-                    color: isOpen ? AafiyaColors.healthBlue : AafiyaColors.border,
+                    color:
+                        isOpen ? AafiyaColors.healthBlue : AafiyaColors.border,
                   ),
                   visualDensity: VisualDensity.compact,
                 );
@@ -183,7 +188,8 @@ class _ScheduleActivationDialogState extends State<ScheduleActivationDialog> {
               decoration: BoxDecoration(
                 color: AafiyaColors.error.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(AafiyaRadius.md),
-                border: Border.all(color: AafiyaColors.error.withValues(alpha: 0.3)),
+                border: Border.all(
+                    color: AafiyaColors.error.withValues(alpha: 0.3)),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -245,7 +251,8 @@ class _ScheduleActivationDialogState extends State<ScheduleActivationDialog> {
       ),
       actions: [
         TextButton(
-          onPressed: _isActivating ? null : () => Navigator.of(context).pop(false),
+          onPressed:
+              _isActivating ? null : () => Navigator.of(context).pop(false),
           child: Text(strings.cancel),
         ),
         ElevatedButton(
@@ -284,7 +291,8 @@ class _ScheduleActivationDialogState extends State<ScheduleActivationDialog> {
                   height: 18,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(AafiyaColors.pureWhite),
+                    valueColor:
+                        AlwaysStoppedAnimation<Color>(AafiyaColors.pureWhite),
                   ),
                 )
               : Text(strings.confirmAndActivate),

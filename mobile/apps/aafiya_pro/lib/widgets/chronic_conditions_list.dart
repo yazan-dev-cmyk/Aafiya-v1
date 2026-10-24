@@ -61,7 +61,8 @@ class _ChronicConditionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final strings = LocalizedStrings.of(context);
-    final (statusColor, statusLabel) = _resolveStatus(condition.status, strings);
+    final (statusColor, statusLabel) =
+        _resolveStatus(condition.status, strings);
 
     return Container(
       padding: AafiyaSpacing.insetAllMd,
@@ -111,7 +112,8 @@ class _ChronicConditionCard extends StatelessWidget {
               ),
             ],
           ),
-          if (condition.icd10Code != null && condition.icd10Code!.trim().isNotEmpty) ...[
+          if (condition.icd10Code != null &&
+              condition.icd10Code!.trim().isNotEmpty) ...[
             const SizedBox(height: 6),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -128,7 +130,8 @@ class _ChronicConditionCard extends StatelessWidget {
               ),
             ),
           ],
-          if (condition.diagnosedDate != null && condition.diagnosedDate!.trim().isNotEmpty) ...[
+          if (condition.diagnosedDate != null &&
+              condition.diagnosedDate!.trim().isNotEmpty) ...[
             const SizedBox(height: 4),
             Text(
               '${strings.diagnosedDate}: ${condition.diagnosedDate!.trim()}',
@@ -137,7 +140,8 @@ class _ChronicConditionCard extends StatelessWidget {
               ),
             ),
           ],
-          if (condition.notes != null && condition.notes!.trim().isNotEmpty) ...[
+          if (condition.notes != null &&
+              condition.notes!.trim().isNotEmpty) ...[
             const SizedBox(height: 4),
             Text(
               condition.notes!.trim(),
@@ -157,7 +161,10 @@ class _ChronicConditionCard extends StatelessWidget {
       'active' => (AafiyaColors.warning, strings.conditionStatusActive),
       'managed' => (AafiyaColors.info, strings.conditionStatusManaged),
       'remission' => (AafiyaColors.success, strings.conditionStatusRemission),
-      'resolved' => (AafiyaColors.secondaryText, strings.conditionStatusResolved),
+      'resolved' => (
+          AafiyaColors.secondaryText,
+          strings.conditionStatusResolved
+        ),
       _ => (AafiyaColors.secondaryText, status),
     };
   }

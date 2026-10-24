@@ -35,7 +35,9 @@ void main() {
       expect(summary == ClinicStatsSummary.zero, isFalse);
     });
 
-    test('ClinicStatsSummary.fromJson handles missing or null fields gracefully', () {
+    test(
+        'ClinicStatsSummary.fromJson handles missing or null fields gracefully',
+        () {
       final summary = ClinicStatsSummary.fromJson({});
 
       expect(summary.totalAppointments, equals(0));
@@ -235,7 +237,8 @@ void main() {
   });
 
   group('ClinicDoctorStatsService Networking Tests', () {
-    test('fetches clinic doctor stats without query params by default', () async {
+    test('fetches clinic doctor stats without query params by default',
+        () async {
       String? requestedPath;
       Map<String, String>? requestedHeaders;
 
@@ -281,10 +284,13 @@ void main() {
       expect(data.summary.totalAppointments, equals(10));
       expect(requestedPath, contains('/clinic/doctor-stats'));
       expect(requestedPath, isNot(contains('from_date=')));
-      expect(requestedHeaders?['x-clinic-id'] ?? requestedHeaders?['X-Clinic-ID'], equals('c-1'));
+      expect(
+          requestedHeaders?['x-clinic-id'] ?? requestedHeaders?['X-Clinic-ID'],
+          equals('c-1'));
     });
 
-    test('preserves from_date, to_date, and doctor_id query parameters', () async {
+    test('preserves from_date, to_date, and doctor_id query parameters',
+        () async {
       Uri? requestedUri;
 
       final mockHttp = MockClient((req) async {
@@ -343,7 +349,8 @@ void main() {
       final mockHttp = MockClient((req) async {
         return http.Response(
           jsonEncode({
-            'message': 'Unauthorized. User does not have clinic director privileges.',
+            'message':
+                'Unauthorized. User does not have clinic director privileges.',
           }),
           403,
         );
@@ -361,13 +368,18 @@ void main() {
       expect(failure.exception.message, contains('Unauthorized'));
     });
 
-    test('returns ApiFailure on 422 Unprocessable Entity with validation errors', () async {
+    test(
+        'returns ApiFailure on 422 Unprocessable Entity with validation errors',
+        () async {
       final mockHttp = MockClient((req) async {
         return http.Response(
           jsonEncode({
-            'message': 'The to date must be a date after or equal to from date.',
+            'message':
+                'The to date must be a date after or equal to from date.',
             'errors': {
-              'to_date': ['The to date must be a date after or equal to from date.'],
+              'to_date': [
+                'The to date must be a date after or equal to from date.'
+              ],
             },
           }),
           422,
@@ -385,7 +397,8 @@ void main() {
       expect(result, isA<ApiFailure<ClinicDoctorStatsData>>());
       final failure = result as ApiFailure<ClinicDoctorStatsData>;
       expect(failure.exception, isA<ValidationException>());
-      expect((failure.exception as ValidationException).statusCode, equals(422));
+      expect(
+          (failure.exception as ValidationException).statusCode, equals(422));
     });
   });
 }

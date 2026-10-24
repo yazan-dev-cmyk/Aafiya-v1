@@ -3,7 +3,8 @@ import 'package:aafiya_core/aafiya_core.dart';
 
 void main() {
   group('ApiErrorResponse & AppException Parsing', () {
-    test('parses standard Laravel error response with message and field errors', () {
+    test('parses standard Laravel error response with message and field errors',
+        () {
       final json = {
         'status': 'error',
         'message': 'The given data was invalid.',
@@ -18,8 +19,10 @@ void main() {
       expect(parsed.message, equals('The given data was invalid.'));
       expect(parsed.status, equals('error'));
       expect(parsed.errors.containsKey('email'), isTrue);
-      expect(parsed.firstErrorFor('email'), equals('The email field is required.'));
-      expect(parsed.firstErrorFor('password'), equals('The password must be at least 8 characters.'));
+      expect(parsed.firstErrorFor('email'),
+          equals('The email field is required.'));
+      expect(parsed.firstErrorFor('password'),
+          equals('The password must be at least 8 characters.'));
     });
 
     test('parses success:false style envelope', () {
@@ -71,7 +74,8 @@ void main() {
 
       expect(exception, isA<ValidationException>());
       final valEx = exception as ValidationException;
-      expect(valEx.firstErrorFor('phone'), equals('The phone format is invalid.'));
+      expect(
+          valEx.firstErrorFor('phone'), equals('The phone format is invalid.'));
     });
 
     test('ApiException.fromStatusCode maps 500 to ServerException', () {

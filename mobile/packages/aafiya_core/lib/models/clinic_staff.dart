@@ -240,8 +240,7 @@ class DoctorLookupResult {
   bool get isAlreadyEmployed => isAlreadyMember;
   bool get isInvited => hasPendingInvitation;
 
-  bool get canInvite =>
-      isVerified && !isAlreadyMember && !hasPendingInvitation;
+  bool get canInvite => isVerified && !isAlreadyMember && !hasPendingInvitation;
 
   DoctorLookupResult copyWith({
     String? id,
@@ -414,7 +413,8 @@ class StaffMemberDetail {
   bool get isDirector => position.toLowerCase() == 'director';
 
   factory StaffMemberDetail.fromJson(Map<String, dynamic> json) {
-    final rawDelegated = json['delegated_permissions'] ?? json['permissions_json'];
+    final rawDelegated =
+        json['delegated_permissions'] ?? json['permissions_json'];
     final delegated = <String>[];
     if (rawDelegated is List) {
       for (final p in rawDelegated) {

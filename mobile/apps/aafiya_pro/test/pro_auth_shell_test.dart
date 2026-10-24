@@ -35,7 +35,8 @@ void main() {
       );
     });
 
-    Future<void> pumpProAuth(WidgetTester tester, {Locale locale = const Locale('ar')}) async {
+    Future<void> pumpProAuth(WidgetTester tester,
+        {Locale locale = const Locale('ar')}) async {
       await tester.pumpWidget(
         _wrapApp(
           locale: locale,
@@ -62,16 +63,20 @@ void main() {
       expect(find.byIcon(Icons.visibility_outlined), findsOneWidget);
     });
 
-    testWidgets('tapping the visibility button reveals the password and icon switches', (tester) async {
+    testWidgets(
+        'tapping the visibility button reveals the password and icon switches',
+        (tester) async {
       await pumpProAuth(tester);
 
       await tester.enterText(passwordFieldFinder(), 'ValidPass123!');
-      expect(tester.widget<TextField>(passwordFieldFinder()).obscureText, isTrue);
+      expect(
+          tester.widget<TextField>(passwordFieldFinder()).obscureText, isTrue);
 
       await tester.tap(find.byIcon(Icons.visibility_outlined));
       await tester.pumpAndSettle();
 
-      expect(tester.widget<TextField>(passwordFieldFinder()).obscureText, isFalse);
+      expect(
+          tester.widget<TextField>(passwordFieldFinder()).obscureText, isFalse);
       expect(find.byIcon(Icons.visibility_off_outlined), findsOneWidget);
       expect(find.text('ValidPass123!'), findsOneWidget);
     });
@@ -82,16 +87,19 @@ void main() {
       await tester.enterText(passwordFieldFinder(), 'ValidPass123!');
       await tester.tap(find.byIcon(Icons.visibility_outlined));
       await tester.pumpAndSettle();
-      expect(tester.widget<TextField>(passwordFieldFinder()).obscureText, isFalse);
+      expect(
+          tester.widget<TextField>(passwordFieldFinder()).obscureText, isFalse);
 
       await tester.tap(find.byIcon(Icons.visibility_off_outlined));
       await tester.pumpAndSettle();
 
-      expect(tester.widget<TextField>(passwordFieldFinder()).obscureText, isTrue);
+      expect(
+          tester.widget<TextField>(passwordFieldFinder()).obscureText, isTrue);
       expect(find.byIcon(Icons.visibility_outlined), findsOneWidget);
     });
 
-    testWidgets('password value remains unchanged while toggling', (tester) async {
+    testWidgets('password value remains unchanged while toggling',
+        (tester) async {
       await pumpProAuth(tester);
 
       await tester.enterText(passwordFieldFinder(), 'UnchangedSecret#1');
@@ -105,7 +113,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('UnchangedSecret#1'), findsOneWidget);
-      expect(tester.widget<TextField>(passwordFieldFinder()).obscureText, isFalse);
+      expect(
+          tester.widget<TextField>(passwordFieldFinder()).obscureText, isFalse);
     });
 
     testWidgets('localized tooltip text for Arabic', (tester) async {
@@ -133,12 +142,14 @@ void main() {
     testWidgets('localized tooltip text for French', (tester) async {
       await pumpProAuth(tester, locale: const Locale('fr'));
 
-      expect(visibilityButton(tester).tooltip, equals('Afficher le mot de passe'));
+      expect(
+          visibilityButton(tester).tooltip, equals('Afficher le mot de passe'));
 
       await tester.tap(find.byIcon(Icons.visibility_outlined));
       await tester.pumpAndSettle();
 
-      expect(visibilityButton(tester).tooltip, equals('Masquer le mot de passe'));
+      expect(
+          visibilityButton(tester).tooltip, equals('Masquer le mot de passe'));
     });
   });
 }

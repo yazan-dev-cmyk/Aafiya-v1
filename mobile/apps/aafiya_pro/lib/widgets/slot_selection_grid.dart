@@ -186,7 +186,8 @@ class _SlotCard extends StatelessWidget {
                   Text(
                     slot.timeSlot,
                     style: AafiyaTypography.bodyMedium.copyWith(
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.w600,
                       color: isFull
                           ? AafiyaColors.secondaryText.withValues(alpha: 0.5)
                           : isSelected
@@ -200,7 +201,8 @@ class _SlotCard extends StatelessWidget {
               const SizedBox(height: 2),
               if (isFull)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                   decoration: BoxDecoration(
                     color: AafiyaColors.error.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(AafiyaRadius.sm),
@@ -216,12 +218,14 @@ class _SlotCard extends StatelessWidget {
                 )
               else
                 Text(
-                  strings.slotCapacityAvailable(slot.available, slot.maxCapacity),
+                  strings.slotCapacityAvailable(
+                      slot.available, slot.maxCapacity),
                   style: AafiyaTypography.caption.copyWith(
                     color: isSelected
                         ? AafiyaColors.healingGreen
                         : AafiyaColors.secondaryText,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                    fontWeight:
+                        isSelected ? FontWeight.w600 : FontWeight.normal,
                     fontSize: 10,
                   ),
                 ),

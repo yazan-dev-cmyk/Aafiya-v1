@@ -39,8 +39,12 @@ class BcBookingTicketSheet extends StatelessWidget {
       AppointmentStatus.confirmed => AafiyaColors.healthBlue,
       AppointmentStatus.attended => AafiyaColors.healingGreen,
       AppointmentStatus.noShow => AafiyaColors.secondaryText,
-      AppointmentStatus.cancelled || AppointmentStatus.rejected => AafiyaColors.error,
-      AppointmentStatus.expired || AppointmentStatus.rescheduled => AafiyaColors.secondaryText,
+      AppointmentStatus.cancelled ||
+      AppointmentStatus.rejected =>
+        AafiyaColors.error,
+      AppointmentStatus.expired ||
+      AppointmentStatus.rescheduled =>
+        AafiyaColors.secondaryText,
       AppointmentStatus.unknown => AafiyaColors.secondaryText,
     };
   }
@@ -93,7 +97,8 @@ class BcBookingTicketSheet extends StatelessWidget {
 
               // Sheet Header
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
                   children: [
                     const Icon(Icons.confirmation_num_outlined,
@@ -129,7 +134,8 @@ class BcBookingTicketSheet extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: statusColor.withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: statusColor.withValues(alpha: 0.3)),
+                          border: Border.all(
+                              color: statusColor.withValues(alpha: 0.3)),
                         ),
                         child: Column(
                           children: [
@@ -138,8 +144,8 @@ class BcBookingTicketSheet extends StatelessWidget {
                               children: [
                                 Text(
                                   strings.bookingReferenceLabel,
-                                  style: AafiyaTypography.caption
-                                      .copyWith(color: AafiyaColors.secondaryText),
+                                  style: AafiyaTypography.caption.copyWith(
+                                      color: AafiyaColors.secondaryText),
                                 ),
                                 Container(
                                   padding: const EdgeInsets.symmetric(
@@ -164,7 +170,8 @@ class BcBookingTicketSheet extends StatelessWidget {
                               children: [
                                 Text(
                                   appointment.bookingReference,
-                                  style: AafiyaTypography.headlineMedium.copyWith(
+                                  style:
+                                      AafiyaTypography.headlineMedium.copyWith(
                                     color: AafiyaColors.primaryText,
                                     fontWeight: FontWeight.bold,
                                     letterSpacing: 1.2,
@@ -172,14 +179,16 @@ class BcBookingTicketSheet extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 8),
                                 IconButton(
-                                  icon: const Icon(Icons.copy_rounded, size: 20),
+                                  icon:
+                                      const Icon(Icons.copy_rounded, size: 20),
                                   tooltip: 'نسخ المرجع',
                                   onPressed: () {
                                     Clipboard.setData(ClipboardData(
                                         text: appointment.bookingReference));
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content: Text(strings.copyReferenceSuccess),
+                                        content:
+                                            Text(strings.copyReferenceSuccess),
                                         duration: const Duration(seconds: 2),
                                         behavior: SnackBarBehavior.floating,
                                       ),
@@ -234,7 +243,8 @@ class BcBookingTicketSheet extends StatelessWidget {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 const Icon(Icons.qr_code_2_rounded,
-                                    size: 16, color: AafiyaColors.secondaryText),
+                                    size: 16,
+                                    color: AafiyaColors.secondaryText),
                                 const SizedBox(width: 6),
                                 Text(
                                   '${strings.secureTokenLabel}: ${appointment.secureToken!.substring(0, 8)}...',
@@ -307,10 +317,12 @@ class BcBookingTicketSheet extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: AafiyaColors.healthBlue.withValues(alpha: 0.08),
+                          color:
+                              AafiyaColors.healthBlue.withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                              color: AafiyaColors.healthBlue.withValues(alpha: 0.2)),
+                              color: AafiyaColors.healthBlue
+                                  .withValues(alpha: 0.2)),
                         ),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,

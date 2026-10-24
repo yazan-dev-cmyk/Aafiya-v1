@@ -117,7 +117,8 @@ void main() {
       expect(item.vacation?.status, 'effective');
     });
 
-    test('Correctly handles privacy phone masking when patient_phone is null', () {
+    test('Correctly handles privacy phone masking when patient_phone is null',
+        () {
       final json = {
         'id': 'reschedule-2',
         'doctor_vacation_id': 'vac-2',
@@ -142,7 +143,8 @@ void main() {
       expect(item.originalAppointment?.hasPhone, isFalse);
     });
 
-    test('PaginatedUnresolvedReschedules handles empty data collection safely', () {
+    test('PaginatedUnresolvedReschedules handles empty data collection safely',
+        () {
       final paginatedJson = {
         'data': [],
         'links': {'first': '...', 'last': '...'},
@@ -159,10 +161,13 @@ void main() {
   });
 
   group('UnresolvedReschedulesScreen Widget Tests', () {
-    testWidgets('Renders top explanation banner, search bar, and empty state when no cases exist',
+    testWidgets(
+        'Renders top explanation banner, search bar, and empty state when no cases exist',
         (tester) async {
       final mockClient = MockClient((request) async {
-        return http.Response('{"data": [], "meta": {"current_page": 1, "last_page": 1, "total": 0}}', 200,
+        return http.Response(
+            '{"data": [], "meta": {"current_page": 1, "last_page": 1, "total": 0}}',
+            200,
             headers: {'content-type': 'application/json'});
       });
 
@@ -175,7 +180,8 @@ void main() {
         token: 'tok-test',
         user: testDoctorUser,
       );
-      sessionManager.setAuthorizedClinics([testClinic1, testClinic2], preferredClinicId: 'clinic-val-01');
+      sessionManager.setAuthorizedClinics([testClinic1, testClinic2],
+          preferredClinicId: 'clinic-val-01');
 
       await tester.pumpWidget(
         createTestWidget(
@@ -191,12 +197,14 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      expect(find.text('لوحة متابعة المواعيد غير المحسومة (حالات حرجة)'), findsOneWidget);
+      expect(find.text('لوحة متابعة المواعيد غير المحسومة (حالات حرجة)'),
+          findsOneWidget);
       expect(find.text('لا توجد حالات غير محسومة حالياً'), findsOneWidget);
       expect(find.byType(TextField), findsOneWidget);
     });
 
-    testWidgets('Renders urgent cases with permitted phone and copy button', (tester) async {
+    testWidgets('Renders urgent cases with permitted phone and copy button',
+        (tester) async {
       final sampleItem = UnresolvedRescheduleItem(
         id: 'reschedule-1',
         doctorVacationId: 'vac-1',
@@ -227,7 +235,8 @@ void main() {
         ),
       );
 
-      final mockClient = MockClient((request) async => http.Response('{}', 200));
+      final mockClient =
+          MockClient((request) async => http.Response('{}', 200));
       final apiClient = ApiClient(httpClient: mockClient);
       final sessionManager = AuthSessionManager(
         tokenStorage: InMemoryTokenStorage('tok-test'),
@@ -237,7 +246,8 @@ void main() {
         token: 'tok-test',
         user: testDoctorUser,
       );
-      sessionManager.setAuthorizedClinics([testClinic1], preferredClinicId: 'clinic-val-01');
+      sessionManager.setAuthorizedClinics([testClinic1],
+          preferredClinicId: 'clinic-val-01');
 
       await tester.pumpWidget(
         createTestWidget(
@@ -261,7 +271,8 @@ void main() {
       expect(find.text('تم نسخ رقم الهاتف للحافظة بنجاح'), findsOneWidget);
     });
 
-    testWidgets('Renders masked indicator when patient_phone is null for Assistant',
+    testWidgets(
+        'Renders masked indicator when patient_phone is null for Assistant',
         (tester) async {
       final maskedItem = UnresolvedRescheduleItem(
         id: 'reschedule-2',
@@ -292,7 +303,8 @@ void main() {
         ),
       );
 
-      final mockClient = MockClient((request) async => http.Response('{}', 200));
+      final mockClient =
+          MockClient((request) async => http.Response('{}', 200));
       final apiClient = ApiClient(httpClient: mockClient);
       final sessionManager = AuthSessionManager(
         tokenStorage: InMemoryTokenStorage('tok-test'),
@@ -302,7 +314,8 @@ void main() {
         token: 'tok-test',
         user: testAssistantUser,
       );
-      sessionManager.setAuthorizedClinics([testClinic1], preferredClinicId: 'clinic-val-01');
+      sessionManager.setAuthorizedClinics([testClinic1],
+          preferredClinicId: 'clinic-val-01');
 
       await tester.pumpWidget(
         createTestWidget(
@@ -321,7 +334,8 @@ void main() {
       expect(find.text('نسخ الرقم'), findsNothing);
     });
 
-    testWidgets('Clears and refreshes list when active clinic switches to prevent stale leakage',
+    testWidgets(
+        'Clears and refreshes list when active clinic switches to prevent stale leakage',
         (tester) async {
       final clinic1Item = UnresolvedRescheduleItem(
         id: 'res-clinic-1',
@@ -345,7 +359,8 @@ void main() {
         ),
       );
 
-      final mockClient = MockClient((request) async => http.Response('{}', 200));
+      final mockClient =
+          MockClient((request) async => http.Response('{}', 200));
       final apiClient = ApiClient(httpClient: mockClient);
       final sessionManager = AuthSessionManager(
         tokenStorage: InMemoryTokenStorage('tok-test'),
@@ -355,7 +370,8 @@ void main() {
         token: 'tok-test',
         user: testDoctorUser,
       );
-      sessionManager.setAuthorizedClinics([testClinic1, testClinic2], preferredClinicId: 'clinic-val-01');
+      sessionManager.setAuthorizedClinics([testClinic1, testClinic2],
+          preferredClinicId: 'clinic-val-01');
 
       final fakeService = _SwitchingClinicRescheduleDashboardService(
         clinicResponses: {
@@ -388,13 +404,15 @@ void main() {
   });
 }
 
-class _FakeClinicRescheduleDashboardService implements ClinicRescheduleDashboardService {
+class _FakeClinicRescheduleDashboardService
+    implements ClinicRescheduleDashboardService {
   _FakeClinicRescheduleDashboardService({required this.result});
 
   final ApiResult<PaginatedUnresolvedReschedules> result;
 
   @override
-  Future<ApiResult<PaginatedUnresolvedReschedules>> fetchUnresolvedAppointments({
+  Future<ApiResult<PaginatedUnresolvedReschedules>>
+      fetchUnresolvedAppointments({
     int page = 1,
     int perPage = 20,
   }) async {
@@ -402,7 +420,8 @@ class _FakeClinicRescheduleDashboardService implements ClinicRescheduleDashboard
   }
 }
 
-class _SwitchingClinicRescheduleDashboardService implements ClinicRescheduleDashboardService {
+class _SwitchingClinicRescheduleDashboardService
+    implements ClinicRescheduleDashboardService {
   _SwitchingClinicRescheduleDashboardService({
     required this.clinicResponses,
     required this.sessionManager,
@@ -412,7 +431,8 @@ class _SwitchingClinicRescheduleDashboardService implements ClinicRescheduleDash
   final AuthSessionManager sessionManager;
 
   @override
-  Future<ApiResult<PaginatedUnresolvedReschedules>> fetchUnresolvedAppointments({
+  Future<ApiResult<PaginatedUnresolvedReschedules>>
+      fetchUnresolvedAppointments({
     int page = 1,
     int perPage = 20,
   }) async {

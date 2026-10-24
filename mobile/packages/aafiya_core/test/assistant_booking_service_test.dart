@@ -135,7 +135,8 @@ void main() {
       expect(doctors[1].isActive, isTrue);
     });
 
-    test('getAvailableSlots passes query params and parses 10 hourly slots', () async {
+    test('getAvailableSlots passes query params and parses 10 hourly slots',
+        () async {
       final mockClient = MockClient((request) async {
         expect(request.method, equals('GET'));
         expect(request.url.path, endsWith('/appointments/slots'));
@@ -146,16 +147,76 @@ void main() {
         final responseData = {
           'data': {
             'slots': [
-              {'time_slot': '08:00', 'max_capacity': 10, 'occupied': 2, 'available': 8, 'is_available': true},
-              {'time_slot': '09:00', 'max_capacity': 10, 'occupied': 5, 'available': 5, 'is_available': true},
-              {'time_slot': '10:00', 'max_capacity': 10, 'occupied': 10, 'available': 0, 'is_available': false},
-              {'time_slot': '11:00', 'max_capacity': 10, 'occupied': 1, 'available': 9, 'is_available': true},
-              {'time_slot': '12:00', 'max_capacity': 10, 'occupied': 0, 'available': 10, 'is_available': true},
-              {'time_slot': '13:00', 'max_capacity': 10, 'occupied': 0, 'available': 10, 'is_available': true},
-              {'time_slot': '14:00', 'max_capacity': 10, 'occupied': 3, 'available': 7, 'is_available': true},
-              {'time_slot': '15:00', 'max_capacity': 10, 'occupied': 4, 'available': 6, 'is_available': true},
-              {'time_slot': '16:00', 'max_capacity': 10, 'occupied': 0, 'available': 10, 'is_available': true},
-              {'time_slot': '17:00', 'max_capacity': 10, 'occupied': 1, 'available': 9, 'is_available': true},
+              {
+                'time_slot': '08:00',
+                'max_capacity': 10,
+                'occupied': 2,
+                'available': 8,
+                'is_available': true
+              },
+              {
+                'time_slot': '09:00',
+                'max_capacity': 10,
+                'occupied': 5,
+                'available': 5,
+                'is_available': true
+              },
+              {
+                'time_slot': '10:00',
+                'max_capacity': 10,
+                'occupied': 10,
+                'available': 0,
+                'is_available': false
+              },
+              {
+                'time_slot': '11:00',
+                'max_capacity': 10,
+                'occupied': 1,
+                'available': 9,
+                'is_available': true
+              },
+              {
+                'time_slot': '12:00',
+                'max_capacity': 10,
+                'occupied': 0,
+                'available': 10,
+                'is_available': true
+              },
+              {
+                'time_slot': '13:00',
+                'max_capacity': 10,
+                'occupied': 0,
+                'available': 10,
+                'is_available': true
+              },
+              {
+                'time_slot': '14:00',
+                'max_capacity': 10,
+                'occupied': 3,
+                'available': 7,
+                'is_available': true
+              },
+              {
+                'time_slot': '15:00',
+                'max_capacity': 10,
+                'occupied': 4,
+                'available': 6,
+                'is_available': true
+              },
+              {
+                'time_slot': '16:00',
+                'max_capacity': 10,
+                'occupied': 0,
+                'available': 10,
+                'is_available': true
+              },
+              {
+                'time_slot': '17:00',
+                'max_capacity': 10,
+                'occupied': 1,
+                'available': 9,
+                'is_available': true
+              },
             ],
           },
         };
@@ -185,7 +246,9 @@ void main() {
       expect(slots[2].available, equals(0));
     });
 
-    test('createAppointment sends proper JSON payload without booking_center_id', () async {
+    test(
+        'createAppointment sends proper JSON payload without booking_center_id',
+        () async {
       final mockClient = MockClient((request) async {
         expect(request.method, equals('POST'));
         expect(request.url.path, endsWith('/appointments'));
@@ -253,7 +316,8 @@ void main() {
       expect(appointment.patient.mrn, equals('MRN-2026-VAL99'));
     });
 
-    test('createAppointment handles 422 slot full conflict correctly', () async {
+    test('createAppointment handles 422 slot full conflict correctly',
+        () async {
       final mockClient = MockClient((request) async {
         final errorResponse = {
           'message': 'Selected time slot has reached maximum capacity.',
@@ -288,7 +352,8 @@ void main() {
       expect(validation.message, contains('maximum capacity'));
     });
 
-    test('rescheduleAppointment calls endpoint with auth and payload correctly', () async {
+    test('rescheduleAppointment calls endpoint with auth and payload correctly',
+        () async {
       const appointmentId = '01a081ea-2e14-72d8-b97d-29026efc9999';
       const newDate = '2026-09-20';
       const newSlot = '11:00';
@@ -296,7 +361,8 @@ void main() {
 
       final mockClient = MockClient((request) async {
         expect(request.method, equals('POST'));
-        expect(request.url.path, endsWith('/appointments/$appointmentId/reschedule'));
+        expect(request.url.path,
+            endsWith('/appointments/$appointmentId/reschedule'));
         expect(request.headers['Authorization'], contains('Bearer'));
 
         final body = jsonDecode(request.body) as Map<String, dynamic>;
@@ -352,7 +418,8 @@ void main() {
       expect(appointment.notes, equals(rescheduleNotes));
     });
 
-    test('rescheduleAppointment handles 422 error when slot is full or invalid', () async {
+    test('rescheduleAppointment handles 422 error when slot is full or invalid',
+        () async {
       const appointmentId = '01a081ea-2e14-72d8-b97d-29026efc9999';
 
       final mockClient = MockClient((request) async {
@@ -387,7 +454,9 @@ void main() {
       expect(validation.statusCode, equals(422));
     });
 
-    test('searchPatients queries ApiEndpoints.patients and parses PatientSearchResult list', () async {
+    test(
+        'searchPatients queries ApiEndpoints.patients and parses PatientSearchResult list',
+        () async {
       final mockClient = MockClient((request) async {
         expect(request.method, equals('GET'));
         expect(request.url.path, endsWith('/patients'));
@@ -440,4 +509,3 @@ void main() {
     });
   });
 }
-

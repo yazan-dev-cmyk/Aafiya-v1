@@ -102,7 +102,8 @@ class _ProAuthShellState extends State<ProAuthShell> {
   @override
   Widget build(BuildContext context) {
     final strings = LocalizedStrings.of(context);
-    final activeLocale = widget.currentLocale ?? Localizations.localeOf(context);
+    final activeLocale =
+        widget.currentLocale ?? Localizations.localeOf(context);
 
     return Scaffold(
       appBar: AafiyaAppBar(
@@ -110,7 +111,8 @@ class _ProAuthShellState extends State<ProAuthShell> {
         actions: widget.onLocaleChanged != null
             ? [
                 PopupMenuButton<Locale>(
-                  icon: const Icon(Icons.language_rounded, color: AafiyaColors.healthBlue),
+                  icon: const Icon(Icons.language_rounded,
+                      color: AafiyaColors.healthBlue),
                   tooltip: strings.language,
                   initialValue: activeLocale,
                   onSelected: widget.onLocaleChanged,
@@ -172,7 +174,8 @@ class _ProAuthShellState extends State<ProAuthShell> {
                         ),
                         child: Text(
                           _errorMessage!,
-                          style: AafiyaTypography.bodyMedium.copyWith(color: AafiyaColors.error),
+                          style: AafiyaTypography.bodyMedium
+                              .copyWith(color: AafiyaColors.error),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -193,10 +196,15 @@ class _ProAuthShellState extends State<ProAuthShell> {
                       prefixIcon: const Icon(Icons.lock_outline),
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                          _obscurePassword
+                              ? Icons.visibility_outlined
+                              : Icons.visibility_off_outlined,
                         ),
-                        tooltip: _obscurePassword ? strings.showPassword : strings.hidePassword,
-                        onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                        tooltip: _obscurePassword
+                            ? strings.showPassword
+                            : strings.hidePassword,
+                        onPressed: () => setState(
+                            () => _obscurePassword = !_obscurePassword),
                       ),
                     ),
                     const SizedBox(height: 24),

@@ -53,8 +53,10 @@ http.Response jsonResponse(dynamic body, [int statusCode = 200]) {
 
 (ApiClient, AuthSessionManager) createTestClients(MockClient mockClient) {
   final tokenStorage = InMemoryTokenStorage();
-  final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
-  final sessionManager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
+  final apiClient =
+      ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+  final sessionManager =
+      AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
   return (apiClient, sessionManager);
 }
 
@@ -151,7 +153,8 @@ void main() {
     'data': {
       'id': 'apt-uuid-001',
       'booking_reference': 'MS-2026-4B82',
-      'secure_token': 'sec_tok_abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678',
+      'secure_token':
+          'sec_tok_abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678',
       'clinic': {
         'id': 'clinic-uuid-001',
         'name': 'عيادة النور',
@@ -186,7 +189,8 @@ void main() {
       {
         'id': 'apt-uuid-001',
         'booking_reference': 'MS-2026-4B82',
-        'secure_token': 'sec_tok_abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678',
+        'secure_token':
+            'sec_tok_abcdef1234567890abcdef1234567890abcdef1234567890abcdef12345678',
         'clinic': {
           'id': 'clinic-uuid-001',
           'name': 'عيادة النور',
@@ -212,7 +216,8 @@ void main() {
       {
         'id': 'apt-uuid-002',
         'booking_reference': 'MS-2026-9C14',
-        'secure_token': 'sec_tok_9988776655443322110099887766554433221100998877665544332211001122',
+        'secure_token':
+            'sec_tok_9988776655443322110099887766554433221100998877665544332211001122',
         'clinic': {
           'id': 'clinic-uuid-001',
           'name': 'عيادة النور',
@@ -237,7 +242,8 @@ void main() {
   };
 
   group('BookingCenterShell Operational Tiles & Governance Tests', () {
-    testWidgets('Renders New Booking and Appointments History action tiles', (tester) async {
+    testWidgets('Renders New Booking and Appointments History action tiles',
+        (tester) async {
       configureTestScreen(tester);
       final mockClient = MockClient((request) async {
         if (request.url.path.contains('/booking-centers/quota-balance')) {
@@ -262,7 +268,8 @@ void main() {
 
       // Assert operational tiles exist
       expect(find.byKey(const Key('open_new_booking_tile')), findsOneWidget);
-      expect(find.byKey(const Key('open_appointments_history_tile')), findsOneWidget);
+      expect(find.byKey(const Key('open_appointments_history_tile')),
+          findsOneWidget);
       expect(find.text('حجز موعد جديد'), findsOneWidget);
       expect(find.text('سجل مواعيد المركز'), findsOneWidget);
 
@@ -275,7 +282,9 @@ void main() {
   });
 
   group('BcAppointmentBookingScreen Wizard Tests', () {
-    testWidgets('Step 1: Renders Registered and Guest patient modes, searches registered patients', (tester) async {
+    testWidgets(
+        'Step 1: Renders Registered and Guest patient modes, searches registered patients',
+        (tester) async {
       configureTestScreen(tester);
       final mockClient = MockClient((request) async {
         if (request.url.path.contains('/booking-centers/quota-balance')) {
@@ -326,7 +335,9 @@ void main() {
       expect(find.text('تغيير المريض'), findsOneWidget);
     });
 
-    testWidgets('Step 2 & 3: Doctor and Clinic selection, slot capacity display', (tester) async {
+    testWidgets(
+        'Step 2 & 3: Doctor and Clinic selection, slot capacity display',
+        (tester) async {
       configureTestScreen(tester);
       final mockClient = MockClient((request) async {
         if (request.url.path.contains('/booking-centers/quota-balance')) {
@@ -391,7 +402,9 @@ void main() {
       expect(find.text('مكتمل'), findsOneWidget); // 09:00 is full
     });
 
-    testWidgets('Step 4 & Submission: Quota notice transparency and creation of pending appointment', (tester) async {
+    testWidgets(
+        'Step 4 & Submission: Quota notice transparency and creation of pending appointment',
+        (tester) async {
       configureTestScreen(tester);
       bool appointmentPostReceived = false;
 
@@ -405,7 +418,8 @@ void main() {
         if (request.url.path.contains('/appointments/slots')) {
           return jsonResponse(mockSlotsPayload);
         }
-        if (request.url.path == '/api/v1/appointments' && request.method == 'POST') {
+        if (request.url.path == '/api/v1/appointments' &&
+            request.method == 'POST') {
           appointmentPostReceived = true;
           final body = jsonDecode(request.body) as Map<String, dynamic>;
           expect(body['patient_name'], 'أحمد بن علي');
@@ -473,7 +487,8 @@ void main() {
       expect(find.text('قيد الانتظار'), findsAtLeast(1));
     });
 
-    testWidgets('Zero Quota renders warning banner in Review step', (tester) async {
+    testWidgets('Zero Quota renders warning banner in Review step',
+        (tester) async {
       configureTestScreen(tester);
       final mockClient = MockClient((request) async {
         if (request.url.path.contains('/booking-centers/quota-balance')) {
@@ -524,14 +539,16 @@ void main() {
 
       // Assert zero quota warning is visible
       expect(
-        find.textContaining('الرصيد الحالي 0 — لا يمكن تأكيد حجوزات جديدة دون شحن باقة'),
+        find.textContaining(
+            'الرصيد الحالي 0 — لا يمكن تأكيد حجوزات جديدة دون شحن باقة'),
         findsOneWidget,
       );
     });
   });
 
   group('BcAppointmentsListScreen History & Actions Tests', () {
-    testWidgets('Lists center appointments and supports status filtering', (tester) async {
+    testWidgets('Lists center appointments and supports status filtering',
+        (tester) async {
       configureTestScreen(tester);
       final mockClient = MockClient((request) async {
         if (request.url.path == '/api/v1/appointments') {
@@ -596,7 +613,9 @@ void main() {
       expect(find.byType(QrImageView), findsOneWidget);
     });
 
-    testWidgets('Cancellation dialog triggers backend cancel call and invokes refresh callback', (tester) async {
+    testWidgets(
+        'Cancellation dialog triggers backend cancel call and invokes refresh callback',
+        (tester) async {
       configureTestScreen(tester);
       bool cancelCalled = false;
       bool quotaRefreshTriggered = false;
@@ -605,7 +624,8 @@ void main() {
         if (request.url.path == '/api/v1/appointments') {
           return jsonResponse(mockAppointmentsListPayload);
         }
-        if (request.url.path == '/api/v1/appointments/apt-uuid-001/cancel' && request.method == 'POST') {
+        if (request.url.path == '/api/v1/appointments/apt-uuid-001/cancel' &&
+            request.method == 'POST') {
           cancelCalled = true;
           return jsonResponse(mockCreatedAppointmentPayload);
         }
@@ -634,7 +654,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert dialog appeared
-      expect(find.text('هل أنت متأكد من رغبتك في إلغاء هذا الموعد؟'), findsOneWidget);
+      expect(find.text('هل أنت متأكد من رغبتك في إلغاء هذا الموعد؟'),
+          findsOneWidget);
 
       // Confirm cancel
       await tester.tap(find.text('تأكيد الإلغاء'));
@@ -644,7 +665,9 @@ void main() {
       expect(quotaRefreshTriggered, isTrue);
     });
 
-    testWidgets('Cancellation succeeds even if onQuotaNeedsRefresh throws an exception', (tester) async {
+    testWidgets(
+        'Cancellation succeeds even if onQuotaNeedsRefresh throws an exception',
+        (tester) async {
       configureTestScreen(tester);
       int cancelCallCount = 0;
 
@@ -652,7 +675,8 @@ void main() {
         if (request.url.path == '/api/v1/appointments') {
           return jsonResponse(mockAppointmentsListPayload);
         }
-        if (request.url.path == '/api/v1/appointments/apt-uuid-001/cancel' && request.method == 'POST') {
+        if (request.url.path == '/api/v1/appointments/apt-uuid-001/cancel' &&
+            request.method == 'POST') {
           cancelCallCount++;
           return jsonResponse(mockCreatedAppointmentPayload);
         }
@@ -687,10 +711,13 @@ void main() {
       // Exactly one cancellation call should have occurred (no retry triggered)
       expect(cancelCallCount, 1);
       // Success snackbar must be rendered despite the callback failure
-      expect(find.text('تم إلغاء الموعد بنجاح وتحديث الرصيد إن كان مؤكداً.'), findsOneWidget);
+      expect(find.text('تم إلغاء الموعد بنجاح وتحديث الرصيد إن كان مؤكداً.'),
+          findsOneWidget);
     });
 
-    testWidgets('Backend 422 error is surfaced clearly in UI SnackBar and does not cancel', (tester) async {
+    testWidgets(
+        'Backend 422 error is surfaced clearly in UI SnackBar and does not cancel',
+        (tester) async {
       configureTestScreen(tester);
       bool cancelCalled = false;
 
@@ -698,7 +725,8 @@ void main() {
         if (request.url.path == '/api/v1/appointments') {
           return jsonResponse(mockAppointmentsListPayload);
         }
-        if (request.url.path == '/api/v1/appointments/apt-uuid-001/cancel' && request.method == 'POST') {
+        if (request.url.path == '/api/v1/appointments/apt-uuid-001/cancel' &&
+            request.method == 'POST') {
           cancelCalled = true;
           return jsonResponse({
             'message': 'The given data was invalid.',
@@ -737,7 +765,8 @@ void main() {
       expect(find.text('غير مصرح لك بإلغاء هذا الموعد الطبي.'), findsOneWidget);
     });
 
-    testWidgets('Terminal appointments do not render cancel button', (tester) async {
+    testWidgets('Terminal appointments do not render cancel button',
+        (tester) async {
       configureTestScreen(tester);
       final cancelledListPayload = {
         'data': [

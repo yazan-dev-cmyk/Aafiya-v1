@@ -85,18 +85,24 @@ void main() {
   }
 
   group('Doctor Working Hours — DTO & Invariants', () {
-    test('Allowed slots invariant strictly contains 08:00..16:00 and excludes 17:00', () {
+    test(
+        'Allowed slots invariant strictly contains 08:00..16:00 and excludes 17:00',
+        () {
       expect(kAllowedHourlySlots.length, 9);
       expect(kAllowedHourlySlots.first, '08:00');
       expect(kAllowedHourlySlots.last, '16:00');
       expect(kAllowedHourlySlots.contains('17:00'), isFalse);
     });
 
-    test('Canonical weekdays ordering has exactly 7 days from 0 (Saturday) to 6 (Friday)', () {
+    test(
+        'Canonical weekdays ordering has exactly 7 days from 0 (Saturday) to 6 (Friday)',
+        () {
       expect(kWeekdaysOrder, [0, 1, 2, 3, 4, 5, 6]);
     });
 
-    test('DoctorWorkingHoursData.defaultDays creates 7 days with weekend closed', () {
+    test(
+        'DoctorWorkingHoursData.defaultDays creates 7 days with weekend closed',
+        () {
       final days = DoctorWorkingHoursData.defaultDays();
       expect(days.length, 7);
       expect(days[0].dayOfWeek, 0); // Saturday
@@ -114,7 +120,8 @@ void main() {
 
     test('Correctly serializes and deserializes DoctorWorkingHoursData', () {
       final sample = createSampleScheduleJson(isActivated: true);
-      final model = DoctorWorkingHoursData.fromJson(sample['data'] as Map<String, dynamic>);
+      final model = DoctorWorkingHoursData.fromJson(
+          sample['data'] as Map<String, dynamic>);
 
       expect(model.clinicId, 'clinic-hours-01');
       expect(model.doctorId, 'doctor-canonical-uuid-999');
@@ -131,10 +138,13 @@ void main() {
   });
 
   group('DoctorWorkingHoursService — HTTP Mock Client', () {
-    test('getSchedule sends X-Clinic-ID header and returns DoctorWorkingHoursData', () async {
+    test(
+        'getSchedule sends X-Clinic-ID header and returns DoctorWorkingHoursData',
+        () async {
       final mockClient = MockClient((request) async {
         expect(request.method, 'GET');
-        expect(request.url.path, contains('/doctors/doctor-canonical-uuid-999/working-hours'));
+        expect(request.url.path,
+            contains('/doctors/doctor-canonical-uuid-999/working-hours'));
         expect(request.url.path, isNot(contains('user-uuid-001')));
         expect(request.headers['X-Clinic-ID'], 'clinic-hours-01');
 
@@ -159,10 +169,12 @@ void main() {
       expect(data.isActivated, isFalse);
     });
 
-    test('saveDraft sends PUT request with 7 days and handles success', () async {
+    test('saveDraft sends PUT request with 7 days and handles success',
+        () async {
       final mockClient = MockClient((request) async {
         expect(request.method, 'PUT');
-        expect(request.url.path, contains('/doctors/doctor-canonical-uuid-999/working-hours'));
+        expect(request.url.path,
+            contains('/doctors/doctor-canonical-uuid-999/working-hours'));
         expect(request.url.path, isNot(contains('user-uuid-001')));
         expect(request.headers['X-Clinic-ID'], 'clinic-hours-01');
 
@@ -188,11 +200,13 @@ void main() {
       expect(result, isA<ApiSuccess<DoctorWorkingHoursData>>());
     });
 
-    test('saveDraft handles SCHEDULE_CONTRACTION_CONFLICT 422 correctly', () async {
+    test('saveDraft handles SCHEDULE_CONTRACTION_CONFLICT 422 correctly',
+        () async {
       final mockClient = MockClient((request) async {
         return http.Response(
           jsonEncode({
-            'message': 'تعذر حفظ المسودة: توجد مواعيد نشطة في الساعات المحذوفة.',
+            'message':
+                'تعذر حفظ المسودة: توجد مواعيد نشطة في الساعات المحذوفة.',
             'error_code': 'SCHEDULE_CONTRACTION_CONFLICT',
           }),
           422,
@@ -214,10 +228,15 @@ void main() {
       expect(failure.exception.message, contains('تعذر حفظ المسودة'));
     });
 
-    test('activateSchedule sends POST to activate endpoint and receives locked schedule', () async {
+    test(
+        'activateSchedule sends POST to activate endpoint and receives locked schedule',
+        () async {
       final mockClient = MockClient((request) async {
         expect(request.method, 'POST');
-        expect(request.url.path, contains('/doctors/doctor-canonical-uuid-999/working-hours/activate'));
+        expect(
+            request.url.path,
+            contains(
+                '/doctors/doctor-canonical-uuid-999/working-hours/activate'));
         expect(request.url.path, isNot(contains('user-uuid-001')));
         expect(request.headers['X-Clinic-ID'], 'clinic-hours-01');
 
@@ -243,7 +262,8 @@ void main() {
   });
 
   group('DoctorWorkingHoursScreen — Widget Tests', () {
-    testWidgets('Renders draft schedule with 7 weekdays and action buttons', (tester) async {
+    testWidgets('Renders draft schedule with 7 weekdays and action buttons',
+        (tester) async {
       final mockClient = MockClient((request) async {
         return http.Response(
           jsonEncode(createSampleScheduleJson(isActivated: false)),
@@ -329,7 +349,9 @@ void main() {
       expect(chip.selected, isTrue);
     });
 
-    testWidgets('Activation dialog requires mandatory checkbox before confirming', (tester) async {
+    testWidgets(
+        'Activation dialog requires mandatory checkbox before confirming',
+        (tester) async {
       bool onConfirmCalled = false;
 
       final sampleDays = DoctorWorkingHoursData.defaultDays();
@@ -358,11 +380,15 @@ void main() {
       await tester.pumpAndSettle();
 
       // Check dialog elements
-      expect(find.textContaining('المراجعة النهائية والتفعيل النهائي'), findsOneWidget);
-      expect(find.textContaining('تحذير حرج: تفعيل جدول ساعات العمل'), findsOneWidget);
+      expect(find.textContaining('المراجعة النهائية والتفعيل النهائي'),
+          findsOneWidget);
+      expect(find.textContaining('تحذير حرج: تفعيل جدول ساعات العمل'),
+          findsOneWidget);
 
-      final confirmBtnFinder = find.byKey(const Key('confirm_activation_button'));
-      final checkboxFinder = find.byKey(const Key('activation_irreversible_checkbox'));
+      final confirmBtnFinder =
+          find.byKey(const Key('confirm_activation_button'));
+      final checkboxFinder =
+          find.byKey(const Key('activation_irreversible_checkbox'));
 
       expect(confirmBtnFinder, findsOneWidget);
       expect(checkboxFinder, findsOneWidget);
@@ -389,7 +415,9 @@ void main() {
       expect(find.byType(ScheduleActivationDialog), findsNothing);
     });
 
-    testWidgets('Renders permanently locked UI when schedule is already activated', (tester) async {
+    testWidgets(
+        'Renders permanently locked UI when schedule is already activated',
+        (tester) async {
       final mockClient = MockClient((request) async {
         return http.Response(
           jsonEncode(createSampleScheduleJson(isActivated: true)),
@@ -421,7 +449,8 @@ void main() {
 
       // Check locked banner
       expect(find.textContaining('جدول مفعل ومقفل نهائياً'), findsOneWidget);
-      expect(find.textContaining('تم قفل الجدول نهائياً في هذا المركز الطبي'), findsOneWidget);
+      expect(find.textContaining('تم قفل الجدول نهائياً في هذا المركز الطبي'),
+          findsOneWidget);
 
       // Action buttons in bottom bar should be absent
       expect(find.byKey(const Key('save_draft_button')), findsNothing);
@@ -434,7 +463,8 @@ void main() {
       }
     });
 
-    testWidgets('Shows error and blocks API requests when User has no doctorId', (tester) async {
+    testWidgets('Shows error and blocks API requests when User has no doctorId',
+        (tester) async {
       int requestCount = 0;
       final mockClient = MockClient((request) async {
         requestCount++;
@@ -473,7 +503,8 @@ void main() {
 
       expect(requestCount, 0); // Strictly 0 network requests
       expect(find.byType(AafiyaErrorView), findsOneWidget);
-      expect(find.textContaining('معرف الطبيب غير متوفر في ملف الحساب'), findsOneWidget);
+      expect(find.textContaining('معرف الطبيب غير متوفر في ملف الحساب'),
+          findsOneWidget);
     });
   });
 }

@@ -46,10 +46,12 @@ class ClinicOperatingHoursScreen extends StatefulWidget {
   }
 
   @override
-  State<ClinicOperatingHoursScreen> createState() => _ClinicOperatingHoursScreenState();
+  State<ClinicOperatingHoursScreen> createState() =>
+      _ClinicOperatingHoursScreenState();
 }
 
-class _ClinicOperatingHoursScreenState extends State<ClinicOperatingHoursScreen> {
+class _ClinicOperatingHoursScreenState
+    extends State<ClinicOperatingHoursScreen> {
   late final ClinicOperatingHoursService _service;
   late String _activeClinicId;
 
@@ -67,7 +69,8 @@ class _ClinicOperatingHoursScreenState extends State<ClinicOperatingHoursScreen>
         ClinicOperatingHoursService(
           apiClient: widget.apiClient ?? widget.sessionManager.apiClient,
         );
-    _activeClinicId = widget.clinicId ?? widget.sessionManager.activeClinicId ?? '';
+    _activeClinicId =
+        widget.clinicId ?? widget.sessionManager.activeClinicId ?? '';
     widget.sessionManager.addListener(_onSessionChanged);
     _loadOperatingHours();
   }
@@ -79,7 +82,8 @@ class _ClinicOperatingHoursScreenState extends State<ClinicOperatingHoursScreen>
   }
 
   void _onSessionChanged() {
-    final newClinicId = widget.clinicId ?? widget.sessionManager.activeClinicId ?? '';
+    final newClinicId =
+        widget.clinicId ?? widget.sessionManager.activeClinicId ?? '';
     if (newClinicId != _activeClinicId) {
       setState(() {
         _activeClinicId = newClinicId;
@@ -414,11 +418,13 @@ class _ClinicOperatingHoursScreenState extends State<ClinicOperatingHoursScreen>
             decoration: BoxDecoration(
               color: AafiyaColors.warning.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(AafiyaRadius.md),
-              border: Border.all(color: AafiyaColors.warning.withValues(alpha: 0.3)),
+              border: Border.all(
+                  color: AafiyaColors.warning.withValues(alpha: 0.3)),
             ),
             child: Row(
               children: [
-                const Icon(Icons.shield_outlined, color: AafiyaColors.warning, size: 22),
+                const Icon(Icons.shield_outlined,
+                    color: AafiyaColors.warning, size: 22),
                 const SizedBox(width: AafiyaSpacing.sm),
                 Expanded(
                   child: Text(
@@ -445,16 +451,19 @@ class _ClinicOperatingHoursScreenState extends State<ClinicOperatingHoursScreen>
             decoration: BoxDecoration(
               color: AafiyaColors.error.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AafiyaRadius.md),
-              border: Border.all(color: AafiyaColors.error.withValues(alpha: 0.3)),
+              border:
+                  Border.all(color: AafiyaColors.error.withValues(alpha: 0.3)),
             ),
             child: Row(
               children: [
-                const Icon(Icons.error_outline, color: AafiyaColors.error, size: 20),
+                const Icon(Icons.error_outline,
+                    color: AafiyaColors.error, size: 20),
                 const SizedBox(width: AafiyaSpacing.sm),
                 Expanded(
                   child: Text(
                     _errorMessage!,
-                    style: AafiyaTypography.caption.copyWith(color: AafiyaColors.error),
+                    style: AafiyaTypography.caption
+                        .copyWith(color: AafiyaColors.error),
                   ),
                 ),
               ],
@@ -469,16 +478,19 @@ class _ClinicOperatingHoursScreenState extends State<ClinicOperatingHoursScreen>
             decoration: BoxDecoration(
               color: AafiyaColors.success.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AafiyaRadius.md),
-              border: Border.all(color: AafiyaColors.success.withValues(alpha: 0.3)),
+              border: Border.all(
+                  color: AafiyaColors.success.withValues(alpha: 0.3)),
             ),
             child: Row(
               children: [
-                const Icon(Icons.check_circle_outline, color: AafiyaColors.success, size: 20),
+                const Icon(Icons.check_circle_outline,
+                    color: AafiyaColors.success, size: 20),
                 const SizedBox(width: AafiyaSpacing.sm),
                 Expanded(
                   child: Text(
                     _successMessage!,
-                    style: AafiyaTypography.caption.copyWith(color: AafiyaColors.success),
+                    style: AafiyaTypography.caption
+                        .copyWith(color: AafiyaColors.success),
                   ),
                 ),
               ],
@@ -487,7 +499,8 @@ class _ClinicOperatingHoursScreenState extends State<ClinicOperatingHoursScreen>
         ],
 
         // 7 Canonical Weekdays
-        ..._days.map((dayItem) => _buildDayCard(context, strings, dayItem, isDirector)),
+        ..._days.map(
+            (dayItem) => _buildDayCard(context, strings, dayItem, isDirector)),
         const SizedBox(height: 80),
       ],
     );
@@ -500,7 +513,8 @@ class _ClinicOperatingHoursScreenState extends State<ClinicOperatingHoursScreen>
         decoration: BoxDecoration(
           color: AafiyaColors.success.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(AafiyaRadius.lg),
-          border: Border.all(color: AafiyaColors.success.withValues(alpha: 0.3)),
+          border:
+              Border.all(color: AafiyaColors.success.withValues(alpha: 0.3)),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -609,7 +623,9 @@ class _ClinicOperatingHoursScreenState extends State<ClinicOperatingHoursScreen>
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AafiyaRadius.md),
         side: BorderSide(
-          color: isOpen ? AafiyaColors.primaryBlue.withValues(alpha: 0.3) : AafiyaColors.border,
+          color: isOpen
+              ? AafiyaColors.primaryBlue.withValues(alpha: 0.3)
+              : AafiyaColors.border,
         ),
       ),
       child: Padding(
@@ -626,12 +642,15 @@ class _ClinicOperatingHoursScreenState extends State<ClinicOperatingHoursScreen>
                         dayName,
                         style: AafiyaTypography.titleMedium.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: isOpen ? AafiyaColors.primaryText : AafiyaColors.secondaryText,
+                          color: isOpen
+                              ? AafiyaColors.primaryText
+                              : AafiyaColors.secondaryText,
                         ),
                       ),
                       const SizedBox(width: AafiyaSpacing.sm),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
                           color: isOpen
                               ? AafiyaColors.healthBlue.withValues(alpha: 0.1)
@@ -643,7 +662,9 @@ class _ClinicOperatingHoursScreenState extends State<ClinicOperatingHoursScreen>
                               ? '${dayItem.periods.length} ${strings.periodLabel}'
                               : strings.closedDayLabel,
                           style: AafiyaTypography.caption.copyWith(
-                            color: isOpen ? AafiyaColors.healthBlue : AafiyaColors.secondaryText,
+                            color: isOpen
+                                ? AafiyaColors.healthBlue
+                                : AafiyaColors.secondaryText,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -655,7 +676,9 @@ class _ClinicOperatingHoursScreenState extends State<ClinicOperatingHoursScreen>
                   key: Key('switch_day_${dayItem.dayOfWeek}'),
                   value: isOpen,
                   activeTrackColor: AafiyaColors.healthBlue,
-                  onChanged: isDirector ? (_) => _handleToggleDay(dayItem.dayOfWeek) : null,
+                  onChanged: isDirector
+                      ? (_) => _handleToggleDay(dayItem.dayOfWeek)
+                      : null,
                 ),
               ],
             ),
@@ -695,9 +718,11 @@ class _ClinicOperatingHoursScreenState extends State<ClinicOperatingHoursScreen>
                               : null,
                           style: OutlinedButton.styleFrom(
                             visualDensity: VisualDensity.compact,
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 6),
                           ),
-                          child: Text('${strings.openTimeLabel}: ${period.openTime}'),
+                          child: Text(
+                              '${strings.openTimeLabel}: ${period.openTime}'),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -719,9 +744,11 @@ class _ClinicOperatingHoursScreenState extends State<ClinicOperatingHoursScreen>
                               : null,
                           style: OutlinedButton.styleFrom(
                             visualDensity: VisualDensity.compact,
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 6),
                           ),
-                          child: Text('${strings.closeTimeLabel}: ${period.closeTime}'),
+                          child: Text(
+                              '${strings.closeTimeLabel}: ${period.closeTime}'),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -732,7 +759,8 @@ class _ClinicOperatingHoursScreenState extends State<ClinicOperatingHoursScreen>
                           key: Key('remove_period_${dayItem.dayOfWeek}_$idx'),
                           icon: const Icon(Icons.delete_outline, size: 20),
                           color: AafiyaColors.error,
-                          onPressed: () => _handleRemovePeriod(dayItem.dayOfWeek, idx),
+                          onPressed: () =>
+                              _handleRemovePeriod(dayItem.dayOfWeek, idx),
                         ),
                     ],
                   ),
@@ -781,11 +809,14 @@ class _ClinicOperatingHoursScreenState extends State<ClinicOperatingHoursScreen>
                     height: 18,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(AafiyaColors.pureWhite),
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(AafiyaColors.pureWhite),
                     ),
                   )
                 : const Icon(Icons.save_rounded, size: 20),
-            label: Text(_isSaving ? strings.savingClinicHours : strings.saveClinicHours),
+            label: Text(_isSaving
+                ? strings.savingClinicHours
+                : strings.saveClinicHours),
             onPressed: _isSaving ? null : _handleSave,
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 14),

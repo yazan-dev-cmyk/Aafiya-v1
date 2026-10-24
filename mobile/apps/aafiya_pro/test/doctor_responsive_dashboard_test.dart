@@ -93,7 +93,9 @@ void main() {
       });
     }
 
-    testWidgets('DoctorMetricCard defaults to maxLines 2 and enforces minHeight constraint', (tester) async {
+    testWidgets(
+        'DoctorMetricCard defaults to maxLines 2 and enforces minHeight constraint',
+        (tester) async {
       await tester.pumpWidget(
         createTestApp(
           child: const Row(
@@ -109,7 +111,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final cardWidget = tester.widget<DoctorMetricCard>(find.byType(DoctorMetricCard));
+      final cardWidget =
+          tester.widget<DoctorMetricCard>(find.byType(DoctorMetricCard));
       expect(cardWidget.maxLines, equals(2));
 
       final container = tester.widget<Container>(find.descendant(
@@ -120,17 +123,26 @@ void main() {
     });
 
     for (final width in [360.0, 375.0, 390.0]) {
-      for (final locale in [const Locale('ar'), const Locale('fr'), const Locale('en')]) {
-        testWidgets('Compact viewport ${width}dp in ${locale.languageCode} renders 2+2+1 layout with zero overflow', (tester) async {
+      for (final locale in [
+        const Locale('ar'),
+        const Locale('fr'),
+        const Locale('en')
+      ]) {
+        testWidgets(
+            'Compact viewport ${width}dp in ${locale.languageCode} renders 2+2+1 layout with zero overflow',
+            (tester) async {
           tester.view.physicalSize = Size(width, 700.0);
           tester.view.devicePixelRatio = 1.0;
           addTearDown(() => tester.view.resetPhysicalSize());
 
           final mockHttpClient = createMockClient();
-          final apiClient = ApiClient(httpClient: mockHttpClient, tokenStorage: tokenStorage);
-          final sessionManager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
+          final apiClient =
+              ApiClient(httpClient: mockHttpClient, tokenStorage: tokenStorage);
+          final sessionManager = AuthSessionManager(
+              tokenStorage: tokenStorage, apiClient: apiClient);
 
-          await sessionManager.setAuthenticatedUser(token: 'valid_mock_token', user: testDoctor);
+          await sessionManager.setAuthenticatedUser(
+              token: 'valid_mock_token', user: testDoctor);
           sessionManager.setAuthorizedClinics([testClinic]);
 
           await tester.pumpWidget(
@@ -151,10 +163,11 @@ void main() {
           // All 5 metric cards must be rendered
           expect(find.byType(DoctorMetricCard), findsNWidgets(5));
           expect(find.text('\u200E18\u200E'), findsOneWidget); // today_total
-          expect(find.text('\u200E4\u200E'), findsOneWidget);  // in_waiting_room
-          expect(find.text('\u200E5\u200E'), findsOneWidget);  // pending_check_in
-          expect(find.text('\u200E8\u200E'), findsOneWidget);  // completed_today
-          expect(find.text('\u200E1\u200E'), findsOneWidget);  // no_show_today
+          expect(find.text('\u200E4\u200E'), findsOneWidget); // in_waiting_room
+          expect(
+              find.text('\u200E5\u200E'), findsOneWidget); // pending_check_in
+          expect(find.text('\u200E8\u200E'), findsOneWidget); // completed_today
+          expect(find.text('\u200E1\u200E'), findsOneWidget); // no_show_today
 
           // Verify text widgets inside metric cards have maxLines: 2
           final textWidgets = tester.widgetList<Text>(
@@ -176,16 +189,21 @@ void main() {
       }
     }
 
-    testWidgets('Medium viewport 450dp renders standard 2+3 layout without overflow', (tester) async {
+    testWidgets(
+        'Medium viewport 450dp renders standard 2+3 layout without overflow',
+        (tester) async {
       tester.view.physicalSize = const Size(450.0, 800.0);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() => tester.view.resetPhysicalSize());
 
       final mockHttpClient = createMockClient();
-      final apiClient = ApiClient(httpClient: mockHttpClient, tokenStorage: tokenStorage);
-      final sessionManager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
+      final apiClient =
+          ApiClient(httpClient: mockHttpClient, tokenStorage: tokenStorage);
+      final sessionManager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
 
-      await sessionManager.setAuthenticatedUser(token: 'valid_mock_token', user: testDoctor);
+      await sessionManager.setAuthenticatedUser(
+          token: 'valid_mock_token', user: testDoctor);
       sessionManager.setAuthorizedClinics([testClinic]);
 
       await tester.pumpWidget(
@@ -207,16 +225,21 @@ void main() {
       expect(find.byKey(const Key('medium_kpi_row_1')), findsOneWidget);
     });
 
-    testWidgets('Expanded viewport 800dp (tablet) renders 1 single row of 5 cards without overflow', (tester) async {
+    testWidgets(
+        'Expanded viewport 800dp (tablet) renders 1 single row of 5 cards without overflow',
+        (tester) async {
       tester.view.physicalSize = const Size(800.0, 1000.0);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() => tester.view.resetPhysicalSize());
 
       final mockHttpClient = createMockClient();
-      final apiClient = ApiClient(httpClient: mockHttpClient, tokenStorage: tokenStorage);
-      final sessionManager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
+      final apiClient =
+          ApiClient(httpClient: mockHttpClient, tokenStorage: tokenStorage);
+      final sessionManager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
 
-      await sessionManager.setAuthenticatedUser(token: 'valid_mock_token', user: testDoctor);
+      await sessionManager.setAuthenticatedUser(
+          token: 'valid_mock_token', user: testDoctor);
       sessionManager.setAuthorizedClinics([testClinic]);
 
       await tester.pumpWidget(

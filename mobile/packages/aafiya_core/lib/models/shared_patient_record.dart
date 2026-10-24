@@ -230,14 +230,17 @@ class SharedPatientRecord {
 
   factory SharedPatientRecord.fromJson(Map<String, dynamic> json) {
     // Check if envelope has 'data'
-    final Map<String, dynamic> data = json.containsKey('data') && json['data'] is Map<String, dynamic>
-        ? json['data'] as Map<String, dynamic>
-        : json;
+    final Map<String, dynamic> data =
+        json.containsKey('data') && json['data'] is Map<String, dynamic>
+            ? json['data'] as Map<String, dynamic>
+            : json;
 
     return SharedPatientRecord(
       scope: data['scope']?.toString() ?? 'all_emr',
-      patient: SharedPatient.fromJson((data['patient'] as Map<String, dynamic>?) ?? {}),
-      shareMetadata: SharedRecordMetadata.fromJson((data['share_metadata'] as Map<String, dynamic>?) ?? {}),
+      patient: SharedPatient.fromJson(
+          (data['patient'] as Map<String, dynamic>?) ?? {}),
+      shareMetadata: SharedRecordMetadata.fromJson(
+          (data['share_metadata'] as Map<String, dynamic>?) ?? {}),
     );
   }
 }

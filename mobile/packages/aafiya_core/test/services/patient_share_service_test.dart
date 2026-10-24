@@ -13,7 +13,8 @@ void main() {
     const validDuration = '24h';
     const jsonHeaders = {'content-type': 'application/json; charset=utf-8'};
 
-    final futureExpiry = DateTime.now().toUtc().add(const Duration(hours: 24)).toIso8601String();
+    final futureExpiry =
+        DateTime.now().toUtc().add(const Duration(hours: 24)).toIso8601String();
 
     final validCreateResponseJson = {
       'message': 'تم إنشاء رابط المشاركة الآمن والمشفر بنجاح.',
@@ -23,7 +24,8 @@ void main() {
         'scope': 'all_emr',
         'duration': '24h',
         'expires_at': futureExpiry,
-        'share_url': 'http://localhost:3000/records/view#token=pst_mockSecretToken1234567890abcdefghijklmnopqrstuvwxyz',
+        'share_url':
+            'http://localhost:3000/records/view#token=pst_mockSecretToken1234567890abcdefghijklmnopqrstuvwxyz',
         'has_pin': true,
         'status': 'active',
       }
@@ -65,12 +67,15 @@ void main() {
       }
     };
 
-    test('successfully creates share token with required fields and authentication', () async {
+    test(
+        'successfully creates share token with required fields and authentication',
+        () async {
       late http.Request capturedRequest;
 
       final mockClient = MockClient((request) async {
         capturedRequest = request;
-        return http.Response(jsonEncode(validCreateResponseJson), 201, headers: jsonHeaders);
+        return http.Response(jsonEncode(validCreateResponseJson), 201,
+            headers: jsonHeaders);
       });
 
       final tokenStorage = InMemoryTokenStorage('patient-sanctum-token');
@@ -80,14 +85,17 @@ void main() {
         config: AppConfig.devLocal,
       );
 
-      final service = PatientShareService(apiClient, config: AppConfig.devLocal);
-      final result = await service.createShare(pin: validPin, duration: validDuration);
+      final service =
+          PatientShareService(apiClient, config: AppConfig.devLocal);
+      final result =
+          await service.createShare(pin: validPin, duration: validDuration);
 
       expect(result, isA<ApiSuccess<PatientShareToken>>());
       final share = (result as ApiSuccess<PatientShareToken>).data;
 
       expect(share.id, equals('share-uuid-001'));
-      expect(share.token, equals('pst_mockSecretToken1234567890abcdefghijklmnopqrstuvwxyz'));
+      expect(share.token,
+          equals('pst_mockSecretToken1234567890abcdefghijklmnopqrstuvwxyz'));
       expect(share.scope, equals('all_emr'));
       expect(share.duration, equals('24h'));
       expect(share.status, equals('active'));
@@ -95,22 +103,26 @@ void main() {
       expect(share.isActive, isTrue);
 
       // Verify request payload & headers
-      expect(capturedRequest.headers['authorization'], contains('Bearer patient-sanctum-token'));
+      expect(capturedRequest.headers['authorization'],
+          contains('Bearer patient-sanctum-token'));
       final body = jsonDecode(capturedRequest.body) as Map<String, dynamic>;
       expect(body['scope'], equals('all_emr'));
       expect(body['duration'], equals('24h'));
       expect(body['pin'], equals('4821'));
     });
 
-    test('validates PIN length locally before network call (too short < 4)', () async {
+    test('validates PIN length locally before network call (too short < 4)',
+        () async {
       bool networkCalled = false;
       final mockClient = MockClient((request) async {
         networkCalled = true;
         return http.Response('{}', 200);
       });
 
-      final apiClient = ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
-      final service = PatientShareService(apiClient, config: AppConfig.devLocal);
+      final apiClient =
+          ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
+      final service =
+          PatientShareService(apiClient, config: AppConfig.devLocal);
 
       final result = await service.createShare(pin: '123', duration: '24h');
 
@@ -120,17 +132,21 @@ void main() {
       expect(networkCalled, isFalse);
     });
 
-    test('validates PIN length locally before network call (too long > 8)', () async {
+    test('validates PIN length locally before network call (too long > 8)',
+        () async {
       bool networkCalled = false;
       final mockClient = MockClient((request) async {
         networkCalled = true;
         return http.Response('{}', 200);
       });
 
-      final apiClient = ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
-      final service = PatientShareService(apiClient, config: AppConfig.devLocal);
+      final apiClient =
+          ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
+      final service =
+          PatientShareService(apiClient, config: AppConfig.devLocal);
 
-      final result = await service.createShare(pin: '123456789', duration: '24h');
+      final result =
+          await service.createShare(pin: '123456789', duration: '24h');
 
       expect(result, isA<ApiFailure<PatientShareToken>>());
       final exception = (result as ApiFailure<PatientShareToken>).exception;
@@ -138,15 +154,18 @@ void main() {
       expect(networkCalled, isFalse);
     });
 
-    test('validates PIN numeric characters locally before network call', () async {
+    test('validates PIN numeric characters locally before network call',
+        () async {
       bool networkCalled = false;
       final mockClient = MockClient((request) async {
         networkCalled = true;
         return http.Response('{}', 200);
       });
 
-      final apiClient = ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
-      final service = PatientShareService(apiClient, config: AppConfig.devLocal);
+      final apiClient =
+          ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
+      final service =
+          PatientShareService(apiClient, config: AppConfig.devLocal);
 
       final result = await service.createShare(pin: 'abcd', duration: '24h');
 
@@ -156,15 +175,18 @@ void main() {
       expect(networkCalled, isFalse);
     });
 
-    test('validates duration locally before network call (rejects unsupported)', () async {
+    test('validates duration locally before network call (rejects unsupported)',
+        () async {
       bool networkCalled = false;
       final mockClient = MockClient((request) async {
         networkCalled = true;
         return http.Response('{}', 200);
       });
 
-      final apiClient = ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
-      final service = PatientShareService(apiClient, config: AppConfig.devLocal);
+      final apiClient =
+          ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
+      final service =
+          PatientShareService(apiClient, config: AppConfig.devLocal);
 
       final result = await service.createShare(pin: '1234', duration: '90d');
 
@@ -178,7 +200,8 @@ void main() {
       bool networkCalled = false;
       final mockClient = MockClient((request) async {
         networkCalled = true;
-        return http.Response(jsonEncode(validCreateResponseJson), 201, headers: jsonHeaders);
+        return http.Response(jsonEncode(validCreateResponseJson), 201,
+            headers: jsonHeaders);
       });
 
       const prodConfig = AppConfig(
@@ -189,7 +212,8 @@ void main() {
       final apiClient = ApiClient(httpClient: mockClient, config: prodConfig);
       final service = PatientShareService(apiClient, config: prodConfig);
 
-      final result = await service.createShare(pin: validPin, duration: validDuration);
+      final result =
+          await service.createShare(pin: validPin, duration: validDuration);
 
       expect(result, isA<ApiFailure<PatientShareToken>>());
       final exception = (result as ApiFailure<PatientShareToken>).exception;
@@ -197,11 +221,13 @@ void main() {
       expect(networkCalled, isFalse);
     });
 
-    test('enforces HTTPS preflight in production even if host is localhost', () async {
+    test('enforces HTTPS preflight in production even if host is localhost',
+        () async {
       bool networkCalled = false;
       final mockClient = MockClient((request) async {
         networkCalled = true;
-        return http.Response(jsonEncode(validCreateResponseJson), 201, headers: jsonHeaders);
+        return http.Response(jsonEncode(validCreateResponseJson), 201,
+            headers: jsonHeaders);
       });
 
       const prodConfig = AppConfig(
@@ -212,7 +238,8 @@ void main() {
       final apiClient = ApiClient(httpClient: mockClient, config: prodConfig);
       final service = PatientShareService(apiClient, config: prodConfig);
 
-      final result = await service.createShare(pin: validPin, duration: validDuration);
+      final result =
+          await service.createShare(pin: validPin, duration: validDuration);
 
       expect(result, isA<ApiFailure<PatientShareToken>>());
       expect(networkCalled, isFalse);
@@ -222,9 +249,12 @@ void main() {
       final mockClient = MockClient((request) async {
         return http.Response(
           jsonEncode({
-            'message': 'رمز الحماية PIN إلزامي لإنشاء رابط المشاركة وفق القرار DEC-P05-03.',
+            'message':
+                'رمز الحماية PIN إلزامي لإنشاء رابط المشاركة وفق القرار DEC-P05-03.',
             'errors': {
-              'pin': ['رمز الحماية PIN إلزامي لإنشاء رابط المشاركة وفق القرار DEC-P05-03.']
+              'pin': [
+                'رمز الحماية PIN إلزامي لإنشاء رابط المشاركة وفق القرار DEC-P05-03.'
+              ]
             }
           }),
           422,
@@ -232,22 +262,27 @@ void main() {
         );
       });
 
-      final apiClient = ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
-      final service = PatientShareService(apiClient, config: AppConfig.devLocal);
+      final apiClient =
+          ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
+      final service =
+          PatientShareService(apiClient, config: AppConfig.devLocal);
 
-      final result = await service.createShare(pin: validPin, duration: validDuration);
+      final result =
+          await service.createShare(pin: validPin, duration: validDuration);
 
       expect(result, isA<ApiFailure<PatientShareToken>>());
       final exception = (result as ApiFailure<PatientShareToken>).exception;
       expect(exception, isA<ValidationException>());
     });
 
-    test('successfully retrieves list of patient shares and maps statuses', () async {
+    test('successfully retrieves list of patient shares and maps statuses',
+        () async {
       late http.Request capturedRequest;
 
       final mockClient = MockClient((request) async {
         capturedRequest = request;
-        return http.Response(jsonEncode(validListResponseJson), 200, headers: jsonHeaders);
+        return http.Response(jsonEncode(validListResponseJson), 200,
+            headers: jsonHeaders);
       });
 
       final tokenStorage = InMemoryTokenStorage('patient-sanctum-token');
@@ -257,7 +292,8 @@ void main() {
         config: AppConfig.devLocal,
       );
 
-      final service = PatientShareService(apiClient, config: AppConfig.devLocal);
+      final service =
+          PatientShareService(apiClient, config: AppConfig.devLocal);
       final result = await service.getMyShares();
 
       expect(result, isA<ApiSuccess<List<PatientShareToken>>>());
@@ -275,7 +311,8 @@ void main() {
       expect(shares[1].isRevoked, isTrue);
       expect(shares[1].isActive, isFalse);
 
-      expect(capturedRequest.headers['authorization'], contains('Bearer patient-sanctum-token'));
+      expect(capturedRequest.headers['authorization'],
+          contains('Bearer patient-sanctum-token'));
     });
 
     test('successfully revokes an active share token by ID', () async {
@@ -283,7 +320,8 @@ void main() {
 
       final mockClient = MockClient((request) async {
         capturedRequest = request;
-        return http.Response(jsonEncode(validRevokeResponseJson), 200, headers: jsonHeaders);
+        return http.Response(jsonEncode(validRevokeResponseJson), 200,
+            headers: jsonHeaders);
       });
 
       final tokenStorage = InMemoryTokenStorage('patient-sanctum-token');
@@ -293,7 +331,8 @@ void main() {
         config: AppConfig.devLocal,
       );
 
-      final service = PatientShareService(apiClient, config: AppConfig.devLocal);
+      final service =
+          PatientShareService(apiClient, config: AppConfig.devLocal);
       final result = await service.revokeShare('share-uuid-001');
 
       expect(result, isA<ApiSuccess<PatientShareToken>>());
@@ -304,22 +343,28 @@ void main() {
       expect(revokedShare.isRevoked, isTrue);
 
       expect(capturedRequest.method, equals('DELETE'));
-      expect(capturedRequest.url.path, endsWith('/patients/share-tokens/share-uuid-001'));
-      expect(capturedRequest.headers['authorization'], contains('Bearer patient-sanctum-token'));
+      expect(capturedRequest.url.path,
+          endsWith('/patients/share-tokens/share-uuid-001'));
+      expect(capturedRequest.headers['authorization'],
+          contains('Bearer patient-sanctum-token'));
     });
 
-    test('PatientShareToken toString() omits plaintext token to prevent credential logging', () {
+    test(
+        'PatientShareToken toString() omits plaintext token to prevent credential logging',
+        () {
       final share = PatientShareToken(
         id: 'share-uuid-999',
         token: 'pst_highlySensitiveBearerSecretToken12345',
-        shareUrl: 'http://localhost:3000/records/view#token=pst_highlySensitiveBearerSecretToken12345',
+        shareUrl:
+            'http://localhost:3000/records/view#token=pst_highlySensitiveBearerSecretToken12345',
         scope: 'all_emr',
         status: 'active',
         expiresAt: DateTime(2026, 10, 17),
       );
 
       final debugString = share.toString();
-      expect(debugString.contains('pst_highlySensitiveBearerSecretToken12345'), isFalse);
+      expect(debugString.contains('pst_highlySensitiveBearerSecretToken12345'),
+          isFalse);
     });
   });
 }

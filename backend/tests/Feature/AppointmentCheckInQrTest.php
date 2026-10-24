@@ -4,7 +4,10 @@ namespace Tests\Feature;
 
 use App\Models\Appointment;
 use App\Models\Clinic;
+use App\Models\ClinicOperatingHour;
 use App\Models\Doctor;
+use App\Models\DoctorDaySchedule;
+use App\Models\DoctorWorkingSlot;
 use App\Models\Patient;
 use App\Models\Role;
 use App\Models\User;
@@ -62,7 +65,34 @@ class AppointmentCheckInQrTest extends TestCase
         $this->doctor->clinics()->attach($this->clinic->id, [
             'position' => 'director',
             'is_primary' => true,
+            'is_working_hours_activated' => true,
         ]);
+
+        // Operating hours & Doctor schedule
+        for ($dow = 0; $dow <= 6; $dow++) {
+            ClinicOperatingHour::create([
+                'clinic_id' => $this->clinic->id,
+                'day_of_week' => $dow,
+                'is_open' => true,
+                'open_time' => '08:00',
+                'close_time' => '17:00',
+            ]);
+
+            $daySched = DoctorDaySchedule::create([
+                'doctor_id' => $this->doctor->id,
+                'clinic_id' => $this->clinic->id,
+                'day_of_week' => $dow,
+                'is_open' => true,
+            ]);
+
+            foreach (['08:00', '09:00', '10:00', '11:00', '14:00', '15:00', '16:00'] as $slot) {
+                DoctorWorkingSlot::create([
+                    'doctor_day_schedule_id' => $daySched->id,
+                    'time_slot' => $slot,
+                    'is_available' => true,
+                ]);
+            }
+        }
 
         $this->assistantUser = User::factory()->create(['email' => 'assistant@clinic.dz']);
         $this->assistantUser->roles()->attach($assistantRole->id);
@@ -141,6 +171,7 @@ class AppointmentCheckInQrTest extends TestCase
             ]);
 
         $response->assertStatus(200);
+        $response->assertJsonPath('check_in_result', 'checked_in');
         $response->assertJsonPath('data.status', 'attended');
 
         $fresh = $appointment->fresh();
@@ -162,21 +193,41 @@ class AppointmentCheckInQrTest extends TestCase
         ], $this->assistantUser);
         $appointment->update(['status' => 'confirmed']);
 
-        // First Scan -> 200 OK
+        // First Scan -> 200 OK with 'checked_in'
         $first = $this->actingAs($this->assistantUser, 'sanctum')
             ->postJson('/api/v1/appointments/check-in', [
                 'token' => $appointment->secure_token,
             ]);
         $first->assertStatus(200);
+        $first->assertJsonPath('check_in_result', 'checked_in');
+        $first->assertJsonPath('data.status', 'attended');
 
-        // Second Scan with SAME token -> 200 OK (safely idempotent)
+        $firstCheckedInAt = $appointment->fresh()->checked_in_at;
+        $this->assertNotNull($firstCheckedInAt);
+
+        // Status history count should be 1
+        $this->assertEquals(1, \App\Models\AppointmentStatusHistory::where('appointment_id', $appointment->id)
+            ->where('to_status', 'attended')
+            ->count());
+
+        // Second Scan with SAME token -> 200 OK with 'already_checked_in' (safely idempotent)
         $second = $this->actingAs($this->assistantUser, 'sanctum')
             ->postJson('/api/v1/appointments/check-in', [
                 'token' => $appointment->secure_token,
             ]);
 
         $second->assertStatus(200);
+        $second->assertJsonPath('check_in_result', 'already_checked_in');
         $second->assertJsonPath('data.status', 'attended');
+
+        $fresh = $appointment->fresh();
+        $this->assertEquals('attended', $fresh->status);
+        $this->assertEquals($firstCheckedInAt->toIso8601String(), $fresh->checked_in_at->toIso8601String());
+
+        // Status history count remains exactly 1 (no duplicate entries)
+        $this->assertEquals(1, \App\Models\AppointmentStatusHistory::where('appointment_id', $appointment->id)
+            ->where('to_status', 'attended')
+            ->count());
     }
 
     public function test_check_in_with_invalid_token_fails_with_422(): void
@@ -217,5 +268,35 @@ class AppointmentCheckInQrTest extends TestCase
 
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['status']);
+    }
+
+    public function test_multiple_repeated_requests_never_yield_more_than_one_checked_in_discriminator(): void
+    {
+        $bookingService = app(BookingService::class);
+        $appointment = $bookingService->createAppointment([
+            'clinic_id' => $this->clinic->id,
+            'doctor_id' => $this->doctor->id,
+            'patient_name' => 'يوسف عبد الرحمان',
+            'patient_phone' => '0555112233',
+            'appointment_date' => now()->addDays(1)->format('Y-m-d'),
+            'time_slot' => '16:00',
+        ], $this->assistantUser);
+        $appointment->update(['status' => 'confirmed']);
+
+        $results = [];
+        for ($i = 0; $i < 5; $i++) {
+            $res = $this->actingAs($this->assistantUser, 'sanctum')
+                ->postJson('/api/v1/appointments/check-in', [
+                    'token' => $appointment->secure_token,
+                ]);
+            $res->assertStatus(200);
+            $results[] = $res->json('check_in_result');
+        }
+
+        // Exactly one 'checked_in', followed by four 'already_checked_in'
+        $this->assertEquals(['checked_in', 'already_checked_in', 'already_checked_in', 'already_checked_in', 'already_checked_in'], $results);
+        $this->assertEquals(1, \App\Models\AppointmentStatusHistory::where('appointment_id', $appointment->id)
+            ->where('to_status', 'attended')
+            ->count());
     }
 }

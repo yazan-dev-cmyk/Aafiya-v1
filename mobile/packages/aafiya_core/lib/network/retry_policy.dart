@@ -68,7 +68,8 @@ class RetryPolicy {
 
     // Apply bounded jitter: +/- 15%
     final rng = random ?? Random();
-    final double jitterMultiplier = 0.85 + (rng.nextDouble() * 0.30); // [0.85, 1.15]
+    final double jitterMultiplier =
+        0.85 + (rng.nextDouble() * 0.30); // [0.85, 1.15]
     final int jitteredMs = (baseMs * jitterMultiplier).round();
 
     final clampedMs = min(jitteredMs, maxDelay.inMilliseconds);

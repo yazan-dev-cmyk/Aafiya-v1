@@ -45,10 +45,12 @@ class AssistantPatientSearchSheet extends StatefulWidget {
   }
 
   @override
-  State<AssistantPatientSearchSheet> createState() => _AssistantPatientSearchSheetState();
+  State<AssistantPatientSearchSheet> createState() =>
+      _AssistantPatientSearchSheetState();
 }
 
-class _AssistantPatientSearchSheetState extends State<AssistantPatientSearchSheet> {
+class _AssistantPatientSearchSheetState
+    extends State<AssistantPatientSearchSheet> {
   final _searchController = TextEditingController();
   bool _isLoading = false;
   List<PatientSearchResult> _results = [];
@@ -162,7 +164,8 @@ class _AssistantPatientSearchSheetState extends State<AssistantPatientSearchShee
                         prefixIcon: const Icon(Icons.search_rounded, size: 20),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(AafiyaRadius.md),
-                          borderSide: const BorderSide(color: AafiyaColors.border),
+                          borderSide:
+                              const BorderSide(color: AafiyaColors.border),
                         ),
                         isDense: true,
                         contentPadding: const EdgeInsets.symmetric(
@@ -188,7 +191,8 @@ class _AssistantPatientSearchSheetState extends State<AssistantPatientSearchShee
                               color: AafiyaColors.pureWhite,
                             ),
                           )
-                        : const Icon(Icons.arrow_forward_rounded, color: AafiyaColors.pureWhite),
+                        : const Icon(Icons.arrow_forward_rounded,
+                            color: AafiyaColors.pureWhite),
                     onPressed: _isLoading ? null : () => _performSearch(),
                   ),
                 ],
@@ -206,7 +210,8 @@ class _AssistantPatientSearchSheetState extends State<AssistantPatientSearchShee
     );
   }
 
-  Widget _buildBody(LocalizedStrings strings, ScrollController scrollController) {
+  Widget _buildBody(
+      LocalizedStrings strings, ScrollController scrollController) {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -258,11 +263,14 @@ class _AssistantPatientSearchSheetState extends State<AssistantPatientSearchShee
     return ListView.separated(
       controller: scrollController,
       itemCount: _results.length,
-      separatorBuilder: (_, __) => const Divider(height: 1, color: AafiyaColors.border),
+      separatorBuilder: (_, __) =>
+          const Divider(height: 1, color: AafiyaColors.border),
       itemBuilder: (context, index) {
         final patient = _results[index];
-        final canViewContacts = widget.user?.hasPermission('patient.view_contacts') ?? false;
-        final canCreateBooking = widget.user?.hasPermission('booking.create') ?? false;
+        final canViewContacts =
+            widget.user?.hasPermission('patient.view_contacts') ?? false;
+        final canCreateBooking =
+            widget.user?.hasPermission('booking.create') ?? false;
 
         return Material(
           color: Colors.transparent,
@@ -272,9 +280,12 @@ class _AssistantPatientSearchSheetState extends State<AssistantPatientSearchShee
               vertical: AafiyaSpacing.xs,
             ),
             leading: CircleAvatar(
-              backgroundColor: AafiyaColors.healingGreen.withValues(alpha: 0.12),
+              backgroundColor:
+                  AafiyaColors.healingGreen.withValues(alpha: 0.12),
               child: Text(
-                patient.firstName.isNotEmpty ? patient.firstName[0].toUpperCase() : 'P',
+                patient.firstName.isNotEmpty
+                    ? patient.firstName[0].toUpperCase()
+                    : 'P',
                 style: AafiyaTypography.bodyMedium.copyWith(
                   color: AafiyaColors.healingGreen,
                   fontWeight: FontWeight.bold,
@@ -299,7 +310,11 @@ class _AssistantPatientSearchSheetState extends State<AssistantPatientSearchShee
                     ),
                   ),
                 Text(
-                  canViewContacts ? (patient.phone?.isNotEmpty == true ? patient.phone! : '—') : '—',
+                  canViewContacts
+                      ? (patient.phone?.isNotEmpty == true
+                          ? patient.phone!
+                          : '—')
+                      : '—',
                   style: AafiyaTypography.caption.copyWith(
                     color: AafiyaColors.secondaryText,
                   ),
@@ -309,16 +324,20 @@ class _AssistantPatientSearchSheetState extends State<AssistantPatientSearchShee
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (canCreateBooking && (widget.sessionManager != null && widget.user != null || widget.onBookReturnVisit != null))
+                if (canCreateBooking &&
+                    (widget.sessionManager != null && widget.user != null ||
+                        widget.onBookReturnVisit != null))
                   IconButton(
                     key: ValueKey('book_return_visit_${patient.id}'),
-                    icon: const Icon(Icons.calendar_today_rounded, size: 20, color: AafiyaColors.healthBlue),
+                    icon: const Icon(Icons.calendar_today_rounded,
+                        size: 20, color: AafiyaColors.healthBlue),
                     tooltip: strings.bookReturnVisitAction,
                     onPressed: () {
                       Navigator.of(context).pop();
                       if (widget.onBookReturnVisit != null) {
                         widget.onBookReturnVisit!(patient);
-                      } else if (widget.sessionManager != null && widget.user != null) {
+                      } else if (widget.sessionManager != null &&
+                          widget.user != null) {
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (_) => AssistantBookingScreen(

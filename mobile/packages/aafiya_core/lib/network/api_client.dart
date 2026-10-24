@@ -76,7 +76,9 @@ class ApiClient {
       }
     }
 
-    if (includeClinicContext && _activeClinicId != null && _activeClinicId!.isNotEmpty) {
+    if (includeClinicContext &&
+        _activeClinicId != null &&
+        _activeClinicId!.isNotEmpty) {
       headers['X-Clinic-ID'] = _activeClinicId!;
       headers['X-Active-Clinic-ID'] = _activeClinicId!;
     }
@@ -206,7 +208,8 @@ class ApiClient {
     );
 
     // Enforce Decision D-06-01-R1: Only safe idempotent read methods may automatically retry.
-    final bool isEligibleMethod = allowRetry && _retryPolicy.shouldRetryMethod(method);
+    final bool isEligibleMethod =
+        allowRetry && _retryPolicy.shouldRetryMethod(method);
     final int maxAttempts = isEligibleMethod ? _retryPolicy.maxAttempts : 1;
 
     for (int attempt = 1; attempt <= maxAttempts; attempt++) {
@@ -220,7 +223,9 @@ class ApiClient {
         final String? encodedBody = body != null ? jsonEncode(body) : null;
 
         final http.Response response = await switch (method) {
-          'GET' => _httpClient.get(uri, headers: requestHeaders).timeout(_config.receiveTimeout),
+          'GET' => _httpClient
+              .get(uri, headers: requestHeaders)
+              .timeout(_config.receiveTimeout),
           'POST' => _httpClient
               .post(uri, headers: requestHeaders, body: encodedBody)
               .timeout(_config.receiveTimeout),
@@ -234,7 +239,9 @@ class ApiClient {
         };
 
         // Decision D-06-01-R2: Check if HTTP status is transient (502, 503, 504) on safe read methods
-        if (isEligibleMethod && _retryPolicy.isRetryableStatusCode(response.statusCode) && attempt < maxAttempts) {
+        if (isEligibleMethod &&
+            _retryPolicy.isRetryableStatusCode(response.statusCode) &&
+            attempt < maxAttempts) {
           final delay = _retryPolicy.delayForAttempt(attempt);
           if (delay > Duration.zero) {
             await Future<void>.delayed(delay);
@@ -248,7 +255,9 @@ class ApiClient {
           notifyUnauthorized: notifyUnauthorized,
         );
       } on SocketException catch (e) {
-        if (isEligibleMethod && _retryPolicy.isRetryableException(e) && attempt < maxAttempts) {
+        if (isEligibleMethod &&
+            _retryPolicy.isRetryableException(e) &&
+            attempt < maxAttempts) {
           final delay = _retryPolicy.delayForAttempt(attempt);
           if (delay > Duration.zero) {
             await Future<void>.delayed(delay);
@@ -260,7 +269,9 @@ class ApiClient {
           e,
         ));
       } on http.ClientException catch (e) {
-        if (isEligibleMethod && _retryPolicy.isRetryableException(e) && attempt < maxAttempts) {
+        if (isEligibleMethod &&
+            _retryPolicy.isRetryableException(e) &&
+            attempt < maxAttempts) {
           final delay = _retryPolicy.delayForAttempt(attempt);
           if (delay > Duration.zero) {
             await Future<void>.delayed(delay);
@@ -272,7 +283,9 @@ class ApiClient {
           e,
         ));
       } on TimeoutException catch (e) {
-        if (isEligibleMethod && _retryPolicy.isRetryableException(e) && attempt < maxAttempts) {
+        if (isEligibleMethod &&
+            _retryPolicy.isRetryableException(e) &&
+            attempt < maxAttempts) {
           final delay = _retryPolicy.delayForAttempt(attempt);
           if (delay > Duration.zero) {
             await Future<void>.delayed(delay);
@@ -329,7 +342,8 @@ class ApiClient {
       }
     }
 
-    final errorResponse = parsedJson != null ? ApiErrorResponse.fromJson(parsedJson) : null;
+    final errorResponse =
+        parsedJson != null ? ApiErrorResponse.fromJson(parsedJson) : null;
 
     final exception = ApiException.fromStatusCode(
       statusCode: statusCode,

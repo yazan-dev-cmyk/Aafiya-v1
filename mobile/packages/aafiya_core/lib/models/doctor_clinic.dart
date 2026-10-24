@@ -29,7 +29,8 @@ class DoctorClinic {
   final String? joinedAt;
 
   /// Helper indicating if the doctor holds the Medical Director position.
-  bool get isMedicalDirector => isDirector || position.toLowerCase() == 'director';
+  bool get isMedicalDirector =>
+      isDirector || position.toLowerCase() == 'director';
 
   factory DoctorClinic.fromJson(Map<String, dynamic> json) {
     return DoctorClinic(
@@ -72,5 +73,6 @@ class DoctorClinic {
   int get hashCode => id.hashCode;
 
   @override
-  String toString() => 'DoctorClinic(id: $id, name: $name, position: $position, isDirector: $isDirector)';
+  String toString() =>
+      'DoctorClinic(id: $id, name: $name, position: $position, isDirector: $isDirector)';
 }

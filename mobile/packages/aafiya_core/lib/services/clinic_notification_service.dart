@@ -65,7 +65,8 @@ class ClinicNotificationService {
               return ApiFailure<ClinicEscalation>(
                 GenericApiException(
                   statusCode: 0,
-                  message: 'Malformed escalation record in acknowledgment response',
+                  message:
+                      'Malformed escalation record in acknowledgment response',
                   cause: e,
                 ),
               );

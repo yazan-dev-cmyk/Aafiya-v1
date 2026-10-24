@@ -86,7 +86,8 @@ void main() {
       'created_at': '2026-01-01T00:00:00.000Z',
     };
 
-    test('EmergencyProfile.fromJson correctly parses full profile structure', () {
+    test('EmergencyProfile.fromJson correctly parses full profile structure',
+        () {
       final profile = EmergencyProfile.fromJson(sampleJson);
 
       expect(profile.id, equals('pat-uuid-55'));
@@ -172,7 +173,8 @@ void main() {
   });
 
   group('EmergencyProfileService Tests', () {
-    test('getEmergencyProfile calls /patients/me and returns EmergencyProfile', () async {
+    test('getEmergencyProfile calls /patients/me and returns EmergencyProfile',
+        () async {
       final mockClient = MockClient((request) async {
         expect(request.url.path, endsWith('/patients/me'));
         return http.Response(
@@ -209,7 +211,9 @@ void main() {
       expect(profile.bloodGroup, equals('B+'));
     });
 
-    test('getPatientSummary calls /patients/{id} with clinic header and returns EmergencyProfile', () async {
+    test(
+        'getPatientSummary calls /patients/{id} with clinic header and returns EmergencyProfile',
+        () async {
       const patientId = '01a084d2-381a-7039-bde1-460d64d06daa';
       const clinicId = '01a084d2-021f-71eb-b09c-39d9ddce3458';
 
@@ -286,7 +290,8 @@ void main() {
       expect(profile.allergies.first.isLifeThreatening, isTrue);
       expect(profile.allergies.first.isSevere, isFalse);
       expect(profile.chronicConditions.length, equals(1));
-      expect(profile.chronicConditions.first.conditionName, equals('السكري من النوع 2'));
+      expect(profile.chronicConditions.first.conditionName,
+          equals('السكري من النوع 2'));
       expect(profile.emergencyContacts.length, equals(1));
       expect(profile.emergencyContacts.first.name, equals('فاطمة اختباري'));
       expect(profile.emergencyContacts.first.isPrimary, isTrue);
@@ -313,7 +318,8 @@ void main() {
       final failure = result as ApiFailure<EmergencyProfile>;
       expect(failure.exception, isA<ForbiddenException>());
       expect((failure.exception as ForbiddenException).statusCode, equals(403));
-      expect(failure.exception.message, contains('غير مصرح لك بعرض الملف الطبي'));
+      expect(
+          failure.exception.message, contains('غير مصرح لك بعرض الملف الطبي'));
     });
   });
 }

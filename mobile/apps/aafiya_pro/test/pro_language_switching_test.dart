@@ -25,7 +25,8 @@ class _ProShellHarness extends StatefulWidget {
   const _ProShellHarness({required this.initialLocale, required this.builder});
 
   final Locale initialLocale;
-  final Widget Function(Locale locale, ValueChanged<Locale> onLocaleChanged) builder;
+  final Widget Function(Locale locale, ValueChanged<Locale> onLocaleChanged)
+      builder;
 
   @override
   State<_ProShellHarness> createState() => _ProShellHarnessState();
@@ -76,16 +77,21 @@ void main() {
       await tester.pump();
     }
 
-    testWidgets('renders the language selector when onLocaleChanged is provided', (tester) async {
+    testWidgets(
+        'renders the language selector when onLocaleChanged is provided',
+        (tester) async {
       await pumpSplash(tester);
 
-      final selector = tester.widget<SegmentedButton<String>>(find.byType(SegmentedButton<String>));
+      final selector = tester.widget<SegmentedButton<String>>(
+          find.byType(SegmentedButton<String>));
       expect(selector.selected, equals({'ar'}));
 
       await tester.pump(const Duration(milliseconds: 700));
     });
 
-    testWidgets('hides the language selector when onLocaleChanged is not provided', (tester) async {
+    testWidgets(
+        'hides the language selector when onLocaleChanged is not provided',
+        (tester) async {
       await tester.pumpWidget(
         _wrapApp(
           child: ProSplashShell(
@@ -102,26 +108,32 @@ void main() {
       await tester.pump(const Duration(milliseconds: 700));
     });
 
-    testWidgets('selecting French updates the active segment at runtime', (tester) async {
+    testWidgets('selecting French updates the active segment at runtime',
+        (tester) async {
       await pumpSplash(tester);
 
       await tester.tap(find.text('FR'));
       await tester.pump();
 
-      final selector = tester.widget<SegmentedButton<String>>(find.byType(SegmentedButton<String>));
+      final selector = tester.widget<SegmentedButton<String>>(
+          find.byType(SegmentedButton<String>));
       expect(selector.selected, equals({'fr'}));
 
       await tester.pump(const Duration(milliseconds: 700));
     });
 
-    testWidgets('switching locale changes layout directionality without restart', (tester) async {
+    testWidgets(
+        'switching locale changes layout directionality without restart',
+        (tester) async {
       await pumpSplash(tester);
-      expect(Directionality.of(tester.element(find.byType(ProSplashShell))), TextDirection.rtl);
+      expect(Directionality.of(tester.element(find.byType(ProSplashShell))),
+          TextDirection.rtl);
 
       await tester.tap(find.text('EN'));
       await tester.pump();
 
-      expect(Directionality.of(tester.element(find.byType(ProSplashShell))), TextDirection.ltr);
+      expect(Directionality.of(tester.element(find.byType(ProSplashShell))),
+          TextDirection.ltr);
 
       await tester.pump(const Duration(milliseconds: 700));
     });
@@ -157,13 +169,16 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    testWidgets('renders the language menu in the AppBar when onLocaleChanged is provided', (tester) async {
+    testWidgets(
+        'renders the language menu in the AppBar when onLocaleChanged is provided',
+        (tester) async {
       await pumpAuth(tester);
 
       expect(find.byIcon(Icons.language_rounded), findsOneWidget);
     });
 
-    testWidgets('hides the language icon when onLocaleChanged is not provided', (tester) async {
+    testWidgets('hides the language icon when onLocaleChanged is not provided',
+        (tester) async {
       await tester.pumpWidget(
         _wrapApp(
           child: ProAuthShell(
@@ -178,7 +193,8 @@ void main() {
       expect(find.byIcon(Icons.language_rounded), findsNothing);
     });
 
-    testWidgets('opening the menu lists Arabic, English and French options', (tester) async {
+    testWidgets('opening the menu lists Arabic, English and French options',
+        (tester) async {
       await pumpAuth(tester);
 
       await tester.tap(find.byIcon(Icons.language_rounded));
@@ -189,7 +205,9 @@ void main() {
       expect(find.text('Français'), findsOneWidget);
     });
 
-    testWidgets('selecting French switches the shell content at runtime without restart', (tester) async {
+    testWidgets(
+        'selecting French switches the shell content at runtime without restart',
+        (tester) async {
       await pumpAuth(tester);
 
       expect(find.text('Votre passerelle vers Aafiya'), findsNothing);
@@ -202,16 +220,20 @@ void main() {
       expect(find.text('Votre passerelle vers Aafiya'), findsOneWidget);
     });
 
-    testWidgets('selecting English switches layout directionality at runtime without restart', (tester) async {
+    testWidgets(
+        'selecting English switches layout directionality at runtime without restart',
+        (tester) async {
       await pumpAuth(tester);
-      expect(Directionality.of(tester.element(find.byType(ProAuthShell))), TextDirection.rtl);
+      expect(Directionality.of(tester.element(find.byType(ProAuthShell))),
+          TextDirection.rtl);
 
       await tester.tap(find.byIcon(Icons.language_rounded));
       await tester.pumpAndSettle();
       await tester.tap(find.text('English'));
       await tester.pumpAndSettle();
 
-      expect(Directionality.of(tester.element(find.byType(ProAuthShell))), TextDirection.ltr);
+      expect(Directionality.of(tester.element(find.byType(ProAuthShell))),
+          TextDirection.ltr);
     });
   });
 }

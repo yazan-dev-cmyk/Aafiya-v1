@@ -167,12 +167,14 @@ class QueuePatientTile extends StatelessWidget {
                     borderRadius: BorderRadius.circular(AafiyaRadius.sm),
                     onTap: onViewSummary,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         color: AafiyaColors.healthBlue.withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(AafiyaRadius.sm),
                         border: Border.all(
-                          color: AafiyaColors.healthBlue.withValues(alpha: 0.25),
+                          color:
+                              AafiyaColors.healthBlue.withValues(alpha: 0.25),
                         ),
                       ),
                       child: Row(
@@ -255,7 +257,8 @@ class QueuePatientTile extends StatelessWidget {
             ],
 
             // Patient notes if available
-            if (appointment.notes != null && appointment.notes!.trim().isNotEmpty) ...[
+            if (appointment.notes != null &&
+                appointment.notes!.trim().isNotEmpty) ...[
               const SizedBox(height: AafiyaSpacing.xs),
               Text(
                 appointment.notes!,
@@ -301,7 +304,8 @@ class QueuePatientTile extends StatelessWidget {
                             vertical: 12,
                           ),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AafiyaRadius.sm),
+                            borderRadius:
+                                BorderRadius.circular(AafiyaRadius.sm),
                           ),
                         ),
                         onPressed: isProcessing ? null : onAttend,
@@ -327,7 +331,8 @@ class QueuePatientTile extends StatelessWidget {
                             vertical: 12,
                           ),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AafiyaRadius.sm),
+                            borderRadius:
+                                BorderRadius.circular(AafiyaRadius.sm),
                           ),
                         ),
                         onPressed: isProcessing ? null : onNoShow,
@@ -388,10 +393,22 @@ class QueuePatientTile extends StatelessWidget {
     LocalizedStrings strings,
   ) {
     final (label, type) = switch (status) {
-      AppointmentStatus.confirmed => (strings.filterConfirmed, AafiyaStatusType.confirmed),
-      AppointmentStatus.attended => (strings.filterAttended, AafiyaStatusType.concluded),
-      AppointmentStatus.noShow => (strings.filterNoShow, AafiyaStatusType.urgent),
-      AppointmentStatus.pending => (strings.pendingCheckInLabel, AafiyaStatusType.pending),
+      AppointmentStatus.confirmed => (
+          strings.filterConfirmed,
+          AafiyaStatusType.confirmed
+        ),
+      AppointmentStatus.attended => (
+          strings.filterAttended,
+          AafiyaStatusType.concluded
+        ),
+      AppointmentStatus.noShow => (
+          strings.filterNoShow,
+          AafiyaStatusType.urgent
+        ),
+      AppointmentStatus.pending => (
+          strings.pendingCheckInLabel,
+          AafiyaStatusType.pending
+        ),
       _ => (status.key, AafiyaStatusType.concluded),
     };
 

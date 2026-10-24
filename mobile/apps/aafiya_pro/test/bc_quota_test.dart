@@ -173,7 +173,10 @@ void main() {
         'units': -1,
         'balance_after': 574,
         'reference_note': 'خصم حصة تأكيد الموعد BK-9988',
-        'appointment': {'booking_reference': 'BK-9988', 'patient_name': 'Amine'},
+        'appointment': {
+          'booking_reference': 'BK-9988',
+          'patient_name': 'Amine'
+        },
         'created_at': '2026-09-20T14:00:00.000000Z',
       },
       {
@@ -183,7 +186,10 @@ void main() {
         'units': 1,
         'balance_after': 575,
         'reference_note': 'استرداد حصة الموعد BK-9988 - السبب: إلغاء العيادة',
-        'appointment': {'booking_reference': 'BK-9988', 'patient_name': 'Amine'},
+        'appointment': {
+          'booking_reference': 'BK-9988',
+          'patient_name': 'Amine'
+        },
         'created_at': '2026-09-20T16:00:00.000000Z',
       },
     ]
@@ -226,7 +232,8 @@ void main() {
   });
 
   group('B. QuotaBalanceCard Unit & Widget Tests', () {
-    testWidgets('renders center name and authoritative numeric quota balance', (tester) async {
+    testWidgets('renders center name and authoritative numeric quota balance',
+        (tester) async {
       await tester.pumpWidget(
         createTestWidget(
           child: const QuotaBalanceCard(
@@ -242,7 +249,9 @@ void main() {
       expect(find.byKey(const Key('quota_balance_value')), findsOneWidget);
     });
 
-    testWidgets('zero quota state renders zero balance and warning banner without error', (tester) async {
+    testWidgets(
+        'zero quota state renders zero balance and warning banner without error',
+        (tester) async {
       await tester.pumpWidget(
         createTestWidget(
           child: const QuotaBalanceCard(
@@ -254,11 +263,15 @@ void main() {
       );
 
       expect(find.text('0 الحصص'), findsOneWidget);
-      expect(find.text('الرصيد الحالي 0 — لا يمكن تأكيد حجوزات جديدة دون شحن باقة.'), findsOneWidget);
+      expect(
+          find.text(
+              'الرصيد الحالي 0 — لا يمكن تأكيد حجوزات جديدة دون شحن باقة.'),
+          findsOneWidget);
       expect(find.byIcon(Icons.warning_amber_rounded), findsOneWidget);
     });
 
-    testWidgets('triggers refresh and recharge callbacks when tapped', (tester) async {
+    testWidgets('triggers refresh and recharge callbacks when tapped',
+        (tester) async {
       bool refreshed = false;
       bool recharged = false;
 
@@ -285,15 +298,19 @@ void main() {
   });
 
   group('C. BcQuotaScreen Contract & API Integration Tests', () {
-    testWidgets('loads and renders authoritative quota, packages, requests, and transactions', (tester) async {
+    testWidgets(
+        'loads and renders authoritative quota, packages, requests, and transactions',
+        (tester) async {
       final mockClient = MockClient((request) async {
-        if (request.url.path.contains('/api/v1/booking-centers/quota-balance')) {
+        if (request.url.path
+            .contains('/api/v1/booking-centers/quota-balance')) {
           return jsonResponse(mockQuotaPayload);
         }
         if (request.url.path.contains('/api/v1/booking-packages')) {
           return jsonResponse(mockPackagesPayload);
         }
-        if (request.url.path.contains('/api/v1/booking-centers/purchase-requests')) {
+        if (request.url.path
+            .contains('/api/v1/booking-centers/purchase-requests')) {
           return jsonResponse(mockRequestsPayload);
         }
         if (request.url.path.contains('/api/v1/booking-centers/transactions')) {
@@ -302,8 +319,10 @@ void main() {
         return jsonResponse({'message': 'Not Found'}, 404);
       });
 
-      final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
-      sessionManager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
+      final apiClient =
+          ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+      sessionManager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
 
       await tester.pumpWidget(
         createTestWidget(
@@ -353,15 +372,19 @@ void main() {
       expect(find.text('الرصيد بعد العملية: 574'), findsOneWidget);
     });
 
-    testWidgets('zero quota balance displays cleanly without treating as API failure', (tester) async {
+    testWidgets(
+        'zero quota balance displays cleanly without treating as API failure',
+        (tester) async {
       final mockClient = MockClient((request) async {
-        if (request.url.path.contains('/api/v1/booking-centers/quota-balance')) {
+        if (request.url.path
+            .contains('/api/v1/booking-centers/quota-balance')) {
           return jsonResponse(mockZeroQuotaPayload);
         }
         if (request.url.path.contains('/api/v1/booking-packages')) {
           return jsonResponse(mockPackagesPayload);
         }
-        if (request.url.path.contains('/api/v1/booking-centers/purchase-requests')) {
+        if (request.url.path
+            .contains('/api/v1/booking-centers/purchase-requests')) {
           return jsonResponse({'data': []});
         }
         if (request.url.path.contains('/api/v1/booking-centers/transactions')) {
@@ -370,8 +393,10 @@ void main() {
         return jsonResponse({'message': 'Not Found'}, 404);
       });
 
-      final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
-      sessionManager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
+      final apiClient =
+          ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+      sessionManager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
 
       await tester.pumpWidget(
         createTestWidget(
@@ -387,24 +412,31 @@ void main() {
       await tester.pump(const Duration(milliseconds: 200));
 
       expect(find.text('0 الحصص'), findsOneWidget);
-      expect(find.text('الرصيد الحالي 0 — لا يمكن تأكيد حجوزات جديدة دون شحن باقة.'), findsOneWidget);
+      expect(
+          find.text(
+              'الرصيد الحالي 0 — لا يمكن تأكيد حجوزات جديدة دون شحن باقة.'),
+          findsOneWidget);
       expect(find.text('تعذر تحميل'), findsNothing);
     });
 
-    testWidgets('purchase request submission sends POST and refreshes without local quota mutation', (tester) async {
+    testWidgets(
+        'purchase request submission sends POST and refreshes without local quota mutation',
+        (tester) async {
       int quotaFetchCount = 0;
       int requestsFetchCount = 0;
       bool purchasePosted = false;
 
       final mockClient = MockClient((request) async {
-        if (request.url.path.contains('/api/v1/booking-centers/quota-balance')) {
+        if (request.url.path
+            .contains('/api/v1/booking-centers/quota-balance')) {
           quotaFetchCount++;
           return jsonResponse(mockQuotaPayload);
         }
         if (request.url.path.contains('/api/v1/booking-packages')) {
           return jsonResponse(mockPackagesPayload);
         }
-        if (request.url.path.contains('/api/v1/booking-centers/purchase-requests')) {
+        if (request.url.path
+            .contains('/api/v1/booking-centers/purchase-requests')) {
           if (request.method == 'POST') {
             purchasePosted = true;
             final body = jsonDecode(request.body) as Map<String, dynamic>;
@@ -439,8 +471,10 @@ void main() {
         return jsonResponse({'message': 'Not Found'}, 404);
       });
 
-      final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
-      sessionManager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
+      final apiClient =
+          ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+      sessionManager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
 
       await tester.pumpWidget(
         createTestWidget(
@@ -458,7 +492,8 @@ void main() {
       await tester.tap(find.byKey(const Key('buy_package_button_PKG_100')));
       await tester.pumpAndSettle();
 
-      expect(find.byKey(const Key('submit_purchase_request_button')), findsOneWidget);
+      expect(find.byKey(const Key('submit_purchase_request_button')),
+          findsOneWidget);
       expect(find.text('طلب شراء باقة'), findsWidgets);
       expect(find.text('بريدي موب'), findsOneWidget);
 
@@ -478,7 +513,8 @@ void main() {
       expect(purchasePosted, isTrue);
 
       // Verified: Success SnackBar shown
-      expect(find.text('تم تقديم طلب شراء الباقة بنجاح وهو قيد المراجعة.'), findsOneWidget);
+      expect(find.text('تم تقديم طلب شراء الباقة بنجاح وهو قيد المراجعة.'),
+          findsOneWidget);
 
       // Verified: Quota & requests re-fetched from server
       expect(quotaFetchCount, greaterThan(1));
@@ -489,7 +525,8 @@ void main() {
       expect(find.text('175 الحصص'), findsNothing);
     });
 
-    testWidgets('error state renders retry button and reloads on retry', (tester) async {
+    testWidgets('error state renders retry button and reloads on retry',
+        (tester) async {
       int attempt = 0;
       final mockClient = MockClient((request) async {
         attempt++;
@@ -499,8 +536,10 @@ void main() {
         return jsonResponse(mockQuotaPayload);
       });
 
-      final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
-      sessionManager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
+      final apiClient =
+          ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+      sessionManager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
 
       await tester.pumpWidget(
         createTestWidget(
@@ -527,16 +566,21 @@ void main() {
   });
 
   group('D. BookingCenterShell & DISC-04 Scope Enforcement Tests', () {
-    testWidgets('renders shell with quota card, packages navigation tile, and zero staff management UI', (tester) async {
+    testWidgets(
+        'renders shell with quota card, packages navigation tile, and zero staff management UI',
+        (tester) async {
       final mockClient = MockClient((request) async {
-        if (request.url.path.contains('/api/v1/booking-centers/quota-balance')) {
+        if (request.url.path
+            .contains('/api/v1/booking-centers/quota-balance')) {
           return jsonResponse(mockQuotaPayload);
         }
         return jsonResponse({'data': []});
       });
 
-      final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
-      sessionManager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
+      final apiClient =
+          ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+      sessionManager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
 
       await tester.pumpWidget(
         createTestWidget(
@@ -554,7 +598,8 @@ void main() {
 
       expect(find.text('مركز حجز: مركز الجزائر للحجوزات'), findsOneWidget);
       expect(find.text('75 الحصص'), findsOneWidget);
-      expect(find.byKey(const Key('open_quota_dashboard_tile')), findsOneWidget);
+      expect(
+          find.byKey(const Key('open_quota_dashboard_tile')), findsOneWidget);
 
       // DISC-04 STRICT NEGATIVE ASSERTIONS
       expect(find.text('إدارة الموظفين'), findsNothing);
@@ -571,7 +616,8 @@ void main() {
   });
 
   group('E. Trilingual Localization Tests (AR, EN, FR)', () {
-    testWidgets('renders Arabic strings with RTL directionality', (tester) async {
+    testWidgets('renders Arabic strings with RTL directionality',
+        (tester) async {
       await tester.pumpWidget(
         createTestWidget(
           locale: const Locale('ar'),

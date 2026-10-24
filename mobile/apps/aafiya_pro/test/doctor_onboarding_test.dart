@@ -95,7 +95,9 @@ void main() {
   });
 
   group('DoctorSetupReminderBanner — Widget Tests', () {
-    testWidgets('1. Director: Renders amber warning when clinic hours unconfigured', (tester) async {
+    testWidgets(
+        '1. Director: Renders amber warning when clinic hours unconfigured',
+        (tester) async {
       bool configureClinicTapped = false;
       bool refreshTapped = false;
 
@@ -122,7 +124,9 @@ void main() {
       expect(refreshTapped, isTrue);
     });
 
-    testWidgets('2. Employed Doctor: Renders waiting notice without editing controls when clinic hours unconfigured', (tester) async {
+    testWidgets(
+        '2. Employed Doctor: Renders waiting notice without editing controls when clinic hours unconfigured',
+        (tester) async {
       await tester.pumpWidget(
         createTestApp(
           child: DoctorSetupReminderBanner(
@@ -142,7 +146,9 @@ void main() {
       expect(find.text('تهيئة ساعات العيادة'), findsNothing);
     });
 
-    testWidgets('3. Doctor Schedule Incomplete: Renders primary blue activation banner', (tester) async {
+    testWidgets(
+        '3. Doctor Schedule Incomplete: Renders primary blue activation banner',
+        (tester) async {
       bool configureScheduleTapped = false;
 
       await tester.pumpWidget(
@@ -165,7 +171,9 @@ void main() {
       expect(configureScheduleTapped, isTrue);
     });
 
-    testWidgets('4. Setup Complete: Hides completely when both configured and activated', (tester) async {
+    testWidgets(
+        '4. Setup Complete: Hides completely when both configured and activated',
+        (tester) async {
       await tester.pumpWidget(
         createTestApp(
           child: DoctorSetupReminderBanner(
@@ -182,7 +190,8 @@ void main() {
       expect(find.byType(Container), findsNothing);
     });
 
-    testWidgets('5. Error: Displays error banner with retry button', (tester) async {
+    testWidgets('5. Error: Displays error banner with retry button',
+        (tester) async {
       bool refreshTapped = false;
 
       await tester.pumpWidget(
@@ -200,7 +209,9 @@ void main() {
       );
 
       expect(find.byIcon(Icons.error_outline_rounded), findsOneWidget);
-      expect(find.text('تعذر التحقق من حالة ساعات العمل. انقر لإعادة المحاولة.'), findsOneWidget);
+      expect(
+          find.text('تعذر التحقق من حالة ساعات العمل. انقر لإعادة المحاولة.'),
+          findsOneWidget);
 
       await tester.tap(find.byIcon(Icons.refresh_rounded));
       expect(refreshTapped, isTrue);
@@ -208,7 +219,9 @@ void main() {
   });
 
   group('DoctorOnboardingDialog — Widget Tests', () {
-    testWidgets('1. Director: Renders 2-step stepper and calls onConfigureClinic', (tester) async {
+    testWidgets(
+        '1. Director: Renders 2-step stepper and calls onConfigureClinic',
+        (tester) async {
       bool configureClinicCalled = false;
       bool laterCalled = false;
 
@@ -240,7 +253,8 @@ void main() {
       expect(find.text('الإعداد والتهيئة التشغيلية'), findsOneWidget);
       expect(find.text('تهيئة المنشأة وتفعيل جدول العمل'), findsOneWidget);
       expect(find.text('• عيادة النور'), findsOneWidget);
-      expect(find.text('الخطوة 1: ساعات تشغيل العيادة العامة'), findsNWidgets(2)); // Stepper & Context card
+      expect(find.text('الخطوة 1: ساعات تشغيل العيادة العامة'),
+          findsNWidgets(2)); // Stepper & Context card
       expect(find.text('الخطوة 2: جدول عمل الطبيب الأسبوعي'), findsOneWidget);
 
       await tester.tap(find.text('تهيئة ساعات العيادة'));
@@ -250,7 +264,8 @@ void main() {
       expect(laterCalled, isFalse);
     });
 
-    testWidgets('2. Later button invokes onLater and closes dialog', (tester) async {
+    testWidgets('2. Later button invokes onLater and closes dialog',
+        (tester) async {
       bool laterCalled = false;
 
       await tester.pumpWidget(
@@ -285,7 +300,9 @@ void main() {
       expect(find.byType(DoctorOnboardingDialog), findsNothing);
     });
 
-    testWidgets('3. Employed Doctor: Displays waiting explanation when clinic unconfigured', (tester) async {
+    testWidgets(
+        '3. Employed Doctor: Displays waiting explanation when clinic unconfigured',
+        (tester) async {
       bool laterCalled = false;
 
       await tester.pumpWidget(

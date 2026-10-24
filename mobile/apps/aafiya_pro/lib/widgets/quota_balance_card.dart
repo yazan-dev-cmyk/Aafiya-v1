@@ -30,7 +30,8 @@ class QuotaBalanceCard extends StatelessWidget {
     final isZero = quotaBalance == 0;
 
     return AafiyaCard(
-      backgroundColor: isZero ? const Color(0xFF1E293B) : AafiyaColors.healthBlue,
+      backgroundColor:
+          isZero ? const Color(0xFF1E293B) : AafiyaColors.healthBlue,
       padding: AafiyaSpacing.insetAllLg,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -70,10 +71,12 @@ class QuotaBalanceCard extends StatelessWidget {
                           height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(AafiyaColors.pureWhite),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                AafiyaColors.pureWhite),
                           ),
                         )
-                      : const Icon(Icons.refresh_rounded, color: AafiyaColors.pureWhite),
+                      : const Icon(Icons.refresh_rounded,
+                          color: AafiyaColors.pureWhite),
                   tooltip: strings.retry,
                   onPressed: isLoading ? null : onRefresh,
                 ),
@@ -96,7 +99,8 @@ class QuotaBalanceCard extends StatelessWidget {
               children: [
                 Icon(
                   Icons.confirmation_num_rounded,
-                  color: isZero ? const Color(0xFFFCA5A5) : AafiyaColors.pureWhite,
+                  color:
+                      isZero ? const Color(0xFFFCA5A5) : AafiyaColors.pureWhite,
                   size: 28,
                 ),
                 const SizedBox(width: 12),
@@ -117,14 +121,17 @@ class QuotaBalanceCard extends StatelessWidget {
                               width: 60,
                               child: LinearProgressIndicator(
                                 backgroundColor: Colors.transparent,
-                                valueColor: AlwaysStoppedAnimation<Color>(AafiyaColors.pureWhite),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    AafiyaColors.pureWhite),
                               ),
                             )
                           : Text(
                               '$quotaBalance ${strings.unitsLabel}',
                               key: const Key('quota_balance_value'),
                               style: AafiyaTypography.headlineMedium.copyWith(
-                                color: isZero ? const Color(0xFFFCA5A5) : AafiyaColors.pureWhite,
+                                color: isZero
+                                    ? const Color(0xFFFCA5A5)
+                                    : AafiyaColors.pureWhite,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -139,12 +146,16 @@ class QuotaBalanceCard extends StatelessWidget {
                     label: Text(strings.purchaseRequest),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AafiyaColors.pureWhite,
-                      foregroundColor: isZero ? const Color(0xFF1E293B) : AafiyaColors.healthBlue,
+                      foregroundColor: isZero
+                          ? const Color(0xFF1E293B)
+                          : AafiyaColors.healthBlue,
                       elevation: 0,
                       minimumSize: Size.zero,
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      textStyle: AafiyaTypography.labelSmall.copyWith(fontWeight: FontWeight.bold),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                      textStyle: AafiyaTypography.labelSmall
+                          .copyWith(fontWeight: FontWeight.bold),
                       shape: RoundedRectangleBorder(
                         borderRadius: AafiyaRadius.borderSm,
                       ),
@@ -160,11 +171,13 @@ class QuotaBalanceCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AafiyaColors.error.withValues(alpha: 0.15),
                 borderRadius: AafiyaRadius.borderSm,
-                border: Border.all(color: AafiyaColors.error.withValues(alpha: 0.3)),
+                border: Border.all(
+                    color: AafiyaColors.error.withValues(alpha: 0.3)),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.warning_amber_rounded, color: Color(0xFFFCA5A5), size: 18),
+                  const Icon(Icons.warning_amber_rounded,
+                      color: Color(0xFFFCA5A5), size: 18),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(

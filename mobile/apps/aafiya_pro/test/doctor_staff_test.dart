@@ -110,7 +110,8 @@ void main() {
   );
 
   group('DoctorShell Staff Navigation Visibility & Clinic Switching', () {
-    testWidgets('Shows 5 navigation items when active clinic is Medical Director',
+    testWidgets(
+        'Shows 5 navigation items when active clinic is Medical Director',
         (tester) async {
       final tokenStorage = InMemoryTokenStorage();
       final sessionManager = AuthSessionManager(
@@ -138,7 +139,14 @@ void main() {
         }
         if (req.url.path.endsWith('/doctor/dashboard/stats')) {
           return http.Response(
-            jsonEncode({'data': {'total_today': 0, 'completed_today': 0, 'waiting': 0, 'in_progress': 0}}),
+            jsonEncode({
+              'data': {
+                'total_today': 0,
+                'completed_today': 0,
+                'waiting': 0,
+                'in_progress': 0
+              }
+            }),
             200,
           );
         }
@@ -171,7 +179,8 @@ void main() {
       expect(find.text('طاقم العيادة'), findsOneWidget);
     });
 
-    testWidgets('Shows 3 navigation items when active clinic is Employed Doctor',
+    testWidgets(
+        'Shows 3 navigation items when active clinic is Employed Doctor',
         (tester) async {
       final tokenStorage = InMemoryTokenStorage();
       final sessionManager = AuthSessionManager(
@@ -218,7 +227,8 @@ void main() {
       expect(find.text('طاقم العيادة'), findsNothing);
     });
 
-    testWidgets('Clamps tab index to 0 when switching from Director to Employed clinic',
+    testWidgets(
+        'Clamps tab index to 0 when switching from Director to Employed clinic',
         (tester) async {
       final tokenStorage = InMemoryTokenStorage();
       final sessionManager = AuthSessionManager(
@@ -264,7 +274,8 @@ void main() {
             200,
           );
         }
-        if (req.url.path.endsWith('/clinics/${directorClinic.id}/doctor-invitations')) {
+        if (req.url.path
+            .endsWith('/clinics/${directorClinic.id}/doctor-invitations')) {
           return http.Response(jsonEncode({'data': []}), 200);
         }
         return http.Response('{}', 200);
@@ -328,7 +339,8 @@ void main() {
             200,
           );
         }
-        if (req.url.path.endsWith('/clinics/${directorClinic.id}/doctor-invitations')) {
+        if (req.url.path
+            .endsWith('/clinics/${directorClinic.id}/doctor-invitations')) {
           return http.Response(
             jsonEncode({
               'data': [
@@ -381,7 +393,8 @@ void main() {
       expect(find.text('2 الصلاحيات'), findsOneWidget);
     });
 
-    testWidgets('Director gate blocks non-director active clinic', (tester) async {
+    testWidgets('Director gate blocks non-director active clinic',
+        (tester) async {
       final tokenStorage = InMemoryTokenStorage();
       final sessionManager = AuthSessionManager(
         tokenStorage: tokenStorage,
@@ -406,7 +419,8 @@ void main() {
   });
 
   group('StaffDetailSheet Guarding & Actions', () {
-    testWidgets('Self / Primary Director: destructive actions hidden and notice shown',
+    testWidgets(
+        'Self / Primary Director: destructive actions hidden and notice shown',
         (tester) async {
       final staffService = ClinicStaffService(apiClient: ApiClient());
 
@@ -434,13 +448,16 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text(sampleDirector.name), findsOneWidget);
-      expect(find.text('لا يمكنك تعليق أو فصل حسابك الخاص أو المدير الرئيسي للعيادة.'),
+      expect(
+          find.text(
+              'لا يمكنك تعليق أو فصل حسابك الخاص أو المدير الرئيسي للعيادة.'),
           findsOneWidget);
       expect(find.text('تعليق الحساب'), findsNothing);
       expect(find.text('فصل الطبيب من العيادة'), findsNothing);
     });
 
-    testWidgets('Employed Doctor: shows suspend & detach buttons and confirmation dialog',
+    testWidgets(
+        'Employed Doctor: shows suspend & detach buttons and confirmation dialog',
         (tester) async {
       final staffService = ClinicStaffService(apiClient: ApiClient());
 
@@ -485,7 +502,8 @@ void main() {
       expect(find.text('تأكيد تعليق الحساب'), findsNothing);
     });
 
-    testWidgets('Assistant: shows permissions chips and edit permissions button',
+    testWidgets(
+        'Assistant: shows permissions chips and edit permissions button',
         (tester) async {
       final staffService = ClinicStaffService(apiClient: ApiClient());
 
@@ -519,7 +537,8 @@ void main() {
   });
 
   group('AddDoctorSheet & AddAssistantSheet Modals', () {
-    testWidgets('AddDoctorSheet displays dual tabs (Lookup & Create)', (tester) async {
+    testWidgets('AddDoctorSheet displays dual tabs (Lookup & Create)',
+        (tester) async {
       final staffService = ClinicStaffService(apiClient: ApiClient());
 
       await tester.pumpWidget(createTestApp(
@@ -547,7 +566,8 @@ void main() {
       expect(find.text('إنشاء حساب جديد'), findsOneWidget);
     });
 
-    testWidgets('AddAssistantSheet displays input fields and Layer 4 permissions',
+    testWidgets(
+        'AddAssistantSheet displays input fields and Layer 4 permissions',
         (tester) async {
       final staffService = ClinicStaffService(apiClient: ApiClient());
 

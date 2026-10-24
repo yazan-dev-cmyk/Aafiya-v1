@@ -53,13 +53,21 @@ void main() {
   }
 
   group('AssistantShell & Queue Operational Tests', () {
-    testWidgets('1. AssistantShell renders app bar with assistant name, role title, and handles logout', (tester) async {
+    testWidgets(
+        '1. AssistantShell renders app bar with assistant name, role title, and handles logout',
+        (tester) async {
       var signedOut = false;
 
       final mockClient = MockClient((request) async {
-        return http.Response(jsonEncode({'data': [], 'meta': {'current_page': 1, 'last_page': 1}}), 200, headers: {
-          'content-type': 'application/json',
-        });
+        return http.Response(
+            jsonEncode({
+              'data': [],
+              'meta': {'current_page': 1, 'last_page': 1}
+            }),
+            200,
+            headers: {
+              'content-type': 'application/json',
+            });
       });
 
       final apiClient = ApiClient(httpClient: mockClient);
@@ -94,48 +102,56 @@ void main() {
       expect(signedOut, isTrue);
     });
 
-    testWidgets('2. Displays Waiting Room and Expected Check-In tabs with counts and switches tabs', (tester) async {
+    testWidgets(
+        '2. Displays Waiting Room and Expected Check-In tabs with counts and switches tabs',
+        (tester) async {
       final mockClient = MockClient((request) async {
         final status = request.url.queryParameters['status'];
         if (status == 'attended') {
-          return http.Response(jsonEncode({
-            'data': [
-              {
-                'id': 'appt-01',
-                'booking_reference': 'BK-001',
-                'status': 'attended',
-                'appointment_date': '2026-09-16',
-                'time_slot': '09:00',
-                'checked_in_at': '2026-09-16T09:10:00.000000Z',
-                'patient': {
-                  'id': 'patient-01',
-                  'name': 'فاطمة الزهراء',
-                  'mrn': 'MRN-001',
-                  'phone': '0555112233',
-                },
-              }
-            ],
-            'meta': {'current_page': 1, 'last_page': 1}
-          }), 200, headers: {'content-type': 'application/json'});
+          return http.Response(
+              jsonEncode({
+                'data': [
+                  {
+                    'id': 'appt-01',
+                    'booking_reference': 'BK-001',
+                    'status': 'attended',
+                    'appointment_date': '2026-09-16',
+                    'time_slot': '09:00',
+                    'checked_in_at': '2026-09-16T09:10:00.000000Z',
+                    'patient': {
+                      'id': 'patient-01',
+                      'name': 'فاطمة الزهراء',
+                      'mrn': 'MRN-001',
+                      'phone': '0555112233',
+                    },
+                  }
+                ],
+                'meta': {'current_page': 1, 'last_page': 1}
+              }),
+              200,
+              headers: {'content-type': 'application/json'});
         } else {
-          return http.Response(jsonEncode({
-            'data': [
-              {
-                'id': 'appt-02',
-                'booking_reference': 'BK-002',
-                'status': 'confirmed',
-                'appointment_date': '2026-09-16',
-                'time_slot': '10:00',
-                'patient': {
-                  'id': 'patient-02',
-                  'name': 'يوسف بن علي',
-                  'mrn': 'MRN-002',
-                  'phone': '0555445566',
-                },
-              }
-            ],
-            'meta': {'current_page': 1, 'last_page': 1}
-          }), 200, headers: {'content-type': 'application/json'});
+          return http.Response(
+              jsonEncode({
+                'data': [
+                  {
+                    'id': 'appt-02',
+                    'booking_reference': 'BK-002',
+                    'status': 'confirmed',
+                    'appointment_date': '2026-09-16',
+                    'time_slot': '10:00',
+                    'patient': {
+                      'id': 'patient-02',
+                      'name': 'يوسف بن علي',
+                      'mrn': 'MRN-002',
+                      'phone': '0555445566',
+                    },
+                  }
+                ],
+                'meta': {'current_page': 1, 'last_page': 1}
+              }),
+              200,
+              headers: {'content-type': 'application/json'});
         }
       });
 
@@ -169,52 +185,66 @@ void main() {
       expect(find.text('لم يحضر'), findsOneWidget);
     });
 
-    testWidgets('3. Attendance Action: confirms attendance dialog and moves patient to waiting room', (tester) async {
+    testWidgets(
+        '3. Attendance Action: confirms attendance dialog and moves patient to waiting room',
+        (tester) async {
       var attendCalled = false;
 
       final mockClient = MockClient((request) async {
         if (request.url.path.contains('/attend')) {
           attendCalled = true;
-          return http.Response(jsonEncode({
-            'message': 'تم تسجيل حضور الموعد بنجاح.',
-            'data': {
-              'id': 'appt-02',
-              'booking_reference': 'BK-002',
-              'status': 'attended',
-              'checked_in_at': '2026-09-16T10:05:00.000000Z',
-              'patient': {
-                'id': 'patient-02',
-                'name': 'يوسف بن علي',
-                'mrn': 'MRN-002',
-              },
-            }
-          }), 200, headers: {'content-type': 'application/json'});
+          return http.Response(
+              jsonEncode({
+                'message': 'تم تسجيل حضور الموعد بنجاح.',
+                'data': {
+                  'id': 'appt-02',
+                  'booking_reference': 'BK-002',
+                  'status': 'attended',
+                  'checked_in_at': '2026-09-16T10:05:00.000000Z',
+                  'patient': {
+                    'id': 'patient-02',
+                    'name': 'يوسف بن علي',
+                    'mrn': 'MRN-002',
+                  },
+                }
+              }),
+              200,
+              headers: {'content-type': 'application/json'});
         }
 
         final status = request.url.queryParameters['status'];
         if (status == 'confirmed') {
-          return http.Response(jsonEncode({
-            'data': [
-              {
-                'id': 'appt-02',
-                'booking_reference': 'BK-002',
-                'status': 'confirmed',
-                'appointment_date': '2026-09-16',
-                'time_slot': '10:00',
-                'patient': {
-                  'id': 'patient-02',
-                  'name': 'يوسف بن علي',
-                  'mrn': 'MRN-002',
-                },
-              }
-            ],
-            'meta': {'current_page': 1, 'last_page': 1}
-          }), 200, headers: {'content-type': 'application/json'});
+          return http.Response(
+              jsonEncode({
+                'data': [
+                  {
+                    'id': 'appt-02',
+                    'booking_reference': 'BK-002',
+                    'status': 'confirmed',
+                    'appointment_date': '2026-09-16',
+                    'time_slot': '10:00',
+                    'patient': {
+                      'id': 'patient-02',
+                      'name': 'يوسف بن علي',
+                      'mrn': 'MRN-002',
+                    },
+                  }
+                ],
+                'meta': {'current_page': 1, 'last_page': 1}
+              }),
+              200,
+              headers: {'content-type': 'application/json'});
         }
 
-        return http.Response(jsonEncode({'data': [], 'meta': {'current_page': 1, 'last_page': 1}}), 200, headers: {
-          'content-type': 'application/json',
-        });
+        return http.Response(
+            jsonEncode({
+              'data': [],
+              'meta': {'current_page': 1, 'last_page': 1}
+            }),
+            200,
+            headers: {
+              'content-type': 'application/json',
+            });
       });
 
       final apiClient = ApiClient(httpClient: mockClient);
@@ -254,36 +284,50 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(attendCalled, isTrue);
-      expect(find.text('تم تسجيل حضور المريض بنجاح ونقله لقاعة الانتظار.'), findsOneWidget);
+      expect(find.text('تم تسجيل حضور المريض بنجاح ونقله لقاعة الانتظار.'),
+          findsOneWidget);
     });
 
-    testWidgets('4. Quick Check-In: opens modal, submits token, and triggers queue reload', (tester) async {
+    testWidgets(
+        '4. Quick Check-In: opens modal, submits token, and triggers queue reload',
+        (tester) async {
       var checkInCalled = false;
-      const testToken = '64charactertokenforappointmentcheckintest1234567890abcdef12345678';
+      const testToken =
+          '64charactertokenforappointmentcheckintest1234567890abcdef12345678';
 
       final mockClient = MockClient((request) async {
         if (request.url.path.contains('/appointments/check-in')) {
           checkInCalled = true;
           final body = jsonDecode(request.body) as Map<String, dynamic>;
           expect(body['token'], equals(testToken));
-          return http.Response(jsonEncode({
-            'message': 'تم تأكيد حضور الموعد بنجاح.',
-            'data': {
-              'id': 'appt-03',
-              'booking_reference': 'BK-003',
-              'status': 'attended',
-              'checked_in_at': '2026-09-16T11:00:00.000000Z',
-              'patient': {
-                'id': 'patient-03',
-                'name': 'كريم بن ناصر',
-              },
-            }
-          }), 200, headers: {'content-type': 'application/json'});
+          return http.Response(
+              jsonEncode({
+                'message': 'تم تأكيد حضور الموعد بنجاح.',
+                'check_in_result': 'checked_in',
+                'data': {
+                  'id': 'appt-03',
+                  'booking_reference': 'BK-003',
+                  'status': 'attended',
+                  'checked_in_at': '2026-09-16T11:00:00.000000Z',
+                  'patient': {
+                    'id': 'patient-03',
+                    'name': 'كريم بن ناصر',
+                  },
+                }
+              }),
+              200,
+              headers: {'content-type': 'application/json'});
         }
 
-        return http.Response(jsonEncode({'data': [], 'meta': {'current_page': 1, 'last_page': 1}}), 200, headers: {
-          'content-type': 'application/json',
-        });
+        return http.Response(
+            jsonEncode({
+              'data': [],
+              'meta': {'current_page': 1, 'last_page': 1}
+            }),
+            200,
+            headers: {
+              'content-type': 'application/json',
+            });
       });
 
       final apiClient = ApiClient(httpClient: mockClient);
@@ -319,33 +363,47 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(checkInCalled, isTrue);
-      expect(find.textContaining('تم تسجيل حضور المريض بنجاح ونقله لقاعة الانتظار.'), findsOneWidget);
+      expect(
+          find.textContaining(
+              'تم تسجيل حضور المريض بنجاح ونقله لقاعة الانتظار.'),
+          findsOneWidget);
     });
 
-    testWidgets('5. Patient Search: opens sheet, submits query, and displays clinic patient results', (tester) async {
+    testWidgets(
+        '5. Patient Search: opens sheet, submits query, and displays clinic patient results',
+        (tester) async {
       var searchCalled = false;
 
       final mockClient = MockClient((request) async {
         if (request.url.path.endsWith('/patients')) {
           searchCalled = true;
           expect(request.url.queryParameters['search'], equals('سارة'));
-          return http.Response(jsonEncode({
-            'data': [
-              {
-                'id': 'patient-sara',
-                'mrn': 'MRN-2026-VAL99',
-                'first_name': 'سارة',
-                'last_name': 'بلمهيدي',
-                'phone': '0555123456',
-                'gender': 'female',
-              }
-            ]
-          }), 200, headers: {'content-type': 'application/json'});
+          return http.Response(
+              jsonEncode({
+                'data': [
+                  {
+                    'id': 'patient-sara',
+                    'mrn': 'MRN-2026-VAL99',
+                    'first_name': 'سارة',
+                    'last_name': 'بلمهيدي',
+                    'phone': '0555123456',
+                    'gender': 'female',
+                  }
+                ]
+              }),
+              200,
+              headers: {'content-type': 'application/json'});
         }
 
-        return http.Response(jsonEncode({'data': [], 'meta': {'current_page': 1, 'last_page': 1}}), 200, headers: {
-          'content-type': 'application/json',
-        });
+        return http.Response(
+            jsonEncode({
+              'data': [],
+              'meta': {'current_page': 1, 'last_page': 1}
+            }),
+            200,
+            headers: {
+              'content-type': 'application/json',
+            });
       });
 
       final apiClient = ApiClient(httpClient: mockClient);

@@ -34,12 +34,14 @@ class BookingService
         protected ?DoctorWorkingHoursService $doctorWorkingHoursService = null,
         protected ?ClinicOperatingHoursService $clinicOperatingHoursService = null,
         protected ?DoctorTimeReservationService $timeReservationService = null,
-        protected ?DoctorVacationService $vacationService = null
+        protected ?DoctorVacationService $vacationService = null,
+        protected ?NotificationOutboxService $notificationOutboxService = null
     ) {
         $this->clinicOperatingHoursService = $clinicOperatingHoursService ?? app(ClinicOperatingHoursService::class);
         $this->doctorWorkingHoursService = $doctorWorkingHoursService ?? app(DoctorWorkingHoursService::class);
         $this->timeReservationService = $timeReservationService ?? app(DoctorTimeReservationService::class);
         $this->vacationService = $vacationService ?? app(DoctorVacationService::class);
+        $this->notificationOutboxService = $notificationOutboxService ?? app(NotificationOutboxService::class);
     }
 
     /**
@@ -357,6 +359,23 @@ class BookingService
                 'reason' => 'إنشاء طلب الحجز الأولي',
             ]);
 
+            $this->createInAppNotification(
+                appointment: $appointment,
+                template: 'appointment_booked',
+                idempotencyKey: "appointment_booked_{$appointment->id}",
+                payloadData: [
+                    'appointment_id' => $appointment->id,
+                    'booking_reference' => $appointment->booking_reference,
+                    'appointment_date' => $date,
+                    'time_slot' => $timeSlot,
+                    'clinic_name' => $clinic->name,
+                    'doctor_name' => $doctor->user?->name ?? 'الطبيب المعالج',
+                    'message' => "تم تسجيل طلب حجز موعدكم الطبي ({$appointment->booking_reference}) بنجاح وهو قيد المراجعة.",
+                    'message_en' => "Your appointment request ({$appointment->booking_reference}) has been registered and is pending review.",
+                    'message_fr' => "Votre demande de rendez-vous ({$appointment->booking_reference}) a été enregistrée et est en cours d'examen.",
+                ]
+            );
+
             return $appointment;
         }, 5);
         } catch (ValidationException $e) {
@@ -394,8 +413,10 @@ class BookingService
 
     /**
      * Concurrency-safe atomic check-in of an appointment using its single-use secure QR token.
+     *
+     * @return array{appointment: Appointment, check_in_result: string}
      */
-    public function checkInAppointmentByToken(string $token, User $actor): Appointment
+    public function checkInAppointmentByToken(string $token, User $actor): array
     {
         return DB::transaction(function () use ($token, $actor) {
             $appointment = Appointment::where('secure_token', $token)
@@ -413,7 +434,10 @@ class BookingService
 
             // Idempotent return if already attended
             if ($appointment->status === 'attended' || $appointment->checked_in_at !== null) {
-                return $appointment->fresh(['clinic', 'doctor.user', 'patient', 'confirmer', 'checkedInBy']);
+                return [
+                    'appointment' => $appointment->fresh(['clinic', 'doctor.user', 'patient', 'confirmer', 'checkedInBy']),
+                    'check_in_result' => 'already_checked_in',
+                ];
             }
 
             // Critical rule: pending -> attended is NEVER allowed. Only confirmed -> attended.
@@ -439,7 +463,10 @@ class BookingService
                 'reason' => 'تأكيد حضور المريض عبر مسح رمز QR الموعد',
             ]);
 
-            return $appointment->fresh(['clinic', 'doctor.user', 'patient', 'confirmer', 'checkedInBy']);
+            return [
+                'appointment' => $appointment->fresh(['clinic', 'doctor.user', 'patient', 'confirmer', 'checkedInBy']),
+                'check_in_result' => 'checked_in',
+            ];
         });
     }
 
@@ -571,6 +598,29 @@ class BookingService
                 'changed_by_id' => $user->id,
                 'reason' => $reason ?? ($user->hasRole('doctor_assistant') ? 'تأكيد الموعد الطبي من قبل مساعد العيادة' : 'تأكيد الموعد الطبي من قبل الطبيب المعني'),
             ]);
+
+            $clinicName = $lockedAppointment->clinic?->name ?? 'العيادة';
+            $doctorName = $lockedAppointment->doctor?->user?->name ?? 'الطبيب المعالج';
+            $formattedDate = $lockedAppointment->appointment_date ? (is_string($lockedAppointment->appointment_date) ? $lockedAppointment->appointment_date : $lockedAppointment->appointment_date->format('Y-m-d')) : null;
+
+            $this->createInAppNotification(
+                appointment: $lockedAppointment,
+                template: 'appointment_confirmed',
+                idempotencyKey: "appointment_confirmed_{$lockedAppointment->id}",
+                payloadData: [
+                    'appointment_id' => $lockedAppointment->id,
+                    'booking_reference' => $lockedAppointment->booking_reference,
+                    'appointment_date' => $formattedDate,
+                    'time_slot' => $lockedAppointment->time_slot,
+                    'clinic_name' => $clinicName,
+                    'doctor_name' => $doctorName,
+                    'confirmed_by' => $user->name,
+                    'confirmed_by_role' => $user->roles->first()?->name ?? 'staff',
+                    'message' => "تم تأكيد موعدكم الطبي ({$lockedAppointment->booking_reference}) في {$clinicName}. تذكرة الدخول متاحة الآن في التطبيق.",
+                    'message_en' => "Your medical appointment ({$lockedAppointment->booking_reference}) at {$clinicName} has been confirmed. Your pass is now available.",
+                    'message_fr' => "Votre rendez-vous médical ({$lockedAppointment->booking_reference}) à {$clinicName} a été confirmé. Votre pass est maintenant disponible.",
+                ]
+            );
 
             return $lockedAppointment->fresh(['clinic', 'doctor.user', 'bookingCenter', 'statusHistory']);
         });
@@ -1635,4 +1685,41 @@ class BookingService
 
         return true;
     }
+
+    /**
+     * Create and dispatch an in-app notification record through the official outbox pipeline.
+     */
+    protected function createInAppNotification(
+        Appointment $appointment,
+        string $template,
+        string $idempotencyKey,
+        array $payloadData
+    ): ?NotificationOutbox {
+        if (NotificationOutbox::where('idempotency_key', $idempotencyKey)->exists()) {
+            return null;
+        }
+
+        $recipientPhone = $appointment->patient_phone
+            ?? $appointment->patient?->phone
+            ?? $appointment->patient?->user?->phone;
+        $recipientPhone = $recipientPhone !== null ? trim((string) $recipientPhone) : '';
+
+        $outbox = NotificationOutbox::create([
+            'id'              => (string) Str::uuid(),
+            'appointment_id'  => $appointment->id,
+            'recipient_phone' => $recipientPhone,
+            'recipient_type'  => 'patient',
+            'channel'         => 'in_app',
+            'template'        => $template,
+            'payload'         => $payloadData,
+            'idempotency_key' => $idempotencyKey,
+            'status'          => NotificationOutbox::STATUS_PENDING,
+            'retry_count'     => 0,
+        ]);
+
+        $this->notificationOutboxService->processRecord($outbox);
+
+        return $outbox;
+    }
 }
+

@@ -46,10 +46,12 @@ class UnresolvedReschedulesScreen extends StatefulWidget {
   }
 
   @override
-  State<UnresolvedReschedulesScreen> createState() => _UnresolvedReschedulesScreenState();
+  State<UnresolvedReschedulesScreen> createState() =>
+      _UnresolvedReschedulesScreenState();
 }
 
-class _UnresolvedReschedulesScreenState extends State<UnresolvedReschedulesScreen> {
+class _UnresolvedReschedulesScreenState
+    extends State<UnresolvedReschedulesScreen> {
   late final ClinicRescheduleDashboardService _service;
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
@@ -105,7 +107,10 @@ class _UnresolvedReschedulesScreenState extends State<UnresolvedReschedulesScree
     if (!_scrollController.hasClients) return;
     final maxScroll = _scrollController.position.maxScrollExtent;
     final currentScroll = _scrollController.position.pixels;
-    if (currentScroll >= maxScroll - 200 && _hasMore && !_isLoadingMore && !_isLoading) {
+    if (currentScroll >= maxScroll - 200 &&
+        _hasMore &&
+        !_isLoadingMore &&
+        !_isLoading) {
       _loadMore();
     }
   }
@@ -129,7 +134,8 @@ class _UnresolvedReschedulesScreenState extends State<UnresolvedReschedulesScree
     }
 
     final targetClinicId = activeClinicId;
-    final result = await _service.fetchUnresolvedAppointments(page: 1, perPage: 20);
+    final result =
+        await _service.fetchUnresolvedAppointments(page: 1, perPage: 20);
 
     if (!mounted) return;
 
@@ -165,7 +171,8 @@ class _UnresolvedReschedulesScreenState extends State<UnresolvedReschedulesScree
     });
 
     final nextPage = _currentPage + 1;
-    final result = await _service.fetchUnresolvedAppointments(page: nextPage, perPage: 20);
+    final result =
+        await _service.fetchUnresolvedAppointments(page: nextPage, perPage: 20);
 
     if (!mounted) return;
     if (widget.sessionManager.activeClinicId != targetClinicId) return;
@@ -194,7 +201,10 @@ class _UnresolvedReschedulesScreenState extends State<UnresolvedReschedulesScree
       final mrn = orig?.patientMrn?.toLowerCase() ?? '';
       final ref = orig?.bookingReference?.toLowerCase() ?? '';
       final docName = orig?.doctorName?.toLowerCase() ?? '';
-      return patientName.contains(q) || mrn.contains(q) || ref.contains(q) || docName.contains(q);
+      return patientName.contains(q) ||
+          mrn.contains(q) ||
+          ref.contains(q) ||
+          docName.contains(q);
     }).toList();
   }
 
@@ -243,7 +253,8 @@ class _UnresolvedReschedulesScreenState extends State<UnresolvedReschedulesScree
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
                               color: AafiyaColors.error.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(AafiyaRadius.sm),
+                              borderRadius:
+                                  BorderRadius.circular(AafiyaRadius.sm),
                             ),
                             child: const Icon(
                               Icons.warning_amber_rounded,
@@ -273,11 +284,13 @@ class _UnresolvedReschedulesScreenState extends State<UnresolvedReschedulesScree
                         ],
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
                           color: AafiyaColors.error.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AafiyaColors.error.withValues(alpha: 0.2)),
+                          border: Border.all(
+                              color: AafiyaColors.error.withValues(alpha: 0.2)),
                         ),
                         child: Text(
                           '${_items.length}',
@@ -300,7 +313,8 @@ class _UnresolvedReschedulesScreenState extends State<UnresolvedReschedulesScree
                       hintStyle: AafiyaTypography.caption.copyWith(
                         color: AafiyaColors.secondaryText,
                       ),
-                      prefixIcon: const Icon(Icons.search, size: 20, color: AafiyaColors.secondaryText),
+                      prefixIcon: const Icon(Icons.search,
+                          size: 20, color: AafiyaColors.secondaryText),
                       suffixIcon: _searchQuery.isNotEmpty
                           ? IconButton(
                               icon: const Icon(Icons.clear, size: 18),
@@ -312,14 +326,17 @@ class _UnresolvedReschedulesScreenState extends State<UnresolvedReschedulesScree
                           : null,
                       filled: true,
                       fillColor: AafiyaColors.lightBackground,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(AafiyaRadius.md),
-                        borderSide: const BorderSide(color: AafiyaColors.border),
+                        borderSide:
+                            const BorderSide(color: AafiyaColors.border),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(AafiyaRadius.md),
-                        borderSide: const BorderSide(color: AafiyaColors.border),
+                        borderSide:
+                            const BorderSide(color: AafiyaColors.border),
                       ),
                     ),
                   ),
@@ -350,12 +367,15 @@ class _UnresolvedReschedulesScreenState extends State<UnresolvedReschedulesScree
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: filtered.length + (_hasMore ? 1 : 0),
-                      separatorBuilder: (_, __) => const SizedBox(height: AafiyaSpacing.sm),
+                      separatorBuilder: (_, __) =>
+                          const SizedBox(height: AafiyaSpacing.sm),
                       itemBuilder: (context, index) {
                         if (index == filtered.length) {
                           return const Padding(
                             padding: EdgeInsets.symmetric(vertical: 16),
-                            child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                            child: Center(
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2)),
                           );
                         }
                         return _buildCaseCard(filtered[index], strings);
@@ -421,7 +441,8 @@ class _UnresolvedReschedulesScreenState extends State<UnresolvedReschedulesScree
       decoration: BoxDecoration(
         color: AafiyaColors.healingGreen.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(AafiyaRadius.md),
-        border: Border.all(color: AafiyaColors.healingGreen.withValues(alpha: 0.2)),
+        border:
+            Border.all(color: AafiyaColors.healingGreen.withValues(alpha: 0.2)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -453,7 +474,8 @@ class _UnresolvedReschedulesScreenState extends State<UnresolvedReschedulesScree
     );
   }
 
-  Widget _buildCaseCard(UnresolvedRescheduleItem item, LocalizedStrings strings) {
+  Widget _buildCaseCard(
+      UnresolvedRescheduleItem item, LocalizedStrings strings) {
     final orig = item.originalAppointment;
     final hasPhone = orig?.hasPhone == true;
     final phone = orig?.patientPhone;
@@ -476,7 +498,8 @@ class _UnresolvedReschedulesScreenState extends State<UnresolvedReschedulesScree
                 decoration: BoxDecoration(
                   color: AafiyaColors.error.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(AafiyaRadius.sm),
-                  border: Border.all(color: AafiyaColors.error.withValues(alpha: 0.2)),
+                  border: Border.all(
+                      color: AafiyaColors.error.withValues(alpha: 0.2)),
                 ),
                 child: Text(
                   strings.urgentUnresolvedBadge,
@@ -490,7 +513,8 @@ class _UnresolvedReschedulesScreenState extends State<UnresolvedReschedulesScree
               if (orig?.bookingReference != null) ...[
                 const SizedBox(width: 6),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
                     color: AafiyaColors.lightBackground,
                     borderRadius: BorderRadius.circular(AafiyaRadius.sm),
@@ -531,7 +555,8 @@ class _UnresolvedReschedulesScreenState extends State<UnresolvedReschedulesScree
           // Original Appointment Date, Time Slot, and Doctor
           Row(
             children: [
-              const Icon(Icons.event_outlined, size: 14, color: AafiyaColors.secondaryText),
+              const Icon(Icons.event_outlined,
+                  size: 14, color: AafiyaColors.secondaryText),
               const SizedBox(width: 4),
               Text(
                 '${strings.originalDateLabel} ${orig?.appointmentDate ?? "—"}',
@@ -542,7 +567,8 @@ class _UnresolvedReschedulesScreenState extends State<UnresolvedReschedulesScree
               ),
               if (orig?.timeSlot != null) ...[
                 const SizedBox(width: 10),
-                const Icon(Icons.access_time, size: 14, color: AafiyaColors.secondaryText),
+                const Icon(Icons.access_time,
+                    size: 14, color: AafiyaColors.secondaryText),
                 const SizedBox(width: 4),
                 Text(
                   orig!.timeSlot!,
@@ -558,7 +584,8 @@ class _UnresolvedReschedulesScreenState extends State<UnresolvedReschedulesScree
             const SizedBox(height: 4),
             Row(
               children: [
-                const Icon(Icons.person_outline, size: 14, color: AafiyaColors.healthBlue),
+                const Icon(Icons.person_outline,
+                    size: 14, color: AafiyaColors.healthBlue),
                 const SizedBox(width: 4),
                 Text(
                   orig.doctorName!,
@@ -597,7 +624,8 @@ class _UnresolvedReschedulesScreenState extends State<UnresolvedReschedulesScree
               children: [
                 Expanded(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                     decoration: BoxDecoration(
                       color: AafiyaColors.lightBackground,
                       borderRadius: BorderRadius.circular(AafiyaRadius.sm),
@@ -605,7 +633,8 @@ class _UnresolvedReschedulesScreenState extends State<UnresolvedReschedulesScree
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.phone_outlined, size: 16, color: AafiyaColors.healingGreen),
+                        const Icon(Icons.phone_outlined,
+                            size: 16, color: AafiyaColors.healingGreen),
                         const SizedBox(width: 8),
                         Text(
                           phone,

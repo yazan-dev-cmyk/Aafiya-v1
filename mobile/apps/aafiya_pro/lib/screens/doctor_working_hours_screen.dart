@@ -101,7 +101,8 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
     if (doctorId == null) {
       setState(() {
         _isLoading = false;
-        _errorMessage = 'معرف الطبيب غير متوفر في ملف الحساب. يرجى تسجيل الدخول بحساب طبيب معتمد.';
+        _errorMessage =
+            'معرف الطبيب غير متوفر في ملف الحساب. يرجى تسجيل الدخول بحساب طبيب معتمد.';
       });
       return;
     }

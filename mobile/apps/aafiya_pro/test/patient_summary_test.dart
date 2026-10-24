@@ -101,7 +101,8 @@ void main() {
   }
 
   group('PatientSummarySheet Widget Tests', () {
-    testWidgets('1. Loading: displays loading indicator while fetching', (tester) async {
+    testWidgets('1. Loading: displays loading indicator while fetching',
+        (tester) async {
       final mockClient = MockClient((request) async {
         await Future<void>.delayed(const Duration(milliseconds: 100));
         return http.Response(jsonEncode(samplePatientResponse), 200);
@@ -116,7 +117,9 @@ void main() {
       expect(find.byType(AafiyaLoadingView), findsNothing);
     });
 
-    testWidgets('2. Content: renders patient identity, allergies, conditions, and emergency contact', (tester) async {
+    testWidgets(
+        '2. Content: renders patient identity, allergies, conditions, and emergency contact',
+        (tester) async {
       final mockClient = MockClient((request) async {
         expect(request.url.path, endsWith('/patients/$samplePatientId'));
         expect(request.headers['X-Clinic-ID'], equals(sampleClinicId));
@@ -157,7 +160,9 @@ void main() {
       expect(find.text('رئيسي'), findsOneWidget);
     });
 
-    testWidgets('3. Data Minimization: strictly whitelist only - no patient phone/email/address', (tester) async {
+    testWidgets(
+        '3. Data Minimization: strictly whitelist only - no patient phone/email/address',
+        (tester) async {
       final mockClient = MockClient((request) async {
         return http.Response(
           jsonEncode(samplePatientResponse),
@@ -179,7 +184,9 @@ void main() {
       expect(find.text('شارع الاختبار 001'), findsNothing);
     });
 
-    testWidgets('4. Empty States: displays localized empty indications when collections are empty', (tester) async {
+    testWidgets(
+        '4. Empty States: displays localized empty indications when collections are empty',
+        (tester) async {
       final emptyPatientResponse = {
         'data': {
           'id': samplePatientId,
@@ -208,12 +215,16 @@ void main() {
       await tester.pumpWidget(createTestWidget(apiClient: apiClient));
       await tester.pumpAndSettle();
 
-      expect(find.text('لا توجد أي حساسيات مسجلة لهذا المريض.'), findsOneWidget);
-      expect(find.text('لا توجد أي أمراض مزمنة مسجلة لهذا المريض.'), findsOneWidget);
+      expect(
+          find.text('لا توجد أي حساسيات مسجلة لهذا المريض.'), findsOneWidget);
+      expect(find.text('لا توجد أي أمراض مزمنة مسجلة لهذا المريض.'),
+          findsOneWidget);
       expect(find.text('لا توجد جهات اتصال للطوارئ مسجلة.'), findsOneWidget);
     });
 
-    testWidgets('5. 403 Forbidden: displays access denied view, NOT empty record', (tester) async {
+    testWidgets(
+        '5. 403 Forbidden: displays access denied view, NOT empty record',
+        (tester) async {
       final mockClient = MockClient((request) async {
         return http.Response(
           jsonEncode({
@@ -229,12 +240,15 @@ void main() {
       await tester.pumpWidget(createTestWidget(apiClient: apiClient));
       await tester.pumpAndSettle();
 
-      expect(find.text('غير مصرح لك بعرض الملف الطبي لهذا المريض.'), findsWidgets);
+      expect(
+          find.text('غير مصرح لك بعرض الملف الطبي لهذا المريض.'), findsWidgets);
       expect(find.byIcon(Icons.gpp_bad_outlined), findsOneWidget);
       expect(find.byType(AafiyaButton), findsOneWidget); // Retry button
     });
 
-    testWidgets('6. DISC-02: Strictly Read-Only Guarantee - zero input fields or edit buttons', (tester) async {
+    testWidgets(
+        '6. DISC-02: Strictly Read-Only Guarantee - zero input fields or edit buttons',
+        (tester) async {
       final mockClient = MockClient((request) async {
         return http.Response(
           jsonEncode(samplePatientResponse),
@@ -256,7 +270,9 @@ void main() {
       expect(find.textContaining('للقراءة فقط'), findsOneWidget);
     });
 
-    testWidgets('7. Trilingual Localization: renders correctly in English and French', (tester) async {
+    testWidgets(
+        '7. Trilingual Localization: renders correctly in English and French',
+        (tester) async {
       final mockClient = MockClient((request) async {
         return http.Response(
           jsonEncode(samplePatientResponse),
@@ -268,7 +284,8 @@ void main() {
       apiClient.setActiveClinicId(sampleClinicId);
 
       // Test English
-      await tester.pumpWidget(createTestWidget(apiClient: apiClient, locale: const Locale('en')));
+      await tester.pumpWidget(
+          createTestWidget(apiClient: apiClient, locale: const Locale('en')));
       await tester.pumpAndSettle();
       expect(find.text('Patient Medical Summary'), findsOneWidget);
       expect(find.text('Life-Threatening'), findsOneWidget);
@@ -276,7 +293,8 @@ void main() {
       expect(find.text('Active'), findsOneWidget);
 
       // Test French
-      await tester.pumpWidget(createTestWidget(apiClient: apiClient, locale: const Locale('fr')));
+      await tester.pumpWidget(
+          createTestWidget(apiClient: apiClient, locale: const Locale('fr')));
       await tester.pumpAndSettle();
       expect(find.text('Résumé médical du patient'), findsOneWidget);
       expect(find.text('Menace vitale'), findsOneWidget);
@@ -284,7 +302,9 @@ void main() {
       expect(find.text('Actif'), findsOneWidget);
     });
 
-    testWidgets('8. Stale Response Protection: late response from previous clinic is discarded', (tester) async {
+    testWidgets(
+        '8. Stale Response Protection: late response from previous clinic is discarded',
+        (tester) async {
       late http.Response lateResponse;
       final mockClient = MockClient((request) async {
         // Simulate late response

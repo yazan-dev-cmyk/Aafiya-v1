@@ -116,7 +116,8 @@ class _AllergyCard extends StatelessWidget {
               ),
             ],
           ),
-          if (allergy.reaction != null && allergy.reaction!.trim().isNotEmpty) ...[
+          if (allergy.reaction != null &&
+              allergy.reaction!.trim().isNotEmpty) ...[
             const SizedBox(height: 6),
             Text(
               '${strings.reaction}: ${allergy.reaction!.trim()}',
@@ -125,7 +126,8 @@ class _AllergyCard extends StatelessWidget {
               ),
             ),
           ],
-          if (allergy.diagnosedAt != null && allergy.diagnosedAt!.trim().isNotEmpty) ...[
+          if (allergy.diagnosedAt != null &&
+              allergy.diagnosedAt!.trim().isNotEmpty) ...[
             const SizedBox(height: 4),
             Text(
               '${strings.diagnosedDate}: ${allergy.diagnosedAt!.trim()}',
@@ -149,7 +151,8 @@ class _AllergyCard extends StatelessWidget {
     );
   }
 
-  (Color, String) _resolveSeverity(PatientAllergy allergy, LocalizedStrings strings) {
+  (Color, String) _resolveSeverity(
+      PatientAllergy allergy, LocalizedStrings strings) {
     if (allergy.isLifeThreatening) {
       return (AafiyaColors.error, strings.severityLifeThreatening);
     }

@@ -33,7 +33,8 @@ class EmergencyProfileService {
   ///
   /// Invokes `GET /api/v1/patients/$patientId`.
   /// Automatically carries active clinic context headers (`X-Clinic-ID` & `X-Active-Clinic-ID`) via [ApiClient].
-  Future<ApiResult<EmergencyProfile>> getPatientSummary(String patientId) async {
+  Future<ApiResult<EmergencyProfile>> getPatientSummary(
+      String patientId) async {
     final result = await _apiClient.get(
       ApiEndpoints.patient(patientId),
       allowRetry: true,

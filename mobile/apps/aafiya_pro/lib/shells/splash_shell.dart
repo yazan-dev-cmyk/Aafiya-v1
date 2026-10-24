@@ -46,7 +46,8 @@ class _ProSplashShellState extends State<ProSplashShell> {
 
   @override
   Widget build(BuildContext context) {
-    final activeCode = (widget.currentLocale ?? Localizations.localeOf(context)).languageCode;
+    final activeCode =
+        (widget.currentLocale ?? Localizations.localeOf(context)).languageCode;
 
     return Scaffold(
       backgroundColor: AafiyaColors.pureWhite,
@@ -67,7 +68,8 @@ class _ProSplashShellState extends State<ProSplashShell> {
                     selected: {activeCode},
                     showSelectedIcon: false,
                     style: SegmentedButton.styleFrom(
-                      textStyle: AafiyaTypography.caption.copyWith(fontWeight: FontWeight.w600),
+                      textStyle: AafiyaTypography.caption
+                          .copyWith(fontWeight: FontWeight.w600),
                       visualDensity: VisualDensity.compact,
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),

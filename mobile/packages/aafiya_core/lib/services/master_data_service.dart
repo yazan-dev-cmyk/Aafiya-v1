@@ -19,7 +19,8 @@ class MasterDataService {
 
   /// Fetches all 69 authoritative Wilayas from `GET /api/v1/master/wilayas`.
   /// Subsequent calls return from in-memory cache unless [forceRefresh] is true.
-  Future<ApiResult<List<Wilaya>>> getWilayas({bool forceRefresh = false}) async {
+  Future<ApiResult<List<Wilaya>>> getWilayas(
+      {bool forceRefresh = false}) async {
     if (!forceRefresh && _cachedWilayas != null) {
       return ApiSuccess(_cachedWilayas!);
     }
@@ -152,7 +153,8 @@ class MasterDataService {
   /// Fetches all active canonical physician specialties from `GET /api/v1/master/specialties`.
   /// Defensive safety rule: strictly excludes `RAD` and `PATH` from physician appointment catalog.
   /// Subsequent calls return from in-memory cache unless [forceRefresh] is true.
-  Future<ApiResult<List<MedicalSpecialty>>> getSpecialties({bool forceRefresh = false}) async {
+  Future<ApiResult<List<MedicalSpecialty>>> getSpecialties(
+      {bool forceRefresh = false}) async {
     if (!forceRefresh && _cachedSpecialties != null) {
       return ApiSuccess(_cachedSpecialties!);
     }

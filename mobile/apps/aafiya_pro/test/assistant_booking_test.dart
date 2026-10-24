@@ -77,7 +77,8 @@ void main() {
       ),
     ];
 
-    testWidgets('Renders all slots with time and capacity information', (tester) async {
+    testWidgets('Renders all slots with time and capacity information',
+        (tester) async {
       await tester.pumpWidget(createTestWidget(
         child: Scaffold(
           body: SlotSelectionGrid(
@@ -100,7 +101,8 @@ void main() {
       expect(find.text('متاح: 6 من 10'), findsOneWidget);
     });
 
-    testWidgets('Tapping available slot triggers onSlotSelected', (tester) async {
+    testWidgets('Tapping available slot triggers onSlotSelected',
+        (tester) async {
       AppointmentSlot? selected;
       await tester.pumpWidget(createTestWidget(
         child: Scaffold(
@@ -119,7 +121,8 @@ void main() {
       expect(selected!.timeSlot, equals('10:00'));
     });
 
-    testWidgets('Tapping full slot does not trigger onSlotSelected', (tester) async {
+    testWidgets('Tapping full slot does not trigger onSlotSelected',
+        (tester) async {
       AppointmentSlot? selected;
       await tester.pumpWidget(createTestWidget(
         child: Scaffold(
@@ -137,7 +140,8 @@ void main() {
       expect(selected, isNull);
     });
 
-    testWidgets('Shows loading indicator when isLoading is true', (tester) async {
+    testWidgets('Shows loading indicator when isLoading is true',
+        (tester) async {
       await tester.pumpWidget(createTestWidget(
         child: const Scaffold(
           body: SlotSelectionGrid(
@@ -163,7 +167,8 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      expect(find.text('لا توجد فترات حجز متاحة لهذا التاريخ.'), findsOneWidget);
+      expect(
+          find.text('لا توجد فترات حجز متاحة لهذا التاريخ.'), findsOneWidget);
     });
   });
 
@@ -202,9 +207,27 @@ void main() {
             jsonEncode({
               'data': {
                 'slots': [
-                  {'time_slot': '08:00', 'max_capacity': 10, 'occupied': 1, 'available': 9, 'is_available': true},
-                  {'time_slot': '09:00', 'max_capacity': 10, 'occupied': 10, 'available': 0, 'is_available': false},
-                  {'time_slot': '10:00', 'max_capacity': 10, 'occupied': 2, 'available': 8, 'is_available': true},
+                  {
+                    'time_slot': '08:00',
+                    'max_capacity': 10,
+                    'occupied': 1,
+                    'available': 9,
+                    'is_available': true
+                  },
+                  {
+                    'time_slot': '09:00',
+                    'max_capacity': 10,
+                    'occupied': 10,
+                    'available': 0,
+                    'is_available': false
+                  },
+                  {
+                    'time_slot': '10:00',
+                    'max_capacity': 10,
+                    'occupied': 2,
+                    'available': 8,
+                    'is_available': true
+                  },
                 ],
               },
             }),
@@ -235,7 +258,8 @@ void main() {
           final body = jsonDecode(request.body) as Map<String, dynamic>;
           // Ensure no booking_center_id is transmitted
           if (body.containsKey('booking_center_id')) {
-            return http.Response(jsonEncode({'message': 'booking_center_id forbidden'}), 400);
+            return http.Response(
+                jsonEncode({'message': 'booking_center_id forbidden'}), 400);
           }
 
           return http.Response(
@@ -275,7 +299,9 @@ void main() {
       );
     });
 
-    testWidgets('Walk-in booking validates required fields and creates appointment', (tester) async {
+    testWidgets(
+        'Walk-in booking validates required fields and creates appointment',
+        (tester) async {
       await tester.pumpWidget(createTestWidget(
         child: AssistantBookingScreen(
           sessionManager: sessionManager,
@@ -297,7 +323,8 @@ void main() {
       expect(find.text('10:00'), findsOneWidget);
 
       // Attempt to submit without selecting slot or filling fields
-      await tester.ensureVisible(find.byKey(const ValueKey('confirm_booking_button')));
+      await tester
+          .ensureVisible(find.byKey(const ValueKey('confirm_booking_button')));
       await tester.tap(find.byKey(const ValueKey('confirm_booking_button')));
       await tester.pumpAndSettle();
 
@@ -310,14 +337,19 @@ void main() {
       await tester.pumpAndSettle();
 
       // Fill in Patient Name & Phone
-      await tester.ensureVisible(find.byKey(const ValueKey('patient_name_field')));
-      await tester.enterText(find.byKey(const ValueKey('patient_name_field')), 'يوسف بن بوعلي');
+      await tester
+          .ensureVisible(find.byKey(const ValueKey('patient_name_field')));
+      await tester.enterText(
+          find.byKey(const ValueKey('patient_name_field')), 'يوسف بن بوعلي');
 
-      await tester.ensureVisible(find.byKey(const ValueKey('patient_phone_field')));
-      await tester.enterText(find.byKey(const ValueKey('patient_phone_field')), '0661223344');
+      await tester
+          .ensureVisible(find.byKey(const ValueKey('patient_phone_field')));
+      await tester.enterText(
+          find.byKey(const ValueKey('patient_phone_field')), '0661223344');
 
       // Submit
-      await tester.ensureVisible(find.byKey(const ValueKey('confirm_booking_button')));
+      await tester
+          .ensureVisible(find.byKey(const ValueKey('confirm_booking_button')));
       await tester.tap(find.byKey(const ValueKey('confirm_booking_button')));
       await tester.pumpAndSettle();
 
@@ -328,7 +360,9 @@ void main() {
       expect(find.text('حجز موعد آخر'), findsOneWidget);
     });
 
-    testWidgets('Return-visit booking prefills patient details and displays return badge', (tester) async {
+    testWidgets(
+        'Return-visit booking prefills patient details and displays return badge',
+        (tester) async {
       const returnPatient = PatientSearchResult(
         id: 'patient-uuid-888',
         mrn: 'MRN-ALG-2026-01',
@@ -361,7 +395,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Submit
-      await tester.ensureVisible(find.byKey(const ValueKey('confirm_booking_button')));
+      await tester
+          .ensureVisible(find.byKey(const ValueKey('confirm_booking_button')));
       await tester.tap(find.byKey(const ValueKey('confirm_booking_button')));
       await tester.pumpAndSettle();
 
@@ -370,7 +405,9 @@ void main() {
       expect(find.text('MS-2026-0099'), findsOneWidget);
     });
 
-    testWidgets('Registered patient booking flow allows searching, selecting patient, auto-fills fields, and sends patient_id', (tester) async {
+    testWidgets(
+        'Registered patient booking flow allows searching, selecting patient, auto-fills fields, and sends patient_id',
+        (tester) async {
       await tester.pumpWidget(createTestWidget(
         child: AssistantBookingScreen(
           sessionManager: sessionManager,
@@ -381,7 +418,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Switch to Registered Patient mode
-      final registeredChip = find.byKey(const ValueKey('patient_type_registered'));
+      final registeredChip =
+          find.byKey(const ValueKey('patient_type_registered'));
       expect(registeredChip, findsOneWidget);
       await tester.tap(registeredChip);
       await tester.pumpAndSettle();
@@ -395,7 +433,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify patient result card appears
-      final patientTile = find.byKey(const ValueKey('patient_result_patient-reg-777'));
+      final patientTile =
+          find.byKey(const ValueKey('patient_result_patient-reg-777'));
       expect(patientTile, findsOneWidget);
       expect(find.text('عمر الورتيلاني'), findsOneWidget);
 
@@ -404,8 +443,10 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify selected patient card is shown
-      expect(find.byKey(const ValueKey('selected_patient_card')), findsOneWidget);
-      expect(find.byKey(const ValueKey('change_patient_button')), findsOneWidget);
+      expect(
+          find.byKey(const ValueKey('selected_patient_card')), findsOneWidget);
+      expect(
+          find.byKey(const ValueKey('change_patient_button')), findsOneWidget);
 
       // Verify Name, Phone, and MRN are prefilled
       expect(find.text('عمر الورتيلاني'), findsWidgets);
@@ -418,7 +459,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Submit booking
-      await tester.ensureVisible(find.byKey(const ValueKey('confirm_booking_button')));
+      await tester
+          .ensureVisible(find.byKey(const ValueKey('confirm_booking_button')));
       await tester.tap(find.byKey(const ValueKey('confirm_booking_button')));
       await tester.pumpAndSettle();
 
@@ -427,7 +469,8 @@ void main() {
       expect(find.text('MS-2026-0099'), findsOneWidget);
     });
 
-    testWidgets('Registered mode without selecting patient prevents submission', (tester) async {
+    testWidgets('Registered mode without selecting patient prevents submission',
+        (tester) async {
       await tester.pumpWidget(createTestWidget(
         child: AssistantBookingScreen(
           sessionManager: sessionManager,
@@ -438,7 +481,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Switch to Registered Patient mode
-      final registeredChip = find.byKey(const ValueKey('patient_type_registered'));
+      final registeredChip =
+          find.byKey(const ValueKey('patient_type_registered'));
       await tester.tap(registeredChip);
       await tester.pumpAndSettle();
 
@@ -448,7 +492,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Tap submit without searching/selecting patient
-      await tester.ensureVisible(find.byKey(const ValueKey('confirm_booking_button')));
+      await tester
+          .ensureVisible(find.byKey(const ValueKey('confirm_booking_button')));
       await tester.tap(find.byKey(const ValueKey('confirm_booking_button')));
       await tester.pumpAndSettle();
 
@@ -456,7 +501,9 @@ void main() {
       expect(find.text('تم إنشاء حجز الموعد بنجاح'), findsNothing);
     });
 
-    testWidgets('Change patient button clears selected patient and allows searching again', (tester) async {
+    testWidgets(
+        'Change patient button clears selected patient and allows searching again',
+        (tester) async {
       await tester.pumpWidget(createTestWidget(
         child: AssistantBookingScreen(
           sessionManager: sessionManager,
@@ -471,13 +518,16 @@ void main() {
       await tester.pumpAndSettle();
 
       // Search & select
-      await tester.enterText(find.byKey(const ValueKey('patient_search_input')), 'عمر');
+      await tester.enterText(
+          find.byKey(const ValueKey('patient_search_input')), 'عمر');
       await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const ValueKey('patient_result_patient-reg-777')));
+      await tester
+          .tap(find.byKey(const ValueKey('patient_result_patient-reg-777')));
       await tester.pumpAndSettle();
 
       // Verify card shown
-      expect(find.byKey(const ValueKey('selected_patient_card')), findsOneWidget);
+      expect(
+          find.byKey(const ValueKey('selected_patient_card')), findsOneWidget);
 
       // Tap change patient
       await tester.tap(find.byKey(const ValueKey('change_patient_button')));
@@ -485,10 +535,12 @@ void main() {
 
       // Card should be gone, search input visible again
       expect(find.byKey(const ValueKey('selected_patient_card')), findsNothing);
-      expect(find.byKey(const ValueKey('patient_search_input')), findsOneWidget);
+      expect(
+          find.byKey(const ValueKey('patient_search_input')), findsOneWidget);
     });
 
-    testWidgets('Handles 422 slot capacity conflict gracefully', (tester) async {
+    testWidgets('Handles 422 slot capacity conflict gracefully',
+        (tester) async {
       final conflictClient = MockClient((request) async {
         final path = request.url.path;
         if (path.endsWith('/clinics/$testClinicId')) {
@@ -497,7 +549,11 @@ void main() {
               'data': {
                 'id': testClinicId,
                 'doctors': [
-                  {'id': testDoctorId, 'name': 'د. مرسلي فاتح', 'is_active': true},
+                  {
+                    'id': testDoctorId,
+                    'name': 'د. مرسلي فاتح',
+                    'is_active': true
+                  },
                 ],
               },
             }),
@@ -510,7 +566,13 @@ void main() {
             jsonEncode({
               'data': {
                 'slots': [
-                  {'time_slot': '08:00', 'max_capacity': 10, 'occupied': 9, 'available': 1, 'is_available': true},
+                  {
+                    'time_slot': '08:00',
+                    'max_capacity': 10,
+                    'occupied': 9,
+                    'available': 1,
+                    'is_available': true
+                  },
                 ],
               },
             }),
@@ -550,13 +612,18 @@ void main() {
       await tester.pumpAndSettle();
 
       // Fill name and phone
-      await tester.ensureVisible(find.byKey(const ValueKey('patient_name_field')));
-      await tester.enterText(find.byKey(const ValueKey('patient_name_field')), 'حميد قادري');
-      await tester.ensureVisible(find.byKey(const ValueKey('patient_phone_field')));
-      await tester.enterText(find.byKey(const ValueKey('patient_phone_field')), '0555001122');
+      await tester
+          .ensureVisible(find.byKey(const ValueKey('patient_name_field')));
+      await tester.enterText(
+          find.byKey(const ValueKey('patient_name_field')), 'حميد قادري');
+      await tester
+          .ensureVisible(find.byKey(const ValueKey('patient_phone_field')));
+      await tester.enterText(
+          find.byKey(const ValueKey('patient_phone_field')), '0555001122');
 
       // Tap submit
-      await tester.ensureVisible(find.byKey(const ValueKey('confirm_booking_button')));
+      await tester
+          .ensureVisible(find.byKey(const ValueKey('confirm_booking_button')));
       await tester.tap(find.byKey(const ValueKey('confirm_booking_button')));
       await tester.pumpAndSettle();
 
@@ -566,10 +633,14 @@ void main() {
   });
 
   group('AssistantQueueScreen Entry Point Integration', () {
-    testWidgets('AssistantQueueScreen renders new booking action button', (tester) async {
+    testWidgets('AssistantQueueScreen renders new booking action button',
+        (tester) async {
       final mockClient = MockClient((request) async {
         return http.Response(
-          jsonEncode({'data': [], 'meta': {'current_page': 1, 'last_page': 1}}),
+          jsonEncode({
+            'data': [],
+            'meta': {'current_page': 1, 'last_page': 1}
+          }),
           200,
           headers: {'content-type': 'application/json'},
         );
@@ -594,7 +665,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Check New Booking Button exists
-      final newBookingBtn = find.byKey(const ValueKey('new_booking_action_button'));
+      final newBookingBtn =
+          find.byKey(const ValueKey('new_booking_action_button'));
       expect(newBookingBtn, findsOneWidget);
       expect(find.text('حجز موعد جديد'), findsWidgets);
     });

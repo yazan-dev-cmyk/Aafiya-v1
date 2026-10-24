@@ -61,9 +61,15 @@ void main() {
     });
 
     test('equality and hashCode are based strictly on code', () {
-      const w1 = Wilaya(code: '16', nameAr: 'الجزائر', nameFr: 'Alger', nameEn: 'Algiers');
-      const w2 = Wilaya(code: '16', nameAr: 'الجزائر العاصمة', nameFr: 'Alger Centre', nameEn: 'Algiers');
-      const w3 = Wilaya(code: '31', nameAr: 'وهران', nameFr: 'Oran', nameEn: 'Oran');
+      const w1 = Wilaya(
+          code: '16', nameAr: 'الجزائر', nameFr: 'Alger', nameEn: 'Algiers');
+      const w2 = Wilaya(
+          code: '16',
+          nameAr: 'الجزائر العاصمة',
+          nameFr: 'Alger Centre',
+          nameEn: 'Algiers');
+      const w3 =
+          Wilaya(code: '31', nameAr: 'وهران', nameFr: 'Oran', nameEn: 'Oran');
 
       expect(w1, equals(w2));
       expect(w1.hashCode, equals(w2.hashCode));
@@ -139,9 +145,30 @@ void main() {
             jsonEncode({
               'status': 'success',
               'data': [
-                {'code': '16', 'name_ar': 'الجزائر', 'name_fr': 'Alger', 'name_en': 'Algiers', 'is_active': true, 'display_order': 16},
-                {'code': '01', 'name_ar': 'أدرار', 'name_fr': 'Adrar', 'name_en': 'Adrar', 'is_active': true, 'display_order': 1},
-                {'code': '31', 'name_ar': 'وهران', 'name_fr': 'Oran', 'name_en': 'Oran', 'is_active': true, 'display_order': 31},
+                {
+                  'code': '16',
+                  'name_ar': 'الجزائر',
+                  'name_fr': 'Alger',
+                  'name_en': 'Algiers',
+                  'is_active': true,
+                  'display_order': 16
+                },
+                {
+                  'code': '01',
+                  'name_ar': 'أدرار',
+                  'name_fr': 'Adrar',
+                  'name_en': 'Adrar',
+                  'is_active': true,
+                  'display_order': 1
+                },
+                {
+                  'code': '31',
+                  'name_ar': 'وهران',
+                  'name_fr': 'Oran',
+                  'name_en': 'Oran',
+                  'is_active': true,
+                  'display_order': 31
+                },
               ],
             }),
             200,
@@ -184,7 +211,15 @@ void main() {
             jsonEncode({
               'status': 'success',
               'data': [
-                {'code': '1601', 'wilaya_code': '16', 'name_ar': 'الجزائر الوسطى', 'name_fr': 'Alger-Centre', 'name_en': 'Algiers Centre', 'is_active': true, 'display_order': 1},
+                {
+                  'code': '1601',
+                  'wilaya_code': '16',
+                  'name_ar': 'الجزائر الوسطى',
+                  'name_fr': 'Alger-Centre',
+                  'name_en': 'Algiers Centre',
+                  'is_active': true,
+                  'display_order': 1
+                },
               ],
             }),
             200,
@@ -195,8 +230,24 @@ void main() {
             jsonEncode({
               'status': 'success',
               'data': [
-                {'code': '3101', 'wilaya_code': '31', 'name_ar': 'وهران', 'name_fr': 'Oran', 'name_en': 'Oran', 'is_active': true, 'display_order': 1},
-                {'code': '3102', 'wilaya_code': '31', 'name_ar': 'السانية', 'name_fr': 'Es Sénia', 'name_en': 'Es Senia', 'is_active': true, 'display_order': 2},
+                {
+                  'code': '3101',
+                  'wilaya_code': '31',
+                  'name_ar': 'وهران',
+                  'name_fr': 'Oran',
+                  'name_en': 'Oran',
+                  'is_active': true,
+                  'display_order': 1
+                },
+                {
+                  'code': '3102',
+                  'wilaya_code': '31',
+                  'name_ar': 'السانية',
+                  'name_fr': 'Es Sénia',
+                  'name_en': 'Es Senia',
+                  'is_active': true,
+                  'display_order': 2
+                },
               ],
             }),
             200,
@@ -249,14 +300,29 @@ void main() {
       expect(communeResult, isA<ApiFailure<List<Commune>>>());
     });
 
-    test('resolveLegacyWilaya matches codes, localized names, and aliases', () async {
+    test('resolveLegacyWilaya matches codes, localized names, and aliases',
+        () async {
       final mockClient = MockClient((request) async {
         return http.Response(
           jsonEncode({
             'status': 'success',
             'data': [
-              {'code': '16', 'name_ar': 'الجزائر', 'name_fr': 'Alger', 'name_en': 'Algiers', 'is_active': true, 'display_order': 16},
-              {'code': '31', 'name_ar': 'وهران', 'name_fr': 'Oran', 'name_en': 'Oran', 'is_active': true, 'display_order': 31},
+              {
+                'code': '16',
+                'name_ar': 'الجزائر',
+                'name_fr': 'Alger',
+                'name_en': 'Algiers',
+                'is_active': true,
+                'display_order': 16
+              },
+              {
+                'code': '31',
+                'name_ar': 'وهران',
+                'name_fr': 'Oran',
+                'name_en': 'Oran',
+                'is_active': true,
+                'display_order': 31
+              },
             ],
           }),
           200,
@@ -277,7 +343,8 @@ void main() {
       // English name
       expect(service.resolveLegacyWilaya('Algiers')?.code, equals('16'));
       // Alias
-      expect(service.resolveLegacyWilaya('الجزائر العاصمة')?.code, equals('16'));
+      expect(
+          service.resolveLegacyWilaya('الجزائر العاصمة')?.code, equals('16'));
       expect(service.resolveLegacyWilaya('alger centre')?.code, equals('16'));
       expect(service.resolveLegacyWilaya('Oran')?.code, equals('31'));
       // Unknown
@@ -353,7 +420,9 @@ void main() {
       expect(wilaya.id, equals(16));
     });
 
-    test('Doctor model integrates canonical MedicalSpecialty and prioritizes localized name', () {
+    test(
+        'Doctor model integrates canonical MedicalSpecialty and prioritizes localized name',
+        () {
       const canonicalCard = MedicalSpecialty(
         id: 2,
         code: 'CARD',
@@ -388,7 +457,8 @@ void main() {
   });
 
   group('5. MasterDataService getSpecialties & Safety Invariants', () {
-    test('getSpecialties loads canonical catalog and EXCLUDES RAD and PATH', () async {
+    test('getSpecialties loads canonical catalog and EXCLUDES RAD and PATH',
+        () async {
       int apiCallCount = 0;
       final mockClient = MockClient((request) async {
         if (request.url.path.endsWith('/master/specialties')) {
@@ -397,12 +467,52 @@ void main() {
             jsonEncode({
               'status': 'success',
               'data': [
-                {'id': 1, 'code': 'GP', 'name_ar': 'طب عام', 'name_fr': 'Médecine générale', 'name_en': 'General Practice', 'is_active': true, 'display_order': 1},
-                {'id': 2, 'code': 'CARD', 'name_ar': 'أمراض القلب', 'name_fr': 'Cardiologie', 'name_en': 'Cardiology', 'is_active': true, 'display_order': 2},
-                {'id': 3, 'code': 'PED', 'name_ar': 'طب الأطفال', 'name_fr': 'Pédiatrie', 'name_en': 'Pediatrics', 'is_active': true, 'display_order': 3},
+                {
+                  'id': 1,
+                  'code': 'GP',
+                  'name_ar': 'طب عام',
+                  'name_fr': 'Médecine générale',
+                  'name_en': 'General Practice',
+                  'is_active': true,
+                  'display_order': 1
+                },
+                {
+                  'id': 2,
+                  'code': 'CARD',
+                  'name_ar': 'أمراض القلب',
+                  'name_fr': 'Cardiologie',
+                  'name_en': 'Cardiology',
+                  'is_active': true,
+                  'display_order': 2
+                },
+                {
+                  'id': 3,
+                  'code': 'PED',
+                  'name_ar': 'طب الأطفال',
+                  'name_fr': 'Pédiatrie',
+                  'name_en': 'Pediatrics',
+                  'is_active': true,
+                  'display_order': 3
+                },
                 // RAD and PATH in payload (must be defensively rejected by Mobile service)
-                {'id': 37, 'code': 'RAD', 'name_ar': 'الأشعة والتصوير الطبي', 'name_fr': 'Radiologie', 'name_en': 'Radiology', 'is_active': false, 'display_order': 37},
-                {'id': 38, 'code': 'PATH', 'name_ar': 'علم الأمراض والتشريح المرضي', 'name_fr': 'Pathologie', 'name_en': 'Pathology', 'is_active': false, 'display_order': 38},
+                {
+                  'id': 37,
+                  'code': 'RAD',
+                  'name_ar': 'الأشعة والتصوير الطبي',
+                  'name_fr': 'Radiologie',
+                  'name_en': 'Radiology',
+                  'is_active': false,
+                  'display_order': 37
+                },
+                {
+                  'id': 38,
+                  'code': 'PATH',
+                  'name_ar': 'علم الأمراض والتشريح المرضي',
+                  'name_fr': 'Pathologie',
+                  'name_en': 'Pathology',
+                  'is_active': false,
+                  'display_order': 38
+                },
               ],
               'meta': {'total': 3},
             }),
@@ -426,8 +536,11 @@ void main() {
       expect(codes, contains('GP'));
       expect(codes, contains('CARD'));
       expect(codes, contains('PED'));
-      expect(codes, isNot(contains('RAD')), reason: 'RAD must never appear in physician appointment specialties');
-      expect(codes, isNot(contains('PATH')), reason: 'PATH must never appear in physician appointment specialties');
+      expect(codes, isNot(contains('RAD')),
+          reason: 'RAD must never appear in physician appointment specialties');
+      expect(codes, isNot(contains('PATH')),
+          reason:
+              'PATH must never appear in physician appointment specialties');
 
       // Subsequent call uses in-memory cache
       final cachedResult = await service.getSpecialties();
@@ -439,9 +552,12 @@ void main() {
       expect(apiCallCount, equals(2));
     });
 
-    test('getSpecialties handles API failure gracefully without throwing or silently substituting fake catalog', () async {
+    test(
+        'getSpecialties handles API failure gracefully without throwing or silently substituting fake catalog',
+        () async {
       final mockClient = MockClient((request) async {
-        return http.Response(jsonEncode({'message': 'Internal Server Error'}), 500);
+        return http.Response(
+            jsonEncode({'message': 'Internal Server Error'}), 500);
       });
 
       final apiClient = ApiClient(httpClient: mockClient);
@@ -451,14 +567,32 @@ void main() {
       expect(result, isA<ApiFailure<List<MedicalSpecialty>>>());
     });
 
-    test('resolveLegacySpecialty resolves code, id, and localized names, rejecting RAD/PATH', () async {
+    test(
+        'resolveLegacySpecialty resolves code, id, and localized names, rejecting RAD/PATH',
+        () async {
       final mockClient = MockClient((request) async {
         return http.Response(
           jsonEncode({
             'status': 'success',
             'data': [
-              {'id': 2, 'code': 'CARD', 'name_ar': 'أمراض القلب', 'name_fr': 'Cardiologie', 'name_en': 'Cardiology', 'is_active': true, 'display_order': 2},
-              {'id': 3, 'code': 'PED', 'name_ar': 'طب الأطفال', 'name_fr': 'Pédiatrie', 'name_en': 'Pediatrics', 'is_active': true, 'display_order': 3},
+              {
+                'id': 2,
+                'code': 'CARD',
+                'name_ar': 'أمراض القلب',
+                'name_fr': 'Cardiologie',
+                'name_en': 'Cardiology',
+                'is_active': true,
+                'display_order': 2
+              },
+              {
+                'id': 3,
+                'code': 'PED',
+                'name_ar': 'طب الأطفال',
+                'name_fr': 'Pédiatrie',
+                'name_en': 'Pediatrics',
+                'is_active': true,
+                'display_order': 3
+              },
             ],
           }),
           200,

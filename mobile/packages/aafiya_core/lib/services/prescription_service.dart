@@ -83,7 +83,8 @@ class PrescriptionService {
 
         final meta = data['meta'] as Map<String, dynamic>?;
         final currentPage = meta?['current_page'] as int? ?? page;
-        final lastPage = meta?['last_page'] as int? ?? (prescriptions.length < perPage ? page : page + 1);
+        final lastPage = meta?['last_page'] as int? ??
+            (prescriptions.length < perPage ? page : page + 1);
         final total = meta?['total'] as int? ?? prescriptions.length;
 
         return ApiSuccess(

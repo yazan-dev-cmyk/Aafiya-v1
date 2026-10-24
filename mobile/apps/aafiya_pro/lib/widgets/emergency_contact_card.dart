@@ -106,9 +106,11 @@ class _SingleContactTile extends StatelessWidget {
                     if (contact.isPrimary) ...[
                       const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: AafiyaColors.healthBlue.withValues(alpha: 0.12),
+                          color:
+                              AafiyaColors.healthBlue.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(AafiyaRadius.sm),
                         ),
                         child: Text(

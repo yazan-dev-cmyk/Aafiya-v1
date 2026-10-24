@@ -220,7 +220,10 @@ class _DoctorDashboardViewState extends State<DoctorDashboardView> {
     final clinicId = activeClinic?.id;
     final doctorId = widget.user.doctorId;
 
-    if (clinicId == null || clinicId.isEmpty || doctorId == null || doctorId.isEmpty) {
+    if (clinicId == null ||
+        clinicId.isEmpty ||
+        doctorId == null ||
+        doctorId.isEmpty) {
       if (mounted) {
         setState(() {
           _isClinicConfigured = null;
@@ -241,8 +244,8 @@ class _DoctorDashboardViewState extends State<DoctorDashboardView> {
 
     final clinicHoursFuture =
         _clinicHoursService.getOperatingHours(clinicId: clinicId);
-    final docScheduleFuture =
-        _doctorWorkingHoursService.getSchedule(doctorId: doctorId, clinicId: clinicId);
+    final docScheduleFuture = _doctorWorkingHoursService.getSchedule(
+        doctorId: doctorId, clinicId: clinicId);
 
     final results = await Future.wait([clinicHoursFuture, docScheduleFuture]);
 
@@ -413,7 +416,8 @@ class _DoctorDashboardViewState extends State<DoctorDashboardView> {
                   // 2. Persistent Onboarding Reminder Banner
                   DoctorSetupReminderBanner(
                     isDirector:
-                        widget.sessionManager.activeClinic?.isMedicalDirector == true,
+                        widget.sessionManager.activeClinic?.isMedicalDirector ==
+                            true,
                     isClinicConfigured: _isClinicConfigured,
                     isScheduleActivated: _isScheduleActivated,
                     isLoading: _isOnboardingLoading,
@@ -482,7 +486,8 @@ class _DoctorDashboardViewState extends State<DoctorDashboardView> {
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
                     final appointment = _appointments[index];
-                    final client = widget.apiClient ?? widget.sessionManager.apiClient;
+                    final client =
+                        widget.apiClient ?? widget.sessionManager.apiClient;
                     return DoctorAgendaTile(
                       appointment: appointment,
                       onTap: appointment.patient.id != null
@@ -491,7 +496,8 @@ class _DoctorDashboardViewState extends State<DoctorDashboardView> {
                                 apiClient: client,
                                 patientId: appointment.patient.id!,
                                 patientName: appointment.patient.name ??
-                                    LocalizedStrings.of(context).patientNameLabel,
+                                    LocalizedStrings.of(context)
+                                        .patientNameLabel,
                                 mrn: appointment.patient.mrn,
                               )
                           : null,

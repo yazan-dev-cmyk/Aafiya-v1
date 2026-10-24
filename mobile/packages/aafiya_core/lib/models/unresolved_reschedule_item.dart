@@ -57,10 +57,11 @@ class UnresolvedRescheduleItem {
           ? OriginalAppointmentInfo.fromJson(
               json['original_appointment'] as Map<String, dynamic>)
           : null,
-      replacementAppointment: json['replacement_appointment'] is Map<String, dynamic>
-          ? ReplacementAppointmentInfo.fromJson(
-              json['replacement_appointment'] as Map<String, dynamic>)
-          : null,
+      replacementAppointment:
+          json['replacement_appointment'] is Map<String, dynamic>
+              ? ReplacementAppointmentInfo.fromJson(
+                  json['replacement_appointment'] as Map<String, dynamic>)
+              : null,
       vacation: json['vacation'] is Map<String, dynamic>
           ? VacationInfo.fromJson(json['vacation'] as Map<String, dynamic>)
           : null,

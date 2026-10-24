@@ -7,7 +7,9 @@ import 'package:aafiya_core/aafiya_core.dart';
 
 void main() {
   group('ApiClient Clinic Header Isolation & Regression Tests', () {
-    test('suppresses X-Clinic-ID and X-Active-Clinic-ID when includeClinicContext is false', () async {
+    test(
+        'suppresses X-Clinic-ID and X-Active-Clinic-ID when includeClinicContext is false',
+        () async {
       late Map<String, String> capturedHeaders;
 
       final mockClient = MockClient((request) async {
@@ -32,7 +34,9 @@ void main() {
       expect(capturedHeaders.containsKey('Authorization'), isFalse);
     });
 
-    test('preserves X-Clinic-ID and X-Active-Clinic-ID by default when active clinic is configured', () async {
+    test(
+        'preserves X-Clinic-ID and X-Active-Clinic-ID by default when active clinic is configured',
+        () async {
       late Map<String, String> capturedHeaders;
 
       final mockClient = MockClient((request) async {
@@ -58,7 +62,8 @@ void main() {
   });
 
   group('SharedRecordService Tests', () {
-    const validToken = '7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b';
+    const validToken =
+        '7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b';
     const validPin = '1234';
 
     final validResponseJson = {
@@ -116,26 +121,32 @@ void main() {
           'scope': 'all_emr',
           'access_granted_at': '2026-10-16T08:00:00.000Z',
           'expires_at': '2026-10-16T12:00:00.000Z',
-          'authorized_clinical_scope': 'ملف طبي موحد معتمد (خالٍ من بيانات الاتصال والهوية الشخصية)',
+          'authorized_clinical_scope':
+              'ملف طبي موحد معتمد (خالٍ من بيانات الاتصال والهوية الشخصية)',
         },
       }
     };
 
     const jsonHeaders = {'content-type': 'application/json; charset=utf-8'};
 
-    test('successfully resolves record with complete privacy minimization', () async {
+    test('successfully resolves record with complete privacy minimization',
+        () async {
       late http.Request capturedRequest;
 
       final mockClient = MockClient((request) async {
         capturedRequest = request;
-        return http.Response(jsonEncode(validResponseJson), 200, headers: jsonHeaders);
+        return http.Response(jsonEncode(validResponseJson), 200,
+            headers: jsonHeaders);
       });
 
-      final apiClient = ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
+      final apiClient =
+          ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
       apiClient.setActiveClinicId('ambient-clinic-123');
 
-      final service = SharedRecordService(apiClient, config: AppConfig.devLocal);
-      final result = await service.resolveSharedRecord(token: validToken, pin: validPin);
+      final service =
+          SharedRecordService(apiClient, config: AppConfig.devLocal);
+      final result =
+          await service.resolveSharedRecord(token: validToken, pin: validPin);
 
       expect(result, isA<SharedRecordSuccess>());
       final record = (result as SharedRecordSuccess).record;
@@ -148,14 +159,17 @@ void main() {
       expect(record.patient.allergies.length, equals(1));
       expect(record.patient.allergies.first.allergen, equals('Penicillin'));
       expect(record.patient.chronicConditions.length, equals(1));
-      expect(record.patient.chronicConditions.first.conditionName, equals('Type 2 Diabetes'));
+      expect(record.patient.chronicConditions.first.conditionName,
+          equals('Type 2 Diabetes'));
       expect(record.patient.currentMedications.length, equals(1));
-      expect(record.patient.currentMedications.first.medicationName, equals('Metformin'));
+      expect(record.patient.currentMedications.first.medicationName,
+          equals('Metformin'));
 
       // Assert security headers on request
       expect(capturedRequest.headers.containsKey('Authorization'), isFalse);
       expect(capturedRequest.headers.containsKey('X-Clinic-ID'), isFalse);
-      expect(capturedRequest.headers.containsKey('X-Active-Clinic-ID'), isFalse);
+      expect(
+          capturedRequest.headers.containsKey('X-Active-Clinic-ID'), isFalse);
 
       // Assert body
       final body = jsonDecode(capturedRequest.body) as Map<String, dynamic>;
@@ -177,10 +191,13 @@ void main() {
         );
       });
 
-      final apiClient = ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
-      final service = SharedRecordService(apiClient, config: AppConfig.devLocal);
+      final apiClient =
+          ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
+      final service =
+          SharedRecordService(apiClient, config: AppConfig.devLocal);
 
-      final result = await service.resolveSharedRecord(token: validToken, pin: '9999');
+      final result =
+          await service.resolveSharedRecord(token: validToken, pin: '9999');
 
       expect(result, isA<SharedRecordWrongPinFailure>());
       final failure = result as SharedRecordWrongPinFailure;
@@ -201,10 +218,13 @@ void main() {
         );
       });
 
-      final apiClient = ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
-      final service = SharedRecordService(apiClient, config: AppConfig.devLocal);
+      final apiClient =
+          ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
+      final service =
+          SharedRecordService(apiClient, config: AppConfig.devLocal);
 
-      final result = await service.resolveSharedRecord(token: 'invalid_token', pin: validPin);
+      final result = await service.resolveSharedRecord(
+          token: 'invalid_token', pin: validPin);
 
       expect(result, isA<SharedRecordNotFoundFailure>());
     });
@@ -215,22 +235,27 @@ void main() {
           jsonEncode({
             'status': 'error',
             'code': 410,
-            'message': 'تم إلغاء رابط المشاركة من قِبل المريض، ولم يعد صالحاً للاستخدام.',
+            'message':
+                'تم إلغاء رابط المشاركة من قِبل المريض، ولم يعد صالحاً للاستخدام.',
           }),
           410,
           headers: jsonHeaders,
         );
       });
 
-      final apiClient = ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
-      final service = SharedRecordService(apiClient, config: AppConfig.devLocal);
+      final apiClient =
+          ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
+      final service =
+          SharedRecordService(apiClient, config: AppConfig.devLocal);
 
-      final result = await service.resolveSharedRecord(token: validToken, pin: validPin);
+      final result =
+          await service.resolveSharedRecord(token: validToken, pin: validPin);
 
       expect(result, isA<SharedRecordExpiredOrRevokedFailure>());
     });
 
-    test('maps 422 Unprocessable Content to SharedRecordValidationFailure', () async {
+    test('maps 422 Unprocessable Content to SharedRecordValidationFailure',
+        () async {
       final mockClient = MockClient((request) async {
         return http.Response(
           jsonEncode({
@@ -244,36 +269,46 @@ void main() {
         );
       });
 
-      final apiClient = ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
-      final service = SharedRecordService(apiClient, config: AppConfig.devLocal);
+      final apiClient =
+          ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
+      final service =
+          SharedRecordService(apiClient, config: AppConfig.devLocal);
 
-      final result = await service.resolveSharedRecord(token: validToken, pin: '12');
+      final result =
+          await service.resolveSharedRecord(token: validToken, pin: '12');
 
       expect(result, isA<SharedRecordValidationFailure>());
     });
 
-    test('maps 423 Locked to SharedRecordLockedFailure without exposing locked_until', () async {
+    test(
+        'maps 423 Locked to SharedRecordLockedFailure without exposing locked_until',
+        () async {
       final mockClient = MockClient((request) async {
         return http.Response(
           jsonEncode({
             'status': 'error',
             'code': 423,
-            'message': 'تم قفل الرابط مؤقتاً بسبب تكرار المحاولات الخاطئة. يرجى الانتظار والمحاولة لاحقاً.',
+            'message':
+                'تم قفل الرابط مؤقتاً بسبب تكرار المحاولات الخاطئة. يرجى الانتظار والمحاولة لاحقاً.',
           }),
           423,
           headers: jsonHeaders,
         );
       });
 
-      final apiClient = ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
-      final service = SharedRecordService(apiClient, config: AppConfig.devLocal);
+      final apiClient =
+          ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
+      final service =
+          SharedRecordService(apiClient, config: AppConfig.devLocal);
 
-      final result = await service.resolveSharedRecord(token: validToken, pin: validPin);
+      final result =
+          await service.resolveSharedRecord(token: validToken, pin: validPin);
 
       expect(result, isA<SharedRecordLockedFailure>());
     });
 
-    test('maps 429 Too Many Requests to SharedRecordRateLimitFailure', () async {
+    test('maps 429 Too Many Requests to SharedRecordRateLimitFailure',
+        () async {
       final mockClient = MockClient((request) async {
         return http.Response(
           jsonEncode({
@@ -286,19 +321,24 @@ void main() {
         );
       });
 
-      final apiClient = ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
-      final service = SharedRecordService(apiClient, config: AppConfig.devLocal);
+      final apiClient =
+          ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
+      final service =
+          SharedRecordService(apiClient, config: AppConfig.devLocal);
 
-      final result = await service.resolveSharedRecord(token: validToken, pin: validPin);
+      final result =
+          await service.resolveSharedRecord(token: validToken, pin: validPin);
 
       expect(result, isA<SharedRecordRateLimitFailure>());
     });
 
-    test('rejects plain HTTP in production environment before network call', () async {
+    test('rejects plain HTTP in production environment before network call',
+        () async {
       bool networkCalled = false;
       final mockClient = MockClient((request) async {
         networkCalled = true;
-        return http.Response(jsonEncode(validResponseJson), 200, headers: jsonHeaders);
+        return http.Response(jsonEncode(validResponseJson), 200,
+            headers: jsonHeaders);
       });
 
       const insecureProdConfig = AppConfig(
@@ -306,20 +346,25 @@ void main() {
         environment: 'production',
       );
 
-      final apiClient = ApiClient(httpClient: mockClient, config: insecureProdConfig);
-      final service = SharedRecordService(apiClient, config: insecureProdConfig);
+      final apiClient =
+          ApiClient(httpClient: mockClient, config: insecureProdConfig);
+      final service =
+          SharedRecordService(apiClient, config: insecureProdConfig);
 
-      final result = await service.resolveSharedRecord(token: validToken, pin: validPin);
+      final result =
+          await service.resolveSharedRecord(token: validToken, pin: validPin);
 
       expect(result, isA<SharedRecordInsecureSchemeFailure>());
       expect(networkCalled, isFalse);
     });
 
-    test('rejects plain HTTP in production even if host is localhost', () async {
+    test('rejects plain HTTP in production even if host is localhost',
+        () async {
       bool networkCalled = false;
       final mockClient = MockClient((request) async {
         networkCalled = true;
-        return http.Response(jsonEncode(validResponseJson), 200, headers: jsonHeaders);
+        return http.Response(jsonEncode(validResponseJson), 200,
+            headers: jsonHeaders);
       });
 
       const config = AppConfig(
@@ -330,17 +375,20 @@ void main() {
       final apiClient = ApiClient(httpClient: mockClient, config: config);
       final service = SharedRecordService(apiClient, config: config);
 
-      final result = await service.resolveSharedRecord(token: validToken, pin: validPin);
+      final result =
+          await service.resolveSharedRecord(token: validToken, pin: validPin);
 
       expect(result, isA<SharedRecordInsecureSchemeFailure>());
       expect(networkCalled, isFalse);
     });
 
-    test('rejects plain HTTP in production even if host is 127.0.0.1', () async {
+    test('rejects plain HTTP in production even if host is 127.0.0.1',
+        () async {
       bool networkCalled = false;
       final mockClient = MockClient((request) async {
         networkCalled = true;
-        return http.Response(jsonEncode(validResponseJson), 200, headers: jsonHeaders);
+        return http.Response(jsonEncode(validResponseJson), 200,
+            headers: jsonHeaders);
       });
 
       const config = AppConfig(
@@ -351,7 +399,8 @@ void main() {
       final apiClient = ApiClient(httpClient: mockClient, config: config);
       final service = SharedRecordService(apiClient, config: config);
 
-      final result = await service.resolveSharedRecord(token: validToken, pin: validPin);
+      final result =
+          await service.resolveSharedRecord(token: validToken, pin: validPin);
 
       expect(result, isA<SharedRecordInsecureSchemeFailure>());
       expect(networkCalled, isFalse);
@@ -361,7 +410,8 @@ void main() {
       bool networkCalled = false;
       final mockClient = MockClient((request) async {
         networkCalled = true;
-        return http.Response(jsonEncode(validResponseJson), 200, headers: jsonHeaders);
+        return http.Response(jsonEncode(validResponseJson), 200,
+            headers: jsonHeaders);
       });
 
       const config = AppConfig(
@@ -372,7 +422,8 @@ void main() {
       final apiClient = ApiClient(httpClient: mockClient, config: config);
       final service = SharedRecordService(apiClient, config: config);
 
-      final result = await service.resolveSharedRecord(token: validToken, pin: validPin);
+      final result =
+          await service.resolveSharedRecord(token: validToken, pin: validPin);
 
       expect(result, isA<SharedRecordInsecureSchemeFailure>());
       expect(networkCalled, isFalse);
@@ -382,7 +433,8 @@ void main() {
       bool networkCalled = false;
       final mockClient = MockClient((request) async {
         networkCalled = true;
-        return http.Response(jsonEncode(validResponseJson), 200, headers: jsonHeaders);
+        return http.Response(jsonEncode(validResponseJson), 200,
+            headers: jsonHeaders);
       });
 
       const config = AppConfig(
@@ -393,17 +445,21 @@ void main() {
       final apiClient = ApiClient(httpClient: mockClient, config: config);
       final service = SharedRecordService(apiClient, config: config);
 
-      final result = await service.resolveSharedRecord(token: validToken, pin: validPin);
+      final result =
+          await service.resolveSharedRecord(token: validToken, pin: validPin);
 
       expect(result, isA<SharedRecordInsecureSchemeFailure>());
       expect(networkCalled, isFalse);
     });
 
-    test('rejects invalid or scheme-less base URI in non-development environment', () async {
+    test(
+        'rejects invalid or scheme-less base URI in non-development environment',
+        () async {
       bool networkCalled = false;
       final mockClient = MockClient((request) async {
         networkCalled = true;
-        return http.Response(jsonEncode(validResponseJson), 200, headers: jsonHeaders);
+        return http.Response(jsonEncode(validResponseJson), 200,
+            headers: jsonHeaders);
       });
 
       const config = AppConfig(
@@ -414,7 +470,8 @@ void main() {
       final apiClient = ApiClient(httpClient: mockClient, config: config);
       final service = SharedRecordService(apiClient, config: config);
 
-      final result = await service.resolveSharedRecord(token: validToken, pin: validPin);
+      final result =
+          await service.resolveSharedRecord(token: validToken, pin: validPin);
 
       expect(result, isA<SharedRecordInsecureSchemeFailure>());
       expect(networkCalled, isFalse);
@@ -424,13 +481,17 @@ void main() {
       bool networkCalled = false;
       final mockClient = MockClient((request) async {
         networkCalled = true;
-        return http.Response(jsonEncode(validResponseJson), 200, headers: jsonHeaders);
+        return http.Response(jsonEncode(validResponseJson), 200,
+            headers: jsonHeaders);
       });
 
-      final apiClient = ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
-      final service = SharedRecordService(apiClient, config: AppConfig.devLocal);
+      final apiClient =
+          ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
+      final service =
+          SharedRecordService(apiClient, config: AppConfig.devLocal);
 
-      final result = await service.resolveSharedRecord(token: validToken, pin: validPin);
+      final result =
+          await service.resolveSharedRecord(token: validToken, pin: validPin);
 
       expect(result, isA<SharedRecordSuccess>());
       expect(networkCalled, isTrue);

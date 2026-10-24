@@ -18,7 +18,8 @@ void main() {
       );
     });
 
-    testWidgets('initializes in splash state and displays Pro brand title', (tester) async {
+    testWidgets('initializes in splash state and displays Pro brand title',
+        (tester) async {
       await tester.pumpWidget(
         AafiyaProApp(
           sessionManager: sessionManager,
@@ -82,7 +83,9 @@ void main() {
       expect(find.text('لوحة تحكم المساعد'), findsOneWidget);
     });
 
-    testWidgets('resolves Booking Center role and enforces NO staff management UI', (tester) async {
+    testWidgets(
+        'resolves Booking Center role and enforces NO staff management UI',
+        (tester) async {
       const bookingCenterUser = User(
         id: 'bc-1',
         name: 'Central Booking Algiers',
@@ -115,7 +118,8 @@ void main() {
       expect(find.byKey(const Key('staff_management_button')), findsNothing);
     });
 
-    testWidgets('rejects Patient role in Pro app with unauthorized feedback', (tester) async {
+    testWidgets('rejects Patient role in Pro app with unauthorized feedback',
+        (tester) async {
       const patientUser = User(
         id: 'pat-99',
         name: 'Patient Unauthorized',
@@ -136,11 +140,14 @@ void main() {
         ),
       );
 
-      expect(find.text('الحساب الحالي غير مصرح له بالدخول إلى هذا التطبيق.'), findsOneWidget);
+      expect(find.text('الحساب الحالي غير مصرح له بالدخول إلى هذا التطبيق.'),
+          findsOneWidget);
     });
 
     group('Session Expiration & Stack Teardown (TASK-06-02)', () {
-      testWidgets('runtime session expiration in Doctor shell tears down stack, routes to ProAuthShell, and shows modal', (tester) async {
+      testWidgets(
+          'runtime session expiration in Doctor shell tears down stack, routes to ProAuthShell, and shows modal',
+          (tester) async {
         const doctorUser = User(
           id: 'doc-1',
           name: 'Dr. Fatima',
@@ -177,7 +184,8 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Sensitive Clinical Consultation Route'), findsOneWidget);
+        expect(
+            find.text('Sensitive Clinical Consultation Route'), findsOneWidget);
 
         // Trigger runtime 401 session expiration
         sessionManager.handleUnauthorized();
@@ -185,11 +193,13 @@ void main() {
         await tester.pumpAndSettle();
 
         // Stack teardown: sensitive sub-route evicted
-        expect(find.text('Sensitive Clinical Consultation Route'), findsNothing);
+        expect(
+            find.text('Sensitive Clinical Consultation Route'), findsNothing);
 
         // Session expired modal is displayed with localized Arabic strings
         expect(find.text('انتهت الجلسة'), findsOneWidget);
-        expect(find.text('انتهت جلستك. يرجى تسجيل الدخول مجدداً للمتابعة.'), findsOneWidget);
+        expect(find.text('انتهت جلستك. يرجى تسجيل الدخول مجدداً للمتابعة.'),
+            findsOneWidget);
         expect(find.text('تسجيل الدخول مجدداً'), findsOneWidget);
 
         // Dismiss modal
@@ -199,10 +209,13 @@ void main() {
         // Now on ProAuthShell
         expect(find.text('تسجيل الدخول'), findsWidgets);
         expect(find.text('البريد الإلكتروني'), findsOneWidget);
-        expect(find.text('Sensitive Clinical Consultation Route'), findsNothing);
+        expect(
+            find.text('Sensitive Clinical Consultation Route'), findsNothing);
       });
 
-      testWidgets('runtime session expiration in Assistant shell tears down stack, routes to ProAuthShell, and shows modal', (tester) async {
+      testWidgets(
+          'runtime session expiration in Assistant shell tears down stack, routes to ProAuthShell, and shows modal',
+          (tester) async {
         const assistantUser = User(
           id: 'asst-1',
           name: 'Sami Assistant',
@@ -259,7 +272,9 @@ void main() {
         expect(find.text('Assistant Patient Triage Sub-Route'), findsNothing);
       });
 
-      testWidgets('runtime session expiration in Booking Center shell tears down stack, routes to ProAuthShell, and shows modal', (tester) async {
+      testWidgets(
+          'runtime session expiration in Booking Center shell tears down stack, routes to ProAuthShell, and shows modal',
+          (tester) async {
         const bookingCenterUser = User(
           id: 'bc-1',
           name: 'Central Booking Algiers',
@@ -316,7 +331,9 @@ void main() {
         expect(find.text('Booking Quota Allocation Sub-Route'), findsNothing);
       });
 
-      testWidgets('session expiration disposes in-flight Pro form state (PHI isolation)', (tester) async {
+      testWidgets(
+          'session expiration disposes in-flight Pro form state (PHI isolation)',
+          (tester) async {
         const doctorUser = User(
           id: 'doc-1',
           name: 'Dr. Fatima',
@@ -342,7 +359,8 @@ void main() {
         await tester.pumpAndSettle();
 
         // Push a clinical notes form with sensitive text input
-        final testController = TextEditingController(text: 'Confidential Patient Diagnostic Findings');
+        final testController = TextEditingController(
+            text: 'Confidential Patient Diagnostic Findings');
         navKey.currentState!.push(
           MaterialPageRoute<void>(
             builder: (_) => Scaffold(
@@ -351,14 +369,16 @@ void main() {
           ),
         );
         await tester.pumpAndSettle();
-        expect(find.text('Confidential Patient Diagnostic Findings'), findsOneWidget);
+        expect(find.text('Confidential Patient Diagnostic Findings'),
+            findsOneWidget);
 
         // Trigger session expiration
         sessionManager.handleUnauthorized();
         await tester.pumpAndSettle();
 
         // Confidential text must be completely evicted from widget tree
-        expect(find.text('Confidential Patient Diagnostic Findings'), findsNothing);
+        expect(find.text('Confidential Patient Diagnostic Findings'),
+            findsNothing);
         expect(find.text('انتهت الجلسة'), findsOneWidget);
       });
     });

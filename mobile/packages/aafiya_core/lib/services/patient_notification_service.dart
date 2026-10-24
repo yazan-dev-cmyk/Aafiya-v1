@@ -63,7 +63,8 @@ class PatientNotificationService {
               return ApiFailure<PatientNotification>(
                 GenericApiException(
                   statusCode: 0,
-                  message: 'Malformed notification record in acknowledgment response',
+                  message:
+                      'Malformed notification record in acknowledgment response',
                   cause: e,
                 ),
               );

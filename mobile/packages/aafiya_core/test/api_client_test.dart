@@ -9,15 +9,20 @@ import 'package:aafiya_core/aafiya_core.dart';
 
 void main() {
   group('ApiClient Resilience & Hardening', () {
-    test('GET request retries once on transient SocketException and succeeds', () async {
+    test('GET request retries once on transient SocketException and succeeds',
+        () async {
       int attempts = 0;
       final mockClient = MockClient((request) async {
         attempts++;
         if (attempts == 1) {
-          throw const SocketException('Software caused connection abort, errno = 103');
+          throw const SocketException(
+              'Software caused connection abort, errno = 103');
         }
         return http.Response(
-          jsonEncode({'status': 'ok', 'data': {'test': true}}),
+          jsonEncode({
+            'status': 'ok',
+            'data': {'test': true}
+          }),
           200,
           headers: {'content-type': 'application/json'},
         );
@@ -34,7 +39,8 @@ void main() {
       expect(result.dataOrNull?['status'], equals('ok'));
     });
 
-    test('GET request retries once on transient ClientException and succeeds', () async {
+    test('GET request retries once on transient ClientException and succeeds',
+        () async {
       int attempts = 0;
       final mockClient = MockClient((request) async {
         attempts++;
@@ -58,11 +64,14 @@ void main() {
       expect(result.isSuccess, isTrue);
     });
 
-    test('GET request fails after exhausting retries if SocketException persists, sanitizing error message', () async {
+    test(
+        'GET request fails after exhausting retries if SocketException persists, sanitizing error message',
+        () async {
       int attempts = 0;
       final mockClient = MockClient((request) async {
         attempts++;
-        throw const SocketException('Software caused connection abort, errno = 103');
+        throw const SocketException(
+            'Software caused connection abort, errno = 103');
       });
 
       final apiClient = ApiClient(
@@ -71,7 +80,9 @@ void main() {
       );
       final result = await apiClient.get('/test-endpoint');
 
-      expect(attempts, equals(3), reason: 'Must cap at 3 attempts (1 initial + 2 retries per D-06-01-R3)');
+      expect(attempts, equals(3),
+          reason:
+              'Must cap at 3 attempts (1 initial + 2 retries per D-06-01-R3)');
       expect(result.isFailure, isTrue);
       expect(result.exceptionOrNull, isA<NetworkConnectionException>());
 
@@ -79,7 +90,8 @@ void main() {
       // User-facing message must NEVER contain raw OS errno or socket abort strings
       expect(
         ex.message,
-        equals('Unable to connect to server. Please check your internet connection.'),
+        equals(
+            'Unable to connect to server. Please check your internet connection.'),
       );
       expect(ex.message.contains('Software caused connection abort'), isFalse);
       expect(ex.message.contains('103'), isFalse);
@@ -88,33 +100,43 @@ void main() {
       expect(ex.cause, isA<SocketException>());
     });
 
-    test('POST request by default does NOT retry on SocketException (safe idempotency)', () async {
+    test(
+        'POST request by default does NOT retry on SocketException (safe idempotency)',
+        () async {
       int attempts = 0;
       final mockClient = MockClient((request) async {
         attempts++;
-        throw const SocketException('Software caused connection abort, errno = 103');
+        throw const SocketException(
+            'Software caused connection abort, errno = 103');
       });
 
       final apiClient = ApiClient(
         httpClient: mockClient,
         retryPolicy: const RetryPolicy(useDelays: false),
       );
-      final result = await apiClient.post('/appointments', body: {'doctor_id': '1'});
+      final result =
+          await apiClient.post('/appointments', body: {'doctor_id': '1'});
 
-      expect(attempts, equals(1), reason: 'POST must not retry by default to prevent duplicate mutation');
+      expect(attempts, equals(1),
+          reason:
+              'POST must not retry by default to prevent duplicate mutation');
       expect(result.isFailure, isTrue);
       expect(result.exceptionOrNull, isA<NetworkConnectionException>());
       expect(
         result.exceptionOrNull?.message,
-        equals('Unable to connect to server. Please check your internet connection.'),
+        equals(
+            'Unable to connect to server. Please check your internet connection.'),
       );
     });
 
-    test('POST requests are strictly non-retryable even if allowRetry is requested (D-06-01-R1)', () async {
+    test(
+        'POST requests are strictly non-retryable even if allowRetry is requested (D-06-01-R1)',
+        () async {
       int attempts = 0;
       final mockClient = MockClient((request) async {
         attempts++;
-        throw const SocketException('Software caused connection abort, errno = 103');
+        throw const SocketException(
+            'Software caused connection abort, errno = 103');
       });
 
       final apiClient = ApiClient(
@@ -127,12 +149,16 @@ void main() {
         allowRetry: true,
       );
 
-      expect(attempts, equals(1), reason: 'State mutations must never automatically retry per D-06-01-R1');
+      expect(attempts, equals(1),
+          reason:
+              'State mutations must never automatically retry per D-06-01-R1');
       expect(result.isFailure, isTrue);
       expect(result.exceptionOrNull, isA<NetworkConnectionException>());
     });
 
-    test('TimeoutException returns clean timeout message without leaking internal details', () async {
+    test(
+        'TimeoutException returns clean timeout message without leaking internal details',
+        () async {
       final mockClient = MockClient((request) async {
         throw TimeoutException('Client timeout exceeded');
       });
@@ -149,7 +175,8 @@ void main() {
     });
 
     group('Session Expiration 401 Notification Hook Tests (TASK-06-02)', () {
-      test('401 on authenticated request invokes onUnauthorized hook', () async {
+      test('401 on authenticated request invokes onUnauthorized hook',
+          () async {
         int unauthorizedCallCount = 0;
         final mockClient = MockClient((request) async {
           return http.Response(
@@ -171,7 +198,9 @@ void main() {
         expect(result.exceptionOrNull, isA<UnauthorizedException>());
       });
 
-      test('callback receives notification without altering the original ApiFailure response', () async {
+      test(
+          'callback receives notification without altering the original ApiFailure response',
+          () async {
         bool hookFired = false;
         final mockClient = MockClient((request) async {
           return http.Response(
@@ -197,7 +226,9 @@ void main() {
         expect(ex.message, equals('Token expired.'));
       });
 
-      test('callback exception does not alter or suppress the original ApiFailure', () async {
+      test(
+          'callback exception does not alter or suppress the original ApiFailure',
+          () async {
         final mockClient = MockClient((request) async {
           return http.Response(
             jsonEncode({'status': 'error', 'message': 'Session expired.'}),
@@ -220,7 +251,9 @@ void main() {
         expect(result.exceptionOrNull?.message, equals('Session expired.'));
       });
 
-      test('notifyUnauthorized: false prevents invoking onUnauthorized callback', () async {
+      test(
+          'notifyUnauthorized: false prevents invoking onUnauthorized callback',
+          () async {
         int unauthorizedCallCount = 0;
         final mockClient = MockClient((request) async {
           return http.Response(
@@ -240,7 +273,8 @@ void main() {
           notifyUnauthorized: false,
         );
 
-        expect(unauthorizedCallCount, equals(0), reason: 'restoreSession must exclude runtime unauthorized hook');
+        expect(unauthorizedCallCount, equals(0),
+            reason: 'restoreSession must exclude runtime unauthorized hook');
         expect(result.isFailure, isTrue);
         expect(result.exceptionOrNull, isA<UnauthorizedException>());
       });
@@ -273,7 +307,9 @@ void main() {
         expect(unauthorizedCallCount, equals(0));
       });
 
-      test('unauthenticated requests (requiresAuth == false) do not invoke onUnauthorized even on 401', () async {
+      test(
+          'unauthenticated requests (requiresAuth == false) do not invoke onUnauthorized even on 401',
+          () async {
         int unauthorizedCallCount = 0;
         final mockClient = MockClient((request) async {
           return http.Response(
@@ -294,11 +330,14 @@ void main() {
           requiresAuth: false,
         );
 
-        expect(unauthorizedCallCount, equals(0), reason: 'Login endpoint must not trigger session expiration hook');
+        expect(unauthorizedCallCount, equals(0),
+            reason: 'Login endpoint must not trigger session expiration hook');
         expect(result.isFailure, isTrue);
       });
 
-      test('401 is never automatically retried (executes exactly 1 attempt per ADR-06-01-01)', () async {
+      test(
+          '401 is never automatically retried (executes exactly 1 attempt per ADR-06-01-01)',
+          () async {
         int attempts = 0;
         final mockClient = MockClient((request) async {
           attempts++;

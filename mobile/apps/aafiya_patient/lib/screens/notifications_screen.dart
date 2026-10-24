@@ -384,7 +384,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ),
             const SizedBox(height: 12.0),
             Text(
-              item.message,
+              item.displayMessage(strings),
               style: AafiyaTypography.bodyMedium.copyWith(
                 fontWeight:
                     item.isAcknowledged ? FontWeight.normal : FontWeight.w600,

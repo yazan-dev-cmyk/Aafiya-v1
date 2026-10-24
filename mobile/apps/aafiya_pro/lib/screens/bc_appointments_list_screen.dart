@@ -75,8 +75,12 @@ class _BcAppointmentsListScreenState extends State<BcAppointmentsListScreen> {
       AppointmentStatus.confirmed => AafiyaColors.healthBlue,
       AppointmentStatus.attended => AafiyaColors.healingGreen,
       AppointmentStatus.noShow => AafiyaColors.secondaryText,
-      AppointmentStatus.cancelled || AppointmentStatus.rejected => AafiyaColors.error,
-      AppointmentStatus.expired || AppointmentStatus.rescheduled => AafiyaColors.secondaryText,
+      AppointmentStatus.cancelled ||
+      AppointmentStatus.rejected =>
+        AafiyaColors.error,
+      AppointmentStatus.expired ||
+      AppointmentStatus.rescheduled =>
+        AafiyaColors.secondaryText,
       AppointmentStatus.unknown => AafiyaColors.secondaryText,
     };
   }
@@ -106,10 +110,12 @@ class _BcAppointmentsListScreenState extends State<BcAppointmentsListScreen> {
       final confirmed = await showDialog<bool>(
         context: context,
         builder: (ctx) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Row(
             children: [
-              const Icon(Icons.cancel_outlined, color: AafiyaColors.error, size: 26),
+              const Icon(Icons.cancel_outlined,
+                  color: AafiyaColors.error, size: 26),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -201,7 +207,8 @@ class _BcAppointmentsListScreenState extends State<BcAppointmentsListScreen> {
           });
           final errorMessage = switch (exception) {
             ValidationException(:final validationErrors, :final message) =>
-              validationErrors.values.expand((msgs) => msgs).firstOrNull ?? message,
+              validationErrors.values.expand((msgs) => msgs).firstOrNull ??
+                  message,
             _ => exception.message,
           };
           ScaffoldMessenger.of(context).showSnackBar(
@@ -489,7 +496,9 @@ class _BcAppointmentsListScreenState extends State<BcAppointmentsListScreen> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         OutlinedButton.icon(
-                          onPressed: _isLoading ? null : () => _showCancelDialog(appointment),
+                          onPressed: _isLoading
+                              ? null
+                              : () => _showCancelDialog(appointment),
                           icon: const Icon(Icons.close_rounded,
                               size: 16, color: AafiyaColors.error),
                           label: Text(
@@ -505,7 +514,9 @@ class _BcAppointmentsListScreenState extends State<BcAppointmentsListScreen> {
                         ),
                         const SizedBox(width: 8),
                         ElevatedButton.icon(
-                          onPressed: _isLoading ? null : () => _showRescheduleSheet(appointment),
+                          onPressed: _isLoading
+                              ? null
+                              : () => _showRescheduleSheet(appointment),
                           icon: const Icon(Icons.schedule_rounded, size: 16),
                           label: Text(strings.rescheduleAppointmentTitle),
                           style: ElevatedButton.styleFrom(
@@ -702,7 +713,8 @@ class _RescheduleSheetState extends State<_RescheduleSheet> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
                   children: [
                     const Icon(Icons.schedule_rounded,

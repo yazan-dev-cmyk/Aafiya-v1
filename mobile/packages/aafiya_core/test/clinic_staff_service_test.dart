@@ -184,7 +184,8 @@ void main() {
       );
 
       expect(res, isA<ApiSuccess<ClinicDoctorStaff>>());
-      expect((res as ApiSuccess<ClinicDoctorStaff>).data.name, equals('Dr. Nouvel'));
+      expect((res as ApiSuccess<ClinicDoctorStaff>).data.name,
+          equals('Dr. Nouvel'));
     });
 
     test('3. lookupDoctor GET /clinics/{id}/doctors/lookup', () async {
@@ -211,10 +212,12 @@ void main() {
 
       final res = await service.lookupDoctor(clinicId, 'kaci@aafiya.test');
       expect(res, isA<ApiSuccess<DoctorLookupResult>>());
-      expect((res as ApiSuccess<DoctorLookupResult>).data.fullName, equals('Dr. Leila Kaci'));
+      expect((res as ApiSuccess<DoctorLookupResult>).data.fullName,
+          equals('Dr. Leila Kaci'));
     });
 
-    test('4. sendDoctorInvitation POST /clinics/{id}/doctor-invitations', () async {
+    test('4. sendDoctorInvitation POST /clinics/{id}/doctor-invitations',
+        () async {
       final mock = MockClient((req) async {
         expect(req.method, equals('POST'));
         expect(req.url.path, endsWith('/clinics/$clinicId/doctor-invitations'));
@@ -236,12 +239,15 @@ void main() {
         apiClient: ApiClient(httpClient: mock),
       );
 
-      final res = await service.sendDoctorInvitation(clinicId, doctorId: doctorId);
+      final res =
+          await service.sendDoctorInvitation(clinicId, doctorId: doctorId);
       expect(res, isA<ApiSuccess<ClinicDoctorInvitation>>());
-      expect((res as ApiSuccess<ClinicDoctorInvitation>).data.id, equals(invitationId));
+      expect((res as ApiSuccess<ClinicDoctorInvitation>).data.id,
+          equals(invitationId));
     });
 
-    test('5. fetchClinicInvitations GET /clinics/{id}/doctor-invitations', () async {
+    test('5. fetchClinicInvitations GET /clinics/{id}/doctor-invitations',
+        () async {
       final mock = MockClient((req) async {
         expect(req.method, equals('GET'));
         expect(req.url.path, endsWith('/clinics/$clinicId/doctor-invitations'));
@@ -265,13 +271,19 @@ void main() {
 
       final res = await service.fetchClinicInvitations(clinicId);
       expect(res, isA<ApiSuccess<List<ClinicDoctorInvitation>>>());
-      expect((res as ApiSuccess<List<ClinicDoctorInvitation>>).data.length, equals(1));
+      expect((res as ApiSuccess<List<ClinicDoctorInvitation>>).data.length,
+          equals(1));
     });
 
-    test('6. cancelInvitation POST /clinics/{id}/doctor-invitations/{id}/cancel', () async {
+    test(
+        '6. cancelInvitation POST /clinics/{id}/doctor-invitations/{id}/cancel',
+        () async {
       final mock = MockClient((req) async {
         expect(req.method, equals('POST'));
-        expect(req.url.path, endsWith('/clinics/$clinicId/doctor-invitations/$invitationId/cancel'));
+        expect(
+            req.url.path,
+            endsWith(
+                '/clinics/$clinicId/doctor-invitations/$invitationId/cancel'));
         return http.Response(
           jsonEncode({'message': 'Invitation cancelled'}),
           200,
@@ -287,10 +299,12 @@ void main() {
       expect((res as ApiSuccess<bool>).data, isTrue);
     });
 
-    test('7. updateDoctorStatus PUT /clinics/{id}/doctors/{id}/status', () async {
+    test('7. updateDoctorStatus PUT /clinics/{id}/doctors/{id}/status',
+        () async {
       final mock = MockClient((req) async {
         expect(req.method, equals('PUT'));
-        expect(req.url.path, endsWith('/clinics/$clinicId/doctors/$doctorId/status'));
+        expect(req.url.path,
+            endsWith('/clinics/$clinicId/doctors/$doctorId/status'));
         final body = jsonDecode(req.body);
         expect(body['is_active'], isFalse);
         return http.Response(
@@ -303,7 +317,8 @@ void main() {
         apiClient: ApiClient(httpClient: mock),
       );
 
-      final res = await service.updateDoctorStatus(clinicId, doctorId, isActive: false);
+      final res =
+          await service.updateDoctorStatus(clinicId, doctorId, isActive: false);
       expect(res, isA<ApiSuccess<bool>>());
     });
 
@@ -358,13 +373,16 @@ void main() {
       );
 
       expect(res, isA<ApiSuccess<ClinicAssistantStaff>>());
-      expect((res as ApiSuccess<ClinicAssistantStaff>).data.name, equals('Assistant Yasmine'));
+      expect((res as ApiSuccess<ClinicAssistantStaff>).data.name,
+          equals('Assistant Yasmine'));
     });
 
-    test('10. updateAssistantStatus PUT /clinics/{id}/assistants/{id}/status', () async {
+    test('10. updateAssistantStatus PUT /clinics/{id}/assistants/{id}/status',
+        () async {
       final mock = MockClient((req) async {
         expect(req.method, equals('PUT'));
-        expect(req.url.path, endsWith('/clinics/$clinicId/assistants/$assistantId/status'));
+        expect(req.url.path,
+            endsWith('/clinics/$clinicId/assistants/$assistantId/status'));
         final body = jsonDecode(req.body);
         expect(body['is_active'], isTrue);
         return http.Response(
@@ -377,14 +395,18 @@ void main() {
         apiClient: ApiClient(httpClient: mock),
       );
 
-      final res = await service.updateAssistantStatus(clinicId, assistantId, isActive: true);
+      final res = await service.updateAssistantStatus(clinicId, assistantId,
+          isActive: true);
       expect(res, isA<ApiSuccess<bool>>());
     });
 
-    test('11. updateAssistantPermissions PUT /clinics/{id}/assistants/{id}/permissions', () async {
+    test(
+        '11. updateAssistantPermissions PUT /clinics/{id}/assistants/{id}/permissions',
+        () async {
       final mock = MockClient((req) async {
         expect(req.method, equals('PUT'));
-        expect(req.url.path, endsWith('/clinics/$clinicId/assistants/$assistantId/permissions'));
+        expect(req.url.path,
+            endsWith('/clinics/$clinicId/assistants/$assistantId/permissions'));
         final body = jsonDecode(req.body);
         expect(body['permissions'], contains('patient.view_contacts'));
         return http.Response(
@@ -419,7 +441,8 @@ void main() {
     test('12. deleteAssistant DELETE /clinics/{id}/assistants/{id}', () async {
       final mock = MockClient((req) async {
         expect(req.method, equals('DELETE'));
-        expect(req.url.path, endsWith('/clinics/$clinicId/assistants/$assistantId'));
+        expect(req.url.path,
+            endsWith('/clinics/$clinicId/assistants/$assistantId'));
         return http.Response(
           jsonEncode({'message': 'Assistant deleted'}),
           200,
@@ -457,7 +480,8 @@ void main() {
 
       final res = await service.getStaffDetail(clinicId, doctorId);
       expect(res, isA<ApiSuccess<StaffMemberDetail>>());
-      expect((res as ApiSuccess<StaffMemberDetail>).data.name, equals('Dr. Amine'));
+      expect((res as ApiSuccess<StaffMemberDetail>).data.name,
+          equals('Dr. Amine'));
     });
 
     test('Forbidden 403 maps to ForbiddenException', () async {

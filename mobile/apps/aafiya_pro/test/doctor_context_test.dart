@@ -39,13 +39,15 @@ void main() {
       tokenStorage = InMemoryTokenStorage();
     });
 
-    testWidgets('ProAuthShell renders login form and submits credentials', (tester) async {
+    testWidgets('ProAuthShell renders login form and submits credentials',
+        (tester) async {
       bool loginSuccessCalled = false;
 
       final mockHttpClient = MockClient((request) async {
         if (request.url.path.endsWith('/auth/login')) {
           final body = jsonDecode(request.body) as Map<String, dynamic>;
-          if (body['email'] == 'mansouri@example.dz' && body['password'] == 'ValidPass123!') {
+          if (body['email'] == 'mansouri@example.dz' &&
+              body['password'] == 'ValidPass123!') {
             return http.Response(
               jsonEncode({
                 'status': 'success',
@@ -64,7 +66,8 @@ void main() {
             );
           }
         }
-        return http.Response(jsonEncode({'message': 'Invalid credentials'}), 401);
+        return http.Response(
+            jsonEncode({'message': 'Invalid credentials'}), 401);
       });
 
       final mockApiClient = ApiClient(
@@ -93,7 +96,8 @@ void main() {
       expect(find.text('عافية للمهنيين'), findsWidgets);
       expect(find.byType(AafiyaTextField), findsNWidgets(2));
 
-      await tester.enterText(find.byType(TextFormField).at(0), 'mansouri@example.dz');
+      await tester.enterText(
+          find.byType(TextFormField).at(0), 'mansouri@example.dz');
       await tester.enterText(find.byType(TextFormField).at(1), 'ValidPass123!');
       await tester.pump();
 
@@ -103,10 +107,12 @@ void main() {
       expect(loginSuccessCalled, isTrue);
       expect(testSessionManager.isAuthenticated, isTrue);
       expect(testSessionManager.currentUser?.name, equals('Dr. Mansouri'));
-      expect(testSessionManager.currentUser?.roles.contains(UserRole.doctor), isTrue);
+      expect(testSessionManager.currentUser?.roles.contains(UserRole.doctor),
+          isTrue);
     });
 
-    testWidgets('RoleResolutionShell routes doctor to DoctorShell', (tester) async {
+    testWidgets('RoleResolutionShell routes doctor to DoctorShell',
+        (tester) async {
       const doctorUser = User(
         id: 'doc-1',
         name: 'Dr. Fatima',
@@ -179,7 +185,8 @@ void main() {
       tokenStorage = InMemoryTokenStorage();
     });
 
-    testWidgets('displays loading indicator while fetching clinics', (tester) async {
+    testWidgets('displays loading indicator while fetching clinics',
+        (tester) async {
       final mockClient = MockClient((request) async {
         await Future<void>.delayed(const Duration(milliseconds: 500));
         return http.Response(
@@ -220,7 +227,8 @@ void main() {
       await tester.pumpAndSettle();
     });
 
-    testWidgets('displays error view on fetch failure and retries successfully', (tester) async {
+    testWidgets('displays error view on fetch failure and retries successfully',
+        (tester) async {
       int attempts = 0;
       final mockClient = MockClient((request) async {
         attempts++;
@@ -292,7 +300,8 @@ void main() {
       expect(mockApiClient.activeClinicId, equals('cli-01'));
     });
 
-    testWidgets('displays empty state when doctor has no clinics assigned', (tester) async {
+    testWidgets('displays empty state when doctor has no clinics assigned',
+        (tester) async {
       final mockClient = MockClient((request) async {
         return http.Response(
           jsonEncode({'status': 'success', 'data': <Map<String, dynamic>>[]}),
@@ -328,11 +337,15 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      expect(find.text('لا توجد عيادة مرتبطة بحسابك حالياً. يرجى التواصل مع الإدارة.'), findsOneWidget);
+      expect(
+          find.text(
+              'لا توجد عيادة مرتبطة بحسابك حالياً. يرجى التواصل مع الإدارة.'),
+          findsOneWidget);
       expect(find.text('تسجيل الخروج'), findsOneWidget);
     });
 
-    testWidgets('single clinic auto-binds active context without change button', (tester) async {
+    testWidgets('single clinic auto-binds active context without change button',
+        (tester) async {
       final mockClient = MockClient((request) async {
         return http.Response(
           jsonEncode({
@@ -397,7 +410,9 @@ void main() {
       expect(find.text('تغيير'), findsNothing);
     });
 
-    testWidgets('multi-clinic supports switching active clinic context via bottom sheet', (tester) async {
+    testWidgets(
+        'multi-clinic supports switching active clinic context via bottom sheet',
+        (tester) async {
       final multiClinicsData = [
         {
           'id': 'cli-01',
@@ -481,7 +496,8 @@ void main() {
       expect(mockApiClient.activeClinicId, equals('cli-02'));
     });
 
-    testWidgets('trilingual localization renders correctly across AR, FR, EN', (tester) async {
+    testWidgets('trilingual localization renders correctly across AR, FR, EN',
+        (tester) async {
       final clinicData = [
         {
           'id': 'cli-01',
@@ -503,7 +519,11 @@ void main() {
         },
       ];
 
-      for (final locale in [const Locale('ar'), const Locale('fr'), const Locale('en')]) {
+      for (final locale in [
+        const Locale('ar'),
+        const Locale('fr'),
+        const Locale('en')
+      ]) {
         final mockClient = MockClient((request) async {
           return http.Response(
             jsonEncode({'status': 'success', 'data': clinicData}),
@@ -557,7 +577,9 @@ void main() {
       }
     });
 
-    testWidgets('DoctorShell renders corrected navigation labels across AR, EN, FR (DEF-03)', (tester) async {
+    testWidgets(
+        'DoctorShell renders corrected navigation labels across AR, EN, FR (DEF-03)',
+        (tester) async {
       final clinicData = [
         {
           'id': 'cln-1',
@@ -570,7 +592,11 @@ void main() {
         },
       ];
 
-      for (final locale in [const Locale('ar'), const Locale('en'), const Locale('fr')]) {
+      for (final locale in [
+        const Locale('ar'),
+        const Locale('en'),
+        const Locale('fr')
+      ]) {
         final mockClient = MockClient((request) async {
           if (request.url.path.endsWith('/doctor/clinics')) {
             return http.Response(
@@ -603,13 +629,19 @@ void main() {
               jsonEncode({
                 'status': 'success',
                 'data': [],
-                'meta': {'current_page': 1, 'per_page': 15, 'total': 0, 'total_pages': 0},
+                'meta': {
+                  'current_page': 1,
+                  'per_page': 15,
+                  'total': 0,
+                  'total_pages': 0
+                },
               }),
               200,
               headers: {'content-type': 'application/json'},
             );
           }
-          return http.Response(jsonEncode({'status': 'success', 'data': []}), 200);
+          return http.Response(
+              jsonEncode({'status': 'success', 'data': []}), 200);
         });
 
         final mockApiClient = ApiClient(
@@ -643,7 +675,9 @@ void main() {
 
         // Verify Tab 1 (Waiting Room) and Tab 2 (My Clinics) labels
         final navBar = tester.widget<NavigationBar>(find.byType(NavigationBar));
-        final labels = navBar.destinations.map((d) => (d as NavigationDestination).label).toList();
+        final labels = navBar.destinations
+            .map((d) => (d as NavigationDestination).label)
+            .toList();
 
         if (locale.languageCode == 'ar') {
           expect(labels.contains('قاعة الانتظار'), isTrue);

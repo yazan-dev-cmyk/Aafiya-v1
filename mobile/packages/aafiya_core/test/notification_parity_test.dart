@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -44,6 +45,10 @@ void main() {
         'derives template-specific fallback messages when payload.message is empty or missing',
         () {
       final templatesAndFallbacks = {
+        'appointment_booked':
+            'تم تسجيل طلب حجز موعدكم الطبي بنجاح وهو قيد المراجعة.',
+        'appointment_confirmed':
+            'تم تأكيد موعدكم الطبي بنجاح. تذكرة الحضور متاحة الآن في التطبيق.',
         'vacation_reschedule_success':
             'تمت إعادة جدولة موعدكم الطبي نظراً لإجازة الطبيب.',
         'appointment_cancelled': 'تم إلغاء الموعد الطبي.',
@@ -95,6 +100,49 @@ void main() {
       final notification = PatientNotification.fromJson(json);
       expect(notification.isAcknowledged, isTrue);
       expect(notification.acknowledgedAt, isNotNull);
+    });
+
+    test(
+        'resolves trilingual messages accurately using displayMessage(strings)',
+        () {
+      final jsonWithTranslations = {
+        'id': 'uuid-multilang-1',
+        'template': 'appointment_confirmed',
+        'created_at': '2026-10-23T08:00:00Z',
+        'payload': {
+          'message': 'تم تأكيد موعدكم الطبي.',
+          'message_en': 'Your appointment has been confirmed.',
+          'message_fr': 'Votre rendez-vous a été confirmé.',
+        },
+      };
+
+      final notif = PatientNotification.fromJson(jsonWithTranslations);
+
+      const arStrings = LocalizedStrings(Locale('ar'));
+      const enStrings = LocalizedStrings(Locale('en'));
+      const frStrings = LocalizedStrings(Locale('fr'));
+
+      expect(notif.displayMessage(arStrings), equals('تم تأكيد موعدكم الطبي.'));
+      expect(notif.displayMessage(enStrings),
+          equals('Your appointment has been confirmed.'));
+      expect(notif.displayMessage(frStrings),
+          equals('Votre rendez-vous a été confirmé.'));
+
+      // Test fallback to LocalizedStrings template getters when translations are missing in payload
+      final jsonFallback = {
+        'id': 'uuid-multilang-fallback',
+        'template': 'appointment_booked',
+        'created_at': '2026-10-23T08:00:00Z',
+        'payload': <String, dynamic>{},
+      };
+
+      final notifFallback = PatientNotification.fromJson(jsonFallback);
+      expect(notifFallback.displayMessage(arStrings),
+          equals(arStrings.appointmentBookedNotification));
+      expect(notifFallback.displayMessage(enStrings),
+          equals(enStrings.appointmentBookedNotification));
+      expect(notifFallback.displayMessage(frStrings),
+          equals(frStrings.appointmentBookedNotification));
     });
   });
 

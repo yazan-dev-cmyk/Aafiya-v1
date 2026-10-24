@@ -71,12 +71,18 @@ class MedicalSpecialty {
   String localizedName(String languageCode) {
     switch (languageCode.toLowerCase()) {
       case 'ar':
-        return nameAr.isNotEmpty ? nameAr : (nameFr.isNotEmpty ? nameFr : nameEn);
+        return nameAr.isNotEmpty
+            ? nameAr
+            : (nameFr.isNotEmpty ? nameFr : nameEn);
       case 'fr':
-        return nameFr.isNotEmpty ? nameFr : (nameAr.isNotEmpty ? nameAr : nameEn);
+        return nameFr.isNotEmpty
+            ? nameFr
+            : (nameAr.isNotEmpty ? nameAr : nameEn);
       case 'en':
       default:
-        return nameEn.isNotEmpty ? nameEn : (nameFr.isNotEmpty ? nameFr : nameAr);
+        return nameEn.isNotEmpty
+            ? nameEn
+            : (nameFr.isNotEmpty ? nameFr : nameAr);
     }
   }
 
@@ -90,5 +96,6 @@ class MedicalSpecialty {
   int get hashCode => Object.hash(id, code);
 
   @override
-  String toString() => 'MedicalSpecialty(id: $id, code: $code: $nameAr / $nameFr)';
+  String toString() =>
+      'MedicalSpecialty(id: $id, code: $code: $nameAr / $nameFr)';
 }

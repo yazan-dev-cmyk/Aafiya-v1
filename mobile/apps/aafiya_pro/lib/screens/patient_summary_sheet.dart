@@ -244,7 +244,9 @@ class _PatientSummarySheetState extends State<PatientSummarySheet> {
             // Allergies Section (High Visibility)
             _buildSectionHeader(
               icon: Icons.warning_amber_rounded,
-              iconColor: profile.hasAllergies ? AafiyaColors.error : AafiyaColors.secondaryText,
+              iconColor: profile.hasAllergies
+                  ? AafiyaColors.error
+                  : AafiyaColors.secondaryText,
               title: '${strings.allergiesTitle} (${profile.allergies.length})',
             ),
             const SizedBox(height: AafiyaSpacing.xs),
@@ -254,8 +256,11 @@ class _PatientSummarySheetState extends State<PatientSummarySheet> {
             // Chronic Conditions Section
             _buildSectionHeader(
               icon: Icons.healing_outlined,
-              iconColor: profile.hasChronicConditions ? AafiyaColors.warning : AafiyaColors.secondaryText,
-              title: '${strings.chronicConditionsTitle} (${profile.chronicConditions.length})',
+              iconColor: profile.hasChronicConditions
+                  ? AafiyaColors.warning
+                  : AafiyaColors.secondaryText,
+              title:
+                  '${strings.chronicConditionsTitle} (${profile.chronicConditions.length})',
             ),
             const SizedBox(height: AafiyaSpacing.xs),
             ChronicConditionsList(conditions: profile.chronicConditions),
@@ -265,7 +270,8 @@ class _PatientSummarySheetState extends State<PatientSummarySheet> {
             _buildSectionHeader(
               icon: Icons.contact_phone_outlined,
               iconColor: AafiyaColors.healthBlue,
-              title: '${strings.emergencyContactsTitle} (${profile.emergencyContacts.length})',
+              title:
+                  '${strings.emergencyContactsTitle} (${profile.emergencyContacts.length})',
             ),
             const SizedBox(height: AafiyaSpacing.xs),
             EmergencyContactCard(contacts: profile.emergencyContacts),
@@ -308,8 +314,10 @@ class _PatientSummarySheetState extends State<PatientSummarySheet> {
     );
   }
 
-  Widget _buildIdentityCard(EmergencyProfile profile, LocalizedStrings strings) {
-    final effectiveMrn = profile.mrn.isNotEmpty ? profile.mrn : (widget.mrn ?? '');
+  Widget _buildIdentityCard(
+      EmergencyProfile profile, LocalizedStrings strings) {
+    final effectiveMrn =
+        profile.mrn.isNotEmpty ? profile.mrn : (widget.mrn ?? '');
     final bloodGroup = profile.bloodGroup;
 
     return AafiyaCard(
@@ -357,7 +365,9 @@ class _PatientSummarySheetState extends State<PatientSummarySheet> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  profile.fullName.isNotEmpty ? profile.fullName : widget.patientName,
+                  profile.fullName.isNotEmpty
+                      ? profile.fullName
+                      : widget.patientName,
                   style: AafiyaTypography.titleMedium.copyWith(
                     fontWeight: FontWeight.bold,
                     color: AafiyaColors.primaryText,
@@ -366,7 +376,8 @@ class _PatientSummarySheetState extends State<PatientSummarySheet> {
                 if (effectiveMrn.isNotEmpty) ...[
                   const SizedBox(height: 4),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
                       color: AafiyaColors.lightBackground,
                       borderRadius: BorderRadius.circular(AafiyaRadius.sm),
@@ -380,7 +391,8 @@ class _PatientSummarySheetState extends State<PatientSummarySheet> {
                     ),
                   ),
                 ],
-                if (profile.dateOfBirth != null && profile.dateOfBirth!.isNotEmpty) ...[
+                if (profile.dateOfBirth != null &&
+                    profile.dateOfBirth!.isNotEmpty) ...[
                   const SizedBox(height: 4),
                   Text(
                     profile.dateOfBirth!,

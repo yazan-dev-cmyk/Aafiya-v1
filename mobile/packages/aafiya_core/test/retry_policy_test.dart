@@ -9,7 +9,8 @@ import 'package:aafiya_core/aafiya_core.dart';
 
 void main() {
   group('RetryPolicy Unit Tests (D-06-01-R1, R2, R3)', () {
-    test('Method eligibility: only GET and HEAD are eligible for auto-retry', () {
+    test('Method eligibility: only GET and HEAD are eligible for auto-retry',
+        () {
       const policy = RetryPolicy();
       expect(policy.shouldRetryMethod('GET'), isTrue);
       expect(policy.shouldRetryMethod('get'), isTrue);
@@ -50,12 +51,17 @@ void main() {
       expect(policy.isRetryableStatusCode(201), isFalse);
     });
 
-    test('Exception eligibility: SocketException, ClientException, TimeoutException are retryable', () {
+    test(
+        'Exception eligibility: SocketException, ClientException, TimeoutException are retryable',
+        () {
       const policy = RetryPolicy();
-      expect(policy.isRetryableException(const SocketException('abort')), isTrue);
-      expect(policy.isRetryableException(http.ClientException('abort')), isTrue);
+      expect(
+          policy.isRetryableException(const SocketException('abort')), isTrue);
+      expect(
+          policy.isRetryableException(http.ClientException('abort')), isTrue);
       expect(policy.isRetryableException(TimeoutException('timeout')), isTrue);
-      expect(policy.isRetryableException(const FormatException('invalid json')), isFalse);
+      expect(policy.isRetryableException(const FormatException('invalid json')),
+          isFalse);
       expect(policy.isRetryableException(StateError('bad state')), isFalse);
     });
 
@@ -87,7 +93,8 @@ void main() {
   group('ApiClient Retry Integration with RetryPolicy', () {
     const testPolicy = RetryPolicy(useDelays: false);
 
-    test('GET retries on 503 Service Unavailable and succeeds on attempt 2', () async {
+    test('GET retries on 503 Service Unavailable and succeeds on attempt 2',
+        () async {
       int attempts = 0;
       final mockClient = MockClient((request) async {
         attempts++;
@@ -99,7 +106,11 @@ void main() {
           );
         }
         return http.Response(
-          jsonEncode({'data': {'items': [1, 2, 3]}}),
+          jsonEncode({
+            'data': {
+              'items': [1, 2, 3]
+            }
+          }),
           200,
           headers: {'content-type': 'application/json'},
         );
@@ -113,7 +124,8 @@ void main() {
       expect(result.dataOrNull?['data']['items'], equals([1, 2, 3]));
     });
 
-    test('GET retries on 502 and 504 status codes up to 3 total attempts', () async {
+    test('GET retries on 502 and 504 status codes up to 3 total attempts',
+        () async {
       int attempts = 0;
       final mockClient = MockClient((request) async {
         attempts++;
@@ -123,7 +135,8 @@ void main() {
         if (attempts == 2) {
           return http.Response('Gateway Timeout', 504);
         }
-        return http.Response(jsonEncode({'status': 'recovered'}), 200, headers: {'content-type': 'application/json'});
+        return http.Response(jsonEncode({'status': 'recovered'}), 200,
+            headers: {'content-type': 'application/json'});
       });
 
       final client = ApiClient(httpClient: mockClient, retryPolicy: testPolicy);
@@ -134,23 +147,30 @@ void main() {
       expect(result.dataOrNull?['status'], equals('recovered'));
     });
 
-    test('GET terminates and returns ServerException after exhausting all 3 attempts on 503', () async {
+    test(
+        'GET terminates and returns ServerException after exhausting all 3 attempts on 503',
+        () async {
       int attempts = 0;
       final mockClient = MockClient((request) async {
         attempts++;
-        return http.Response(jsonEncode({'message': 'Unavailable'}), 503, headers: {'content-type': 'application/json'});
+        return http.Response(jsonEncode({'message': 'Unavailable'}), 503,
+            headers: {'content-type': 'application/json'});
       });
 
       final client = ApiClient(httpClient: mockClient, retryPolicy: testPolicy);
       final result = await client.get('/clinics');
 
-      expect(attempts, equals(3), reason: 'Must cap at 3 attempts (1 initial + 2 retries)');
+      expect(attempts, equals(3),
+          reason: 'Must cap at 3 attempts (1 initial + 2 retries)');
       expect(result.isFailure, isTrue);
       expect(result.exceptionOrNull, isA<ServerException>());
-      expect((result.exceptionOrNull as ServerException).statusCode, equals(503));
+      expect(
+          (result.exceptionOrNull as ServerException).statusCode, equals(503));
     });
 
-    test('GET does NOT retry on 500 Internal Server Error (executes exactly once)', () async {
+    test(
+        'GET does NOT retry on 500 Internal Server Error (executes exactly once)',
+        () async {
       int attempts = 0;
       final mockClient = MockClient((request) async {
         attempts++;
@@ -164,13 +184,17 @@ void main() {
       final client = ApiClient(httpClient: mockClient, retryPolicy: testPolicy);
       final result = await client.get('/appointments');
 
-      expect(attempts, equals(1), reason: '500 Internal Server Error must not be retried');
+      expect(attempts, equals(1),
+          reason: '500 Internal Server Error must not be retried');
       expect(result.isFailure, isTrue);
       expect(result.exceptionOrNull, isA<ServerException>());
-      expect((result.exceptionOrNull as ServerException).statusCode, equals(500));
+      expect(
+          (result.exceptionOrNull as ServerException).statusCode, equals(500));
     });
 
-    test('GET does NOT retry on 4xx Client Errors (401, 403, 404, 409, 422, 429)', () async {
+    test(
+        'GET does NOT retry on 4xx Client Errors (401, 403, 404, 409, 422, 429)',
+        () async {
       for (final code in [400, 401, 403, 404, 409, 422, 429]) {
         int attempts = 0;
         final mockClient = MockClient((request) async {
@@ -182,15 +206,19 @@ void main() {
           );
         });
 
-        final client = ApiClient(httpClient: mockClient, retryPolicy: testPolicy);
+        final client =
+            ApiClient(httpClient: mockClient, retryPolicy: testPolicy);
         final result = await client.get('/test-$code');
 
-        expect(attempts, equals(1), reason: 'Status code $code must not be retried');
+        expect(attempts, equals(1),
+            reason: 'Status code $code must not be retried');
         expect(result.isFailure, isTrue);
       }
     });
 
-    test('POST requests are NEVER retried automatically on 503 or SocketException (Idempotency Safe)', () async {
+    test(
+        'POST requests are NEVER retried automatically on 503 or SocketException (Idempotency Safe)',
+        () async {
       int attempts = 0;
       final mockClient = MockClient((request) async {
         attempts++;
@@ -198,14 +226,18 @@ void main() {
       });
 
       final client = ApiClient(httpClient: mockClient, retryPolicy: testPolicy);
-      final result = await client.post('/appointments', body: {'slot_id': '101'});
+      final result =
+          await client.post('/appointments', body: {'slot_id': '101'});
 
-      expect(attempts, equals(1), reason: 'POST must never retry automatically to prevent duplicate mutations');
+      expect(attempts, equals(1),
+          reason:
+              'POST must never retry automatically to prevent duplicate mutations');
       expect(result.isFailure, isTrue);
       expect(result.exceptionOrNull, isA<NetworkConnectionException>());
     });
 
-    test('PUT and DELETE requests are NEVER retried automatically on 503', () async {
+    test('PUT and DELETE requests are NEVER retried automatically on 503',
+        () async {
       int putAttempts = 0;
       int deleteAttempts = 0;
 
@@ -223,7 +255,8 @@ void main() {
 
       final client = ApiClient(httpClient: mockClient, retryPolicy: testPolicy);
 
-      final putResult = await client.put('/clinic-staff/1/status', body: {'status': 'active'});
+      final putResult = await client
+          .put('/clinic-staff/1/status', body: {'status': 'active'});
       expect(putAttempts, equals(1));
       expect(putResult.isFailure, isTrue);
 
@@ -234,7 +267,8 @@ void main() {
   });
 
   group('ConnectivityService Abstraction Unit Tests (D-06-01-C1)', () {
-    test('MockConnectivityService emits online and offline state changes', () async {
+    test('MockConnectivityService emits online and offline state changes',
+        () async {
       final service = MockConnectivityService(initialOnline: true);
       expect(await service.checkConnectivity(), isTrue);
 

@@ -16,7 +16,8 @@ void main() {
     setUp(() {
       tokenStorage = InMemoryTokenStorage();
       apiClient = ApiClient(
-        httpClient: MockClient((request) async => http.Response('{"data": {}}', 200)),
+        httpClient:
+            MockClient((request) async => http.Response('{"data": {}}', 200)),
         tokenStorage: tokenStorage,
         retryPolicy: const RetryPolicy(useDelays: false),
       );
@@ -31,7 +32,8 @@ void main() {
       mockConnectivity.dispose();
     });
 
-    testWidgets('Pro app boots with offline banner hidden when online', (tester) async {
+    testWidgets('Pro app boots with offline banner hidden when online',
+        (tester) async {
       await tester.pumpWidget(AafiyaProApp(
         sessionManager: sessionManager,
         apiClient: apiClient,
@@ -44,7 +46,8 @@ void main() {
       expect(find.text('لا يوجد اتصال بالإنترنت'), findsNothing);
     });
 
-    testWidgets('Pro app displays offline banner when network drops', (tester) async {
+    testWidgets('Pro app displays offline banner when network drops',
+        (tester) async {
       await tester.pumpWidget(AafiyaProApp(
         sessionManager: sessionManager,
         apiClient: apiClient,
@@ -62,7 +65,9 @@ void main() {
       expect(find.byIcon(Icons.wifi_off_rounded), findsOneWidget);
     });
 
-    testWidgets('Pro app displays Reconnected indicator upon network restoration', (tester) async {
+    testWidgets(
+        'Pro app displays Reconnected indicator upon network restoration',
+        (tester) async {
       await tester.pumpWidget(AafiyaProApp(
         sessionManager: sessionManager,
         apiClient: apiClient,

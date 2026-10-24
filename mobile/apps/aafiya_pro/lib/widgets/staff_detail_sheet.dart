@@ -112,8 +112,11 @@ class _StaffDetailSheetState extends State<StaffDetailSheet> {
       context: context,
       builder: (dialogCtx) => AlertDialog(
         title: Text(
-          willSuspend ? strings.confirmSuspendTitle : strings.confirmActivateTitle,
-          style: AafiyaTypography.titleMedium.copyWith(fontWeight: FontWeight.bold),
+          willSuspend
+              ? strings.confirmSuspendTitle
+              : strings.confirmActivateTitle,
+          style: AafiyaTypography.titleMedium
+              .copyWith(fontWeight: FontWeight.bold),
         ),
         content: Text(
           willSuspend
@@ -191,7 +194,8 @@ class _StaffDetailSheetState extends State<StaffDetailSheet> {
           _isDoctor
               ? strings.confirmDetachDoctorTitle
               : strings.confirmDeleteAssistantTitle,
-          style: AafiyaTypography.titleMedium.copyWith(fontWeight: FontWeight.bold),
+          style: AafiyaTypography.titleMedium
+              .copyWith(fontWeight: FontWeight.bold),
         ),
         content: Text(
           _isDoctor
@@ -265,7 +269,8 @@ class _StaffDetailSheetState extends State<StaffDetailSheet> {
     return Container(
       decoration: const BoxDecoration(
         color: AafiyaColors.pureWhite,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AafiyaRadius.lg)),
+        borderRadius:
+            BorderRadius.vertical(top: Radius.circular(AafiyaRadius.lg)),
       ),
       padding: EdgeInsets.fromLTRB(
         AafiyaSpacing.lg,
@@ -381,7 +386,8 @@ class _StaffDetailSheetState extends State<StaffDetailSheet> {
                 child: Text(
                   _isActive ? strings.activeStatus : strings.suspendedStatus,
                   style: AafiyaTypography.caption.copyWith(
-                    color: _isActive ? AafiyaColors.success : AafiyaColors.error,
+                    color:
+                        _isActive ? AafiyaColors.success : AafiyaColors.error,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -413,11 +419,13 @@ class _StaffDetailSheetState extends State<StaffDetailSheet> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (_email != null && _email!.isNotEmpty) ...[
-                  _buildDetailRow(Icons.email_outlined, strings.emailLabel, _email!),
+                  _buildDetailRow(
+                      Icons.email_outlined, strings.emailLabel, _email!),
                   const SizedBox(height: AafiyaSpacing.sm),
                 ],
                 if (_phone != null && _phone!.isNotEmpty) ...[
-                  _buildDetailRow(Icons.phone_outlined, strings.phoneLabel, _phone!),
+                  _buildDetailRow(
+                      Icons.phone_outlined, strings.phoneLabel, _phone!),
                   const SizedBox(height: AafiyaSpacing.sm),
                 ],
                 if (_isDoctor && widget.doctor!.specialty != null) ...[

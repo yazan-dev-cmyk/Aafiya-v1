@@ -20,7 +20,8 @@ class AssistantBookingService {
 
   /// Fetches all active doctors affiliated with the specified clinic.
   /// Mapped from `GET /api/v1/clinics/{clinicId}` -> `data.doctors`.
-  Future<ApiResult<List<ClinicDoctorStaff>>> getClinicDoctors(String clinicId) async {
+  Future<ApiResult<List<ClinicDoctorStaff>>> getClinicDoctors(
+      String clinicId) async {
     final result = await _apiClient.get(ApiEndpoints.clinic(clinicId));
 
     return switch (result) {
@@ -79,8 +80,7 @@ class AssistantBookingService {
         'patient_id': patientId.trim(),
       if (patientMrn != null && patientMrn.trim().isNotEmpty)
         'patient_mrn': patientMrn.trim(),
-      if (notes != null && notes.trim().isNotEmpty)
-        'notes': notes.trim(),
+      if (notes != null && notes.trim().isNotEmpty) 'notes': notes.trim(),
     };
 
     final result = await _apiClient.post(
@@ -105,8 +105,7 @@ class AssistantBookingService {
     final body = <String, dynamic>{
       'appointment_date': appointmentDate.trim(),
       'time_slot': timeSlot.trim(),
-      if (notes != null && notes.trim().isNotEmpty)
-        'notes': notes.trim(),
+      if (notes != null && notes.trim().isNotEmpty) 'notes': notes.trim(),
     };
 
     final result = await _apiClient.post(
@@ -156,7 +155,8 @@ class AssistantBookingService {
     };
   }
 
-  ApiResult<List<ClinicDoctorStaff>> _parseClinicDoctors(Map<String, dynamic> data) {
+  ApiResult<List<ClinicDoctorStaff>> _parseClinicDoctors(
+      Map<String, dynamic> data) {
     try {
       final rawData = data['data'];
       final clinicMap = rawData is Map<String, dynamic> ? rawData : data;
@@ -183,7 +183,9 @@ class AssistantBookingService {
       if (rawDoctors is List) {
         for (final item in rawDoctors.whereType<Map<String, dynamic>>()) {
           final doc = ClinicDoctorStaff.fromJson(item);
-          if (doc.id.isNotEmpty && doc.isActive && !seenDoctorIds.contains(doc.id)) {
+          if (doc.id.isNotEmpty &&
+              doc.isActive &&
+              !seenDoctorIds.contains(doc.id)) {
             doctors.add(doc);
             seenDoctorIds.add(doc.id);
           }
@@ -192,7 +194,8 @@ class AssistantBookingService {
 
       return ApiSuccess(doctors);
     } catch (e) {
-      return ApiFailure(GenericApiException(statusCode: 500, message: 'Failed to parse clinic doctors: $e'));
+      return ApiFailure(GenericApiException(
+          statusCode: 500, message: 'Failed to parse clinic doctors: $e'));
     }
   }
 
@@ -211,7 +214,8 @@ class AssistantBookingService {
       }
       return const ApiSuccess([]);
     } catch (e) {
-      return ApiFailure(GenericApiException(statusCode: 500, message: 'Failed to parse appointment slots: $e'));
+      return ApiFailure(GenericApiException(
+          statusCode: 500, message: 'Failed to parse appointment slots: $e'));
     }
   }
 
@@ -223,11 +227,14 @@ class AssistantBookingService {
       }
       return ApiSuccess(Appointment.fromJson(data));
     } catch (e) {
-      return ApiFailure(GenericApiException(statusCode: 500, message: 'Failed to parse appointment response: $e'));
+      return ApiFailure(GenericApiException(
+          statusCode: 500,
+          message: 'Failed to parse appointment response: $e'));
     }
   }
 
-  ApiResult<List<PatientSearchResult>> _parsePatientList(Map<String, dynamic> data) {
+  ApiResult<List<PatientSearchResult>> _parsePatientList(
+      Map<String, dynamic> data) {
     try {
       final rawData = data['data'];
       if (rawData is List) {
@@ -239,7 +246,8 @@ class AssistantBookingService {
       }
       return const ApiSuccess([]);
     } catch (e) {
-      return ApiFailure(GenericApiException(statusCode: 500, message: 'Failed to parse patients list: $e'));
+      return ApiFailure(GenericApiException(
+          statusCode: 500, message: 'Failed to parse patients list: $e'));
     }
   }
 }

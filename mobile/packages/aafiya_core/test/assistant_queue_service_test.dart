@@ -6,7 +6,8 @@ import 'package:aafiya_core/aafiya_core.dart';
 
 void main() {
   const appointmentId = 'appt-uuid-001';
-  const token = '64charactertokenforappointmentcheckintest1234567890abcdef12345678';
+  const token =
+      '64charactertokenforappointmentcheckintest1234567890abcdef12345678';
   const patientId = 'patient-uuid-002';
 
   group('PatientSearchResult Model Tests', () {
@@ -41,13 +42,16 @@ void main() {
   });
 
   group('AssistantQueueService Tests', () {
-    test('fetchTodayQueue passes correct query parameters and parses PaginatedAppointments', () async {
+    test(
+        'fetchTodayQueue passes correct query parameters and parses PaginatedAppointments',
+        () async {
       final mockClient = MockClient((request) async {
         expect(request.method, equals('GET'));
         expect(request.url.path, endsWith('/appointments'));
         expect(request.url.queryParameters['sort_by'], equals('time_slot'));
         expect(request.url.queryParameters['sort_order'], equals('asc'));
-        expect(request.url.queryParameters['appointment_date'], equals('2026-09-16'));
+        expect(request.url.queryParameters['appointment_date'],
+            equals('2026-09-16'));
         expect(request.url.queryParameters['status'], equals('confirmed'));
         expect(request.url.queryParameters['page'], equals('1'));
         expect(request.url.queryParameters['per_page'], equals('20'));
@@ -102,7 +106,8 @@ void main() {
       expect(paginated.items.first.patient.name, equals('Sarah Benali'));
     });
 
-    test('checkInAppointment submits token via POST /appointments/check-in', () async {
+    test('checkInAppointment submits token and parses checked_in result',
+        () async {
       final mockClient = MockClient((request) async {
         expect(request.method, equals('POST'));
         expect(request.url.path, endsWith('/appointments/check-in'));
@@ -111,6 +116,7 @@ void main() {
 
         final responseData = {
           'message': 'تم تأكيد حضور الموعد بنجاح.',
+          'check_in_result': 'checked_in',
           'data': {
             'id': appointmentId,
             'booking_reference': 'BK-20260916-0001',
@@ -140,17 +146,75 @@ void main() {
 
       final result = await service.checkInAppointment(token);
 
-      expect(result, isA<ApiSuccess<Appointment>>());
-      final appt = (result as ApiSuccess<Appointment>).data;
-      expect(appt.id, equals(appointmentId));
-      expect(appt.status, equals(AppointmentStatus.attended));
-      expect(appt.checkedInAt, isNotNull);
+      expect(result, isA<ApiSuccess<AppointmentCheckInResult>>());
+      final outcome = (result as ApiSuccess<AppointmentCheckInResult>).data;
+      expect(outcome.result, equals(CheckInResult.checkedIn));
+      expect(outcome.appointment.id, equals(appointmentId));
+      expect(outcome.appointment.status, equals(AppointmentStatus.attended));
+      expect(outcome.appointment.checkedInAt, isNotNull);
+    });
+
+    test('checkInAppointment parses already_checked_in result', () async {
+      final mockClient = MockClient((request) async {
+        final responseData = {
+          'message': 'تم تأكيد حضور الموعد بنجاح.',
+          'check_in_result': 'already_checked_in',
+          'data': {
+            'id': appointmentId,
+            'booking_reference': 'BK-20260916-0001',
+            'status': 'attended',
+            'checked_in_at': '2026-09-16T09:30:00.000000Z',
+          }
+        };
+
+        return http.Response(jsonEncode(responseData), 200, headers: {
+          'content-type': 'application/json',
+        });
+      });
+
+      final apiClient = ApiClient(httpClient: mockClient);
+      final service = AssistantQueueService(apiClient: apiClient);
+
+      final result = await service.checkInAppointment(token);
+
+      expect(result, isA<ApiSuccess<AppointmentCheckInResult>>());
+      final outcome = (result as ApiSuccess<AppointmentCheckInResult>).data;
+      expect(outcome.result, equals(CheckInResult.alreadyCheckedIn));
+      expect(outcome.appointment.status, equals(AppointmentStatus.attended));
+    });
+
+    test(
+        'checkInAppointment handles missing or unrecognized discriminator as unknown',
+        () async {
+      final mockClient = MockClient((request) async {
+        final responseData = {
+          'message': 'تم تأكيد حضور الموعد بنجاح.',
+          'data': {
+            'id': appointmentId,
+            'status': 'attended',
+          }
+        };
+
+        return http.Response(jsonEncode(responseData), 200, headers: {
+          'content-type': 'application/json',
+        });
+      });
+
+      final apiClient = ApiClient(httpClient: mockClient);
+      final service = AssistantQueueService(apiClient: apiClient);
+
+      final result = await service.checkInAppointment(token);
+
+      expect(result, isA<ApiSuccess<AppointmentCheckInResult>>());
+      final outcome = (result as ApiSuccess<AppointmentCheckInResult>).data;
+      expect(outcome.result, equals(CheckInResult.unknown));
     });
 
     test('attendAppointment calls POST /appointments/{id}/attend', () async {
       final mockClient = MockClient((request) async {
         expect(request.method, equals('POST'));
-        expect(request.url.path, endsWith('/appointments/$appointmentId/attend'));
+        expect(
+            request.url.path, endsWith('/appointments/$appointmentId/attend'));
 
         final responseData = {
           'message': 'تم تسجيل حضور الموعد بنجاح.',
@@ -180,10 +244,12 @@ void main() {
       expect(appt.status, equals(AppointmentStatus.attended));
     });
 
-    test('markNoShow calls POST /appointments/{id}/no-show with reason', () async {
+    test('markNoShow calls POST /appointments/{id}/no-show with reason',
+        () async {
       final mockClient = MockClient((request) async {
         expect(request.method, equals('POST'));
-        expect(request.url.path, endsWith('/appointments/$appointmentId/no-show'));
+        expect(
+            request.url.path, endsWith('/appointments/$appointmentId/no-show'));
         final body = jsonDecode(request.body) as Map<String, dynamic>;
         expect(body['reason'], equals('Patient unreachable'));
 
@@ -205,7 +271,8 @@ void main() {
       );
       final service = AssistantQueueService(apiClient: apiClient);
 
-      final result = await service.markNoShow(appointmentId, reason: 'Patient unreachable');
+      final result = await service.markNoShow(appointmentId,
+          reason: 'Patient unreachable');
 
       expect(result, isA<ApiSuccess<Appointment>>());
       final appt = (result as ApiSuccess<Appointment>).data;
@@ -213,7 +280,8 @@ void main() {
       expect(appt.status, equals(AppointmentStatus.noShow));
     });
 
-    test('searchPatients queries GET /patients and parses patient results', () async {
+    test('searchPatients queries GET /patients and parses patient results',
+        () async {
       final mockClient = MockClient((request) async {
         expect(request.method, equals('GET'));
         expect(request.url.path, endsWith('/patients'));
@@ -255,10 +323,13 @@ void main() {
       expect(list.first.mrn, equals('MRN-2026-VAL99'));
     });
 
-    test('confirmAppointment posts to /appointments/{id}/confirm and deserializes confirmed Appointment', () async {
+    test(
+        'confirmAppointment posts to /appointments/{id}/confirm and deserializes confirmed Appointment',
+        () async {
       final mockClient = MockClient((request) async {
         expect(request.method, equals('POST'));
-        expect(request.url.path, endsWith('/appointments/$appointmentId/confirm'));
+        expect(
+            request.url.path, endsWith('/appointments/$appointmentId/confirm'));
 
         final body = jsonDecode(request.body) as Map<String, dynamic>;
         expect(body['reason'], equals('Confirmed by assistant'));
@@ -287,7 +358,8 @@ void main() {
       final apiClient = ApiClient(httpClient: mockClient);
       final service = AssistantQueueService(apiClient: apiClient);
 
-      final result = await service.confirmAppointment(appointmentId, reason: 'Confirmed by assistant');
+      final result = await service.confirmAppointment(appointmentId,
+          reason: 'Confirmed by assistant');
 
       expect(result, isA<ApiSuccess<Appointment>>());
       final appt = (result as ApiSuccess<Appointment>).data;
@@ -299,7 +371,8 @@ void main() {
       final mockClient = MockClient((request) async {
         return http.Response(
           jsonEncode({
-            'message': 'Unauthorized action: missing booking.confirm permission.',
+            'message':
+                'Unauthorized action: missing booking.confirm permission.',
           }),
           403,
           headers: {'content-type': 'application/json'},
@@ -317,7 +390,8 @@ void main() {
       expect(failure.exception.message, contains('missing booking.confirm'));
     });
 
-    test('fetchQueue transmits doctor_id and date range filters when supplied', () async {
+    test('fetchQueue transmits doctor_id and date range filters when supplied',
+        () async {
       final mockClient = MockClient((request) async {
         expect(request.method, equals('GET'));
         expect(request.url.path, endsWith('/appointments'));

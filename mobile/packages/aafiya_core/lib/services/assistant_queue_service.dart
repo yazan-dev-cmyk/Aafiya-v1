@@ -61,7 +61,8 @@ class AssistantQueueService {
     );
 
     return switch (result) {
-      ApiSuccess(:final data) => ApiSuccess(PaginatedAppointments.fromJson(data)),
+      ApiSuccess(:final data) =>
+        ApiSuccess(PaginatedAppointments.fromJson(data)),
       ApiFailure(:final exception) => ApiFailure(exception),
     };
   }
@@ -129,17 +130,23 @@ class AssistantQueueService {
 
   /// Checks in an appointment using its single-use secure QR token.
   /// Mapped from `POST /api/v1/appointments/check-in`.
-  /// Transitions status from `confirmed` -> `attended`.
-  Future<ApiResult<Appointment>> checkInAppointment(String token) async {
+  /// Returns [AppointmentCheckInResult] containing the explicit server discriminator.
+  Future<ApiResult<AppointmentCheckInResult>> checkInAppointment(
+      String token) async {
     final result = await _apiClient.post(
       ApiEndpoints.appointmentCheckIn,
       body: {'token': token.trim()},
     );
 
     return switch (result) {
-      ApiSuccess(:final data) => _parseAppointment(data),
+      ApiSuccess(:final data) => _parseCheckInResult(data),
       ApiFailure(:final exception) => ApiFailure(exception),
     };
+  }
+
+  ApiResult<AppointmentCheckInResult> _parseCheckInResult(
+      Map<String, dynamic> data) {
+    return ApiSuccess(AppointmentCheckInResult.fromJson(data));
   }
 
   /// Marks an appointment as attended directly by ID.
@@ -219,7 +226,8 @@ class AssistantQueueService {
     return ApiSuccess(Appointment.fromJson(data));
   }
 
-  ApiResult<List<PatientSearchResult>> _parsePatientList(Map<String, dynamic> data) {
+  ApiResult<List<PatientSearchResult>> _parsePatientList(
+      Map<String, dynamic> data) {
     final rawData = data['data'];
     if (rawData is List) {
       final list = rawData

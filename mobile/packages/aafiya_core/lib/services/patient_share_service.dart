@@ -68,7 +68,9 @@ class PatientShareService {
     final isDev = _config.environment.toLowerCase() == 'development';
 
     if (!isDev) {
-      if (baseUri == null || !baseUri.hasScheme || baseUri.scheme.toLowerCase() != 'https') {
+      if (baseUri == null ||
+          !baseUri.hasScheme ||
+          baseUri.scheme.toLowerCase() != 'https') {
         return const ApiFailure(
           GenericApiException(
             statusCode: 400,
@@ -154,7 +156,8 @@ class PatientShareService {
     }
   }
 
-  ApiResult<List<PatientShareToken>> _parseListSuccess(Map<String, dynamic> data) {
+  ApiResult<List<PatientShareToken>> _parseListSuccess(
+      Map<String, dynamic> data) {
     try {
       final rawList = data['data'];
       if (rawList is List) {

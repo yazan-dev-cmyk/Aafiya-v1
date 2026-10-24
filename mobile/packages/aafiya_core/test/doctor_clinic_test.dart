@@ -64,12 +64,14 @@ void main() {
   });
 
   group('ApiClient Active Clinic Header Injection Tests', () {
-    test('does not inject clinic headers when activeClinicId is null', () async {
+    test('does not inject clinic headers when activeClinicId is null',
+        () async {
       late Map<String, String> capturedHeaders;
 
       final mockClient = MockClient((request) async {
         capturedHeaders = request.headers;
-        return http.Response(jsonEncode({'status': 'success', 'data': <dynamic>[]}), 200);
+        return http.Response(
+            jsonEncode({'status': 'success', 'data': <dynamic>[]}), 200);
       });
 
       final apiClient = ApiClient(httpClient: mockClient);
@@ -79,12 +81,15 @@ void main() {
       expect(capturedHeaders.containsKey('X-Active-Clinic-ID'), isFalse);
     });
 
-    test('injects both X-Clinic-ID and X-Active-Clinic-ID when activeClinicId is set', () async {
+    test(
+        'injects both X-Clinic-ID and X-Active-Clinic-ID when activeClinicId is set',
+        () async {
       late Map<String, String> capturedHeaders;
 
       final mockClient = MockClient((request) async {
         capturedHeaders = request.headers;
-        return http.Response(jsonEncode({'status': 'success', 'data': <dynamic>[]}), 200);
+        return http.Response(
+            jsonEncode({'status': 'success', 'data': <dynamic>[]}), 200);
       });
 
       final apiClient = ApiClient(httpClient: mockClient);
@@ -151,7 +156,8 @@ void main() {
       expect(sessionManager.authorizedClinics, isEmpty);
     });
 
-    test('single active clinic is automatically established as active context', () {
+    test('single active clinic is automatically established as active context',
+        () {
       sessionManager.setAuthorizedClinics([clinic2]);
 
       expect(sessionManager.activeClinic, equals(clinic2));
@@ -168,7 +174,8 @@ void main() {
     });
 
     test('preferredClinicId takes precedence if active and authorized', () {
-      sessionManager.setAuthorizedClinics([clinic1, clinic2], preferredClinicId: 'clinic-2');
+      sessionManager.setAuthorizedClinics([clinic1, clinic2],
+          preferredClinicId: 'clinic-2');
 
       expect(sessionManager.activeClinic, equals(clinic2));
       expect(sessionManager.activeClinicId, 'clinic-2');
@@ -187,11 +194,14 @@ void main() {
       expect(apiClient.activeClinicId, 'clinic-2');
     });
 
-    test('switchActiveClinic fails closed and preserves context for unauthorized clinic', () {
+    test(
+        'switchActiveClinic fails closed and preserves context for unauthorized clinic',
+        () {
       sessionManager.setAuthorizedClinics([clinic1, clinic2]);
       expect(sessionManager.activeClinicId, 'clinic-1');
 
-      final switched = sessionManager.switchActiveClinic('unauthorized-clinic-99');
+      final switched =
+          sessionManager.switchActiveClinic('unauthorized-clinic-99');
 
       expect(switched, isFalse);
       expect(sessionManager.activeClinic, equals(clinic1));
@@ -199,7 +209,9 @@ void main() {
       expect(apiClient.activeClinicId, 'clinic-1');
     });
 
-    test('switchActiveClinic fails closed and preserves context for suspended clinic', () {
+    test(
+        'switchActiveClinic fails closed and preserves context for suspended clinic',
+        () {
       sessionManager.setAuthorizedClinics([clinic1, suspendedClinic]);
       expect(sessionManager.activeClinicId, 'clinic-1');
 

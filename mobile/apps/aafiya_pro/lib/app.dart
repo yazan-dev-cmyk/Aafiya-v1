@@ -45,7 +45,8 @@ class _AafiyaProAppState extends State<AafiyaProApp> {
     _locale = widget.initialLocale;
     _navState = widget.initialNavState;
     _navigatorKey = widget.navigatorKey ?? GlobalKey<NavigatorState>();
-    _connectivityService = widget.connectivityService ?? PlatformConnectivityService();
+    _connectivityService =
+        widget.connectivityService ?? PlatformConnectivityService();
     widget.sessionManager.addListener(_onSessionStateChanged);
   }
 
@@ -62,7 +63,8 @@ class _AafiyaProAppState extends State<AafiyaProApp> {
       setState(() {
         _navState = ProNavState.auth;
       });
-      if (state.message == 'Session expired.' || (state.message != null && state.message!.contains('expired'))) {
+      if (state.message == 'Session expired.' ||
+          (state.message != null && state.message!.contains('expired'))) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           _showSessionExpiredDialog();
         });
@@ -86,7 +88,8 @@ class _AafiyaProAppState extends State<AafiyaProApp> {
       barrierDismissible: false,
       builder: (dialogCtx) => AlertDialog(
         backgroundColor: AafiyaColors.pureWhite,
-        shape: const RoundedRectangleBorder(borderRadius: AafiyaRadius.borderLg),
+        shape:
+            const RoundedRectangleBorder(borderRadius: AafiyaRadius.borderLg),
         title: Row(
           children: [
             const Icon(Icons.timer_outlined, color: AafiyaColors.warning),
@@ -94,7 +97,8 @@ class _AafiyaProAppState extends State<AafiyaProApp> {
             Expanded(
               child: Text(
                 strings.sessionExpiredTitle,
-                style: AafiyaTypography.titleLarge.copyWith(color: AafiyaColors.primaryText),
+                style: AafiyaTypography.titleLarge
+                    .copyWith(color: AafiyaColors.primaryText),
               ),
             ),
           ],
@@ -108,7 +112,8 @@ class _AafiyaProAppState extends State<AafiyaProApp> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AafiyaColors.healthBlue,
               foregroundColor: AafiyaColors.pureWhite,
-              shape: const RoundedRectangleBorder(borderRadius: AafiyaRadius.borderMd),
+              shape: const RoundedRectangleBorder(
+                  borderRadius: AafiyaRadius.borderMd),
             ),
             onPressed: () => Navigator.of(dialogCtx).pop(),
             child: Text(
@@ -168,15 +173,18 @@ class _AafiyaProAppState extends State<AafiyaProApp> {
       home: switch (_navState) {
         ProNavState.splash => ProSplashShell(
             sessionManager: widget.sessionManager,
-            onAuthenticated: () => setState(() => _navState = ProNavState.roleResolution),
-            onUnauthenticated: () => setState(() => _navState = ProNavState.auth),
+            onAuthenticated: () =>
+                setState(() => _navState = ProNavState.roleResolution),
+            onUnauthenticated: () =>
+                setState(() => _navState = ProNavState.auth),
             onLocaleChanged: setLocale,
             currentLocale: _locale,
           ),
         ProNavState.auth => ProAuthShell(
             sessionManager: widget.sessionManager,
             apiClient: widget.apiClient,
-            onLoginSuccess: () => setState(() => _navState = ProNavState.roleResolution),
+            onLoginSuccess: () =>
+                setState(() => _navState = ProNavState.roleResolution),
             onLocaleChanged: setLocale,
             currentLocale: _locale,
           ),

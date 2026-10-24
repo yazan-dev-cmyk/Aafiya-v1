@@ -58,7 +58,9 @@ class RoleResolver {
       UserRole.doctor => RoleResolutionResult.doctor,
       UserRole.doctorAssistant => RoleResolutionResult.assistant,
       UserRole.bookingCenter => RoleResolutionResult.bookingCenter,
-      UserRole.patientRegistered || UserRole.patientGuest => RoleResolutionResult.patient,
+      UserRole.patientRegistered ||
+      UserRole.patientGuest =>
+        RoleResolutionResult.patient,
       UserRole.admin ||
       UserRole.adminAssistant ||
       UserRole.lab ||
@@ -100,4 +102,3 @@ class RoleResolver {
     return RoleResolutionResult.unauthorized;
   }
 }
-

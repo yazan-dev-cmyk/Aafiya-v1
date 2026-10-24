@@ -14,7 +14,8 @@ sealed class AppException implements Exception {
 /// Thrown when network connection is unavailable or unreachable.
 class NetworkConnectionException extends AppException {
   const NetworkConnectionException([
-    super.message = 'Unable to connect to server. Please check your internet connection.',
+    super.message =
+        'Unable to connect to server. Please check your internet connection.',
     super.cause,
   ]);
 }
@@ -46,20 +47,26 @@ abstract class ApiException extends AppException {
     ApiErrorResponse? parsedResponse,
     Object? cause,
   }) {
-    final message = parsedResponse?.message ?? 'Request failed with status $statusCode.';
+    final message =
+        parsedResponse?.message ?? 'Request failed with status $statusCode.';
 
     return switch (statusCode) {
-      401 => UnauthorizedException(message: message, errorResponse: parsedResponse, cause: cause),
-      403 => ForbiddenException(message: message, errorResponse: parsedResponse, cause: cause),
-      404 => NotFoundException(message: message, errorResponse: parsedResponse, cause: cause),
-      409 => ConflictException(message: message, errorResponse: parsedResponse, cause: cause),
+      401 => UnauthorizedException(
+          message: message, errorResponse: parsedResponse, cause: cause),
+      403 => ForbiddenException(
+          message: message, errorResponse: parsedResponse, cause: cause),
+      404 => NotFoundException(
+          message: message, errorResponse: parsedResponse, cause: cause),
+      409 => ConflictException(
+          message: message, errorResponse: parsedResponse, cause: cause),
       422 => ValidationException(
           message: message,
           errorResponse: parsedResponse,
           validationErrors: parsedResponse?.errors ?? const {},
           cause: cause,
         ),
-      429 => RateLimitException(message: message, errorResponse: parsedResponse, cause: cause),
+      429 => RateLimitException(
+          message: message, errorResponse: parsedResponse, cause: cause),
       >= 500 && < 600 => ServerException(
           statusCode: statusCode,
           message: message,
@@ -106,7 +113,8 @@ class NotFoundException extends ApiException {
 /// 409 Conflict - state conflict (e.g. appointment clash or quota restriction).
 class ConflictException extends ApiException {
   const ConflictException({
-    super.message = 'The requested operation conflicts with current system state.',
+    super.message =
+        'The requested operation conflicts with current system state.',
     super.errorResponse,
     super.cause,
   }) : super(statusCode: 409);
@@ -129,7 +137,8 @@ class ValidationException extends ApiException {
 /// 429 Too Many Requests - rate limit throttled.
 class RateLimitException extends ApiException {
   const RateLimitException({
-    super.message = 'Too many requests. Please slow down and try again shortly.',
+    super.message =
+        'Too many requests. Please slow down and try again shortly.',
     super.errorResponse,
     super.cause,
   }) : super(statusCode: 429);
@@ -139,7 +148,8 @@ class RateLimitException extends ApiException {
 class ServerException extends ApiException {
   const ServerException({
     required super.statusCode,
-    super.message = 'An internal server error occurred. Please try again later.',
+    super.message =
+        'An internal server error occurred. Please try again later.',
     super.errorResponse,
     super.cause,
   });

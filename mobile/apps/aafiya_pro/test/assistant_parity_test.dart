@@ -62,19 +62,26 @@ void main() {
   );
 
   group('1. Canonical 5 Permissions Model Verification', () {
-    test('User.hasPermission recognizes booking.confirm and other 4 permissions', () {
+    test(
+        'User.hasPermission recognizes booking.confirm and other 4 permissions',
+        () {
       expect(fullAssistantUser.hasPermission('booking.confirm'), isTrue);
       expect(fullAssistantUser.hasPermission('booking.create'), isTrue);
       expect(fullAssistantUser.hasPermission('booking.manage_queue'), isTrue);
-      expect(fullAssistantUser.hasPermission('booking.confirm_attendance'), isTrue);
+      expect(fullAssistantUser.hasPermission('booking.confirm_attendance'),
+          isTrue);
       expect(fullAssistantUser.hasPermission('patient.view_contacts'), isTrue);
 
       // Restricted user
       expect(restrictedAssistantUser.hasPermission('booking.confirm'), isFalse);
       expect(restrictedAssistantUser.hasPermission('booking.create'), isFalse);
-      expect(restrictedAssistantUser.hasPermission('booking.confirm_attendance'), isFalse);
-      expect(restrictedAssistantUser.hasPermission('patient.view_contacts'), isFalse);
-      expect(restrictedAssistantUser.hasPermission('booking.manage_queue'), isTrue);
+      expect(
+          restrictedAssistantUser.hasPermission('booking.confirm_attendance'),
+          isFalse);
+      expect(restrictedAssistantUser.hasPermission('patient.view_contacts'),
+          isFalse);
+      expect(restrictedAssistantUser.hasPermission('booking.manage_queue'),
+          isTrue);
 
       // Unknown permission fails closed
       expect(fullAssistantUser.hasPermission('unknown.perm'), isFalse);
@@ -97,7 +104,9 @@ void main() {
   });
 
   group('2. Director Assistant Management Sheets Parity', () {
-    testWidgets('AddAssistantSheet presents all 5 permissions including booking.confirm', (tester) async {
+    testWidgets(
+        'AddAssistantSheet presents all 5 permissions including booking.confirm',
+        (tester) async {
       final staffService = ClinicStaffService(apiClient: ApiClient());
 
       await tester.pumpWidget(createTestWidget(
@@ -122,14 +131,19 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify all 5 permission titles are displayed
-      expect(find.text('إدارة قائمة الانتظار'), findsOneWidget); // booking.manage_queue
-      expect(find.text('تأكيد الحضور'), findsOneWidget); // booking.confirm_attendance
+      expect(find.text('إدارة قائمة الانتظار'),
+          findsOneWidget); // booking.manage_queue
+      expect(find.text('تأكيد الحضور'),
+          findsOneWidget); // booking.confirm_attendance
       expect(find.text('إنشاء المواعيد'), findsOneWidget); // booking.create
-      expect(find.text('عرض بيانات الاتصال'), findsOneWidget); // patient.view_contacts
+      expect(find.text('عرض بيانات الاتصال'),
+          findsOneWidget); // patient.view_contacts
       expect(find.text('تأكيد المواعيد'), findsOneWidget); // booking.confirm
     });
 
-    testWidgets('EditAssistantPermissionsSheet includes booking.confirm and saves updated permissions', (tester) async {
+    testWidgets(
+        'EditAssistantPermissionsSheet includes booking.confirm and saves updated permissions',
+        (tester) async {
       final staffService = ClinicStaffService(apiClient: ApiClient());
       const sampleAssistant = ClinicAssistantStaff(
         id: 'ast-sample-1',
@@ -168,7 +182,9 @@ void main() {
       expect(find.text('تأكيد المواعيد'), findsOneWidget);
     });
 
-    testWidgets('StaffDetailSheet displays booking.confirm permission label for assistant', (tester) async {
+    testWidgets(
+        'StaffDetailSheet displays booking.confirm permission label for assistant',
+        (tester) async {
       final staffService = ClinicStaffService(apiClient: ApiClient());
       const sampleAssistant = ClinicAssistantStaff(
         id: 'ast-sample-2',
@@ -207,7 +223,9 @@ void main() {
   });
 
   group('3. AssistantQueueScreen Fail-Closed Permission Gating', () {
-    testWidgets('booking.manage_queue absent: fails closed with unauthorized view', (tester) async {
+    testWidgets(
+        'booking.manage_queue absent: fails closed with unauthorized view',
+        (tester) async {
       const userWithoutQueue = User(
         id: 'user-no-queue',
         name: 'User No Queue',
@@ -230,15 +248,25 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      expect(find.text('غير مصرح لك باستعراض قائمة مواعيد العيادة. يرجى مراجعة مدير العيادة.'), findsOneWidget);
+      expect(
+          find.text(
+              'غير مصرح لك باستعراض قائمة مواعيد العيادة. يرجى مراجعة مدير العيادة.'),
+          findsOneWidget);
       expect(find.byType(AafiyaErrorView), findsOneWidget);
     });
 
-    testWidgets('booking.create absent: New Booking button is hidden', (tester) async {
+    testWidgets('booking.create absent: New Booking button is hidden',
+        (tester) async {
       final mockClient = MockClient((request) async {
-        return http.Response(jsonEncode({'data': [], 'meta': {'current_page': 1, 'last_page': 1}}), 200, headers: {
-          'content-type': 'application/json',
-        });
+        return http.Response(
+            jsonEncode({
+              'data': [],
+              'meta': {'current_page': 1, 'last_page': 1}
+            }),
+            200,
+            headers: {
+              'content-type': 'application/json',
+            });
       });
       final apiClient = ApiClient(httpClient: mockClient);
       final sessionManager = AuthSessionManager(
@@ -254,14 +282,22 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      expect(find.byKey(const ValueKey('new_booking_action_button')), findsNothing);
+      expect(find.byKey(const ValueKey('new_booking_action_button')),
+          findsNothing);
     });
 
-    testWidgets('booking.create present: New Booking button is visible', (tester) async {
+    testWidgets('booking.create present: New Booking button is visible',
+        (tester) async {
       final mockClient = MockClient((request) async {
-        return http.Response(jsonEncode({'data': [], 'meta': {'current_page': 1, 'last_page': 1}}), 200, headers: {
-          'content-type': 'application/json',
-        });
+        return http.Response(
+            jsonEncode({
+              'data': [],
+              'meta': {'current_page': 1, 'last_page': 1}
+            }),
+            200,
+            headers: {
+              'content-type': 'application/json',
+            });
       });
       final apiClient = ApiClient(httpClient: mockClient);
       final sessionManager = AuthSessionManager(
@@ -277,33 +313,45 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      expect(find.byKey(const ValueKey('new_booking_action_button')), findsOneWidget);
+      expect(find.byKey(const ValueKey('new_booking_action_button')),
+          findsOneWidget);
     });
 
-    testWidgets('booking.confirm_attendance absent: Quick Check-In and attend action hidden/disabled', (tester) async {
+    testWidgets(
+        'booking.confirm_attendance absent: Quick Check-In and attend action hidden/disabled',
+        (tester) async {
       final mockClient = MockClient((request) async {
         final status = request.url.queryParameters['status'];
         if (status == 'confirmed') {
-          return http.Response(jsonEncode({
-            'data': [
-              {
-                'id': 'appt-exp-01',
-                'booking_reference': 'BK-EXP-01',
-                'status': 'confirmed',
-                'appointment_date': '2026-09-18',
-                'time_slot': '10:00',
-                'patient': {
-                  'id': 'pat-1',
-                  'name': 'احمد بن صالح',
-                },
-              }
-            ],
-            'meta': {'current_page': 1, 'last_page': 1},
-          }), 200, headers: {'content-type': 'application/json'});
+          return http.Response(
+              jsonEncode({
+                'data': [
+                  {
+                    'id': 'appt-exp-01',
+                    'booking_reference': 'BK-EXP-01',
+                    'status': 'confirmed',
+                    'appointment_date': '2026-09-18',
+                    'time_slot': '10:00',
+                    'patient': {
+                      'id': 'pat-1',
+                      'name': 'احمد بن صالح',
+                    },
+                  }
+                ],
+                'meta': {'current_page': 1, 'last_page': 1},
+              }),
+              200,
+              headers: {'content-type': 'application/json'});
         }
-        return http.Response(jsonEncode({'data': [], 'meta': {'current_page': 1, 'last_page': 1}}), 200, headers: {
-          'content-type': 'application/json',
-        });
+        return http.Response(
+            jsonEncode({
+              'data': [],
+              'meta': {'current_page': 1, 'last_page': 1}
+            }),
+            200,
+            headers: {
+              'content-type': 'application/json',
+            });
       });
       final apiClient = ApiClient(httpClient: mockClient);
       final sessionManager = AuthSessionManager(
@@ -335,31 +383,42 @@ void main() {
   });
 
   group('4. Appointment Confirmation Flow & 3 Sub-Tabs', () {
-    testWidgets('Displays 3 sub-tabs with counts and switches to Pending Confirmation', (tester) async {
+    testWidgets(
+        'Displays 3 sub-tabs with counts and switches to Pending Confirmation',
+        (tester) async {
       final mockClient = MockClient((request) async {
         final status = request.url.queryParameters['status'];
         if (status == 'pending') {
-          return http.Response(jsonEncode({
-            'data': [
-              {
-                'id': 'appt-pnd-01',
-                'booking_reference': 'BK-PND-01',
-                'status': 'pending',
-                'appointment_date': '2026-09-18',
-                'time_slot': '11:00',
-                'patient': {
-                  'id': 'pat-pnd',
-                  'name': 'خالد سلطاني',
-                  'phone': '0555998877',
-                },
-              }
-            ],
-            'meta': {'current_page': 1, 'last_page': 1},
-          }), 200, headers: {'content-type': 'application/json'});
+          return http.Response(
+              jsonEncode({
+                'data': [
+                  {
+                    'id': 'appt-pnd-01',
+                    'booking_reference': 'BK-PND-01',
+                    'status': 'pending',
+                    'appointment_date': '2026-09-18',
+                    'time_slot': '11:00',
+                    'patient': {
+                      'id': 'pat-pnd',
+                      'name': 'خالد سلطاني',
+                      'phone': '0555998877',
+                    },
+                  }
+                ],
+                'meta': {'current_page': 1, 'last_page': 1},
+              }),
+              200,
+              headers: {'content-type': 'application/json'});
         }
-        return http.Response(jsonEncode({'data': [], 'meta': {'current_page': 1, 'last_page': 1}}), 200, headers: {
-          'content-type': 'application/json',
-        });
+        return http.Response(
+            jsonEncode({
+              'data': [],
+              'meta': {'current_page': 1, 'last_page': 1}
+            }),
+            200,
+            headers: {
+              'content-type': 'application/json',
+            });
       });
       final apiClient = ApiClient(httpClient: mockClient);
       final sessionManager = AuthSessionManager(
@@ -388,52 +447,67 @@ void main() {
       expect(find.text('تأكيد الموعد'), findsOneWidget);
     });
 
-    testWidgets('Tapping Confirm button shows confirmation prompt and invokes API', (tester) async {
+    testWidgets(
+        'Tapping Confirm button shows confirmation prompt and invokes API',
+        (tester) async {
       var confirmApiCalled = false;
 
       final mockClient = MockClient((request) async {
         if (request.url.path.endsWith('/appointments/appt-pnd-01/confirm')) {
           confirmApiCalled = true;
           expect(request.method, equals('POST'));
-          return http.Response(jsonEncode({
-            'message': 'تم تأكيد الموعد بنجاح وخصم الحصة من الرصيد إن وجدت.',
-            'data': {
-              'id': 'appt-pnd-01',
-              'booking_reference': 'BK-PND-01',
-              'status': 'confirmed',
-              'appointment_date': '2026-09-18',
-              'time_slot': '11:00',
-              'patient': {
-                'id': 'pat-pnd',
-                'name': 'خالد سلطاني',
-              },
-            },
-          }), 200, headers: {'content-type': 'application/json'});
+          return http.Response(
+              jsonEncode({
+                'message':
+                    'تم تأكيد الموعد بنجاح وخصم الحصة من الرصيد إن وجدت.',
+                'data': {
+                  'id': 'appt-pnd-01',
+                  'booking_reference': 'BK-PND-01',
+                  'status': 'confirmed',
+                  'appointment_date': '2026-09-18',
+                  'time_slot': '11:00',
+                  'patient': {
+                    'id': 'pat-pnd',
+                    'name': 'خالد سلطاني',
+                  },
+                },
+              }),
+              200,
+              headers: {'content-type': 'application/json'});
         }
 
         final status = request.url.queryParameters['status'];
         if (status == 'pending') {
-          return http.Response(jsonEncode({
-            'data': [
-              {
-                'id': 'appt-pnd-01',
-                'booking_reference': 'BK-PND-01',
-                'status': 'pending',
-                'appointment_date': '2026-09-18',
-                'time_slot': '11:00',
-                'patient': {
-                  'id': 'pat-pnd',
-                  'name': 'خالد سلطاني',
-                },
-              }
-            ],
-            'meta': {'current_page': 1, 'last_page': 1},
-          }), 200, headers: {'content-type': 'application/json'});
+          return http.Response(
+              jsonEncode({
+                'data': [
+                  {
+                    'id': 'appt-pnd-01',
+                    'booking_reference': 'BK-PND-01',
+                    'status': 'pending',
+                    'appointment_date': '2026-09-18',
+                    'time_slot': '11:00',
+                    'patient': {
+                      'id': 'pat-pnd',
+                      'name': 'خالد سلطاني',
+                    },
+                  }
+                ],
+                'meta': {'current_page': 1, 'last_page': 1},
+              }),
+              200,
+              headers: {'content-type': 'application/json'});
         }
 
-        return http.Response(jsonEncode({'data': [], 'meta': {'current_page': 1, 'last_page': 1}}), 200, headers: {
-          'content-type': 'application/json',
-        });
+        return http.Response(
+            jsonEncode({
+              'data': [],
+              'meta': {'current_page': 1, 'last_page': 1}
+            }),
+            200,
+            headers: {
+              'content-type': 'application/json',
+            });
       });
 
       final apiClient = ApiClient(httpClient: mockClient);
@@ -462,7 +536,8 @@ void main() {
 
       // Verification dialog appears
       expect(find.text('تأكيد الموعد الطبي'), findsOneWidget);
-      expect(find.textContaining('هل أنت متأكد من تأكيد هذا الموعد الطبي'), findsOneWidget);
+      expect(find.textContaining('هل أنت متأكد من تأكيد هذا الموعد الطبي'),
+          findsOneWidget);
 
       // Tap confirm action in dialog
       final dialogConfirmBtn = find.descendant(
@@ -476,30 +551,41 @@ void main() {
       expect(find.textContaining('تم تأكيد الموعد بنجاح.'), findsOneWidget);
     });
 
-    testWidgets('When booking.confirm is revoked, confirmation action is disabled', (tester) async {
+    testWidgets(
+        'When booking.confirm is revoked, confirmation action is disabled',
+        (tester) async {
       final mockClient = MockClient((request) async {
         final status = request.url.queryParameters['status'];
         if (status == 'pending') {
-          return http.Response(jsonEncode({
-            'data': [
-              {
-                'id': 'appt-pnd-02',
-                'booking_reference': 'BK-PND-02',
-                'status': 'pending',
-                'appointment_date': '2026-09-18',
-                'time_slot': '12:00',
-                'patient': {
-                  'id': 'pat-pnd-2',
-                  'name': 'نبيل بوزيد',
-                },
-              }
-            ],
-            'meta': {'current_page': 1, 'last_page': 1},
-          }), 200, headers: {'content-type': 'application/json'});
+          return http.Response(
+              jsonEncode({
+                'data': [
+                  {
+                    'id': 'appt-pnd-02',
+                    'booking_reference': 'BK-PND-02',
+                    'status': 'pending',
+                    'appointment_date': '2026-09-18',
+                    'time_slot': '12:00',
+                    'patient': {
+                      'id': 'pat-pnd-2',
+                      'name': 'نبيل بوزيد',
+                    },
+                  }
+                ],
+                'meta': {'current_page': 1, 'last_page': 1},
+              }),
+              200,
+              headers: {'content-type': 'application/json'});
         }
-        return http.Response(jsonEncode({'data': [], 'meta': {'current_page': 1, 'last_page': 1}}), 200, headers: {
-          'content-type': 'application/json',
-        });
+        return http.Response(
+            jsonEncode({
+              'data': [],
+              'meta': {'current_page': 1, 'last_page': 1}
+            }),
+            200,
+            headers: {
+              'content-type': 'application/json',
+            });
       });
 
       final apiClient = ApiClient(httpClient: mockClient);
@@ -527,11 +613,19 @@ void main() {
   });
 
   group('5. Date and Doctor Filtering Controls', () {
-    testWidgets('Doctor and Date filter popup menus render and update selection', (tester) async {
+    testWidgets(
+        'Doctor and Date filter popup menus render and update selection',
+        (tester) async {
       final mockClient = MockClient((request) async {
-        return http.Response(jsonEncode({'data': [], 'meta': {'current_page': 1, 'last_page': 1}}), 200, headers: {
-          'content-type': 'application/json',
-        });
+        return http.Response(
+            jsonEncode({
+              'data': [],
+              'meta': {'current_page': 1, 'last_page': 1}
+            }),
+            200,
+            headers: {
+              'content-type': 'application/json',
+            });
       });
 
       final apiClient = ApiClient(httpClient: mockClient);
@@ -549,7 +643,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Doctor filter button and Date filter button exist
-      expect(find.byKey(const ValueKey('doctor_filter_button')), findsOneWidget);
+      expect(
+          find.byKey(const ValueKey('doctor_filter_button')), findsOneWidget);
       expect(find.byKey(const ValueKey('date_filter_button')), findsOneWidget);
       expect(find.text('جميع الأطباء'), findsOneWidget);
       expect(find.text('اليوم'), findsOneWidget);
@@ -570,7 +665,9 @@ void main() {
       expect(find.text('جميع التواريخ'), findsOneWidget);
     });
 
-    testWidgets('HV-G03: Doctor filter selection, reset to All Doctors, repeated switching, and date filter preservation', (tester) async {
+    testWidgets(
+        'HV-G03: Doctor filter selection, reset to All Doctors, repeated switching, and date filter preservation',
+        (tester) async {
       final requestedDoctorIds = <String?>[];
 
       final mockClient = MockClient((request) async {
@@ -614,7 +711,10 @@ void main() {
         }
 
         return http.Response(
-          jsonEncode({'data': [], 'meta': {'current_page': 1, 'last_page': 1}}),
+          jsonEncode({
+            'data': [],
+            'meta': {'current_page': 1, 'last_page': 1}
+          }),
           200,
           headers: {'content-type': 'application/json'},
         );
@@ -636,7 +736,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Test 1: Default state (All Doctors, no restriction)
-      expect(find.byKey(const ValueKey('doctor_filter_button')), findsOneWidget);
+      expect(
+          find.byKey(const ValueKey('doctor_filter_button')), findsOneWidget);
       expect(find.text('جميع الأطباء'), findsOneWidget);
       expect(requestedDoctorIds.isNotEmpty, isTrue);
       expect(requestedDoctorIds.last, isNull);
@@ -719,7 +820,8 @@ void main() {
       await tester.tap(find.text('د. أحمد خليل'));
       await tester.pumpAndSettle();
       expect(find.text('د. أحمد خليل'), findsOneWidget);
-      expect(find.text('جميع التواريخ'), findsOneWidget); // date filter preserved
+      expect(
+          find.text('جميع التواريخ'), findsOneWidget); // date filter preserved
 
       // Reset Doctor filter to All Doctors
       await tester.tap(find.byKey(const ValueKey('doctor_filter_button')));
@@ -730,31 +832,42 @@ void main() {
       ));
       await tester.pumpAndSettle();
       expect(find.text('جميع الأطباء'), findsOneWidget);
-      expect(find.text('جميع التواريخ'), findsOneWidget); // date filter STILL preserved
+      expect(find.text('جميع التواريخ'),
+          findsOneWidget); // date filter STILL preserved
       expect(requestedDoctorIds.last, isNull);
     });
   });
 
   group('6. Patient Search Contact Masking Parity', () {
-    testWidgets('patient.view_contacts granted: shows full phone number', (tester) async {
+    testWidgets('patient.view_contacts granted: shows full phone number',
+        (tester) async {
       final mockClient = MockClient((request) async {
         if (request.url.path.endsWith('/patients')) {
-          return http.Response(jsonEncode({
-            'data': [
-              {
-                'id': 'patient-001',
-                'mrn': 'MRN-001',
-                'first_name': 'ياسمين',
-                'last_name': 'عماري',
-                'phone': '0555123456',
-                'gender': 'female',
-              }
-            ]
-          }), 200, headers: {'content-type': 'application/json'});
+          return http.Response(
+              jsonEncode({
+                'data': [
+                  {
+                    'id': 'patient-001',
+                    'mrn': 'MRN-001',
+                    'first_name': 'ياسمين',
+                    'last_name': 'عماري',
+                    'phone': '0555123456',
+                    'gender': 'female',
+                  }
+                ]
+              }),
+              200,
+              headers: {'content-type': 'application/json'});
         }
-        return http.Response(jsonEncode({'data': [], 'meta': {'current_page': 1, 'last_page': 1}}), 200, headers: {
-          'content-type': 'application/json',
-        });
+        return http.Response(
+            jsonEncode({
+              'data': [],
+              'meta': {'current_page': 1, 'last_page': 1}
+            }),
+            200,
+            headers: {
+              'content-type': 'application/json',
+            });
       });
 
       final apiClient = ApiClient(httpClient: mockClient);
@@ -796,25 +909,35 @@ void main() {
       expect(find.text('0555123456'), findsOneWidget);
     });
 
-    testWidgets('patient.view_contacts revoked: masks phone number as —', (tester) async {
+    testWidgets('patient.view_contacts revoked: masks phone number as —',
+        (tester) async {
       final mockClient = MockClient((request) async {
         if (request.url.path.endsWith('/patients')) {
-          return http.Response(jsonEncode({
-            'data': [
-              {
-                'id': 'patient-002',
-                'mrn': 'MRN-002',
-                'first_name': 'بلال',
-                'last_name': 'حمدي',
-                'phone': '0555987654',
-                'gender': 'male',
-              }
-            ]
-          }), 200, headers: {'content-type': 'application/json'});
+          return http.Response(
+              jsonEncode({
+                'data': [
+                  {
+                    'id': 'patient-002',
+                    'mrn': 'MRN-002',
+                    'first_name': 'بلال',
+                    'last_name': 'حمدي',
+                    'phone': '0555987654',
+                    'gender': 'male',
+                  }
+                ]
+              }),
+              200,
+              headers: {'content-type': 'application/json'});
         }
-        return http.Response(jsonEncode({'data': [], 'meta': {'current_page': 1, 'last_page': 1}}), 200, headers: {
-          'content-type': 'application/json',
-        });
+        return http.Response(
+            jsonEncode({
+              'data': [],
+              'meta': {'current_page': 1, 'last_page': 1}
+            }),
+            200,
+            headers: {
+              'content-type': 'application/json',
+            });
       });
 
       final apiClient = ApiClient(httpClient: mockClient);

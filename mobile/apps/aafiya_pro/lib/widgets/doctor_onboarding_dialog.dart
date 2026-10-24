@@ -68,7 +68,8 @@ class DoctorOnboardingDialog extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: AafiyaColors.primaryBlue.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AafiyaRadius.pill),
@@ -302,7 +303,8 @@ class DoctorOnboardingDialog extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
-                      color: isCurrent ? Colors.white : AafiyaColors.secondaryText,
+                      color:
+                          isCurrent ? Colors.white : AafiyaColors.secondaryText,
                     ),
                   ),
           ),
@@ -313,7 +315,9 @@ class DoctorOnboardingDialog extends StatelessWidget {
             title,
             style: AafiyaTypography.bodyMedium.copyWith(
               fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
-              color: isCurrent ? AafiyaColors.primaryText : AafiyaColors.secondaryText,
+              color: isCurrent
+                  ? AafiyaColors.primaryText
+                  : AafiyaColors.secondaryText,
             ),
           ),
         ),

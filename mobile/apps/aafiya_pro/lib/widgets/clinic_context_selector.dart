@@ -17,15 +17,18 @@ class ClinicContextSelector extends StatelessWidget {
   final AuthSessionManager sessionManager;
   final ValueChanged<DoctorClinic>? onClinicSwitched;
 
-  void _showClinicSwitcherSheet(BuildContext context, LocalizedStrings strings) {
-    final activeClinics = sessionManager.authorizedClinics.where((c) => c.isActive).toList();
+  void _showClinicSwitcherSheet(
+      BuildContext context, LocalizedStrings strings) {
+    final activeClinics =
+        sessionManager.authorizedClinics.where((c) => c.isActive).toList();
     if (activeClinics.isEmpty) return;
 
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AafiyaRadius.lg)),
+        borderRadius:
+            BorderRadius.vertical(top: Radius.circular(AafiyaRadius.lg)),
       ),
       builder: (sheetContext) {
         return SafeArea(
@@ -78,7 +81,8 @@ class ClinicContextSelector extends StatelessWidget {
                     separatorBuilder: (_, __) => const Divider(height: 1),
                     itemBuilder: (ctx, index) {
                       final clinic = activeClinics[index];
-                      final isSelected = clinic.id == sessionManager.activeClinicId;
+                      final isSelected =
+                          clinic.id == sessionManager.activeClinicId;
 
                       return ListTile(
                         minVerticalPadding: 12,
@@ -93,7 +97,8 @@ class ClinicContextSelector extends StatelessWidget {
                           foregroundColor: isSelected
                               ? AafiyaColors.pureWhite
                               : AafiyaColors.secondaryText,
-                          child: const Icon(Icons.local_hospital_rounded, size: 20),
+                          child: const Icon(Icons.local_hospital_rounded,
+                              size: 20),
                         ),
                         title: Row(
                           children: [
@@ -101,16 +106,20 @@ class ClinicContextSelector extends StatelessWidget {
                               child: Text(
                                 clinic.name,
                                 style: AafiyaTypography.titleMedium.copyWith(
-                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                  fontWeight: isSelected
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
                                 ),
                               ),
                             ),
                             if (clinic.isMedicalDirector) ...[
                               const SizedBox(width: 6),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: AafiyaColors.warning.withValues(alpha: 0.15),
+                                  color: AafiyaColors.warning
+                                      .withValues(alpha: 0.15),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
@@ -125,9 +134,11 @@ class ClinicContextSelector extends StatelessWidget {
                             if (clinic.isPrimary) ...[
                               const SizedBox(width: 6),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: AafiyaColors.healthBlue.withValues(alpha: 0.1),
+                                  color: AafiyaColors.healthBlue
+                                      .withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
@@ -142,18 +153,23 @@ class ClinicContextSelector extends StatelessWidget {
                           ],
                         ),
                         subtitle: Text(
-                          [clinic.wilaya, clinic.address].whereType<String>().where((s) => s.isNotEmpty).join(' • '),
+                          [clinic.wilaya, clinic.address]
+                              .whereType<String>()
+                              .where((s) => s.isNotEmpty)
+                              .join(' • '),
                           style: AafiyaTypography.caption,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         trailing: isSelected
-                            ? const Icon(Icons.check_circle_rounded, color: AafiyaColors.healthBlue)
+                            ? const Icon(Icons.check_circle_rounded,
+                                color: AafiyaColors.healthBlue)
                             : null,
                         onTap: () {
                           Navigator.of(sheetContext).pop();
                           if (!isSelected) {
-                            final success = sessionManager.switchActiveClinic(clinic.id);
+                            final success =
+                                sessionManager.switchActiveClinic(clinic.id);
                             if (success) {
                               onClinicSwitched?.call(clinic);
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -187,7 +203,8 @@ class ClinicContextSelector extends StatelessWidget {
       listenable: sessionManager,
       builder: (context, _) {
         final activeClinic = sessionManager.activeClinic;
-        final activeClinics = sessionManager.authorizedClinics.where((c) => c.isActive).toList();
+        final activeClinics =
+            sessionManager.authorizedClinics.where((c) => c.isActive).toList();
         final hasMultipleClinics = activeClinics.length > 1;
 
         if (activeClinic == null) {
@@ -262,7 +279,8 @@ class ClinicContextSelector extends StatelessWidget {
                             color: AafiyaColors.primaryText,
                           ),
                         ),
-                        if (activeClinic.wilaya != null || activeClinic.address != null) ...[
+                        if (activeClinic.wilaya != null ||
+                            activeClinic.address != null) ...[
                           const SizedBox(height: 2),
                           Text(
                             [activeClinic.wilaya, activeClinic.address]
@@ -279,12 +297,14 @@ class ClinicContextSelector extends StatelessWidget {
                   ),
                   if (hasMultipleClinics)
                     OutlinedButton.icon(
-                      onPressed: () => _showClinicSwitcherSheet(context, strings),
+                      onPressed: () =>
+                          _showClinicSwitcherSheet(context, strings),
                       icon: const Icon(Icons.swap_horiz_rounded, size: 18),
                       label: Text(strings.changeClinic),
                       style: OutlinedButton.styleFrom(
                         minimumSize: const Size(0, 48),
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 10),
                         foregroundColor: AafiyaColors.healthBlue,
                         side: const BorderSide(color: AafiyaColors.healthBlue),
                         shape: RoundedRectangleBorder(
@@ -300,7 +320,8 @@ class ClinicContextSelector extends StatelessWidget {
                 runSpacing: 4,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
                       color: activeClinic.isMedicalDirector
                           ? AafiyaColors.warning.withValues(alpha: 0.15)
@@ -336,7 +357,8 @@ class ClinicContextSelector extends StatelessWidget {
                   ),
                   if (activeClinic.isPrimary)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
                         color: AafiyaColors.border,
                         borderRadius: BorderRadius.circular(4),

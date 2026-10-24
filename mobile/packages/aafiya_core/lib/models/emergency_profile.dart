@@ -270,7 +270,8 @@ class EmergencyProfile {
   bool get hasEmergencyContacts => emergencyContacts.isNotEmpty;
 
   factory EmergencyProfile.fromJson(Map<String, dynamic> json) {
-    final rawContacts = json['emergency_contacts'] as List<dynamic>? ?? const [];
+    final rawContacts =
+        json['emergency_contacts'] as List<dynamic>? ?? const [];
     final contacts = rawContacts
         .whereType<Map<String, dynamic>>()
         .map(EmergencyContact.fromJson)
@@ -282,13 +283,15 @@ class EmergencyProfile {
         .map(PatientAllergy.fromJson)
         .toList();
 
-    final rawConditions = json['chronic_conditions'] as List<dynamic>? ?? const [];
+    final rawConditions =
+        json['chronic_conditions'] as List<dynamic>? ?? const [];
     final conditions = rawConditions
         .whereType<Map<String, dynamic>>()
         .map(ChronicCondition.fromJson)
         .toList();
 
-    final rawMedications = json['current_medications'] as List<dynamic>? ?? const [];
+    final rawMedications =
+        json['current_medications'] as List<dynamic>? ?? const [];
     final medications = rawMedications
         .whereType<Map<String, dynamic>>()
         .map(CurrentMedication.fromJson)
@@ -304,7 +307,8 @@ class EmergencyProfile {
       mrn: json['mrn'] as String? ?? '',
       firstName: json['first_name'] as String? ?? '',
       lastName: json['last_name'] as String? ?? '',
-      fullName: json['full_name'] as String? ?? '${json['first_name'] ?? ''} ${json['last_name'] ?? ''}'.trim(),
+      fullName: json['full_name'] as String? ??
+          '${json['first_name'] ?? ''} ${json['last_name'] ?? ''}'.trim(),
       gender: json['gender'] as String?,
       dateOfBirth: json['date_of_birth'] as String?,
       bloodGroup: json['blood_group'] as String?,
@@ -340,7 +344,8 @@ class EmergencyProfile {
         'emergency_contacts': emergencyContacts.map((c) => c.toJson()).toList(),
         'allergies': allergies.map((a) => a.toJson()).toList(),
         'chronic_conditions': chronicConditions.map((c) => c.toJson()).toList(),
-        'current_medications': currentMedications.map((m) => m.toJson()).toList(),
+        'current_medications':
+            currentMedications.map((m) => m.toJson()).toList(),
         if (createdAt != null) 'created_at': createdAt!.toIso8601String(),
       };
 }

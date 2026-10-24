@@ -447,7 +447,8 @@ class _DoctorQueueScreenState extends State<DoctorQueueScreen> {
     required VoidCallback onTap,
   }) {
     return Material(
-      color: isSelected ? accentColor.withValues(alpha: 0.1) : Colors.transparent,
+      color:
+          isSelected ? accentColor.withValues(alpha: 0.1) : Colors.transparent,
       borderRadius: BorderRadius.circular(AafiyaRadius.md),
       child: InkWell(
         onTap: onTap,
@@ -473,7 +474,8 @@ class _DoctorQueueScreenState extends State<DoctorQueueScreen> {
                   title,
                   style: AafiyaTypography.bodyMedium.copyWith(
                     color: isSelected ? accentColor : AafiyaColors.primaryText,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    fontWeight:
+                        isSelected ? FontWeight.bold : FontWeight.normal,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -482,13 +484,16 @@ class _DoctorQueueScreenState extends State<DoctorQueueScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                 decoration: BoxDecoration(
-                  color: isSelected ? accentColor : AafiyaColors.lightBackground,
+                  color:
+                      isSelected ? accentColor : AafiyaColors.lightBackground,
                   shape: BoxShape.circle,
                 ),
                 child: Text(
                   count != null ? '\u200E$count\u200E' : '-',
                   style: AafiyaTypography.caption.copyWith(
-                    color: isSelected ? AafiyaColors.pureWhite : AafiyaColors.secondaryText,
+                    color: isSelected
+                        ? AafiyaColors.pureWhite
+                        : AafiyaColors.secondaryText,
                     fontWeight: FontWeight.bold,
                     fontSize: 11,
                   ),
@@ -547,9 +552,8 @@ class _DoctorQueueScreenState extends State<DoctorQueueScreen> {
             key: ValueKey('queue_waiting_${app.id}'),
             appointment: app,
             queueIndex: index + 1,
-            onViewSummary: app.patient.id != null
-                ? () => _openPatientSummary(app)
-                : null,
+            onViewSummary:
+                app.patient.id != null ? () => _openPatientSummary(app) : null,
           );
         },
       );
@@ -602,9 +606,8 @@ class _DoctorQueueScreenState extends State<DoctorQueueScreen> {
             appointment: app,
             onAttend: () => _handleAttend(app),
             onNoShow: () => _handleNoShow(app),
-            onViewSummary: app.patient.id != null
-                ? () => _openPatientSummary(app)
-                : null,
+            onViewSummary:
+                app.patient.id != null ? () => _openPatientSummary(app) : null,
             isProcessing: isProcessingThis,
           );
         },
@@ -620,7 +623,8 @@ class _DoctorQueueScreenState extends State<DoctorQueueScreen> {
       context,
       apiClient: client,
       patientId: patientId,
-      patientName: app.patient.name ?? LocalizedStrings.of(context).patientNameLabel,
+      patientName:
+          app.patient.name ?? LocalizedStrings.of(context).patientNameLabel,
       mrn: app.patient.mrn,
     );
   }
@@ -695,4 +699,3 @@ class _NoShowDialogState extends State<_NoShowDialog> {
     );
   }
 }
-

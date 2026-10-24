@@ -65,7 +65,9 @@ void main() {
       tokenStorage = InMemoryTokenStorage('test_doctor_token');
     });
 
-    testWidgets('1. Loading: displays loading indicator while requests in-flight', (tester) async {
+    testWidgets(
+        '1. Loading: displays loading indicator while requests in-flight',
+        (tester) async {
       final completer = Completer<http.Response>();
 
       final mockClient = MockClient((request) async {
@@ -80,7 +82,7 @@ void main() {
       sessionManager = AuthSessionManager(
         tokenStorage: tokenStorage,
         apiClient: apiClient,
-              );
+      );
       sessionManager.setAuthorizedClinics([testClinic]);
 
       await tester.pumpWidget(
@@ -110,7 +112,9 @@ void main() {
       await tester.pumpAndSettle();
     });
 
-    testWidgets('2. Loaded: displays operational statistics and today agenda list', (tester) async {
+    testWidgets(
+        '2. Loaded: displays operational statistics and today agenda list',
+        (tester) async {
       final mockClient = MockClient((request) async {
         if (request.url.path.endsWith('/doctor/stats')) {
           return http.Response(
@@ -182,7 +186,7 @@ void main() {
       sessionManager = AuthSessionManager(
         tokenStorage: tokenStorage,
         apiClient: apiClient,
-              );
+      );
       sessionManager.setAuthorizedClinics([testClinic]);
 
       await tester.pumpWidget(
@@ -213,7 +217,9 @@ void main() {
       expect(find.textContaining('MS-2026-001'), findsWidgets);
     });
 
-    testWidgets('3. Empty: renders AafiyaEmptyView when no appointments scheduled today', (tester) async {
+    testWidgets(
+        '3. Empty: renders AafiyaEmptyView when no appointments scheduled today',
+        (tester) async {
       final mockClient = MockClient((request) async {
         if (request.url.path.endsWith('/doctor/stats')) {
           return http.Response(
@@ -257,7 +263,7 @@ void main() {
       sessionManager = AuthSessionManager(
         tokenStorage: tokenStorage,
         apiClient: apiClient,
-              );
+      );
       sessionManager.setAuthorizedClinics([testClinic]);
 
       await tester.pumpWidget(
@@ -279,7 +285,9 @@ void main() {
       expect(find.text('لا توجد مواعيد مسجلة لهذا اليوم.'), findsOneWidget);
     });
 
-    testWidgets('4. Error & Retry: request failure displays AafiyaErrorView and retry refetches', (tester) async {
+    testWidgets(
+        '4. Error & Retry: request failure displays AafiyaErrorView and retry refetches',
+        (tester) async {
       int requestCount = 0;
 
       final mockClient = MockClient((request) async {
@@ -302,7 +310,12 @@ void main() {
         return http.Response(
           jsonEncode({
             'data': <Map<String, dynamic>>[],
-            'meta': {'current_page': 1, 'last_page': 1, 'per_page': 20, 'total': 0},
+            'meta': {
+              'current_page': 1,
+              'last_page': 1,
+              'per_page': 20,
+              'total': 0
+            },
           }),
           200,
           headers: {'content-type': 'application/json'},
@@ -317,7 +330,7 @@ void main() {
       sessionManager = AuthSessionManager(
         tokenStorage: tokenStorage,
         apiClient: apiClient,
-              );
+      );
       sessionManager.setAuthorizedClinics([testClinic]);
 
       await tester.pumpWidget(
@@ -345,7 +358,9 @@ void main() {
       expect(find.text('\u200E2\u200E'), findsOneWidget);
     });
 
-    testWidgets('5. Clinic Context Switch: switching active clinic reloads dashboard data with new header', (tester) async {
+    testWidgets(
+        '5. Clinic Context Switch: switching active clinic reloads dashboard data with new header',
+        (tester) async {
       String? lastClinicIdHeader;
 
       final mockClient = MockClient((request) async {
@@ -369,7 +384,12 @@ void main() {
         return http.Response(
           jsonEncode({
             'data': <Map<String, dynamic>>[],
-            'meta': {'current_page': 1, 'last_page': 1, 'per_page': 20, 'total': 0},
+            'meta': {
+              'current_page': 1,
+              'last_page': 1,
+              'per_page': 20,
+              'total': 0
+            },
           }),
           200,
           headers: {'content-type': 'application/json'},
@@ -384,7 +404,7 @@ void main() {
       sessionManager = AuthSessionManager(
         tokenStorage: tokenStorage,
         apiClient: apiClient,
-              );
+      );
       sessionManager.setAuthorizedClinics([testClinic, testClinic2]);
 
       await tester.pumpWidget(
@@ -411,8 +431,11 @@ void main() {
       expect(lastClinicIdHeader, 'clinic-002');
     });
 
-    testWidgets('6. Stale Response Protection: late response from previous clinic is safely discarded', (tester) async {
-      Completer<http.Response> clinic1StatsCompleter = Completer<http.Response>();
+    testWidgets(
+        '6. Stale Response Protection: late response from previous clinic is safely discarded',
+        (tester) async {
+      Completer<http.Response> clinic1StatsCompleter =
+          Completer<http.Response>();
 
       final mockClient = MockClient((request) async {
         final clinicHeader = request.headers['x-clinic-id'];
@@ -445,7 +468,7 @@ void main() {
       sessionManager = AuthSessionManager(
         tokenStorage: tokenStorage,
         apiClient: apiClient,
-              );
+      );
       sessionManager.setAuthorizedClinics([testClinic, testClinic2]);
 
       await tester.pumpWidget(
@@ -488,7 +511,9 @@ void main() {
       expect(find.text('\u200E555\u200E'), findsNothing);
     });
 
-    testWidgets('7. Trilingual Localization: renders properly in English and French', (tester) async {
+    testWidgets(
+        '7. Trilingual Localization: renders properly in English and French',
+        (tester) async {
       final mockClient = MockClient((request) async {
         return http.Response(
           jsonEncode({
@@ -515,7 +540,7 @@ void main() {
       sessionManager = AuthSessionManager(
         tokenStorage: tokenStorage,
         apiClient: apiClient,
-              );
+      );
       sessionManager.setAuthorizedClinics([testClinic]);
 
       // Test English

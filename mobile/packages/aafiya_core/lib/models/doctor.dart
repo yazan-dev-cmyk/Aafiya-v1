@@ -75,7 +75,8 @@ class Doctor {
 
     MedicalSpecialty? parsedMedicalSpecialty;
     if (json['medical_specialty'] is Map<String, dynamic>) {
-      parsedMedicalSpecialty = MedicalSpecialty.fromJson(json['medical_specialty'] as Map<String, dynamic>);
+      parsedMedicalSpecialty = MedicalSpecialty.fromJson(
+          json['medical_specialty'] as Map<String, dynamic>);
     }
 
     return Doctor(

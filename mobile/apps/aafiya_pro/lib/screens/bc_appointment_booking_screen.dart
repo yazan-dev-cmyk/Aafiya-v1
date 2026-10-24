@@ -37,7 +37,8 @@ class BcAppointmentBookingScreen extends StatefulWidget {
       _BcAppointmentBookingScreenState();
 }
 
-class _BcAppointmentBookingScreenState extends State<BcAppointmentBookingScreen> {
+class _BcAppointmentBookingScreenState
+    extends State<BcAppointmentBookingScreen> {
   late final ApiClient _apiClient;
   late final BookingCenterService _service;
 
@@ -84,8 +85,8 @@ class _BcAppointmentBookingScreenState extends State<BcAppointmentBookingScreen>
   void initState() {
     super.initState();
     _apiClient = widget.apiClient ?? widget.sessionManager.apiClient;
-    _service =
-        widget.bookingCenterService ?? BookingCenterService(apiClient: _apiClient);
+    _service = widget.bookingCenterService ??
+        BookingCenterService(apiClient: _apiClient);
     _quotaBalance = widget.initialQuotaBalance;
     _fetchQuota();
     _loadDoctors();
@@ -286,13 +287,19 @@ class _BcAppointmentBookingScreenState extends State<BcAppointmentBookingScreen>
         _showSuccessSheet(data);
       case ApiFailure(:final exception):
         final msg = exception.message.toLowerCase();
-        if (msg.contains('quota') || msg.contains('حصة') || msg.contains('وحدات')) {
+        if (msg.contains('quota') ||
+            msg.contains('حصة') ||
+            msg.contains('وحدات')) {
           _showQuotaErrorDialog();
           _fetchQuota();
-        } else if (msg.contains('capacity') || msg.contains('ممتلئ') || msg.contains('السعة')) {
+        } else if (msg.contains('capacity') ||
+            msg.contains('ممتلئ') ||
+            msg.contains('السعة')) {
           _showErrorSnackbar(strings.slotAlreadyFullError);
           _loadSlots();
-        } else if (msg.contains('duplicate') || msg.contains('نشط بالفعل') || msg.contains('patient_phone')) {
+        } else if (msg.contains('duplicate') ||
+            msg.contains('نشط بالفعل') ||
+            msg.contains('patient_phone')) {
           _showErrorSnackbar(strings.duplicateBookingError);
         } else {
           _showErrorSnackbar(exception.message);
@@ -342,17 +349,19 @@ class _BcAppointmentBookingScreenState extends State<BcAppointmentBookingScreen>
           ElevatedButton(
             onPressed: () {
               Navigator.of(ctx).pop();
-              Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => BcQuotaScreen(
-                    sessionManager: widget.sessionManager,
-                    user: widget.user,
-                    bookingCenterService: _service,
-                    apiClient: widget.apiClient,
-                    onBackToDashboard: () => Navigator.of(context).pop(),
-                  ),
-                ),
-              ).then((_) => _fetchQuota());
+              Navigator.of(context)
+                  .push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => BcQuotaScreen(
+                        sessionManager: widget.sessionManager,
+                        user: widget.user,
+                        bookingCenterService: _service,
+                        apiClient: widget.apiClient,
+                        onBackToDashboard: () => Navigator.of(context).pop(),
+                      ),
+                    ),
+                  )
+                  .then((_) => _fetchQuota());
             },
             child: Text(strings.purchaseRequest),
           ),
@@ -602,7 +611,6 @@ class _BcAppointmentBookingScreenState extends State<BcAppointmentBookingScreen>
               ),
             ),
             const SizedBox(height: 12),
-
             if (_patientSearchError != null)
               Container(
                 padding: const EdgeInsets.all(10),
@@ -616,7 +624,6 @@ class _BcAppointmentBookingScreenState extends State<BcAppointmentBookingScreen>
                       .copyWith(color: AafiyaColors.error),
                 ),
               ),
-
             if (_patientResults.isEmpty &&
                 !_isSearchingPatients &&
                 _patientSearchController.text.trim().length >= 2)
@@ -630,7 +637,6 @@ class _BcAppointmentBookingScreenState extends State<BcAppointmentBookingScreen>
                   ),
                 ),
               ),
-
             ListView.separated(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -810,13 +816,11 @@ class _BcAppointmentBookingScreenState extends State<BcAppointmentBookingScreen>
           ),
         ),
         const SizedBox(height: 12),
-
         if (_isSearchingDoctors)
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 24),
             child: Center(child: CircularProgressIndicator()),
           ),
-
         if (_doctorsError != null)
           Container(
             padding: const EdgeInsets.all(10),
@@ -830,7 +834,6 @@ class _BcAppointmentBookingScreenState extends State<BcAppointmentBookingScreen>
                   AafiyaTypography.caption.copyWith(color: AafiyaColors.error),
             ),
           ),
-
         if (_doctors.isEmpty && !_isSearchingDoctors)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 24),
@@ -842,7 +845,6 @@ class _BcAppointmentBookingScreenState extends State<BcAppointmentBookingScreen>
               ),
             ),
           ),
-
         ListView.separated(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -852,7 +854,8 @@ class _BcAppointmentBookingScreenState extends State<BcAppointmentBookingScreen>
             final doc = _doctors[index];
             final isSelected = _selectedDoctor?.id == doc.id;
             final strings = LocalizedStrings.of(context);
-            final docSpecialty = doc.localizedSpecialty(strings.locale.languageCode);
+            final docSpecialty =
+                doc.localizedSpecialty(strings.locale.languageCode);
 
             return AafiyaCard(
               backgroundColor: isSelected
@@ -866,8 +869,8 @@ class _BcAppointmentBookingScreenState extends State<BcAppointmentBookingScreen>
                     Row(
                       children: [
                         CircleAvatar(
-                          backgroundColor: AafiyaColors.healthBlue
-                              .withValues(alpha: 0.15),
+                          backgroundColor:
+                              AafiyaColors.healthBlue.withValues(alpha: 0.15),
                           child: const Icon(Icons.medical_services_rounded,
                               color: AafiyaColors.healthBlue),
                         ),
@@ -893,7 +896,9 @@ class _BcAppointmentBookingScreenState extends State<BcAppointmentBookingScreen>
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                docSpecialty.isNotEmpty ? docSpecialty : doc.specialty,
+                                docSpecialty.isNotEmpty
+                                    ? docSpecialty
+                                    : doc.specialty,
                                 style: AafiyaTypography.caption.copyWith(
                                     color: AafiyaColors.secondaryText),
                               ),
@@ -939,8 +944,8 @@ class _BcAppointmentBookingScreenState extends State<BcAppointmentBookingScreen>
                           final isClinicSelected =
                               _selectedClinic?.id == clinic.id;
                           return ChoiceChip(
-                            label: Text(
-                                '${clinic.name} (${clinic.wilaya ?? ""})'),
+                            label:
+                                Text('${clinic.name} (${clinic.wilaya ?? ""})'),
                             selected: isClinicSelected,
                             onSelected: (val) {
                               setState(() {
@@ -1174,8 +1179,11 @@ class _BcAppointmentBookingScreenState extends State<BcAppointmentBookingScreen>
                 label: 'الطبيب المعالج',
                 value: _selectedDoctor?.name ?? '',
                 extra: _selectedDoctor != null
-                    ? (_selectedDoctor!.localizedSpecialty(strings.locale.languageCode).isNotEmpty
-                        ? _selectedDoctor!.localizedSpecialty(strings.locale.languageCode)
+                    ? (_selectedDoctor!
+                            .localizedSpecialty(strings.locale.languageCode)
+                            .isNotEmpty
+                        ? _selectedDoctor!
+                            .localizedSpecialty(strings.locale.languageCode)
                         : _selectedDoctor!.specialty)
                     : null,
               ),
@@ -1265,7 +1273,8 @@ class _BcAppointmentBookingScreenState extends State<BcAppointmentBookingScreen>
                 onPressed: _isSubmitting ? null : _previousStep,
                 style: OutlinedButton.styleFrom(
                   minimumSize: Size.zero,
-                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),

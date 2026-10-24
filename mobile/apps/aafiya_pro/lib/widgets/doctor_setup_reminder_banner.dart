@@ -152,7 +152,8 @@ class DoctorSetupReminderBanner extends StatelessWidget {
                       borderRadius: BorderRadius.circular(AafiyaRadius.sm),
                     ),
                   ),
-                  icon: const Icon(Icons.store_mall_directory_outlined, size: 16),
+                  icon:
+                      const Icon(Icons.store_mall_directory_outlined, size: 16),
                   label: Text(
                     strings.onboardingConfigureClinicAction,
                     style: const TextStyle(fontWeight: FontWeight.bold),

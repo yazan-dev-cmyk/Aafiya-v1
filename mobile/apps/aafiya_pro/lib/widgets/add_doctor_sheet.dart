@@ -71,7 +71,8 @@ class _AddDoctorSheetState extends State<AddDoctorSheet>
   @override
   void initState() {
     super.initState();
-    _masterDataService = widget.masterDataService ?? MasterDataService(widget.staffService.apiClient);
+    _masterDataService = widget.masterDataService ??
+        MasterDataService(widget.staffService.apiClient);
     _tabController = TabController(length: 2, vsync: this);
   }
 
@@ -98,7 +99,8 @@ class _AddDoctorSheetState extends State<AddDoctorSheet>
       _lookupError = null;
     });
 
-    final result = await widget.staffService.lookupDoctor(widget.clinicId, query);
+    final result =
+        await widget.staffService.lookupDoctor(widget.clinicId, query);
 
     if (!mounted) return;
 
@@ -111,7 +113,8 @@ class _AddDoctorSheetState extends State<AddDoctorSheet>
       case ApiFailure(:final exception):
         setState(() {
           _searchResults = [];
-          _lookupError = exception is NotFoundException ? null : exception.message;
+          _lookupError =
+              exception is NotFoundException ? null : exception.message;
           _isSearching = false;
         });
     }
@@ -176,7 +179,9 @@ class _AddDoctorSheetState extends State<AddDoctorSheet>
       specialty: _selectedSpecialty?.nameAr ?? _specialtyController.text.trim(),
       specialtyId: _selectedSpecialty?.id,
       licenseNumber: _licenseController.text.trim(),
-      bio: _bioController.text.trim().isNotEmpty ? _bioController.text.trim() : null,
+      bio: _bioController.text.trim().isNotEmpty
+          ? _bioController.text.trim()
+          : null,
     );
 
     if (!mounted) return;
@@ -211,7 +216,8 @@ class _AddDoctorSheetState extends State<AddDoctorSheet>
       constraints: BoxConstraints(maxHeight: maxHeight),
       decoration: const BoxDecoration(
         color: AafiyaColors.pureWhite,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AafiyaRadius.lg)),
+        borderRadius:
+            BorderRadius.vertical(top: Radius.circular(AafiyaRadius.lg)),
       ),
       padding: EdgeInsets.fromLTRB(
         AafiyaSpacing.lg,
@@ -316,7 +322,8 @@ class _AddDoctorSheetState extends State<AddDoctorSheet>
                       : null,
                   filled: true,
                   fillColor: AafiyaColors.lightBackground,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AafiyaRadius.md),
                     borderSide: BorderSide.none,
@@ -332,7 +339,8 @@ class _AddDoctorSheetState extends State<AddDoctorSheet>
                       height: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(AafiyaColors.pureWhite),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                            AafiyaColors.pureWhite),
                       ),
                     )
                   : const Icon(Icons.arrow_forward_rounded),
@@ -464,7 +472,8 @@ class _AddDoctorSheetState extends State<AddDoctorSheet>
                                       ),
                                       child: Text(
                                         strings.alreadyEmployedBadge,
-                                        style: AafiyaTypography.caption.copyWith(
+                                        style:
+                                            AafiyaTypography.caption.copyWith(
                                           color: AafiyaColors.success,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -481,7 +490,8 @@ class _AddDoctorSheetState extends State<AddDoctorSheet>
                                       ),
                                       child: Text(
                                         strings.invitationPendingBadge,
-                                        style: AafiyaTypography.caption.copyWith(
+                                        style:
+                                            AafiyaTypography.caption.copyWith(
                                           color: AafiyaColors.warning,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -504,7 +514,8 @@ class _AddDoctorSheetState extends State<AddDoctorSheet>
                                               size: 16),
                                       label: Text(strings.sendInvitation),
                                       style: OutlinedButton.styleFrom(
-                                        foregroundColor: AafiyaColors.healthBlue,
+                                        foregroundColor:
+                                            AafiyaColors.healthBlue,
                                         side: const BorderSide(
                                             color: AafiyaColors.healthBlue),
                                       ),
@@ -635,7 +646,8 @@ class _AddDoctorSheetState extends State<AddDoctorSheet>
                 });
               },
               validator: (val) {
-                if (_selectedSpecialty == null && _specialtyController.text.trim().isEmpty) {
+                if (_selectedSpecialty == null &&
+                    _specialtyController.text.trim().isEmpty) {
                   return strings.fieldRequired;
                 }
                 return null;

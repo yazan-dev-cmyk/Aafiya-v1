@@ -35,7 +35,8 @@ class SecureTokenStorage implements TokenStorage {
       }
       return token;
     } catch (e) {
-      debugPrint('[SecureTokenStorage] getToken failed; treating as no token: $e');
+      debugPrint(
+          '[SecureTokenStorage] getToken failed; treating as no token: $e');
       return null;
     }
   }

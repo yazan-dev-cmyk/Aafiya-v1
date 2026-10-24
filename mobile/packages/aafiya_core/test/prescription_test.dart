@@ -55,13 +55,15 @@ void main() {
       'created_at': '2026-09-14T10:30:00.000Z',
     };
 
-    test('Prescription.fromJson correctly parses all fields and nested objects', () {
+    test('Prescription.fromJson correctly parses all fields and nested objects',
+        () {
       final rx = Prescription.fromJson(sampleJson);
 
       expect(rx.id, equals('rx-uuid-101'));
       expect(rx.prescriptionReference, equals('RX-2026-0001'));
       expect(rx.secureToken, equals('sec_tok_998877'));
-      expect(rx.qrVerificationUrl, equals('https://api.aafiya.dz/v/sec_tok_998877'));
+      expect(rx.qrVerificationUrl,
+          equals('https://api.aafiya.dz/v/sec_tok_998877'));
       expect(rx.patient.name, equals('Ahmed Benali'));
       expect(rx.patient.mrn, equals('MRN-123456'));
       expect(rx.doctor.name, equals('Dr. Fatima Mansouri'));
@@ -126,7 +128,9 @@ void main() {
   });
 
   group('PrescriptionService Tests', () {
-    test('fetchPrescriptions deserializes paginated response with filter parameters', () async {
+    test(
+        'fetchPrescriptions deserializes paginated response with filter parameters',
+        () async {
       final mockClient = MockClient((request) async {
         expect(request.url.path, endsWith('/prescriptions'));
         expect(request.url.queryParameters['status'], equals('active'));
@@ -172,7 +176,8 @@ void main() {
       );
 
       expect(result, isA<ApiSuccess<PrescriptionPaginatedResult>>());
-      final paginated = (result as ApiSuccess<PrescriptionPaginatedResult>).data;
+      final paginated =
+          (result as ApiSuccess<PrescriptionPaginatedResult>).data;
       expect(paginated.prescriptions.length, equals(1));
       expect(paginated.prescriptions.first.id, equals('rx-1'));
       expect(paginated.currentPage, equals(1));

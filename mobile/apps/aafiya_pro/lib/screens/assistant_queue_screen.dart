@@ -97,7 +97,8 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
   void initState() {
     super.initState();
     _apiClient = widget.apiClient ?? widget.sessionManager.apiClient;
-    _queueService = widget.queueService ?? AssistantQueueService(apiClient: _apiClient);
+    _queueService =
+        widget.queueService ?? AssistantQueueService(apiClient: _apiClient);
 
     _scrollController.addListener(_onScroll);
 
@@ -149,7 +150,8 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
   String _formatDate(DateTime dt) =>
       '${dt.year.toString().padLeft(4, '0')}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}';
 
-  (String? appointmentDate, String? fromDate, String? toDate) _getDateFilterParams() {
+  (String? appointmentDate, String? fromDate, String? toDate)
+      _getDateFilterParams() {
     switch (_dateFilterMode) {
       case AssistantDateFilterMode.today:
         return (_formatDate(DateTime.now()), null, null);
@@ -157,7 +159,11 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
         return (_formatDate(_specificDate ?? DateTime.now()), null, null);
       case AssistantDateFilterMode.dateRange:
         if (_dateRange != null) {
-          return (null, _formatDate(_dateRange!.start), _formatDate(_dateRange!.end));
+          return (
+            null,
+            _formatDate(_dateRange!.start),
+            _formatDate(_dateRange!.end)
+          );
         }
         return (_formatDate(DateTime.now()), null, null);
       case AssistantDateFilterMode.allDates:
@@ -622,9 +628,9 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
       AppointmentStatus.rejected ||
       AppointmentStatus.expired ||
       AppointmentStatus.rescheduled ||
-      AppointmentStatus.noShow => false,
-      AppointmentStatus.confirmed ||
-      AppointmentStatus.pending => true,
+      AppointmentStatus.noShow =>
+        false,
+      AppointmentStatus.confirmed || AppointmentStatus.pending => true,
       _ => false,
     };
   }
@@ -636,19 +642,21 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
       AppointmentStatus.rejected ||
       AppointmentStatus.expired ||
       AppointmentStatus.rescheduled ||
-      AppointmentStatus.noShow => false,
-      AppointmentStatus.confirmed ||
-      AppointmentStatus.pending => true,
+      AppointmentStatus.noShow =>
+        false,
+      AppointmentStatus.confirmed || AppointmentStatus.pending => true,
       _ => false,
     };
   }
 
   void _openRescheduleSheet(Appointment appointment) {
     final strings = LocalizedStrings.of(context);
-    final clinicId = (appointment.clinic.id != null && appointment.clinic.id!.trim().isNotEmpty)
+    final clinicId = (appointment.clinic.id != null &&
+            appointment.clinic.id!.trim().isNotEmpty)
         ? appointment.clinic.id!.trim()
         : _getEffectiveClinicId();
-    final doctorId = (appointment.doctor.id != null && appointment.doctor.id!.trim().isNotEmpty)
+    final doctorId = (appointment.doctor.id != null &&
+            appointment.doctor.id!.trim().isNotEmpty)
         ? appointment.doctor.id!.trim()
         : (_selectedDoctorId != null && _selectedDoctorId != _allDoctorsSentinel
             ? _selectedDoctorId!
@@ -733,7 +741,9 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
       case AssistantDateFilterMode.today:
         return strings.filterToday;
       case AssistantDateFilterMode.specificDate:
-        return _specificDate != null ? _formatDate(_specificDate!) : strings.filterSpecificDate;
+        return _specificDate != null
+            ? _formatDate(_specificDate!)
+            : strings.filterSpecificDate;
       case AssistantDateFilterMode.dateRange:
         return _dateRange != null
             ? '${_formatDate(_dateRange!.start)} - ${_formatDate(_dateRange!.end)}'
@@ -744,7 +754,8 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
   }
 
   Widget _buildDoctorFilter(LocalizedStrings strings) {
-    final selectedDoc = _clinicDoctors.where((d) => d.id == _selectedDoctorId).firstOrNull;
+    final selectedDoc =
+        _clinicDoctors.where((d) => d.id == _selectedDoctorId).firstOrNull;
     final label = selectedDoc?.name ?? strings.filterAllDoctors;
 
     return PopupMenuButton<String>(
@@ -768,13 +779,17 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
               Icon(
                 Icons.people_outline,
                 size: 18,
-                color: _selectedDoctorId == null ? AafiyaColors.healthBlue : AafiyaColors.secondaryText,
+                color: _selectedDoctorId == null
+                    ? AafiyaColors.healthBlue
+                    : AafiyaColors.secondaryText,
               ),
               const SizedBox(width: 8),
               Text(
                 strings.filterAllDoctors,
                 style: TextStyle(
-                  fontWeight: _selectedDoctorId == null ? FontWeight.bold : FontWeight.normal,
+                  fontWeight: _selectedDoctorId == null
+                      ? FontWeight.bold
+                      : FontWeight.normal,
                 ),
               ),
             ],
@@ -787,14 +802,18 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
                   Icon(
                     Icons.person_outline,
                     size: 18,
-                    color: _selectedDoctorId == doc.id ? AafiyaColors.healthBlue : AafiyaColors.secondaryText,
+                    color: _selectedDoctorId == doc.id
+                        ? AafiyaColors.healthBlue
+                        : AafiyaColors.secondaryText,
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       doc.name,
                       style: TextStyle(
-                        fontWeight: _selectedDoctorId == doc.id ? FontWeight.bold : FontWeight.normal,
+                        fontWeight: _selectedDoctorId == doc.id
+                            ? FontWeight.bold
+                            : FontWeight.normal,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -812,7 +831,8 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
         ),
         child: Row(
           children: [
-            const Icon(Icons.person_outline, size: 16, color: AafiyaColors.secondaryText),
+            const Icon(Icons.person_outline,
+                size: 16, color: AafiyaColors.secondaryText),
             const SizedBox(width: 6),
             Expanded(
               child: Text(
@@ -824,7 +844,8 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            const Icon(Icons.arrow_drop_down, size: 18, color: AafiyaColors.secondaryText),
+            const Icon(Icons.arrow_drop_down,
+                size: 18, color: AafiyaColors.secondaryText),
           ],
         ),
       ),
@@ -867,7 +888,9 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
               Icon(
                 Icons.today,
                 size: 18,
-                color: _dateFilterMode == AssistantDateFilterMode.today ? AafiyaColors.healthBlue : AafiyaColors.secondaryText,
+                color: _dateFilterMode == AssistantDateFilterMode.today
+                    ? AafiyaColors.healthBlue
+                    : AafiyaColors.secondaryText,
               ),
               const SizedBox(width: 8),
               Text(strings.filterToday),
@@ -881,7 +904,9 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
               Icon(
                 Icons.calendar_today,
                 size: 18,
-                color: _dateFilterMode == AssistantDateFilterMode.specificDate ? AafiyaColors.healthBlue : AafiyaColors.secondaryText,
+                color: _dateFilterMode == AssistantDateFilterMode.specificDate
+                    ? AafiyaColors.healthBlue
+                    : AafiyaColors.secondaryText,
               ),
               const SizedBox(width: 8),
               Text(strings.filterSpecificDate),
@@ -895,7 +920,9 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
               Icon(
                 Icons.date_range,
                 size: 18,
-                color: _dateFilterMode == AssistantDateFilterMode.dateRange ? AafiyaColors.healthBlue : AafiyaColors.secondaryText,
+                color: _dateFilterMode == AssistantDateFilterMode.dateRange
+                    ? AafiyaColors.healthBlue
+                    : AafiyaColors.secondaryText,
               ),
               const SizedBox(width: 8),
               Text(strings.filterDateRange),
@@ -909,7 +936,9 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
               Icon(
                 Icons.all_inclusive,
                 size: 18,
-                color: _dateFilterMode == AssistantDateFilterMode.allDates ? AafiyaColors.healthBlue : AafiyaColors.secondaryText,
+                color: _dateFilterMode == AssistantDateFilterMode.allDates
+                    ? AafiyaColors.healthBlue
+                    : AafiyaColors.secondaryText,
               ),
               const SizedBox(width: 8),
               Text(strings.filterAllDates),
@@ -926,7 +955,8 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
         ),
         child: Row(
           children: [
-            const Icon(Icons.calendar_month_outlined, size: 16, color: AafiyaColors.secondaryText),
+            const Icon(Icons.calendar_month_outlined,
+                size: 16, color: AafiyaColors.secondaryText),
             const SizedBox(width: 6),
             Expanded(
               child: Text(
@@ -938,7 +968,8 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            const Icon(Icons.arrow_drop_down, size: 18, color: AafiyaColors.secondaryText),
+            const Icon(Icons.arrow_drop_down,
+                size: 18, color: AafiyaColors.secondaryText),
           ],
         ),
       ),
@@ -988,7 +1019,8 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
       context,
       apiClient: _apiClient,
       patientId: patientId,
-      patientName: app.patient.name ?? LocalizedStrings.of(context).patientNameLabel,
+      patientName:
+          app.patient.name ?? LocalizedStrings.of(context).patientNameLabel,
       mrn: app.patient.mrn,
     );
   }
@@ -1015,7 +1047,8 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
       );
     }
 
-    final canConfirmAttendance = widget.user.hasPermission('booking.confirm_attendance');
+    final canConfirmAttendance =
+        widget.user.hasPermission('booking.confirm_attendance');
     final canCreateBooking = widget.user.hasPermission('booking.create');
 
     return Scaffold(
@@ -1059,10 +1092,12 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
                         child: _buildSubTabButton(
                           title: strings.waitingRoomTab,
                           count: _waitingRoomItems.length,
-                          isSelected: _activeTab == AssistantQueueSubTab.waitingRoom,
+                          isSelected:
+                              _activeTab == AssistantQueueSubTab.waitingRoom,
                           accentColor: AafiyaColors.healingGreen,
                           onTap: () {
-                            if (_activeTab != AssistantQueueSubTab.waitingRoom) {
+                            if (_activeTab !=
+                                AssistantQueueSubTab.waitingRoom) {
                               setState(() {
                                 _activeTab = AssistantQueueSubTab.waitingRoom;
                               });
@@ -1077,12 +1112,15 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
                         child: _buildSubTabButton(
                           title: strings.expectedCheckInTab,
                           count: _expectedItems.length,
-                          isSelected: _activeTab == AssistantQueueSubTab.expectedCheckIn,
+                          isSelected: _activeTab ==
+                              AssistantQueueSubTab.expectedCheckIn,
                           accentColor: AafiyaColors.healthBlue,
                           onTap: () {
-                            if (_activeTab != AssistantQueueSubTab.expectedCheckIn) {
+                            if (_activeTab !=
+                                AssistantQueueSubTab.expectedCheckIn) {
                               setState(() {
-                                _activeTab = AssistantQueueSubTab.expectedCheckIn;
+                                _activeTab =
+                                    AssistantQueueSubTab.expectedCheckIn;
                               });
                             }
                           },
@@ -1095,12 +1133,15 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
                         child: _buildSubTabButton(
                           title: strings.pendingConfirmationTab,
                           count: _pendingItems.length,
-                          isSelected: _activeTab == AssistantQueueSubTab.pendingConfirmation,
+                          isSelected: _activeTab ==
+                              AssistantQueueSubTab.pendingConfirmation,
                           accentColor: AafiyaColors.warning,
                           onTap: () {
-                            if (_activeTab != AssistantQueueSubTab.pendingConfirmation) {
+                            if (_activeTab !=
+                                AssistantQueueSubTab.pendingConfirmation) {
                               setState(() {
-                                _activeTab = AssistantQueueSubTab.pendingConfirmation;
+                                _activeTab =
+                                    AssistantQueueSubTab.pendingConfirmation;
                               });
                             }
                           },
@@ -1119,14 +1160,17 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
                           child: OutlinedButton.icon(
                             style: OutlinedButton.styleFrom(
                               foregroundColor: AafiyaColors.healingGreen,
-                              side: const BorderSide(color: AafiyaColors.healingGreen),
+                              side: const BorderSide(
+                                  color: AafiyaColors.healingGreen),
                               padding: const EdgeInsets.symmetric(vertical: 10),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(AafiyaRadius.md),
+                                borderRadius:
+                                    BorderRadius.circular(AafiyaRadius.md),
                               ),
                             ),
                             onPressed: _openCheckInSheet,
-                            icon: const Icon(Icons.qr_code_scanner_rounded, size: 18),
+                            icon: const Icon(Icons.qr_code_scanner_rounded,
+                                size: 18),
                             label: Text(
                               strings.quickCheckInAction,
                               style: AafiyaTypography.caption.copyWith(
@@ -1147,7 +1191,8 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
                             side: const BorderSide(color: AafiyaColors.border),
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(AafiyaRadius.md),
+                              borderRadius:
+                                  BorderRadius.circular(AafiyaRadius.md),
                             ),
                           ),
                           onPressed: _openPatientSearch,
@@ -1218,7 +1263,9 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
     required VoidCallback onTap,
   }) {
     return Material(
-      color: isSelected ? accentColor.withValues(alpha: 0.1) : AafiyaColors.pureWhite,
+      color: isSelected
+          ? accentColor.withValues(alpha: 0.1)
+          : AafiyaColors.pureWhite,
       borderRadius: BorderRadius.circular(AafiyaRadius.md),
       child: InkWell(
         onTap: onTap,
@@ -1243,7 +1290,8 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
                   title,
                   style: AafiyaTypography.bodyMedium.copyWith(
                     color: isSelected ? accentColor : AafiyaColors.primaryText,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    fontWeight:
+                        isSelected ? FontWeight.bold : FontWeight.normal,
                     fontSize: 12,
                   ),
                   overflow: TextOverflow.ellipsis,
@@ -1253,13 +1301,16 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                 decoration: BoxDecoration(
-                  color: isSelected ? accentColor : AafiyaColors.lightBackground,
+                  color:
+                      isSelected ? accentColor : AafiyaColors.lightBackground,
                   shape: BoxShape.circle,
                 ),
                 child: Text(
                   '$count',
                   style: AafiyaTypography.caption.copyWith(
-                    color: isSelected ? AafiyaColors.pureWhite : AafiyaColors.secondaryText,
+                    color: isSelected
+                        ? AafiyaColors.pureWhite
+                        : AafiyaColors.secondaryText,
                     fontWeight: FontWeight.bold,
                     fontSize: 10,
                   ),
@@ -1318,9 +1369,8 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
             key: ValueKey('assistant_waiting_${app.id}'),
             appointment: app,
             queueIndex: index + 1,
-            onViewSummary: app.patient.id != null
-                ? () => _openPatientSummary(app)
-                : null,
+            onViewSummary:
+                app.patient.id != null ? () => _openPatientSummary(app) : null,
           );
         },
       );
@@ -1351,7 +1401,8 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
         );
       }
 
-      final canConfirmAttendance = widget.user.hasPermission('booking.confirm_attendance');
+      final canConfirmAttendance =
+          widget.user.hasPermission('booking.confirm_attendance');
 
       return ListView.builder(
         controller: _scrollController,
@@ -1368,7 +1419,8 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
 
           final app = _expectedItems[index];
           final isProcessingThis = _processingAppointmentId == app.id;
-          final canReschedule = !isProcessingThis && _isAppointmentReschedulable(app);
+          final canReschedule =
+              !isProcessingThis && _isAppointmentReschedulable(app);
           final canCancel = !isProcessingThis && _isAppointmentCancellable(app);
 
           return Column(
@@ -1378,8 +1430,10 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
               QueuePatientTile(
                 key: ValueKey('assistant_expected_${app.id}'),
                 appointment: app,
-                onAttend: canConfirmAttendance ? () => _handleAttend(app) : null,
-                onNoShow: canConfirmAttendance ? () => _handleNoShow(app) : null,
+                onAttend:
+                    canConfirmAttendance ? () => _handleAttend(app) : null,
+                onNoShow:
+                    canConfirmAttendance ? () => _handleNoShow(app) : null,
                 onViewSummary: app.patient.id != null
                     ? () => _openPatientSummary(app)
                     : null,
@@ -1387,13 +1441,15 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
               ),
               if (canReschedule || canCancel)
                 Padding(
-                  padding: const EdgeInsets.only(bottom: AafiyaSpacing.xs, left: 4, right: 4),
+                  padding: const EdgeInsets.only(
+                      bottom: AafiyaSpacing.xs, left: 4, right: 4),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       if (canReschedule)
                         OutlinedButton.icon(
-                          icon: const Icon(Icons.edit_calendar_outlined, size: 15, color: AafiyaColors.healthBlue),
+                          icon: const Icon(Icons.edit_calendar_outlined,
+                              size: 15, color: AafiyaColors.healthBlue),
                           label: Text(
                             strings.rescheduleAppointmentTitle,
                             style: AafiyaTypography.caption.copyWith(
@@ -1402,20 +1458,23 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
                             ),
                           ),
                           style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: AafiyaColors.healthBlue),
+                            side: const BorderSide(
+                                color: AafiyaColors.healthBlue),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(AafiyaRadius.sm),
+                              borderRadius:
+                                  BorderRadius.circular(AafiyaRadius.sm),
                             ),
-                            padding: const EdgeInsets.symmetric(horizontal: AafiyaSpacing.sm, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: AafiyaSpacing.sm, vertical: 4),
                           ),
                           onPressed: () => _openRescheduleSheet(app),
                         ),
-                      if (canReschedule && canCancel)
-                        const SizedBox(width: 8),
+                      if (canReschedule && canCancel) const SizedBox(width: 8),
                       if (canCancel)
                         OutlinedButton.icon(
                           key: ValueKey('assistant_cancel_expected_${app.id}'),
-                          icon: const Icon(Icons.cancel_outlined, size: 15, color: AafiyaColors.error),
+                          icon: const Icon(Icons.cancel_outlined,
+                              size: 15, color: AafiyaColors.error),
                           label: Text(
                             strings.cancelAppointmentTitle,
                             style: AafiyaTypography.caption.copyWith(
@@ -1426,11 +1485,15 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
                           style: OutlinedButton.styleFrom(
                             side: const BorderSide(color: AafiyaColors.error),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(AafiyaRadius.sm),
+                              borderRadius:
+                                  BorderRadius.circular(AafiyaRadius.sm),
                             ),
-                            padding: const EdgeInsets.symmetric(horizontal: AafiyaSpacing.sm, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: AafiyaSpacing.sm, vertical: 4),
                           ),
-                          onPressed: isProcessingThis ? null : () => _handleCancel(app),
+                          onPressed: isProcessingThis
+                              ? null
+                              : () => _handleCancel(app),
                         ),
                     ],
                   ),
@@ -1484,7 +1547,8 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
 
           final app = _pendingItems[index];
           final isProcessingThis = _processingAppointmentId == app.id;
-          final canReschedule = !isProcessingThis && _isAppointmentReschedulable(app);
+          final canReschedule =
+              !isProcessingThis && _isAppointmentReschedulable(app);
           final canCancel = !isProcessingThis && _isAppointmentCancellable(app);
 
           return Column(
@@ -1502,13 +1566,15 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
               ),
               if (canReschedule || canCancel)
                 Padding(
-                  padding: const EdgeInsets.only(bottom: AafiyaSpacing.xs, left: 4, right: 4),
+                  padding: const EdgeInsets.only(
+                      bottom: AafiyaSpacing.xs, left: 4, right: 4),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       if (canReschedule)
                         OutlinedButton.icon(
-                          icon: const Icon(Icons.edit_calendar_outlined, size: 15, color: AafiyaColors.healthBlue),
+                          icon: const Icon(Icons.edit_calendar_outlined,
+                              size: 15, color: AafiyaColors.healthBlue),
                           label: Text(
                             strings.rescheduleAppointmentTitle,
                             style: AafiyaTypography.caption.copyWith(
@@ -1517,20 +1583,23 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
                             ),
                           ),
                           style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: AafiyaColors.healthBlue),
+                            side: const BorderSide(
+                                color: AafiyaColors.healthBlue),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(AafiyaRadius.sm),
+                              borderRadius:
+                                  BorderRadius.circular(AafiyaRadius.sm),
                             ),
-                            padding: const EdgeInsets.symmetric(horizontal: AafiyaSpacing.sm, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: AafiyaSpacing.sm, vertical: 4),
                           ),
                           onPressed: () => _openRescheduleSheet(app),
                         ),
-                      if (canReschedule && canCancel)
-                        const SizedBox(width: 8),
+                      if (canReschedule && canCancel) const SizedBox(width: 8),
                       if (canCancel)
                         OutlinedButton.icon(
                           key: ValueKey('assistant_cancel_pending_${app.id}'),
-                          icon: const Icon(Icons.cancel_outlined, size: 15, color: AafiyaColors.error),
+                          icon: const Icon(Icons.cancel_outlined,
+                              size: 15, color: AafiyaColors.error),
                           label: Text(
                             strings.cancelAppointmentTitle,
                             style: AafiyaTypography.caption.copyWith(
@@ -1541,11 +1610,15 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
                           style: OutlinedButton.styleFrom(
                             side: const BorderSide(color: AafiyaColors.error),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(AafiyaRadius.sm),
+                              borderRadius:
+                                  BorderRadius.circular(AafiyaRadius.sm),
                             ),
-                            padding: const EdgeInsets.symmetric(horizontal: AafiyaSpacing.sm, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: AafiyaSpacing.sm, vertical: 4),
                           ),
-                          onPressed: isProcessingThis ? null : () => _handleCancel(app),
+                          onPressed: isProcessingThis
+                              ? null
+                              : () => _handleCancel(app),
                         ),
                     ],
                   ),
@@ -1638,7 +1711,8 @@ class _CancelAppointmentDialog extends StatefulWidget {
   final String patientName;
 
   @override
-  State<_CancelAppointmentDialog> createState() => _CancelAppointmentDialogState();
+  State<_CancelAppointmentDialog> createState() =>
+      _CancelAppointmentDialogState();
 }
 
 class _CancelAppointmentDialogState extends State<_CancelAppointmentDialog> {
@@ -1748,8 +1822,9 @@ class _AssistantRescheduleSheetState extends State<_AssistantRescheduleSheet> {
         _selectedSlot!.timeSlot.trim().length >= 5
             ? 5
             : _selectedSlot!.timeSlot.trim().length);
-    final origNorm = origSlot.trim().substring(
-        0, origSlot.trim().length >= 5 ? 5 : origSlot.trim().length);
+    final origNorm = origSlot
+        .trim()
+        .substring(0, origSlot.trim().length >= 5 ? 5 : origSlot.trim().length);
     return isSameDate && slotNorm == origNorm;
   }
 
@@ -1831,7 +1906,8 @@ class _AssistantRescheduleSheetState extends State<_AssistantRescheduleSheet> {
     if (_isSameAsCurrent) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('يرجى اختيار تاريخ أو فترة زمنية مختلفة عن الموعد الحالي.'),
+          content:
+              Text('يرجى اختيار تاريخ أو فترة زمنية مختلفة عن الموعد الحالي.'),
           backgroundColor: AafiyaColors.error,
         ),
       );
@@ -1905,7 +1981,8 @@ class _AssistantRescheduleSheetState extends State<_AssistantRescheduleSheet> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
                   children: [
                     const Icon(Icons.schedule_rounded,
@@ -1947,7 +2024,8 @@ class _AssistantRescheduleSheetState extends State<_AssistantRescheduleSheet> {
                             Row(
                               children: [
                                 const Icon(Icons.info_outline,
-                                    size: 16, color: AafiyaColors.secondaryText),
+                                    size: 16,
+                                    color: AafiyaColors.secondaryText),
                                 const SizedBox(width: 6),
                                 Text(
                                   'الموعد الحالي',
@@ -1966,8 +2044,8 @@ class _AssistantRescheduleSheetState extends State<_AssistantRescheduleSheet> {
                               const SizedBox(height: 2),
                               Text(
                                 'الطبيب: ${widget.appointment.doctor.name!}',
-                                style: AafiyaTypography.caption
-                                    .copyWith(color: AafiyaColors.secondaryText),
+                                style: AafiyaTypography.caption.copyWith(
+                                    color: AafiyaColors.secondaryText),
                               ),
                             ],
                           ],
@@ -2119,4 +2197,3 @@ class _AssistantRescheduleSheetState extends State<_AssistantRescheduleSheet> {
     );
   }
 }
-

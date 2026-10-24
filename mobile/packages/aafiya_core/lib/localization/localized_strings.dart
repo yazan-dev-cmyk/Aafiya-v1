@@ -15,6 +15,7 @@ class LocalizedStrings {
 
   bool get isArabic => locale.languageCode == 'ar';
   bool get isFrench => locale.languageCode == 'fr';
+  bool get isEnglish => locale.languageCode == 'en';
 
   // Brand Identifiers
   String get appBrandName => isArabic ? 'عافية' : 'AAFIYA';
@@ -2118,6 +2119,66 @@ class LocalizedStrings {
       : isFrench
           ? 'Scanner QR'
           : 'Scan QR';
+  String get qrScannerTitle => isArabic
+      ? 'مسح رمز حضور الموعد'
+      : isFrench
+          ? 'Scan du code de présence'
+          : 'Scan Check-In QR';
+  String get qrScannerPrompt => isArabic
+      ? 'وجّه الكاميرا نحو رمز QR للموعد'
+      : isFrench
+          ? 'Pointez la caméra vers le code QR'
+          : 'Point camera at check-in QR code';
+  String get cameraPermissionTitle => isArabic
+      ? 'يلزم إذن الكاميرا'
+      : isFrench
+          ? 'Autorisation de la caméra requise'
+          : 'Camera Permission Required';
+  String get cameraPermissionMessage => isArabic
+      ? 'يرجى منح إذن استخدام الكاميرا لمسح رمز QR، أو إدخال الرمز يدوياً.'
+      : isFrench
+          ? "Veuillez autoriser l'accès à la caméra pour scanner, ou saisissez le code manuellement."
+          : 'Please grant camera access to scan QR codes, or enter the token manually.';
+  String get cameraPermissionSettingsGuidance => isArabic
+      ? 'تم رفض إذن الكاميرا. يرجى تفعيله من إعدادات جهازك أو متابعة إدخال الرمز يدوياً.'
+      : isFrench
+          ? "L'accès à la caméra a été refusé. Activez-le dans les paramètres ou saisissez le code manuellement."
+          : 'Camera permission was denied. Enable it in settings or continue with manual entry.';
+  String get scannerTorchToggle => isArabic
+      ? 'إضاءة الفلاش'
+      : isFrench
+          ? 'Lampe torche'
+          : 'Flashlight';
+  String get scanQrCodeButton => isArabic
+      ? 'مسح الرمز بالكاميرا'
+      : isFrench
+          ? 'Scanner avec la caméra'
+          : 'Scan with Camera';
+  String get qrScanInvalidToken => isArabic
+      ? 'رمز QR غير صالح لموعد في عافية.'
+      : isFrench
+          ? 'Code QR invalide pour un rendez-vous Aafiya.'
+          : 'Invalid Aafiya appointment QR code.';
+  String get tokenCapturedPrompt => isArabic
+      ? 'تم التقاط الرمز بنجاح. اضغط على تأكيد الحضور لإتمام العملية.'
+      : isFrench
+          ? 'Code capturé avec succès. Appuyez sur Confirmer.'
+          : 'Token captured. Tap Confirm Check-In to proceed.';
+  String get autoCheckingInPrompt => isArabic
+      ? 'تم مسح الرمز بنجاح. جاري تأكيد حضور المريض تلقائياً...'
+      : isFrench
+          ? "Code scanné avec succès. Confirmation de l'arrivée en cours..."
+          : 'QR scanned successfully. Confirming check-in automatically...';
+  String get alreadyCheckedInNotice => isArabic
+      ? 'تم تسجيل حضور هذا الموعد مسبقاً.'
+      : isFrench
+          ? 'La présence pour ce rendez-vous a déjà été enregistrée.'
+          : 'Attendance for this appointment was already recorded.';
+  String get checkInContractMismatchError => isArabic
+      ? 'استجابة غير متوقعة من الخادم: تعذر تحديد حالة تسجيل الحضور بدقة.'
+      : isFrench
+          ? 'Réponse inattendue du serveur: impossible de vérifier le statut de présence.'
+          : 'Unexpected server response: unable to verify check-in outcome.';
 
   // In-Clinic Appointment Booking Flow (TASK-05-02)
   String get assistantNewBookingAction => isArabic
@@ -3899,6 +3960,31 @@ class LocalizedStrings {
       : isFrench
           ? 'Impossible de confirmer la lecture.'
           : 'Failed to acknowledge notification. Please try again.';
+  String get appointmentBookedNotification => isArabic
+      ? 'تم تسجيل طلب حجز موعدكم الطبي بنجاح وهو قيد المراجعة.'
+      : isFrench
+          ? 'Votre demande de rendez-vous a été enregistrée avec succès et est en attente de confirmation.'
+          : 'Your appointment request has been successfully registered and is pending confirmation.';
+  String get appointmentConfirmedNotification => isArabic
+      ? 'تم تأكيد موعدكم الطبي بنجاح. تذكرة الحضور متاحة الآن في التطبيق.'
+      : isFrench
+          ? 'Votre rendez-vous médical a été confirmé avec succès. Votre pass de présence est maintenant disponible.'
+          : 'Your medical appointment has been confirmed. Your visit pass is now available.';
+  String get appointmentCancelledNotification => isArabic
+      ? 'تم إلغاء الموعد الطبي.'
+      : isFrench
+          ? 'Le rendez-vous médical a été annulé.'
+          : 'Medical appointment has been cancelled.';
+  String get appointmentRejectedNotification => isArabic
+      ? 'تم رفض طلب الموعد الطبي.'
+      : isFrench
+          ? 'La demande de rendez-vous médical a été refusée.'
+          : 'Medical appointment request has been rejected.';
+  String get vacationRescheduleNotification => isArabic
+      ? 'تمت إعادة جدولة موعدكم الطبي نظراً لإجازة الطبيب.'
+      : isFrench
+          ? 'Votre rendez-vous a été reprogrammé en raison du congé du médecin.'
+          : 'Your appointment was rescheduled due to doctor vacation.';
   String get clinicEscalationsTitle => isArabic
       ? 'تصعيدات المتابعة'
       : isFrench

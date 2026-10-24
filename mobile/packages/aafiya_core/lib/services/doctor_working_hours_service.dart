@@ -95,11 +95,13 @@ class DoctorWorkingHoursService {
     };
   }
 
-  ApiResult<DoctorWorkingHoursData> _parseSchedulePayload(Map<String, dynamic> data) {
+  ApiResult<DoctorWorkingHoursData> _parseSchedulePayload(
+      Map<String, dynamic> data) {
     try {
-      final payload = data.containsKey('data') && data['data'] is Map<String, dynamic>
-          ? data['data'] as Map<String, dynamic>
-          : data;
+      final payload =
+          data.containsKey('data') && data['data'] is Map<String, dynamic>
+              ? data['data'] as Map<String, dynamic>
+              : data;
       return ApiSuccess(DoctorWorkingHoursData.fromJson(payload));
     } catch (e) {
       return ApiFailure(

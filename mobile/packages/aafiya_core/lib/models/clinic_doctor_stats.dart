@@ -161,7 +161,8 @@ class ClinicDoctorItem {
   int get hashCode => Object.hash(id, name, specialty, position, metrics);
 
   @override
-  String toString() => 'ClinicDoctorItem(id: $id, name: $name, position: $position)';
+  String toString() =>
+      'ClinicDoctorItem(id: $id, name: $name, position: $position)';
 }
 
 /// Focused doctor identity in Single-Doctor mode.
@@ -213,7 +214,8 @@ class ClinicSelectedDoctor {
   int get hashCode => Object.hash(id, name, specialty, position);
 
   @override
-  String toString() => 'ClinicSelectedDoctor(id: $id, name: $name, position: $position)';
+  String toString() =>
+      'ClinicSelectedDoctor(id: $id, name: $name, position: $position)';
 }
 
 /// Applied filters in the backend response.
@@ -258,7 +260,8 @@ class ClinicStatsFilters {
   int get hashCode => Object.hash(fromDate, toDate, doctorId);
 
   @override
-  String toString() => 'ClinicStatsFilters(from: $fromDate, to: $toDate, doctor: $doctorId)';
+  String toString() =>
+      'ClinicStatsFilters(from: $fromDate, to: $toDate, doctor: $doctorId)';
 }
 
 /// Minimal clinic context attached to the statistics payload.
@@ -366,7 +369,8 @@ class ClinicDoctorStatsData {
       'clinic': clinic.toJson(),
       'filters': filters.toJson(),
       'summary': summary.toJson(),
-      if (doctors.isNotEmpty) 'doctors': doctors.map((d) => d.toJson()).toList(),
+      if (doctors.isNotEmpty)
+        'doctors': doctors.map((d) => d.toJson()).toList(),
       if (selectedDoctor != null) 'selected_doctor': selectedDoctor!.toJson(),
     };
   }

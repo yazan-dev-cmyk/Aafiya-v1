@@ -169,8 +169,12 @@ void main() {
     };
   }
 
-  group('DoctorShell Authorization & Navigation Guards for Clinic Director Stats', () {
-    testWidgets('Shows 5 navigation items when active clinic is Medical Director', (tester) async {
+  group(
+      'DoctorShell Authorization & Navigation Guards for Clinic Director Stats',
+      () {
+    testWidgets(
+        'Shows 5 navigation items when active clinic is Medical Director',
+        (tester) async {
       final mockHttp = MockClient((req) async {
         if (req.url.path.endsWith('/doctor/clinics')) {
           return jsonResponse({
@@ -186,7 +190,14 @@ void main() {
           });
         }
         if (req.url.path.endsWith('/doctor/dashboard/stats')) {
-          return jsonResponse({'data': {'total_today': 0, 'completed_today': 0, 'waiting': 0, 'in_progress': 0}});
+          return jsonResponse({
+            'data': {
+              'total_today': 0,
+              'completed_today': 0,
+              'waiting': 0,
+              'in_progress': 0
+            }
+          });
         }
         if (req.url.path.endsWith('/appointments')) {
           return jsonResponse({'data': []});
@@ -222,7 +233,9 @@ void main() {
       expect(find.text('طاقم العيادة'), findsOneWidget);
     });
 
-    testWidgets('Hides stats tab (3 navigation items) even if Employed Doctor has clinic.view_analytics permission', (tester) async {
+    testWidgets(
+        'Hides stats tab (3 navigation items) even if Employed Doctor has clinic.view_analytics permission',
+        (tester) async {
       final mockHttp = MockClient((req) async {
         if (req.url.path.endsWith('/doctor/clinics')) {
           return jsonResponse({
@@ -238,7 +251,14 @@ void main() {
           });
         }
         if (req.url.path.endsWith('/doctor/dashboard/stats')) {
-          return jsonResponse({'data': {'total_today': 0, 'completed_today': 0, 'waiting': 0, 'in_progress': 0}});
+          return jsonResponse({
+            'data': {
+              'total_today': 0,
+              'completed_today': 0,
+              'waiting': 0,
+              'in_progress': 0
+            }
+          });
         }
         if (req.url.path.endsWith('/appointments')) {
           return jsonResponse({'data': []});
@@ -271,7 +291,9 @@ void main() {
       expect(find.text('طاقم العيادة'), findsNothing);
     });
 
-    testWidgets('Hides stats tab (3 navigation items) for plain Employed Doctor', (tester) async {
+    testWidgets(
+        'Hides stats tab (3 navigation items) for plain Employed Doctor',
+        (tester) async {
       final mockHttp = MockClient((req) async {
         if (req.url.path.endsWith('/doctor/clinics')) {
           return jsonResponse({
@@ -287,7 +309,14 @@ void main() {
           });
         }
         if (req.url.path.endsWith('/doctor/dashboard/stats')) {
-          return jsonResponse({'data': {'total_today': 0, 'completed_today': 0, 'waiting': 0, 'in_progress': 0}});
+          return jsonResponse({
+            'data': {
+              'total_today': 0,
+              'completed_today': 0,
+              'waiting': 0,
+              'in_progress': 0
+            }
+          });
         }
         if (req.url.path.endsWith('/appointments')) {
           return jsonResponse({'data': []});
@@ -322,7 +351,9 @@ void main() {
   });
 
   group('ClinicDirectorStatsScreen UI & Interactions', () {
-    testWidgets('Renders all 10 KPIs and doctor breakdown cards in All Doctors mode', (tester) async {
+    testWidgets(
+        'Renders all 10 KPIs and doctor breakdown cards in All Doctors mode',
+        (tester) async {
       final mockHttp = MockClient((req) async {
         if (req.url.path.endsWith('/clinic/doctor-stats')) {
           return jsonResponse(sampleStatsResponse());
@@ -390,7 +421,8 @@ void main() {
       expect(find.text('د. سهام بلقاسم'), findsOneWidget);
     });
 
-    testWidgets('Doctor selection triggers single-doctor mode and banner card', (tester) async {
+    testWidgets('Doctor selection triggers single-doctor mode and banner card',
+        (tester) async {
       String? requestedDoctorId;
 
       final mockHttp = MockClient((req) async {
@@ -457,7 +489,8 @@ void main() {
       expect(find.text('أداء الأطباء'), findsOneWidget);
     });
 
-    testWidgets('Client-side date validation prevents invalid range query', (tester) async {
+    testWidgets('Client-side date validation prevents invalid range query',
+        (tester) async {
       int requestCount = 0;
 
       final mockHttp = MockClient((req) async {
@@ -549,17 +582,20 @@ void main() {
 
       // Verify Empty View is rendered
       expect(find.byType(AafiyaEmptyView), findsOneWidget);
-      expect(find.text('لا توجد مواعيد أو زيارات في هذه الفترة'), findsOneWidget);
+      expect(
+          find.text('لا توجد مواعيد أو زيارات في هذه الفترة'), findsOneWidget);
     });
 
-    testWidgets('Displays AafiyaErrorView on 403 Forbidden with retry', (tester) async {
+    testWidgets('Displays AafiyaErrorView on 403 Forbidden with retry',
+        (tester) async {
       int attempts = 0;
 
       final mockHttp = MockClient((req) async {
         if (req.url.path.endsWith('/clinic/doctor-stats')) {
           attempts++;
           if (attempts == 1) {
-            return jsonResponse({'message': 'غير مصرح لك بالوصول لإحصائيات العيادة.'}, 403);
+            return jsonResponse(
+                {'message': 'غير مصرح لك بالوصول لإحصائيات العيادة.'}, 403);
           }
           return jsonResponse(sampleStatsResponse());
         }
@@ -589,7 +625,8 @@ void main() {
 
       // Verify Error View is shown
       expect(find.byType(AafiyaErrorView), findsOneWidget);
-      expect(find.text('غير مصرح لك بالوصول لإحصائيات العيادة.'), findsOneWidget);
+      expect(
+          find.text('غير مصرح لك بالوصول لإحصائيات العيادة.'), findsOneWidget);
 
       // Tap Retry
       await tester.tap(find.text('إعادة المحاولة'));
@@ -600,12 +637,15 @@ void main() {
       expect(find.text('إجمالي المواعيد'), findsWidgets);
     });
 
-    testWidgets('Multi-clinic context switching resets filters and refetches with new clinic header', (tester) async {
+    testWidgets(
+        'Multi-clinic context switching resets filters and refetches with new clinic header',
+        (tester) async {
       String? lastClinicIdHeader;
 
       final mockHttp = MockClient((req) async {
         if (req.url.path.endsWith('/clinic/doctor-stats')) {
-          lastClinicIdHeader = req.headers['x-clinic-id'] ?? req.headers['X-Clinic-ID'];
+          lastClinicIdHeader =
+              req.headers['x-clinic-id'] ?? req.headers['X-Clinic-ID'];
           return jsonResponse(sampleStatsResponse(
             clinicId: lastClinicIdHeader ?? 'unknown',
             clinicName: lastClinicIdHeader == employedClinic.id
@@ -650,11 +690,13 @@ void main() {
   });
 
   group('Trilingual Localization Coverage', () {
-    testWidgets('Renders French strings correctly when locale is French', (tester) async {
+    testWidgets('Renders French strings correctly when locale is French',
+        (tester) async {
       final tokenStorage = InMemoryTokenStorage();
       final mockHttp = MockClient((req) async {
         if (req.url.path.endsWith('/clinic/doctor-stats')) {
-          return jsonResponse(sampleStatsResponse(clinicName: 'Clinique Al-Nour'));
+          return jsonResponse(
+              sampleStatsResponse(clinicName: 'Clinique Al-Nour'));
         }
         return jsonResponse({});
       });
@@ -694,14 +736,17 @@ void main() {
       expect(find.text('En salle d\'attente'), findsWidgets);
       expect(find.text('En attente d\'enregistrement'), findsOneWidget);
       expect(find.text('Visites directes (Sans RDV)'), findsWidgets);
-      expect(find.text('Performances des médecins de la clinique'), findsOneWidget);
+      expect(find.text('Performances des médecins de la clinique'),
+          findsOneWidget);
     });
 
-    testWidgets('Renders English strings correctly when locale is English', (tester) async {
+    testWidgets('Renders English strings correctly when locale is English',
+        (tester) async {
       final tokenStorage = InMemoryTokenStorage();
       final mockHttp = MockClient((req) async {
         if (req.url.path.endsWith('/clinic/doctor-stats')) {
-          return jsonResponse(sampleStatsResponse(clinicName: 'Al-Nour Central Clinic'));
+          return jsonResponse(
+              sampleStatsResponse(clinicName: 'Al-Nour Central Clinic'));
         }
         return jsonResponse({});
       });

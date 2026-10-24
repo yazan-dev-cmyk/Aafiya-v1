@@ -112,7 +112,9 @@ class SharedRecordService {
     final isDev = _config.environment.toLowerCase() == 'development';
 
     if (!isDev) {
-      if (baseUri == null || !baseUri.hasScheme || baseUri.scheme.toLowerCase() != 'https') {
+      if (baseUri == null ||
+          !baseUri.hasScheme ||
+          baseUri.scheme.toLowerCase() != 'https') {
         return const SharedRecordInsecureSchemeFailure(
           'Insecure connection prohibited. Medical records can only be resolved over HTTPS in non-development environments.',
         );
@@ -141,12 +143,14 @@ class SharedRecordService {
       final record = SharedPatientRecord.fromJson(data);
       return SharedRecordSuccess(record);
     } catch (_) {
-      return const SharedRecordNetworkFailure('Failed to parse shared medical record response.');
+      return const SharedRecordNetworkFailure(
+          'Failed to parse shared medical record response.');
     }
   }
 
   SharedRecordResult _handleFailure(AppException exception) {
-    if (exception is NetworkConnectionException || exception is NetworkTimeoutException) {
+    if (exception is NetworkConnectionException ||
+        exception is NetworkTimeoutException) {
       return SharedRecordNetworkFailure(exception.message);
     }
 
@@ -154,7 +158,8 @@ class SharedRecordService {
       final statusCode = exception.statusCode;
       final message = exception.message;
       final rawCause = exception.cause;
-      final Map<String, dynamic>? causeMap = rawCause is Map<String, dynamic> ? rawCause : null;
+      final Map<String, dynamic>? causeMap =
+          rawCause is Map<String, dynamic> ? rawCause : null;
 
       switch (statusCode) {
         case 403:
@@ -166,28 +171,38 @@ class SharedRecordService {
 
         case 404:
           return SharedRecordNotFoundFailure(
-            message.isNotEmpty ? message : 'Shared record not found or invalid.',
+            message.isNotEmpty
+                ? message
+                : 'Shared record not found or invalid.',
           );
 
         case 410:
           return SharedRecordExpiredOrRevokedFailure(
-            message.isNotEmpty ? message : 'This share link has expired or been revoked.',
+            message.isNotEmpty
+                ? message
+                : 'This share link has expired or been revoked.',
           );
 
         case 422:
           return SharedRecordValidationFailure(
-            message.isNotEmpty ? message : 'Invalid sharing parameters or PIN format.',
+            message.isNotEmpty
+                ? message
+                : 'Invalid sharing parameters or PIN format.',
           );
 
         case 423:
           // DEC-P05-03: Expose locked status without leaking locked_until duration
           return SharedRecordLockedFailure(
-            message.isNotEmpty ? message : 'Access temporarily locked due to too many failed attempts.',
+            message.isNotEmpty
+                ? message
+                : 'Access temporarily locked due to too many failed attempts.',
           );
 
         case 429:
           return SharedRecordRateLimitFailure(
-            message.isNotEmpty ? message : 'Too many resolution attempts. Please wait a moment.',
+            message.isNotEmpty
+                ? message
+                : 'Too many resolution attempts. Please wait a moment.',
           );
 
         default:

@@ -357,7 +357,8 @@ class _BcQuotaScreenState extends State<BcQuotaScreen>
                                 modalError = null;
                               });
 
-                              final result = await _service.createPurchaseRequest(
+                              final result =
+                                  await _service.createPurchaseRequest(
                                 packageId: package.id,
                                 paymentMethod: selectedPaymentMethod,
                                 transactionReference: refController.text.trim(),
@@ -378,7 +379,8 @@ class _BcQuotaScreenState extends State<BcQuotaScreen>
                                   if (!mounted) return;
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text(strings.requestSubmittedSuccess),
+                                      content:
+                                          Text(strings.requestSubmittedSuccess),
                                       backgroundColor: AafiyaColors.success,
                                     ),
                                   );
@@ -406,8 +408,8 @@ class _BcQuotaScreenState extends State<BcQuotaScreen>
                               width: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                valueColor:
-                                    AlwaysStoppedAnimation<Color>(AafiyaColors.pureWhite),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    AafiyaColors.pureWhite),
                               ),
                             )
                           : Text(
@@ -431,7 +433,8 @@ class _BcQuotaScreenState extends State<BcQuotaScreen>
   @override
   Widget build(BuildContext context) {
     final strings = LocalizedStrings.of(context);
-    final centerName = _quotaData?.name ?? widget.user?.name ?? strings.bookingCenterRoleTitle;
+    final centerName =
+        _quotaData?.name ?? widget.user?.name ?? strings.bookingCenterRoleTitle;
     final quotaBalance = _quotaData?.quotaBalance ?? 0;
 
     return Scaffold(
@@ -470,12 +473,14 @@ class _BcQuotaScreenState extends State<BcQuotaScreen>
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.error_outline_rounded, color: AafiyaColors.error, size: 20),
+                    const Icon(Icons.error_outline_rounded,
+                        color: AafiyaColors.error, size: 20),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         _quotaError!,
-                        style: AafiyaTypography.caption.copyWith(color: AafiyaColors.error),
+                        style: AafiyaTypography.caption
+                            .copyWith(color: AafiyaColors.error),
                       ),
                     ),
                     TextButton(
@@ -534,7 +539,8 @@ class _BcQuotaScreenState extends State<BcQuotaScreen>
       return Center(
         child: Text(
           strings.noPackagesFound,
-          style: AafiyaTypography.bodyMedium.copyWith(color: AafiyaColors.secondaryText),
+          style: AafiyaTypography.bodyMedium
+              .copyWith(color: AafiyaColors.secondaryText),
         ),
       );
     }
@@ -581,7 +587,8 @@ class _BcQuotaScreenState extends State<BcQuotaScreen>
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    if (pkg.description != null && pkg.description!.isNotEmpty) ...[
+                    if (pkg.description != null &&
+                        pkg.description!.isNotEmpty) ...[
                       const SizedBox(height: 4),
                       Text(
                         pkg.description!,
@@ -612,8 +619,10 @@ class _BcQuotaScreenState extends State<BcQuotaScreen>
                       foregroundColor: AafiyaColors.pureWhite,
                       minimumSize: Size.zero,
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      textStyle: AafiyaTypography.labelSmall.copyWith(fontWeight: FontWeight.bold),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      textStyle: AafiyaTypography.labelSmall
+                          .copyWith(fontWeight: FontWeight.bold),
                       shape: RoundedRectangleBorder(
                         borderRadius: AafiyaRadius.borderSm,
                       ),
@@ -651,7 +660,8 @@ class _BcQuotaScreenState extends State<BcQuotaScreen>
       return Center(
         child: Text(
           strings.noPurchaseRequestsFound,
-          style: AafiyaTypography.bodyMedium.copyWith(color: AafiyaColors.secondaryText),
+          style: AafiyaTypography.bodyMedium
+              .copyWith(color: AafiyaColors.secondaryText),
         ),
       );
     }
@@ -665,10 +675,22 @@ class _BcQuotaScreenState extends State<BcQuotaScreen>
         itemBuilder: (context, index) {
           final req = _purchaseRequests[index];
           final (statusColor, statusLabel) = switch (req.status) {
-            PurchaseRequestStatus.pending => (const Color(0xFFD97706), strings.requestPending),
-            PurchaseRequestStatus.approved => (AafiyaColors.success, strings.requestApproved),
-            PurchaseRequestStatus.rejected => (AafiyaColors.error, strings.requestRejected),
-            PurchaseRequestStatus.unknown => (AafiyaColors.secondaryText, 'Unknown'),
+            PurchaseRequestStatus.pending => (
+                const Color(0xFFD97706),
+                strings.requestPending
+              ),
+            PurchaseRequestStatus.approved => (
+                AafiyaColors.success,
+                strings.requestApproved
+              ),
+            PurchaseRequestStatus.rejected => (
+                AafiyaColors.error,
+                strings.requestRejected
+              ),
+            PurchaseRequestStatus.unknown => (
+                AafiyaColors.secondaryText,
+                'Unknown'
+              ),
           };
 
           return AafiyaCard(
@@ -687,11 +709,13 @@ class _BcQuotaScreenState extends State<BcQuotaScreen>
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         color: statusColor.withValues(alpha: 0.15),
                         borderRadius: AafiyaRadius.borderSm,
-                        border: Border.all(color: statusColor.withValues(alpha: 0.4)),
+                        border: Border.all(
+                            color: statusColor.withValues(alpha: 0.4)),
                       ),
                       child: Text(
                         statusLabel,
@@ -709,7 +733,8 @@ class _BcQuotaScreenState extends State<BcQuotaScreen>
                   children: [
                     Text(
                       req.packageName,
-                      style: AafiyaTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
+                      style: AafiyaTypography.bodyMedium
+                          .copyWith(fontWeight: FontWeight.w600),
                     ),
                     Text(
                       '+${req.quotaUnits} ${strings.unitsLabel}',
@@ -726,12 +751,16 @@ class _BcQuotaScreenState extends State<BcQuotaScreen>
                   children: [
                     Text(
                       '${req.priceDzd.toStringAsFixed(0)} ${strings.currencyDzd}',
-                      style: AafiyaTypography.caption.copyWith(color: AafiyaColors.secondaryText),
+                      style: AafiyaTypography.caption
+                          .copyWith(color: AafiyaColors.secondaryText),
                     ),
                     if (req.createdAt != null)
                       Text(
-                        req.createdAt!.length >= 10 ? req.createdAt!.substring(0, 10) : req.createdAt!,
-                        style: AafiyaTypography.caption.copyWith(color: AafiyaColors.secondaryText),
+                        req.createdAt!.length >= 10
+                            ? req.createdAt!.substring(0, 10)
+                            : req.createdAt!,
+                        style: AafiyaTypography.caption
+                            .copyWith(color: AafiyaColors.secondaryText),
                       ),
                   ],
                 ),
@@ -745,11 +774,13 @@ class _BcQuotaScreenState extends State<BcQuotaScreen>
                     decoration: BoxDecoration(
                       color: AafiyaColors.error.withValues(alpha: 0.08),
                       borderRadius: AafiyaRadius.borderSm,
-                      border: Border.all(color: AafiyaColors.error.withValues(alpha: 0.2)),
+                      border: Border.all(
+                          color: AafiyaColors.error.withValues(alpha: 0.2)),
                     ),
                     child: Text(
                       '${strings.requestRejected}: ${req.rejectionReason}',
-                      style: AafiyaTypography.caption.copyWith(color: AafiyaColors.error),
+                      style: AafiyaTypography.caption
+                          .copyWith(color: AafiyaColors.error),
                     ),
                   ),
                 ],
@@ -783,7 +814,8 @@ class _BcQuotaScreenState extends State<BcQuotaScreen>
       return Center(
         child: Text(
           strings.noTransactionsFound,
-          style: AafiyaTypography.bodyMedium.copyWith(color: AafiyaColors.secondaryText),
+          style: AafiyaTypography.bodyMedium
+              .copyWith(color: AafiyaColors.secondaryText),
         ),
       );
     }
@@ -799,11 +831,13 @@ class _BcQuotaScreenState extends State<BcQuotaScreen>
           final isCredit = tx.transactionType.isCredit;
           final typeLabel = switch (tx.transactionType) {
             BookingTransactionType.purchase => strings.transactionTypePurchase,
-            BookingTransactionType.confirmation => strings.transactionTypeConfirmation,
+            BookingTransactionType.confirmation =>
+              strings.transactionTypeConfirmation,
             BookingTransactionType.refund => strings.transactionTypeRefund,
             BookingTransactionType.unknown => 'Transaction',
           };
-          final badgeColor = isCredit ? AafiyaColors.success : AafiyaColors.error;
+          final badgeColor =
+              isCredit ? AafiyaColors.success : AafiyaColors.error;
 
           return AafiyaCard(
             padding: AafiyaSpacing.insetAllMd,
@@ -811,7 +845,9 @@ class _BcQuotaScreenState extends State<BcQuotaScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Icon(
-                  isCredit ? Icons.add_circle_outline_rounded : Icons.remove_circle_outline_rounded,
+                  isCredit
+                      ? Icons.add_circle_outline_rounded
+                      : Icons.remove_circle_outline_rounded,
                   color: badgeColor,
                   size: 24,
                 ),
@@ -839,10 +875,12 @@ class _BcQuotaScreenState extends State<BcQuotaScreen>
                         ],
                       ),
                       const SizedBox(height: 4),
-                      if (tx.referenceNote != null && tx.referenceNote!.isNotEmpty)
+                      if (tx.referenceNote != null &&
+                          tx.referenceNote!.isNotEmpty)
                         Text(
                           tx.referenceNote!,
-                          style: AafiyaTypography.caption.copyWith(color: AafiyaColors.primaryText),
+                          style: AafiyaTypography.caption
+                              .copyWith(color: AafiyaColors.primaryText),
                         ),
                       if (tx.appointmentBookingReference != null) ...[
                         const SizedBox(height: 2),
@@ -867,8 +905,11 @@ class _BcQuotaScreenState extends State<BcQuotaScreen>
                           ),
                           if (tx.createdAt != null)
                             Text(
-                              tx.createdAt!.length >= 10 ? tx.createdAt!.substring(0, 10) : tx.createdAt!,
-                              style: AafiyaTypography.caption.copyWith(color: AafiyaColors.secondaryText),
+                              tx.createdAt!.length >= 10
+                                  ? tx.createdAt!.substring(0, 10)
+                                  : tx.createdAt!,
+                              style: AafiyaTypography.caption
+                                  .copyWith(color: AafiyaColors.secondaryText),
                             ),
                         ],
                       ),

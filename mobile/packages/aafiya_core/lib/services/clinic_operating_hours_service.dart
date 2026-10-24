@@ -65,11 +65,13 @@ class ClinicOperatingHoursService {
     };
   }
 
-  ApiResult<ClinicOperatingHoursData> _parseClinicHoursPayload(Map<String, dynamic> data) {
+  ApiResult<ClinicOperatingHoursData> _parseClinicHoursPayload(
+      Map<String, dynamic> data) {
     try {
-      final payload = data.containsKey('data') && data['data'] is Map<String, dynamic>
-          ? data['data'] as Map<String, dynamic>
-          : data;
+      final payload =
+          data.containsKey('data') && data['data'] is Map<String, dynamic>
+              ? data['data'] as Map<String, dynamic>
+              : data;
       return ApiSuccess(ClinicOperatingHoursData.fromJson(payload));
     } catch (e) {
       return ApiFailure(

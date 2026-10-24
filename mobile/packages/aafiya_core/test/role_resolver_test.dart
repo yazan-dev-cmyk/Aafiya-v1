@@ -21,7 +21,9 @@ void main() {
         expect(result, equals(RoleResolutionResult.doctor));
       });
 
-      test('resolves doctor_assistant to AssistantShell (RoleResolutionResult.assistant)', () {
+      test(
+          'resolves doctor_assistant to AssistantShell (RoleResolutionResult.assistant)',
+          () {
         const user = User(
           id: 'asst-1',
           name: 'Assistant Ali',
@@ -33,7 +35,9 @@ void main() {
         expect(result, equals(RoleResolutionResult.assistant));
       });
 
-      test('resolves booking_center to BookingCenterShell (RoleResolutionResult.bookingCenter)', () {
+      test(
+          'resolves booking_center to BookingCenterShell (RoleResolutionResult.bookingCenter)',
+          () {
         const user = User(
           id: 'bc-1',
           name: 'Algiers Central Booking',
@@ -50,7 +54,8 @@ void main() {
     // 2. Patient Roles in AAFIYA Pro (Rejected)
     // -------------------------------------------------------------------------
     group('Patient Roles in Pro App', () {
-      test('rejects patient_registered from Pro app (returns patient result)', () {
+      test('rejects patient_registered from Pro app (returns patient result)',
+          () {
         const user = User(
           id: 'pat-1',
           name: 'Patient Yazan',
@@ -87,7 +92,8 @@ void main() {
           roles: [UserRole.admin],
         );
 
-        expect(resolver.resolveProDestination(user), equals(RoleResolutionResult.webOnly));
+        expect(resolver.resolveProDestination(user),
+            equals(RoleResolutionResult.webOnly));
       });
 
       test('maps admin_assistant to RoleResolutionResult.webOnly', () {
@@ -98,7 +104,8 @@ void main() {
           roles: [UserRole.adminAssistant],
         );
 
-        expect(resolver.resolveProDestination(user), equals(RoleResolutionResult.webOnly));
+        expect(resolver.resolveProDestination(user),
+            equals(RoleResolutionResult.webOnly));
       });
 
       test('maps lab to RoleResolutionResult.webOnly', () {
@@ -109,7 +116,8 @@ void main() {
           roles: [UserRole.lab],
         );
 
-        expect(resolver.resolveProDestination(user), equals(RoleResolutionResult.webOnly));
+        expect(resolver.resolveProDestination(user),
+            equals(RoleResolutionResult.webOnly));
       });
 
       test('maps lab_assistant to RoleResolutionResult.webOnly', () {
@@ -120,7 +128,8 @@ void main() {
           roles: [UserRole.labAssistant],
         );
 
-        expect(resolver.resolveProDestination(user), equals(RoleResolutionResult.webOnly));
+        expect(resolver.resolveProDestination(user),
+            equals(RoleResolutionResult.webOnly));
       });
 
       test('maps radiology to RoleResolutionResult.webOnly', () {
@@ -131,7 +140,8 @@ void main() {
           roles: [UserRole.radiology],
         );
 
-        expect(resolver.resolveProDestination(user), equals(RoleResolutionResult.webOnly));
+        expect(resolver.resolveProDestination(user),
+            equals(RoleResolutionResult.webOnly));
       });
 
       test('maps rad_assistant to RoleResolutionResult.webOnly', () {
@@ -142,7 +152,8 @@ void main() {
           roles: [UserRole.radAssistant],
         );
 
-        expect(resolver.resolveProDestination(user), equals(RoleResolutionResult.webOnly));
+        expect(resolver.resolveProDestination(user),
+            equals(RoleResolutionResult.webOnly));
       });
     });
 
@@ -158,7 +169,8 @@ void main() {
           roles: [UserRole.unknown],
         );
 
-        expect(resolver.resolveProDestination(user), equals(RoleResolutionResult.unauthorized));
+        expect(resolver.resolveProDestination(user),
+            equals(RoleResolutionResult.unauthorized));
       });
     });
 
@@ -174,7 +186,8 @@ void main() {
           roles: [UserRole.patientRegistered],
         );
 
-        expect(resolver.resolvePatientDestination(user), equals(RoleResolutionResult.patient));
+        expect(resolver.resolvePatientDestination(user),
+            equals(RoleResolutionResult.patient));
       });
 
       test('rejects professional doctor role in Patient app', () {
@@ -185,7 +198,8 @@ void main() {
           roles: [UserRole.doctor],
         );
 
-        expect(resolver.resolvePatientDestination(user), equals(RoleResolutionResult.unauthorized));
+        expect(resolver.resolvePatientDestination(user),
+            equals(RoleResolutionResult.unauthorized));
       });
 
       test('rejects web-only admin in Patient app with webOnly result', () {
@@ -196,7 +210,8 @@ void main() {
           roles: [UserRole.admin],
         );
 
-        expect(resolver.resolvePatientDestination(user), equals(RoleResolutionResult.webOnly));
+        expect(resolver.resolvePatientDestination(user),
+            equals(RoleResolutionResult.webOnly));
       });
     });
 
@@ -212,8 +227,10 @@ void main() {
           roles: [],
         );
 
-        expect(resolver.resolveProDestination(user), equals(RoleResolutionResult.unauthorized));
-        expect(resolver.resolvePatientDestination(user), equals(RoleResolutionResult.unauthorized));
+        expect(resolver.resolveProDestination(user),
+            equals(RoleResolutionResult.unauthorized));
+        expect(resolver.resolvePatientDestination(user),
+            equals(RoleResolutionResult.unauthorized));
       });
 
       test('rejects inactive user regardless of roles', () {
@@ -225,11 +242,15 @@ void main() {
           roles: [UserRole.doctor],
         );
 
-        expect(resolver.resolveProDestination(user), equals(RoleResolutionResult.unauthorized));
-        expect(resolver.resolvePatientDestination(user), equals(RoleResolutionResult.unauthorized));
+        expect(resolver.resolveProDestination(user),
+            equals(RoleResolutionResult.unauthorized));
+        expect(resolver.resolvePatientDestination(user),
+            equals(RoleResolutionResult.unauthorized));
       });
 
-      test('multi-role user safely rejects as unauthorized without inventing priority', () {
+      test(
+          'multi-role user safely rejects as unauthorized without inventing priority',
+          () {
         // Current AAFIYA accounts are single-role.
         // If multiple roles exist, must NOT silently pick doctor or any other role.
         const multiRoleDoctorAdmin = User(
@@ -285,13 +306,17 @@ void main() {
             'roles': [roleKey],
           });
 
-          expect(user.roles.length, equals(1), reason: 'Failed for role: $roleKey');
-          expect(user.roles.first, isNot(equals(UserRole.unknown)), reason: 'Parsed as unknown: $roleKey');
+          expect(user.roles.length, equals(1),
+              reason: 'Failed for role: $roleKey');
+          expect(user.roles.first, isNot(equals(UserRole.unknown)),
+              reason: 'Parsed as unknown: $roleKey');
           expect(user.roles.first.key, equals(roleKey));
         }
       });
 
-      test('critical previously vulnerable role strings survive deserialization', () {
+      test(
+          'critical previously vulnerable role strings survive deserialization',
+          () {
         final user = User.fromJson({
           'id': 'crit-1',
           'name': 'Critical Roles User',
@@ -310,7 +335,9 @@ void main() {
         expect(user.roles, contains(UserRole.radAssistant));
       });
 
-      test('unrecognized backend role parses to UserRole.unknown without being dropped', () {
+      test(
+          'unrecognized backend role parses to UserRole.unknown without being dropped',
+          () {
         final user = User.fromJson({
           'id': 'unk-json-1',
           'name': 'Custom Operator',
@@ -324,4 +351,3 @@ void main() {
     });
   });
 }
-

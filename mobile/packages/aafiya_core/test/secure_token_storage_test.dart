@@ -20,7 +20,8 @@ class _ThrowingReadFlutterSecureStorage extends FlutterSecureStorage {
     AppleOptions? mOptions,
     WindowsOptions? wOptions,
   }) async {
-    throw PlatformException(code: 'test-read', message: 'simulated read failure');
+    throw PlatformException(
+        code: 'test-read', message: 'simulated read failure');
   }
 }
 
@@ -36,7 +37,8 @@ class _ThrowingWriteFlutterSecureStorage extends FlutterSecureStorage {
     AppleOptions? mOptions,
     WindowsOptions? wOptions,
   }) async {
-    throw PlatformException(code: 'test-write', message: 'simulated write failure');
+    throw PlatformException(
+        code: 'test-write', message: 'simulated write failure');
   }
 }
 
@@ -51,7 +53,8 @@ class _ThrowingDeleteFlutterSecureStorage extends FlutterSecureStorage {
     AppleOptions? mOptions,
     WindowsOptions? wOptions,
   }) async {
-    throw PlatformException(code: 'test-delete', message: 'simulated delete failure');
+    throw PlatformException(
+        code: 'test-delete', message: 'simulated delete failure');
   }
 }
 
@@ -87,7 +90,8 @@ void main() {
       expect(await storage.getToken(), isNull);
     });
 
-    test('a new SecureTokenStorage instance retrieves previously stored data', () async {
+    test('a new SecureTokenStorage instance retrieves previously stored data',
+        () async {
       final first = SecureTokenStorage();
       await first.saveToken('persisted_across_instances');
 
@@ -138,7 +142,8 @@ void main() {
 
       final storage = SecureTokenStorage();
       final client = ApiClient(tokenStorage: storage, httpClient: mockHttp);
-      final manager = AuthSessionManager(tokenStorage: storage, apiClient: client);
+      final manager =
+          AuthSessionManager(tokenStorage: storage, apiClient: client);
 
       const user = User(
         id: 'p1',
@@ -181,7 +186,8 @@ void main() {
       await storage.saveToken('persisted_token_42');
 
       final client = ApiClient(tokenStorage: storage, httpClient: mockHttp);
-      final manager = AuthSessionManager(tokenStorage: storage, apiClient: client);
+      final manager =
+          AuthSessionManager(tokenStorage: storage, apiClient: client);
 
       await manager.restoreSession();
 
@@ -193,7 +199,8 @@ void main() {
     test('401 invalidation clears the persisted token', () async {
       final storage = SecureTokenStorage();
       final client = ApiClient(tokenStorage: storage);
-      final manager = AuthSessionManager(tokenStorage: storage, apiClient: client);
+      final manager =
+          AuthSessionManager(tokenStorage: storage, apiClient: client);
 
       const user = User(
         id: 'p3',
@@ -209,7 +216,8 @@ void main() {
       await Future<void>.delayed(Duration.zero);
 
       expect(manager.isAuthenticated, isFalse);
-      expect((manager.state as Unauthenticated).message, equals('Session expired.'));
+      expect((manager.state as Unauthenticated).message,
+          equals('Session expired.'));
       expect(await storage.getToken(), isNull);
     });
   });

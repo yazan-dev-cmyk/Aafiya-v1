@@ -42,7 +42,8 @@ class BookingCenter {
       address: json['address'] as String?,
       wilaya: json['wilaya'] as String?,
       quotaBalance: (json['quota_balance'] as num?)?.toInt() ?? 0,
-      verificationStatus: (json['verification_status'] as String?) ?? 'verified',
+      verificationStatus:
+          (json['verification_status'] as String?) ?? 'verified',
       isActive: json['is_active'] != false,
       createdAt: json['created_at'] as String?,
     );

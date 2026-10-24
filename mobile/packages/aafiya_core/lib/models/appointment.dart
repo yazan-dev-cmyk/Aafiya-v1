@@ -40,7 +40,8 @@ enum AppointmentStatus {
       };
 
   /// Whether this appointment is currently in an active state.
-  bool get isActive => this == AppointmentStatus.pending || this == AppointmentStatus.confirmed;
+  bool get isActive =>
+      this == AppointmentStatus.pending || this == AppointmentStatus.confirmed;
 
   /// Whether this appointment is in a terminal or completed state.
   bool get isTerminal =>
@@ -199,7 +200,8 @@ class Appointment {
     try {
       final date = DateTime.parse(appointmentDate!);
       final reference = now ?? DateTime.now();
-      final todayMidnight = DateTime(reference.year, reference.month, reference.day);
+      final todayMidnight =
+          DateTime(reference.year, reference.month, reference.day);
       final appDateMidnight = DateTime(date.year, date.month, date.day);
       return !appDateMidnight.isBefore(todayMidnight);
     } catch (_) {
@@ -213,11 +215,15 @@ class Appointment {
       id: (json['id']?.toString()) ?? '',
       bookingReference: (json['booking_reference'] as String?) ?? '',
       secureToken: json['secure_token'] as String?,
-      clinic: AppointmentClinic.fromJson(json['clinic'] as Map<String, dynamic>?),
-      doctor: AppointmentDoctor.fromJson(json['doctor'] as Map<String, dynamic>?),
-      patient: AppointmentPatient.fromJson(json['patient'] as Map<String, dynamic>?),
+      clinic:
+          AppointmentClinic.fromJson(json['clinic'] as Map<String, dynamic>?),
+      doctor:
+          AppointmentDoctor.fromJson(json['doctor'] as Map<String, dynamic>?),
+      patient:
+          AppointmentPatient.fromJson(json['patient'] as Map<String, dynamic>?),
       bookingCenter: json['booking_center'] != null
-          ? AppointmentBookingCenter.fromJson(json['booking_center'] as Map<String, dynamic>?)
+          ? AppointmentBookingCenter.fromJson(
+              json['booking_center'] as Map<String, dynamic>?)
           : null,
       appointmentDate: json['appointment_date'] as String?,
       timeSlot: json['time_slot'] as String?,
@@ -228,6 +234,56 @@ class Appointment {
       checkedInAt: json['checked_in_at'] as String?,
       checkedInBy: json['checked_in_by'] as String?,
       createdAt: json['created_at'] as String?,
+    );
+  }
+}
+
+/// Explicit discriminator returned by server for check-in requests.
+enum CheckInResult {
+  checkedIn,
+  alreadyCheckedIn,
+  unknown;
+
+  static CheckInResult fromString(String? value) {
+    return switch (value) {
+      'checked_in' => CheckInResult.checkedIn,
+      'already_checked_in' => CheckInResult.alreadyCheckedIn,
+      _ => CheckInResult.unknown,
+    };
+  }
+
+  String get key => switch (this) {
+        CheckInResult.checkedIn => 'checked_in',
+        CheckInResult.alreadyCheckedIn => 'already_checked_in',
+        CheckInResult.unknown => 'unknown',
+      };
+}
+
+/// Domain model encapsulating the check-in outcome alongside the resulting appointment.
+@immutable
+class AppointmentCheckInResult {
+  const AppointmentCheckInResult({
+    required this.appointment,
+    required this.result,
+    this.rawResult,
+  });
+
+  final Appointment appointment;
+  final CheckInResult result;
+  final String? rawResult;
+
+  factory AppointmentCheckInResult.fromJson(Map<String, dynamic> json) {
+    final rawData = json['data'];
+    final appointment = rawData is Map<String, dynamic>
+        ? Appointment.fromJson(rawData)
+        : Appointment.fromJson(json);
+
+    final rawResult = json['check_in_result'] as String?;
+
+    return AppointmentCheckInResult(
+      appointment: appointment,
+      result: CheckInResult.fromString(rawResult),
+      rawResult: rawResult,
     );
   }
 }

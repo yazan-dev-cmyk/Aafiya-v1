@@ -134,7 +134,8 @@ class _EditAssistantPermissionsSheetState
 
     return Material(
       color: AafiyaColors.pureWhite,
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(AafiyaRadius.lg)),
+      borderRadius:
+          const BorderRadius.vertical(top: Radius.circular(AafiyaRadius.lg)),
       child: Padding(
         padding: EdgeInsets.fromLTRB(
           AafiyaSpacing.lg,
@@ -143,133 +144,135 @@ class _EditAssistantPermissionsSheetState
           AafiyaSpacing.lg + bottomInset,
         ),
         child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Drag Handle
-          Center(
-            child: Container(
-              width: 36,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AafiyaColors.border,
-                borderRadius: BorderRadius.circular(2),
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Drag Handle
+            Center(
+              child: Container(
+                width: 36,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AafiyaColors.border,
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: AafiyaSpacing.md),
+            const SizedBox(height: AafiyaSpacing.md),
 
-          // Header
-          Row(
-            children: [
-              const CircleAvatar(
-                backgroundColor: AafiyaColors.lightBackground,
-                foregroundColor: AafiyaColors.healthBlue,
-                child: Icon(Icons.security_rounded),
-              ),
-              const SizedBox(width: AafiyaSpacing.sm),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      strings.editPermissions,
-                      style: AafiyaTypography.titleMedium.copyWith(
-                        fontWeight: FontWeight.bold,
+            // Header
+            Row(
+              children: [
+                const CircleAvatar(
+                  backgroundColor: AafiyaColors.lightBackground,
+                  foregroundColor: AafiyaColors.healthBlue,
+                  child: Icon(Icons.security_rounded),
+                ),
+                const SizedBox(width: AafiyaSpacing.sm),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        strings.editPermissions,
+                        style: AafiyaTypography.titleMedium.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    Text(
-                      widget.assistant.name,
-                      style: AafiyaTypography.caption.copyWith(
-                        color: AafiyaColors.secondaryText,
+                      Text(
+                        widget.assistant.name,
+                        style: AafiyaTypography.caption.copyWith(
+                          color: AafiyaColors.secondaryText,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close_rounded),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ],
+            ),
+            const Divider(height: AafiyaSpacing.lg),
+
+            if (_errorMessage != null) ...[
+              Container(
+                padding: AafiyaSpacing.insetAllSm,
+                decoration: BoxDecoration(
+                  color: AafiyaColors.error.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AafiyaRadius.sm),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.error_outline_rounded,
+                        color: AafiyaColors.error, size: 20),
+                    const SizedBox(width: AafiyaSpacing.xs),
+                    Expanded(
+                      child: Text(
+                        _errorMessage!,
+                        style: AafiyaTypography.caption.copyWith(
+                          color: AafiyaColors.error,
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-              IconButton(
-                icon: const Icon(Icons.close_rounded),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
+              const SizedBox(height: AafiyaSpacing.sm),
             ],
-          ),
-          const Divider(height: AafiyaSpacing.lg),
 
-          if (_errorMessage != null) ...[
-            Container(
-              padding: AafiyaSpacing.insetAllSm,
-              decoration: BoxDecoration(
-                color: AafiyaColors.error.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AafiyaRadius.sm),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.error_outline_rounded,
-                      color: AafiyaColors.error, size: 20),
-                  const SizedBox(width: AafiyaSpacing.xs),
-                  Expanded(
-                    child: Text(
-                      _errorMessage!,
-                      style: AafiyaTypography.caption.copyWith(
-                        color: AafiyaColors.error,
-                      ),
-                    ),
+            // Permissions Checkboxes
+            ...permissionsConfig.map((item) {
+              final isChecked = _selectedPermissions.contains(item.key);
+              return CheckboxListTile(
+                contentPadding: EdgeInsets.zero,
+                secondary: Icon(
+                  item.icon,
+                  color: isChecked
+                      ? AafiyaColors.healthBlue
+                      : AafiyaColors.secondaryText,
+                  size: 24,
+                ),
+                title: Text(
+                  item.title,
+                  style: AafiyaTypography.bodyLarge.copyWith(
+                    fontWeight: FontWeight.w600,
                   ),
-                ],
-              ),
+                ),
+                subtitle: Text(
+                  item.desc,
+                  style: AafiyaTypography.caption.copyWith(
+                    color: AafiyaColors.secondaryText,
+                  ),
+                ),
+                activeColor: AafiyaColors.healthBlue,
+                value: isChecked,
+                onChanged: _isLoading
+                    ? null
+                    : (val) {
+                        setState(() {
+                          if (val == true) {
+                            _selectedPermissions.add(item.key);
+                          } else {
+                            _selectedPermissions.remove(item.key);
+                          }
+                        });
+                      },
+              );
+            }),
+
+            const SizedBox(height: AafiyaSpacing.lg),
+
+            // Save Button
+            AafiyaButton(
+              label: strings.savePermissions,
+              isLoading: _isLoading,
+              onPressed: _isLoading ? null : _savePermissions,
             ),
-            const SizedBox(height: AafiyaSpacing.sm),
           ],
-
-          // Permissions Checkboxes
-          ...permissionsConfig.map((item) {
-            final isChecked = _selectedPermissions.contains(item.key);
-            return CheckboxListTile(
-              contentPadding: EdgeInsets.zero,
-              secondary: Icon(
-                item.icon,
-                color: isChecked ? AafiyaColors.healthBlue : AafiyaColors.secondaryText,
-                size: 24,
-              ),
-              title: Text(
-                item.title,
-                style: AafiyaTypography.bodyLarge.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              subtitle: Text(
-                item.desc,
-                style: AafiyaTypography.caption.copyWith(
-                  color: AafiyaColors.secondaryText,
-                ),
-              ),
-              activeColor: AafiyaColors.healthBlue,
-              value: isChecked,
-              onChanged: _isLoading
-                  ? null
-                  : (val) {
-                      setState(() {
-                        if (val == true) {
-                          _selectedPermissions.add(item.key);
-                        } else {
-                          _selectedPermissions.remove(item.key);
-                        }
-                      });
-                    },
-            );
-          }),
-
-          const SizedBox(height: AafiyaSpacing.lg),
-
-          // Save Button
-          AafiyaButton(
-            label: strings.savePermissions,
-            isLoading: _isLoading,
-            onPressed: _isLoading ? null : _savePermissions,
-          ),
-        ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 }

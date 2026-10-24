@@ -9,7 +9,9 @@ void main() {
   const testClinicName = 'عيادة شفاء الاختبارية 01';
 
   group('User Model Clinic Parsing', () {
-    test('User.fromJson correctly parses clinic and clinics from backend UserResource', () {
+    test(
+        'User.fromJson correctly parses clinic and clinics from backend UserResource',
+        () {
       final json = {
         'id': '01a084d5-adcd-7045-84c6-881865f4bce9',
         'name': 'مساعد طبيب اختباري 001',
@@ -72,10 +74,13 @@ void main() {
   });
 
   group('AuthSessionManager Assistant Clinic Context', () {
-    test('setAuthenticatedUser auto-establishes single active clinic for doctor_assistant', () async {
+    test(
+        'setAuthenticatedUser auto-establishes single active clinic for doctor_assistant',
+        () async {
       final storage = InMemoryTokenStorage();
       final client = ApiClient(tokenStorage: storage);
-      final sessionManager = AuthSessionManager(tokenStorage: storage, apiClient: client);
+      final sessionManager =
+          AuthSessionManager(tokenStorage: storage, apiClient: client);
 
       const clinic = DoctorClinic(
         id: testClinicId,
@@ -94,7 +99,8 @@ void main() {
         clinics: [clinic],
       );
 
-      await sessionManager.setAuthenticatedUser(token: 'test-token', user: assistantUser);
+      await sessionManager.setAuthenticatedUser(
+          token: 'test-token', user: assistantUser);
 
       expect(sessionManager.isAuthenticated, isTrue);
       expect(sessionManager.activeClinic, isNotNull);
@@ -104,7 +110,8 @@ void main() {
       expect(sessionManager.authorizedClinics.first.id, equals(testClinicId));
     });
 
-    test('restoreSession auto-establishes clinic context from /auth/me profile', () async {
+    test('restoreSession auto-establishes clinic context from /auth/me profile',
+        () async {
       final mockHttp = MockClient((request) async {
         if (request.url.path.endsWith('/auth/me')) {
           return http.Response(
@@ -141,21 +148,26 @@ void main() {
 
       final storage = InMemoryTokenStorage('persisted-token');
       final client = ApiClient(tokenStorage: storage, httpClient: mockHttp);
-      final sessionManager = AuthSessionManager(tokenStorage: storage, apiClient: client);
+      final sessionManager =
+          AuthSessionManager(tokenStorage: storage, apiClient: client);
 
       await sessionManager.restoreSession();
 
       expect(sessionManager.isAuthenticated, isTrue);
-      expect(sessionManager.currentUser?.primaryRole, equals(UserRole.doctorAssistant));
+      expect(sessionManager.currentUser?.primaryRole,
+          equals(UserRole.doctorAssistant));
       expect(sessionManager.activeClinicId, equals(testClinicId));
       expect(client.activeClinicId, equals(testClinicId));
       expect(sessionManager.authorizedClinics, hasLength(1));
     });
 
-    test('assistant without clinic context fails closed (activeClinicId remains null)', () async {
+    test(
+        'assistant without clinic context fails closed (activeClinicId remains null)',
+        () async {
       final storage = InMemoryTokenStorage();
       final client = ApiClient(tokenStorage: storage);
-      final sessionManager = AuthSessionManager(tokenStorage: storage, apiClient: client);
+      final sessionManager =
+          AuthSessionManager(tokenStorage: storage, apiClient: client);
 
       const assistantWithoutClinic = User(
         id: 'ast-orphan',
@@ -166,7 +178,8 @@ void main() {
         clinics: [],
       );
 
-      await sessionManager.setAuthenticatedUser(token: 'test-token', user: assistantWithoutClinic);
+      await sessionManager.setAuthenticatedUser(
+          token: 'test-token', user: assistantWithoutClinic);
 
       expect(sessionManager.isAuthenticated, isTrue);
       expect(sessionManager.activeClinic, isNull);
@@ -175,10 +188,13 @@ void main() {
       expect(sessionManager.authorizedClinics, isEmpty);
     });
 
-    test('doctor role is NOT auto-bound on login, preserving Doctor Multi-Clinic workflow', () async {
+    test(
+        'doctor role is NOT auto-bound on login, preserving Doctor Multi-Clinic workflow',
+        () async {
       final storage = InMemoryTokenStorage();
       final client = ApiClient(tokenStorage: storage);
-      final sessionManager = AuthSessionManager(tokenStorage: storage, apiClient: client);
+      final sessionManager =
+          AuthSessionManager(tokenStorage: storage, apiClient: client);
 
       const doctorUser = User(
         id: 'doc-001',
@@ -187,7 +203,8 @@ void main() {
         roles: [UserRole.doctor],
       );
 
-      await sessionManager.setAuthenticatedUser(token: 'doc-token', user: doctorUser);
+      await sessionManager.setAuthenticatedUser(
+          token: 'doc-token', user: doctorUser);
 
       expect(sessionManager.isAuthenticated, isTrue);
       // Doctor clinics are loaded independently by DoctorShell via fetchDoctorClinics()

@@ -89,13 +89,15 @@ class PackagePurchaseRequest {
       receiptDocumentPath: json['receipt_document_path'] as String?,
       status: PurchaseRequestStatus.fromString(json['status'] as String?),
       notes: json['notes'] as String?,
-      reviewedByName:
-          reviewedBy is Map<String, dynamic> ? reviewedBy['name'] as String? : null,
+      reviewedByName: reviewedBy is Map<String, dynamic>
+          ? reviewedBy['name'] as String?
+          : null,
       reviewedAt: json['reviewed_at'] as String?,
       rejectionReason: json['rejection_reason'] as String?,
       bookingTransactionId: json['booking_transaction_id'] as String?,
-      createdByName:
-          createdBy is Map<String, dynamic> ? createdBy['name'] as String? : null,
+      createdByName: createdBy is Map<String, dynamic>
+          ? createdBy['name'] as String?
+          : null,
       createdAt: json['created_at'] as String?,
     );
   }
