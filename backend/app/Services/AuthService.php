@@ -28,7 +28,14 @@ class AuthService
      */
     public function register(array $data): array
     {
+        $allowedRoles = ['patient_registered', 'booking_center'];
         $roleName = $data['role'] ?? 'patient_registered';
+
+        if (! in_array($roleName, $allowedRoles, true)) {
+            throw ValidationException::withMessages([
+                'role' => ['الدور المطلوب غير مصرح به للتسجيل الذاتي.'],
+            ]);
+        }
 
         if ($roleName === 'booking_center') {
             return \Illuminate\Support\Facades\DB::transaction(function () use ($data, $roleName) {

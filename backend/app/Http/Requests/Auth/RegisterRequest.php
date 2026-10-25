@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class RegisterRequest extends FormRequest
 {
@@ -26,7 +27,7 @@ class RegisterRequest extends FormRequest
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'phone' => ['required', 'string', 'max:20', 'unique:users,phone'],
             'password' => ['required', 'string', 'min:8'],
-            'role' => ['nullable', 'string', 'exists:roles,name'],
+            'role' => ['nullable', 'string', Rule::in(['patient_registered', 'booking_center'])],
             'specialty' => ['nullable', 'string', 'max:255'],
             'specialty_id' => ['nullable', 'integer', 'exists:medical_specialties,id'],
             'license_number' => ['nullable', 'string', 'max:100'],
@@ -51,6 +52,7 @@ class RegisterRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'role.in' => 'الدور المحدد غير مصرح به للتسجيل العام.',
             'accepted_terms.required' => 'يجب إقرار وقبول شروط الخدمة والاطلاع على إشعار الخصوصية لإتمام إنشاء الحساب.',
             'accepted_terms.accepted' => 'يجب إقرار وقبول شروط الخدمة والاطلاع على إشعار الخصوصية لإتمام إنشاء الحساب.',
         ];

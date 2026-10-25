@@ -23,13 +23,11 @@ class AuthTest extends TestCase
     public function test_user_can_register_with_valid_data_and_receives_uuid_and_token(): void
     {
         $payload = [
-            'name' => 'Dr. Ahmed Benali',
+            'name' => 'Ahmed Benali',
             'email' => 'ahmed.benali@aafiya.dz',
             'phone' => '+213555123456',
             'password' => 'SecurePassword123!',
-            'role' => 'doctor',
-            'specialty' => 'أمراض القلب (Cardiology)',
-            'license_number' => 'DZ-ALG-2026-DOC-TEST',
+            'accepted_terms' => true,
         ];
 
         $response = $this->postJson('/api/v1/auth/register', $payload);
@@ -70,7 +68,7 @@ class AuthTest extends TestCase
 
         $user = User::find($userId);
         $this->assertTrue(Hash::check('SecurePassword123!', $user->password));
-        $this->assertTrue($user->hasRole('doctor'));
+        $this->assertTrue($user->hasRole('patient_registered'));
     }
 
     public function test_user_cannot_register_with_duplicate_email_or_phone(): void
@@ -252,5 +250,94 @@ class AuthTest extends TestCase
         foreach ($requiredPermissions as $permissionName) {
             $this->assertDatabaseHas('permissions', ['name' => $permissionName]);
         }
+    }
+
+    /**
+     * SEC-01 Regression: Prohibited roles cannot be assigned via public self-registration.
+     */
+    public function test_prohibited_roles_cannot_be_assigned_via_public_registration(): void
+    {
+        $this->withoutMiddleware(\Illuminate\Routing\Middleware\ThrottleRequests::class);
+
+        $prohibitedRoles = [
+            'admin',
+            'admin_assistant',
+            'clinic_director',
+            'doctor',
+            'doctor_assistant',
+            'lab',
+            'lab_assistant',
+            'radiology',
+            'rad_assistant',
+            'superadmin',
+            'invalid_role_xyz',
+        ];
+
+        foreach ($prohibitedRoles as $index => $prohibitedRole) {
+            $response = $this->postJson('/api/v1/auth/register', [
+                'name' => "Attacker {$index}",
+                'email' => "attacker{$index}@exploit.local",
+                'phone' => "+2136990000" . str_pad((string) $index, 2, '0', STR_PAD_LEFT),
+                'password' => 'ExploitPass123!',
+                'role' => $prohibitedRole,
+                'accepted_terms' => true,
+            ]);
+
+            $response->assertStatus(422)
+                ->assertJsonValidationErrors(['role']);
+
+            $this->assertDatabaseMissing('users', [
+                'email' => "attacker{$index}@exploit.local",
+            ]);
+        }
+    }
+
+    /**
+     * SEC-01 Regression: Booking center registration with whitelisted role succeeds and is pending.
+     */
+    public function test_booking_center_registration_succeeds_with_whitelisted_role_and_pending_status(): void
+    {
+        $response = $this->postJson('/api/v1/auth/register', [
+            'name' => 'مركز الشفاء للحجز',
+            'manager_name' => 'عمر خالد',
+            'email' => 'contact@alshifa-booking.dz',
+            'phone' => '+213550998877',
+            'password' => 'SecureAgency2026!',
+            'role' => 'booking_center',
+            'commercial_register' => 'RC-16/00-1122334',
+            'license_number' => 'DZ-BC-2026-009',
+            'wilaya' => 'الجزائر العاصمة',
+            'address' => 'شارع ديدوش مراد',
+            'accepted_terms' => true,
+        ]);
+
+        $response->assertStatus(201);
+        $user = User::where('email', 'contact@alshifa-booking.dz')->firstOrFail();
+        $this->assertTrue($user->hasRole('booking_center'));
+
+        $this->assertDatabaseHas('booking_centers', [
+            'user_id' => $user->id,
+            'verification_status' => 'pending',
+            'is_active' => false,
+        ]);
+    }
+
+    /**
+     * SEC-01 Regression: AuthService rejects prohibited roles directly with ValidationException.
+     */
+    public function test_auth_service_rejects_unauthorized_role_directly(): void
+    {
+        $authService = app(\App\Services\AuthService::class);
+
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+
+        $authService->register([
+            'name' => 'Direct Escalation Attempt',
+            'email' => 'direct.escalation@exploit.local',
+            'phone' => '+213550887766',
+            'password' => 'DirectPass123!',
+            'role' => 'admin',
+            'accepted_terms' => true,
+        ]);
     }
 }

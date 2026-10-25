@@ -31,7 +31,8 @@ class DoctorOnboardingController extends Controller
         ];
 
         $doctorData = [
-            'specialty' => $validated['specialty'],
+            'specialty' => $validated['specialty'] ?? null,
+            'specialty_id' => $validated['specialty_id'] ?? null,
             'license_number' => $validated['license_number'],
             'bio' => $validated['bio'] ?? null,
             'is_verified' => false,
@@ -73,7 +74,8 @@ class DoctorOnboardingController extends Controller
         $validated = $request->validated();
 
         $doctorData = [
-            'specialty' => $validated['specialty'],
+            'specialty' => $validated['specialty'] ?? null,
+            'specialty_id' => $validated['specialty_id'] ?? null,
             'license_number' => $validated['license_number'],
             'bio' => $validated['bio'] ?? null,
             'is_verified' => true,
