@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
     'address',
     'wilaya',
     'wilaya_id',
+    'commune_id',
     'is_active',
 ])]
 class Patient extends Model
@@ -44,6 +45,14 @@ class Patient extends Model
     public function wilaya(): BelongsTo
     {
         return $this->belongsTo(Wilaya::class, 'wilaya_id');
+    }
+
+    /**
+     * Authoritative Commune relationship.
+     */
+    public function commune(): BelongsTo
+    {
+        return $this->belongsTo(Commune::class, 'commune_id');
     }
 
     /**

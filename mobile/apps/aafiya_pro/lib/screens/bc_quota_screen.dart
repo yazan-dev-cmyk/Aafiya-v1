@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:aafiya_core/aafiya_core.dart';
 import 'package:aafiya_ui/aafiya_ui.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../widgets/quota_balance_card.dart';
 
@@ -175,9 +176,12 @@ class _BcQuotaScreenState extends State<BcQuotaScreen>
 
   void _openPurchaseRequestModal(BookingPackage package) {
     final strings = LocalizedStrings.of(context);
+    final isPaidPackage = package.priceDzd > 0;
     String selectedPaymentMethod = 'baridimob';
     final refController = TextEditingController();
     final notesController = TextEditingController();
+    XFile? selectedReceiptImage;
+    final picker = ImagePicker();
     String? modalError;
 
     showModalBottomSheet<void>(
@@ -187,6 +191,27 @@ class _BcQuotaScreenState extends State<BcQuotaScreen>
       builder: (modalContext) {
         return StatefulBuilder(
           builder: (builderContext, setModalState) {
+            Future<void> pickImage(ImageSource source) async {
+              try {
+                final picked = await picker.pickImage(
+                  source: source,
+                  maxWidth: 1920,
+                  maxHeight: 1920,
+                  imageQuality: 85,
+                );
+                if (picked != null) {
+                  setModalState(() {
+                    selectedReceiptImage = picked;
+                    modalError = null;
+                  });
+                }
+              } catch (e) {
+                setModalState(() {
+                  modalError = 'فشل فتح الكاميرا أو المعرض: $e';
+                });
+              }
+            }
+
             return Container(
               padding: EdgeInsets.only(
                 top: 20,
@@ -249,9 +274,14 @@ class _BcQuotaScreenState extends State<BcQuotaScreen>
                                 style: AafiyaTypography.bodyMedium,
                               ),
                               Text(
-                                '${package.priceDzd.toStringAsFixed(0)} ${strings.currencyDzd}',
+                                package.priceDzd <= 0
+                                    ? strings.freePackageLabel
+                                    : '${package.priceDzd.toStringAsFixed(0)} ${strings.currencyDzd}',
                                 style: AafiyaTypography.titleMedium.copyWith(
                                   fontWeight: FontWeight.bold,
+                                  color: package.priceDzd <= 0
+                                      ? AafiyaColors.healthBlue
+                                      : null,
                                 ),
                               ),
                             ],
@@ -261,48 +291,183 @@ class _BcQuotaScreenState extends State<BcQuotaScreen>
                     ),
                     const SizedBox(height: 16),
 
-                    // Payment Method Selector
-                    Text(
-                      strings.paymentMethod,
-                      style: AafiyaTypography.labelMedium.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: ChoiceChip(
-                            key: const Key('payment_method_baridimob'),
-                            label: Text(strings.baridimob),
-                            selected: selectedPaymentMethod == 'baridimob',
-                            onSelected: (selected) {
-                              if (selected) {
-                                setModalState(() {
-                                  selectedPaymentMethod = 'baridimob';
-                                });
-                              }
-                            },
-                          ),
+                    if (isPaidPackage) ...[
+                      // Official BaridiMob Details Card
+                      Container(
+                        padding: AafiyaSpacing.insetAllMd,
+                        decoration: BoxDecoration(
+                          color: AafiyaColors.lightBackground,
+                          borderRadius: AafiyaRadius.borderMd,
+                          border: Border.all(color: AafiyaColors.border),
                         ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: ChoiceChip(
-                            key: const Key('payment_method_bank_transfer'),
-                            label: Text(strings.bankTransfer),
-                            selected: selectedPaymentMethod == 'bank_transfer',
-                            onSelected: (selected) {
-                              if (selected) {
-                                setModalState(() {
-                                  selectedPaymentMethod = 'bank_transfer';
-                                });
-                              }
-                            },
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(Icons.account_balance_wallet_rounded,
+                                    size: 18, color: AafiyaColors.healthBlue),
+                                const SizedBox(width: 8),
+                                Text(
+                                  strings.baridimob,
+                                  style: AafiyaTypography.labelMedium.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: AafiyaColors.healthBlue,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            SelectableText(
+                              strings.baridiMobRipDetails,
+                              style: AafiyaTypography.bodySmall
+                                  .copyWith(fontWeight: FontWeight.w600),
+                            ),
+                            const SizedBox(height: 2),
+                            SelectableText(
+                              strings.baridiMobBeneficiaryDetails,
+                              style: AafiyaTypography.caption,
+                            ),
+                            const SizedBox(height: 2),
+                            SelectableText(
+                              strings.baridiMobCcpDetails,
+                              style: AafiyaTypography.caption,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Mandatory Receipt Photo Picker
+                      Row(
+                        children: [
+                          Text(
+                            strings.receiptPhotoLabel,
+                            style: AafiyaTypography.labelMedium.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const Text(
+                            ' *',
+                            style: TextStyle(
+                              color: AafiyaColors.error,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        strings.receiptMandatoryNotice,
+                        style: AafiyaTypography.caption.copyWith(
+                          color: AafiyaColors.secondaryText,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+
+                      if (selectedReceiptImage == null) ...[
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                key: const Key('button_take_receipt_photo'),
+                                icon: const Icon(Icons.camera_alt_rounded,
+                                    size: 18),
+                                label: Text(
+                                  strings.takeReceiptPhoto,
+                                  style: AafiyaTypography.labelSmall,
+                                ),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: AafiyaColors.healthBlue,
+                                  side: const BorderSide(
+                                      color: AafiyaColors.healthBlue),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 10),
+                                ),
+                                onPressed: () =>
+                                    pickImage(ImageSource.camera),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                key: const Key('button_choose_receipt_gallery'),
+                                icon: const Icon(Icons.photo_library_rounded,
+                                    size: 18),
+                                label: Text(
+                                  strings.chooseFromGallery,
+                                  style: AafiyaTypography.labelSmall,
+                                ),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: AafiyaColors.healthBlue,
+                                  side: const BorderSide(
+                                      color: AafiyaColors.healthBlue),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 10),
+                                ),
+                                onPressed: () =>
+                                    pickImage(ImageSource.gallery),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ] else ...[
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: AafiyaColors.success.withValues(alpha: 0.1),
+                            borderRadius: AafiyaRadius.borderSm,
+                            border: Border.all(
+                                color: AafiyaColors.success
+                                    .withValues(alpha: 0.4)),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.check_circle_rounded,
+                                  color: AafiyaColors.success, size: 20),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      strings.receiptAttachedSuccess,
+                                      style:
+                                          AafiyaTypography.labelSmall.copyWith(
+                                        color: AafiyaColors.success,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      selectedReceiptImage!.name,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: AafiyaTypography.caption
+                                          .copyWith(
+                                              color: AafiyaColors.secondaryText),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  setModalState(() {
+                                    selectedReceiptImage = null;
+                                  });
+                                },
+                                style: TextButton.styleFrom(
+                                  foregroundColor: AafiyaColors.error,
+                                  visualDensity: VisualDensity.compact,
+                                ),
+                                child: Text(strings.removeReceiptPhoto),
+                              ),
+                            ],
                           ),
                         ),
                       ],
-                    ),
-                    const SizedBox(height: 16),
+                      const SizedBox(height: 16),
+                    ],
 
                     // Transaction Reference (Optional)
                     TextField(
@@ -332,6 +497,7 @@ class _BcQuotaScreenState extends State<BcQuotaScreen>
 
                     if (modalError != null) ...[
                       Container(
+                        key: const Key('modal_error_banner'),
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: AafiyaColors.error.withValues(alpha: 0.1),
@@ -352,16 +518,33 @@ class _BcQuotaScreenState extends State<BcQuotaScreen>
                       onPressed: _isSubmittingRequest
                           ? null
                           : () async {
+                              if (isPaidPackage &&
+                                  selectedReceiptImage == null) {
+                                setModalState(() {
+                                  modalError = strings.receiptMandatoryNotice;
+                                });
+                                return;
+                              }
+
                               setModalState(() {
                                 _isSubmittingRequest = true;
                                 modalError = null;
                               });
 
+                              List<int>? imageBytes;
+                              if (selectedReceiptImage != null) {
+                                imageBytes = await selectedReceiptImage!
+                                    .readAsBytes();
+                              }
+
                               final result =
                                   await _service.createPurchaseRequest(
                                 packageId: package.id,
                                 paymentMethod: selectedPaymentMethod,
-                                transactionReference: refController.text.trim(),
+                                transactionReference:
+                                    refController.text.trim(),
+                                receiptFileBytes: imageBytes,
+                                receiptFileName: selectedReceiptImage?.name,
                                 notes: notesController.text.trim(),
                               );
 
@@ -604,10 +787,14 @@ class _BcQuotaScreenState extends State<BcQuotaScreen>
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    '${pkg.priceDzd.toStringAsFixed(0)} ${strings.currencyDzd}',
+                    pkg.priceDzd <= 0
+                        ? strings.freePackageLabel
+                        : '${pkg.priceDzd.toStringAsFixed(0)} ${strings.currencyDzd}',
                     style: AafiyaTypography.titleMedium.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: AafiyaColors.primaryText,
+                      color: pkg.priceDzd <= 0
+                          ? AafiyaColors.healthBlue
+                          : AafiyaColors.primaryText,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -750,9 +937,15 @@ class _BcQuotaScreenState extends State<BcQuotaScreen>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      '${req.priceDzd.toStringAsFixed(0)} ${strings.currencyDzd}',
-                      style: AafiyaTypography.caption
-                          .copyWith(color: AafiyaColors.secondaryText),
+                      req.priceDzd <= 0
+                          ? strings.freePackageLabel
+                          : '${req.priceDzd.toStringAsFixed(0)} ${strings.currencyDzd}',
+                      style: AafiyaTypography.caption.copyWith(
+                        color: req.priceDzd <= 0
+                            ? AafiyaColors.healthBlue
+                            : AafiyaColors.secondaryText,
+                        fontWeight: req.priceDzd <= 0 ? FontWeight.bold : null,
+                      ),
                     ),
                     if (req.createdAt != null)
                       Text(

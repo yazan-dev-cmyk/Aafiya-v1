@@ -806,6 +806,36 @@ class LocalizedStrings {
           ? 'Code postal'
           : 'Postal Code';
 
+  String get addressLabel => isArabic
+      ? 'العنوان'
+      : isFrench
+          ? 'Adresse'
+          : 'Address';
+
+  String get addressPlaceholder => isArabic
+      ? 'مثال: حي النور، عمارة 4'
+      : isFrench
+          ? 'ex: Cité En-Nour, Bâtiment 4'
+          : 'e.g., Cité En-Nour, Building 4';
+
+  String get optional => isArabic
+      ? 'اختياري'
+      : isFrench
+          ? 'Optionnel'
+          : 'Optional';
+
+  String get wilayaRequired => isArabic
+      ? 'يرجى اختيار الولاية'
+      : isFrench
+          ? 'Veuillez sélectionner la wilaya'
+          : 'Please select a wilaya';
+
+  String get communeRequired => isArabic
+      ? 'يرجى اختيار البلدية'
+      : isFrench
+          ? 'Veuillez sélectionner la commune'
+          : 'Please select a commune';
+
   // Specialties (DEF-02 Stage A)
   String get specialtyCardiology => isArabic
       ? 'أمراض القلب'
@@ -2681,6 +2711,64 @@ class LocalizedStrings {
       : isFrench
           ? 'DA'
           : 'DZD';
+
+  String get freePackageLabel => isArabic
+      ? 'مجاناً'
+      : isFrench
+          ? 'Gratuit'
+          : 'Free';
+
+  String get complimentaryPackageInvoice => isArabic
+      ? 'باقة ترحيبية مجانية'
+      : isFrench
+          ? 'Pack de bienvenue gratuit'
+          : 'Complimentary Welcome Package';
+
+  String get takeReceiptPhoto => isArabic
+      ? 'التقاط صورة للوصل'
+      : isFrench
+          ? 'Prendre une photo'
+          : 'Take photo';
+
+  String get chooseFromGallery => isArabic
+      ? 'اختيار من المعرض'
+      : isFrench
+          ? 'Depuis la galerie'
+          : 'From gallery';
+
+  String get receiptMandatoryNotice => isArabic
+      ? 'إرفاق إثبات الدفع (وصل التحويل) إلزامي للباقة المدفوعة *'
+      : isFrench
+          ? 'Le reçu de paiement est obligatoire pour les packs payants *'
+          : 'Payment receipt is mandatory for paid packages *';
+
+  String get receiptAttachedSuccess => isArabic
+      ? 'تم إرفاق صورة الوصل بنجاح'
+      : isFrench
+          ? 'Reçu joint avec succès'
+          : 'Receipt attached successfully';
+
+  String get changeReceiptPhoto => isArabic
+      ? 'تغيير الصورة'
+      : isFrench
+          ? 'Changer'
+          : 'Change photo';
+
+  String get removeReceiptPhoto => isArabic
+      ? 'حذف'
+      : isFrench
+          ? 'Supprimer'
+          : 'Remove';
+
+  String get receiptPhotoLabel => isArabic
+      ? 'إثبات الدفع (وصل بريدي موب)'
+      : isFrench
+          ? 'Preuve de paiement (BaridiMob)'
+          : 'Proof of payment (BaridiMob)';
+
+  String get baridiMobRipDetails => 'RIP: 00799999000524419939';
+  String get baridiMobBeneficiaryDetails => 'SPA AAFIYA PLATFORMS ALGERIA';
+  String get baridiMobCcpDetails => 'CCP: 0005244199 Clé 39';
 
   String get requestSubmittedSuccess => isArabic
       ? 'تم تقديم طلب شراء الباقة بنجاح وهو قيد المراجعة.'

@@ -4,9 +4,11 @@ namespace App\Services;
 
 use App\Models\Clinic;
 use App\Models\ClinicAssistant;
+use App\Models\Commune;
 use App\Models\Doctor;
 use App\Models\DoctorClinic;
 use App\Models\User;
+use App\Models\Wilaya;
 use App\Services\LegacyWilayaMigrationService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
@@ -46,13 +48,55 @@ class ClinicService
             $directorDoctor = $creator->doctor;
 
             $wilayaStr = $data['wilaya'] ?? null;
-            $wilayaId = $data['wilaya_id'] ?? ($wilayaStr !== null ? $this->wilayaResolver->resolveWilaya($wilayaStr)?->id : null);
+            $wilayaId = $data['wilaya_id'] ?? null;
+            $communeId = $data['commune_id'] ?? null;
+            $wilayaCode = $data['wilaya_code'] ?? null;
+            $communeCode = $data['commune_code'] ?? null;
+
+            // Resolve Wilaya via canonical code
+            if (! empty($wilayaCode)) {
+                $wilayaModel = Wilaya::where('code', $wilayaCode)->first();
+                if ($wilayaModel) {
+                    $wilayaId = $wilayaModel->id;
+                    $wilayaStr = $wilayaModel->name_ar;
+                }
+            } elseif ($wilayaId !== null) {
+                $wilayaModel = Wilaya::find($wilayaId);
+                if ($wilayaModel) {
+                    $wilayaStr = $wilayaModel->name_ar;
+                }
+            } elseif (! empty($wilayaStr)) {
+                $resolved = $this->wilayaResolver->resolveWilaya($wilayaStr);
+                if ($resolved) {
+                    $wilayaId = $resolved->id;
+                    $wilayaStr = $resolved->name_ar;
+                }
+            }
+
+            // Resolve Commune via canonical code
+            if (! empty($communeCode)) {
+                $communeQuery = Commune::where('code', $communeCode);
+                if ($wilayaId !== null) {
+                    $communeQuery->where('wilaya_id', $wilayaId);
+                }
+                $communeModel = $communeQuery->first();
+                if ($communeModel) {
+                    $communeId = $communeModel->id;
+                    if ($wilayaId === null) {
+                        $wilayaId = $communeModel->wilaya_id;
+                    }
+                }
+            }
 
             $clinic = Clinic::create([
                 'name' => $data['name'],
                 'address' => $data['address'],
-                'wilaya' => $wilayaStr,
+                'wilaya' => $wilayaStr ?? ($data['wilaya'] ?? 'الجزائر العاصمة'),
                 'wilaya_id' => $wilayaId,
+                'commune_id' => $communeId,
+                'latitude' => $data['latitude'] ?? null,
+                'longitude' => $data['longitude'] ?? null,
+                'google_maps_link' => $data['google_maps_link'] ?? null,
                 'phone' => $data['phone'],
                 'director_doctor_id' => $directorDoctor?->id,
                 'max_patients_per_slot' => isset($data['max_patients_per_slot']) ? max(1, min(10, (int) $data['max_patients_per_slot'])) : 10,
@@ -98,6 +142,16 @@ class ClinicService
             'is_active' => $data['is_active'] ?? null,
         ];
 
+        if (array_key_exists('latitude', $data)) {
+            $updateData['latitude'] = $data['latitude'];
+        }
+        if (array_key_exists('longitude', $data)) {
+            $updateData['longitude'] = $data['longitude'];
+        }
+        if (array_key_exists('google_maps_link', $data)) {
+            $updateData['google_maps_link'] = $data['google_maps_link'];
+        }
+
         if (array_key_exists('wilaya', $data)) {
             $wilayaStr = $data['wilaya'];
             $wilayaId = $data['wilaya_id'] ?? ($wilayaStr !== null ? $this->wilayaResolver->resolveWilaya($wilayaStr)?->id : null);
@@ -107,7 +161,7 @@ class ClinicService
             $updateData['wilaya_id'] = $data['wilaya_id'];
         }
 
-        $clinic->update(array_filter($updateData, fn ($val) => $val !== null));
+        $clinic->update(array_filter($updateData, fn ($val, $key) => $val !== null || in_array($key, ['latitude', 'longitude', 'google_maps_link'], true), ARRAY_FILTER_USE_BOTH));
 
         return $clinic->fresh(['director.user', 'doctors']);
     }

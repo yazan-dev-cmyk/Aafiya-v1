@@ -7,11 +7,16 @@ use App\Models\BookingPackage;
 use App\Models\BookingTransaction;
 use App\Models\PackagePurchaseRequest;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class PackagePurchaseRequestService
 {
+    public function __construct(
+        protected GoogleDriveService $googleDriveService
+    ) {}
+
     /**
      * Submit a new purchase request in pending status.
      * Captures immutable historical snapshots of package attributes.
@@ -31,8 +36,51 @@ class PackagePurchaseRequestService
             ]);
         }
 
+        // Rule 1: Free package can be granted ONLY ONCE per booking center
+        if ((float) $package->price_dzd <= 0.0) {
+            $alreadyClaimed = PackagePurchaseRequest::where('booking_center_id', $center->id)
+                ->where(function ($q) use ($package) {
+                    $q->where('booking_package_id', $package->id)
+                      ->orWhere('price_dzd', '<=', 0);
+                })
+                ->whereIn('status', [PackagePurchaseRequest::STATUS_PENDING, PackagePurchaseRequest::STATUS_APPROVED])
+                ->exists();
+
+            if ($alreadyClaimed) {
+                throw ValidationException::withMessages([
+                    'package_id' => ['لقد استفاد مركز الحجز من الباقة المجانية مسبقاً، ولا يمكن الحصول عليها أكثر من مرة.'],
+                ]);
+            }
+        }
+
+        // Rule 2: Payment receipt is strictly mandatory for paid packages
+        if ((float) $package->price_dzd > 0.0) {
+            $hasFile = isset($data['receipt_file']) && $data['receipt_file'] instanceof UploadedFile;
+            $hasPath = ! empty($data['receipt_document_path']);
+
+            if (! $hasFile && ! $hasPath) {
+                throw ValidationException::withMessages([
+                    'receipt_file' => ['إرفاق إثبات الدفع (وصل التحويل عبر بريدي موب) إلزامي عند شراء باقة مدفوعة.'],
+                ]);
+            }
+        }
+
         return DB::transaction(function () use ($center, $package, $data, $creator) {
             $reference = $this->generateRequestReference();
+
+            $receiptPath = $data['receipt_document_path'] ?? null;
+            if (isset($data['receipt_file']) && $data['receipt_file'] instanceof UploadedFile) {
+                $ext = $data['receipt_file']->getClientOriginalExtension() ?: 'pdf';
+                $cleanCenterCode = preg_replace('/[^a-zA-Z0-9_\-]/', '', $center->code ?: 'BC');
+                $customName = "receipt_{$cleanCenterCode}_{$reference}.{$ext}";
+                
+                $upload = $this->googleDriveService->uploadReceipt($data['receipt_file'], $customName);
+                if (($upload['storage'] ?? '') === 'local' && !empty($upload['storage_path'])) {
+                    $receiptPath = "local:{$upload['storage_path']}:{$upload['name']}";
+                } else {
+                    $receiptPath = "gdrive:{$upload['file_id']}:{$upload['name']}";
+                }
+            }
 
             return PackagePurchaseRequest::create([
                 'request_reference' => $reference,
@@ -44,7 +92,7 @@ class PackagePurchaseRequestService
                 'price_dzd' => (float) $package->price_dzd,
                 'payment_method' => $data['payment_method'] ?? null,
                 'transaction_reference' => $data['transaction_reference'] ?? null,
-                'receipt_document_path' => $data['receipt_document_path'] ?? null,
+                'receipt_document_path' => $receiptPath,
                 'status' => PackagePurchaseRequest::STATUS_PENDING,
                 'notes' => $data['notes'] ?? null,
                 'created_by_id' => $creator->id,

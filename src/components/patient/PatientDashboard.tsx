@@ -39,7 +39,9 @@ import {
   X,
   RefreshCw,
   Eye,
-  EyeOff
+  EyeOff,
+  Search,
+  Info
 } from 'lucide-react';
 
 import { DashboardLayout } from '../ui/DashboardLayout';
@@ -59,6 +61,7 @@ import { MedicalDocumentCode } from '../shared/MedicalDocumentCode';
 import { ChangePasswordCard } from '../shared/ChangePasswordCard';
 import { MedicalTimelineHeader, MedicalTimelineValue } from '../shared/MedicalTimelineHeader';
 import { resolveCanonicalShareUrl } from '@/lib/utils';
+import { DoctorSearchSection } from '../DoctorSearchSection';
 
 interface PatientDashboardProps {
   onBackToMainPlatform: () => void;
@@ -69,6 +72,7 @@ interface PatientDashboardProps {
 
 export type PatientTab =
   | 'dashboard'
+  | 'directory'
   | 'appointments'
   | 'visit_pass'
   | 'medical_record'
@@ -218,6 +222,7 @@ export function PatientDashboard({
     router.push(targetUrl, { scroll: false });
   };
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+  const [bookingNoticeOpen, setBookingNoticeOpen] = useState<boolean>(false);
   const [showQrModal, setShowQrModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [selectedScanForViewer, setSelectedScanForViewer] = useState<RadResultItem | null>(null);
@@ -950,6 +955,7 @@ export function PatientDashboard({
 
   const navItems: NavItem[] = [
     { id: 'dashboard', label: t('tabs.dashboard'), icon: Activity },
+    { id: 'directory', label: t('tabs.directory'), icon: Search },
     { id: 'appointments', label: t('tabs.appointments'), icon: Calendar },
     { id: 'visit_pass', label: t('tabs.visitPass'), icon: QrCode },
     { id: 'medical_record', label: t('tabs.medicalRecord'), icon: ShieldCheck },
@@ -1257,6 +1263,71 @@ export function PatientDashboard({
           </div>
         )}
 
+        {/* PAGE: DIRECTORY (DOCTORS & BOOKING CENTERS) */}
+        {activeTab === 'directory' && (
+          <div className="space-y-6">
+            {/* Informational Guidance Notice (Directing to certified centers & clinic reception) */}
+            <Card variant="elevated" padding="none" className="border border-blue-200/80 bg-gradient-to-br from-blue-50/70 to-white shadow-xs overflow-hidden">
+              <div className="p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div className="flex items-start gap-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shrink-0 shadow-xs text-white">
+                    <Info className="w-5 h-5" />
+                  </div>
+                  <div className="space-y-1 text-start">
+                    <h3 className="text-sm font-black text-slate-900">
+                      {isRtl ? 'إرشادات حجز المواعيد للمرضى' : (locale === 'fr' ? 'Instructions de réservation pour les patients' : 'Patient Appointment Booking Guide')}
+                    </h3>
+                    <p className="text-xs font-bold text-slate-600 leading-relaxed max-w-3xl">
+                      {isRtl
+                        ? 'لحوكمة وتنظيم المواعيد الطبية، يتم حجز وتثبيت الموعد حصرياً عبر أحد مراكز الحجز المعتمدة أو الاتصال المباشر باستقبال عيادة الطبيب عبر الأرقام الموضحة في الدليل أدناه. لا يُتاح الحجز المباشر للمريض ذاتياً من لوحة التحكم.'
+                        : (locale === 'fr'
+                          ? 'Pour réguler les rendez-vous médicaux, la réservation se fait exclusivement via un centre agréé ou par contact direct avec la clinique. La réservation directe par le patient n\'est pas autorisée depuis le tableau de bord.'
+                          : 'To regulate medical appointments, booking is done exclusively through certified booking centers or by contacting the clinic directly. Direct patient self-booking is prohibited from this dashboard.')}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            {/* Doctor & Facility Directory Component */}
+            <div className="bg-white rounded-3xl border border-slate-100 p-2 md:p-6 shadow-xs">
+              <DoctorSearchSection
+                onOpenAuth={() => setBookingNoticeOpen(true)}
+              />
+            </div>
+
+            {/* Informative Guidance Modal when clicking on a card */}
+            {bookingNoticeOpen && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-xs animate-in fade-in">
+                <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 text-center space-y-4">
+                  <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center mx-auto">
+                    <Info className="w-6 h-6" />
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="text-base font-black text-slate-900">
+                      {isRtl ? 'طريقة حجز الموعد' : (locale === 'fr' ? 'Comment réserver un rendez-vous' : 'How to Book an Appointment')}
+                    </h4>
+                    <p className="text-xs font-bold text-slate-500 leading-relaxed">
+                      {isRtl
+                        ? 'حجز المواعيد لدى الأطباء المعتمدين غير متاح ذاتياً للمريض من لوحة التحكم. يرجى التواصل هاتفياً مع عيادة الطبيب أو زيارة أقرب مركز حجز معتمد لتأكيد حجزك وتثبيته في الجدول.'
+                        : (locale === 'fr'
+                          ? 'La réservation directe n\'est pas autorisée. Veuillez contacter la clinique ou vous rendre dans le centre de réservation le plus proche.'
+                          : 'Direct self-booking is prohibited. Please contact the clinic by phone or visit the nearest certified booking center to confirm your slot.')}
+                    </p>
+                  </div>
+                  <Button
+                    fullWidth
+                    onClick={() => setBookingNoticeOpen(false)}
+                    className="rounded-xl font-black text-xs h-10"
+                  >
+                    {isRtl ? 'فهمت ذلك' : (locale === 'fr' ? 'J\'ai compris' : 'Understood')}
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* PAGE 2: APPOINTMENTS */}
         {activeTab === 'appointments' && (
           <Card className="p-8 space-y-8">
@@ -1268,7 +1339,7 @@ export function PatientDashboard({
                 </h2>
                 <p className="text-xs text-slate-500 mt-1 font-bold">{t('appointments.subtitle')}</p>
               </div>
-              <Button onClick={() => alert(isRtl ? 'جاري توجيهك لنظام حجز المواعيد المعتمد...' : 'Redirecting to booking portal...')}>
+              <Button onClick={() => handleTabChange('directory')}>
                 {t('appointments.newButton')}
               </Button>
             </div>
@@ -1314,7 +1385,7 @@ export function PatientDashboard({
                 <p className="text-xs text-slate-400 mt-1 max-w-md mx-auto">
                   {isRtl ? 'يمكنك حجز موعد جديد مع الأطباء والاستشاريين في العيادات والمراكز المعتمدة.' : 'You can schedule a new appointment with our doctors and specialists.'}
                 </p>
-                <Button className="mt-4" size="sm" onClick={() => alert(isRtl ? 'جاري فتح نافذة حجز موعد جديد...' : 'Opening new booking wizard...')}>
+                <Button className="mt-4" size="sm" onClick={() => handleTabChange('directory')}>
                   {t('appointments.newButton')}
                 </Button>
               </div>

@@ -57,8 +57,15 @@ class AuthService
                     'license_number' => $data['license_number'] ?? null,
                     'phone' => $data['phone'],
                     'email' => $data['email'],
-                    'address' => $data['address'] ?? 'الجزائر',
-                    'wilaya' => $data['wilaya'] ?? 'الجزائر العاصمة',
+                    'address' => $data['address'] ?? null,
+                    'wilaya' => $data['wilaya'] ?? null,
+                    'wilaya_code' => $data['wilaya_code'] ?? null,
+                    'commune_code' => $data['commune_code'] ?? null,
+                    'wilaya_id' => $data['wilaya_id'] ?? null,
+                    'commune_id' => $data['commune_id'] ?? null,
+                    'latitude' => $data['latitude'] ?? null,
+                    'longitude' => $data['longitude'] ?? null,
+                    'google_maps_link' => $data['google_maps_link'] ?? null,
                 ], $user);
 
                 $this->recordConsents($user, $data);
@@ -98,9 +105,16 @@ class AuthService
             if (! empty($data['clinic_name'])) {
                 $clinicData = [
                     'name' => $data['clinic_name'],
-                    'address' => $data['address'] ?? 'الجزائر',
-                    'wilaya' => $data['wilaya'] ?? 'الجزائر العاصمة',
-                    'phone' => $clinicData['phone'] ?? $data['phone'],
+                    'address' => $data['address'] ?? null,
+                    'wilaya' => $data['wilaya'] ?? null,
+                    'wilaya_code' => $data['wilaya_code'] ?? null,
+                    'commune_code' => $data['commune_code'] ?? null,
+                    'wilaya_id' => $data['wilaya_id'] ?? null,
+                    'commune_id' => $data['commune_id'] ?? null,
+                    'latitude' => $data['latitude'] ?? null,
+                    'longitude' => $data['longitude'] ?? null,
+                    'google_maps_link' => $data['google_maps_link'] ?? null,
+                    'phone' => $data['clinic_phone'] ?? $data['phone'],
                 ];
             }
 
@@ -142,6 +156,11 @@ class AuthService
                     'national_id' => $data['national_id'] ?? null,
                     'address' => $data['address'] ?? null,
                     'wilaya' => $data['wilaya'] ?? null,
+                    'commune' => $data['commune'] ?? null,
+                    'wilaya_code' => $data['wilaya_code'] ?? null,
+                    'commune_code' => $data['commune_code'] ?? null,
+                    'wilaya_id' => $data['wilaya_id'] ?? null,
+                    'commune_id' => $data['commune_id'] ?? null,
                 ], $user);
             }
 

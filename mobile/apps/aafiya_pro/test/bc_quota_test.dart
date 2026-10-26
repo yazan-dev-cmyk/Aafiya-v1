@@ -95,6 +95,15 @@ void main() {
         'is_active': true,
       },
       {
+        'id': 'pkg-free',
+        'package_code': 'PKG_FREE',
+        'name': 'باقة ترحيبية مجانية',
+        'quota_units': 20,
+        'price_dzd': 0.0,
+        'description': 'باقة مجانية ترحيبية.',
+        'is_active': true,
+      },
+      {
         'id': 'pkg-500',
         'package_code': 'PKG_500',
         'name': 'باقة 500 حجز',
@@ -440,7 +449,7 @@ void main() {
           if (request.method == 'POST') {
             purchasePosted = true;
             final body = jsonDecode(request.body) as Map<String, dynamic>;
-            expect(body['package_id'], 'pkg-100');
+            expect(body['package_id'], 'pkg-free');
             expect(body['payment_method'], 'baridimob');
             expect(body['transaction_reference'], 'TXN-TEST-999');
 
@@ -450,11 +459,11 @@ void main() {
                 'id': 'req-999',
                 'request_reference': 'PR-2026-0999',
                 'booking_center_id': 'bc-001',
-                'booking_package_id': 'pkg-100',
-                'package_name': 'باقة 100 حجز',
-                'package_code': 'PKG_100',
-                'quota_units': 100,
-                'price_dzd': 15000.0,
+                'booking_package_id': 'pkg-free',
+                'package_name': 'باقة ترحيبية مجانية',
+                'package_code': 'PKG_FREE',
+                'quota_units': 20,
+                'price_dzd': 0.0,
                 'payment_method': 'baridimob',
                 'status': 'pending',
                 'created_at': '2026-09-21T12:00:00.000000Z',
@@ -488,14 +497,36 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // Open purchase request modal for PKG_100
+      // 1. Open purchase request modal for paid PKG_100
       await tester.tap(find.byKey(const Key('buy_package_button_PKG_100')));
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('submit_purchase_request_button')),
           findsOneWidget);
-      expect(find.text('طلب شراء باقة'), findsWidgets);
-      expect(find.text('بريدي موب'), findsOneWidget);
+      expect(find.byKey(const Key('button_take_receipt_photo')), findsOneWidget);
+      expect(find.byKey(const Key('button_choose_receipt_gallery')), findsOneWidget);
+
+      // Scroll submit button into view and tap without attaching receipt
+      await tester.ensureVisible(find.byKey(const Key('submit_purchase_request_button')));
+      await tester.tap(find.byKey(const Key('submit_purchase_request_button')));
+      await tester.pumpAndSettle();
+
+      // Verified: Paid package submission without receipt is blocked
+      expect(purchasePosted, isFalse);
+      expect(find.byKey(const Key('modal_error_banner')), findsOneWidget);
+      expect(find.text('إرفاق إثبات الدفع (وصل التحويل) إلزامي للباقة المدفوعة *'), findsWidgets);
+
+      // Close modal
+      Navigator.of(tester.element(find.byKey(const Key('submit_purchase_request_button')))).pop();
+      await tester.pumpAndSettle();
+
+      // 2. Open purchase request modal for free PKG_FREE
+      await tester.ensureVisible(find.byKey(const Key('buy_package_button_PKG_FREE')));
+      await tester.tap(find.byKey(const Key('buy_package_button_PKG_FREE')));
+      await tester.pumpAndSettle();
+
+      // Verified: Free package does not show receipt picker buttons
+      expect(find.byKey(const Key('button_take_receipt_photo')), findsNothing);
 
       // Enter transaction reference
       await tester.enterText(
@@ -504,7 +535,8 @@ void main() {
       );
       await tester.pump();
 
-      // Submit purchase request
+      // Submit purchase request for free package
+      await tester.ensureVisible(find.byKey(const Key('submit_purchase_request_button')));
       await tester.tap(find.byKey(const Key('submit_purchase_request_button')));
       await tester.pump();
       await tester.pumpAndSettle();
@@ -520,9 +552,8 @@ void main() {
       expect(quotaFetchCount, greaterThan(1));
       expect(requestsFetchCount, greaterThan(1));
 
-      // Verified: Quota is NOT optimistically increased to 175, still matches server balance 75
+      // Verified: Quota balance matches server balance 75
       expect(find.text('75 الحصص'), findsOneWidget);
-      expect(find.text('175 الحصص'), findsNothing);
     });
 
     testWidgets('error state renders retry button and reloads on retry',

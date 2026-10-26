@@ -31,6 +31,8 @@ class PackagePurchaseRequestResource extends JsonResource
             'payment_method' => $this->payment_method,
             'transaction_reference' => $this->transaction_reference,
             'receipt_document_path' => $this->receipt_document_path,
+            'has_receipt' => ! empty($this->receipt_document_path),
+            'receipt_file_name' => $this->resolveReceiptFileName(),
             'status' => $this->status,
             'notes' => $this->notes,
             'reviewed_by' => $this->reviewedBy ? [
@@ -47,5 +49,19 @@ class PackagePurchaseRequestResource extends JsonResource
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];
+    }
+
+    protected function resolveReceiptFileName(): ?string
+    {
+        if (empty($this->receipt_document_path)) {
+            return null;
+        }
+
+        if (str_starts_with($this->receipt_document_path, 'gdrive:')) {
+            $parts = explode(':', $this->receipt_document_path, 3);
+            return $parts[2] ?? 'receipt_document.pdf';
+        }
+
+        return basename($this->receipt_document_path);
     }
 }

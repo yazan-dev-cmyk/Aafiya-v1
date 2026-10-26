@@ -1,4 +1,4 @@
-import { api, ApiResponse } from '../lib/api';
+import { api, ApiResponse, getStoredToken } from '../lib/api';
 
 export interface PlatformDashboardStats {
   total_users: number;
@@ -232,6 +232,19 @@ export const adminService = {
     return api.post<import('./bookingCenterService').PackagePurchaseRequestItem>(`/admin/package-purchase-requests/${id}/reject`, {
       rejection_reason: rejectionReason,
     });
+  },
+
+  downloadPackagePurchaseRequestReceipt: async (id: string): Promise<Blob> => {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+    const clean = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+    const token = getStoredToken();
+    const res = await fetch(`${clean}/admin/package-purchase-requests/${id}/receipt`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to load receipt: ${res.statusText}`);
+    }
+    return res.blob();
   },
 
   getPlatformFinancialSummary: async (): Promise<ApiResponse<PlatformFinancialSummary>> => {

@@ -242,6 +242,27 @@ export function PlatformAssistantDashboard({
     }
   };
 
+  const handleDownloadAssistantReceipt = async (requestId: string, filename: string) => {
+    try {
+      const blob = await adminService.downloadPackagePurchaseRequestReceipt(requestId);
+      const url = window.URL.createObjectURL(blob);
+      const isPdf = blob.type.includes('pdf');
+      const isImage = blob.type.includes('image');
+      if (isPdf || isImage) {
+        window.open(url, '_blank');
+      } else {
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename || 'receipt_document.pdf';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+    } catch (err: any) {
+      alert(err.message || (isRtl ? 'تعذر تحميل إيصال الدفع من Google Drive' : 'Failed to download receipt'));
+    }
+  };
+
   const triggerAccessDenied = (requiredPermissionName: string) => {
     setAlertMessage({
       type: 'error',
@@ -584,7 +605,15 @@ export function PlatformAssistantDashboard({
                           <td className="p-3 font-bold text-slate-900">{req.booking_center?.name || 'مركز الحجز'}</td>
                           <td className="p-3">{req.package_name}</td>
                           <td className="p-3 font-bold text-emerald-700">+{req.quota_units}</td>
-                          <td className="p-3 font-mono">{Number(req.price_dzd).toLocaleString()} {isRtl ? 'دج' : 'DZD'}</td>
+                          <td className="p-3 font-mono">
+                            {Number(req.price_dzd) <= 0 ? (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 font-sans">
+                                {isRtl ? 'مجاناً' : 'Free'}
+                              </span>
+                            ) : (
+                              `${Number(req.price_dzd).toLocaleString()} ${isRtl ? 'دج' : 'DZD'}`
+                            )}
+                          </td>
                           <td className="p-3">
                             {req.status === 'pending' && (
                               <span className="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded">
@@ -603,6 +632,16 @@ export function PlatformAssistantDashboard({
                             )}
                           </td>
                           <td className="p-3 text-center space-x-1.5 space-x-reverse">
+                            {req.has_receipt && (
+                              <button
+                                onClick={() => handleDownloadAssistantReceipt(req.id, req.receipt_file_name || 'receipt.pdf')}
+                                className="bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 px-2 py-0.5 rounded text-[11px] font-bold cursor-pointer inline-flex items-center gap-1 shadow-2xs me-1.5"
+                                title={isRtl ? 'معاينة / تحميل إيصال الدفع' : 'View / Download Receipt'}
+                              >
+                                <Download className="w-3 h-3" />
+                                <span>{isRtl ? 'الإيصال' : 'Receipt'}</span>
+                              </button>
+                            )}
                             {req.status === 'pending' ? (
                               <>
                                 <button

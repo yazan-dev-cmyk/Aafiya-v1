@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'google' => [
+        'drive' => [
+            'folder_id' => env('GOOGLE_DRIVE_RECEIPTS_FOLDER_ID', '1_VDIOpv4BHKWgLnVRclv3VCfj6TM0WEp'),
+            'credentials_path' => env('GOOGLE_APPLICATION_CREDENTIALS', 'storage/app/credentials/google-service-account.json'),
+        ],
+    ],
+
 ];

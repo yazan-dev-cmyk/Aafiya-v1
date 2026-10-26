@@ -12,6 +12,7 @@ interface AuthContextType {
   switchActiveClinic: (clinicId: string) => Promise<void>;
   login: (credentials: { email: string; password: string }) => Promise<AuthResponse>;
   register: (data: any) => Promise<AuthResponse>;
+  registerDoctor: (data: any) => Promise<AuthResponse>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
   hasRole: (role: string) => boolean;
@@ -26,6 +27,7 @@ const AuthContext = createContext<AuthContextType>({
   switchActiveClinic: async () => {},
   login: async () => ({} as AuthResponse),
   register: async () => ({} as AuthResponse),
+  registerDoctor: async () => ({} as AuthResponse),
   logout: async () => {},
   refreshUser: async () => {},
   hasRole: () => false,
@@ -142,6 +144,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const registerDoctor = async (data: any): Promise<AuthResponse> => {
+    setIsLoading(true);
+    try {
+      const response = await authService.registerDoctor(data);
+      setUser(response.user);
+      const clinicId = resolveActiveClinic(response.user);
+      setApiActiveClinicId(clinicId);
+      setActiveClinicId(clinicId);
+      return response;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const logout = async () => {
     setIsLoading(true);
     try {
@@ -174,6 +190,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         switchActiveClinic,
         login,
         register,
+        registerDoctor,
         logout,
         refreshUser,
         hasRole,

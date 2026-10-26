@@ -183,7 +183,15 @@ export const BillingInvoicesTab: React.FC<BillingInvoicesTabProps> = () => {
                       +{record.quota_units} عملية
                     </td>
                     <td className="px-5 py-3.5 font-black text-slate-900 font-mono text-sm">
-                      {isAmountMasked ? '•••••• دج' : `${Number(record.price_dzd).toLocaleString()} دج`}
+                      {Number(record.price_dzd) <= 0 ? (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 font-sans">
+                          باقة ترحيبية مجانية
+                        </span>
+                      ) : isAmountMasked ? (
+                        '•••••• دج'
+                      ) : (
+                        `${Number(record.price_dzd).toLocaleString()} دج`
+                      )}
                     </td>
                     <td className="px-5 py-3.5">
                       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-slate-100 text-slate-800 font-medium text-[11px]">
@@ -258,7 +266,11 @@ export const BillingInvoicesTab: React.FC<BillingInvoicesTabProps> = () => {
                 <div>
                   <span className="text-slate-400 text-[10px] block">المبلغ الإجمالي المسدد:</span>
                   <strong className="text-slate-900 text-sm font-mono block">
-                    {Number(selectedReceipt.price_dzd).toLocaleString()} دج
+                    {Number(selectedReceipt.price_dzd) <= 0 ? (
+                      <span className="text-emerald-700 font-sans font-bold">باقة ترحيبية مجانية (0 دج غير مستحق)</span>
+                    ) : (
+                      `${Number(selectedReceipt.price_dzd).toLocaleString()} دج`
+                    )}
                   </strong>
                 </div>
                 <div>

@@ -59,11 +59,44 @@ interface DirectoryItem {
   address: string;
   phone: string;
   isVerified: boolean;
+  latitude?: number | null;
+  longitude?: number | null;
 }
 
 interface DoctorSearchSectionProps {
   onOpenAuth: (role?: RoleType, isRegister?: boolean) => void;
 }
+
+const GoogleMapsPinIcon: React.FC<{ className?: string }> = ({ className = 'w-4 h-4' }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+      d="M12 2C8.134 2 5 5.134 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.134 15.866 2 12 2Z"
+      fill="#EA4335"
+    />
+    <path
+      d="M12 2C10.07 2 8.32 2.78 7.05 4.05L12 9V2Z"
+      fill="#D93025"
+      opacity="0.3"
+    />
+    <circle cx="12" cy="9" r="2.8" fill="#FFFFFF" />
+    <circle cx="12" cy="9" r="1.5" fill="#4285F4" />
+  </svg>
+);
+
+const getGoogleMapsUrl = (item: DirectoryItem): string => {
+  if (
+    item.latitude !== undefined &&
+    item.latitude !== null &&
+    item.longitude !== undefined &&
+    item.longitude !== null &&
+    !isNaN(Number(item.latitude)) &&
+    !isNaN(Number(item.longitude))
+  ) {
+    return `https://maps.google.com/?q=${item.latitude},${item.longitude}`;
+  }
+  const query = [item.name, item.address, item.wilaya].filter(Boolean).join(', ');
+  return `https://maps.google.com/?q=${encodeURIComponent(query)}`;
+};
 
 const getInitials = (name: string): string => {
   const parts = name.trim().split(/\s+/);
@@ -165,6 +198,8 @@ export const DoctorSearchSection: React.FC<DoctorSearchSectionProps> = ({ onOpen
     }
 
     const primaryClinic = Array.isArray(doc.clinics) && doc.clinics.length > 0 ? doc.clinics[0] : null;
+    const lat = primaryClinic?.latitude ?? doc.latitude ?? null;
+    const lng = primaryClinic?.longitude ?? doc.longitude ?? null;
     return {
       id: `doc-${doc.id}`,
       rawId: doc.id,
@@ -177,6 +212,8 @@ export const DoctorSearchSection: React.FC<DoctorSearchSectionProps> = ({ onOpen
       address: primaryClinic?.address || primaryClinic?.name || '',
       phone: primaryClinic?.phone || '',
       isVerified: Boolean(doc.is_verified ?? true),
+      latitude: lat != null ? Number(lat) : null,
+      longitude: lng != null ? Number(lng) : null,
     };
   }, [locale, specialtiesMap, t]);
 
@@ -187,6 +224,8 @@ export const DoctorSearchSection: React.FC<DoctorSearchSectionProps> = ({ onOpen
       else if (locale === 'fr') specName = clinic.director.medical_specialty.name_fr;
       else specName = clinic.director.medical_specialty.name_en || clinic.director.medical_specialty.name_fr;
     }
+    const lat = clinic.latitude ?? null;
+    const lng = clinic.longitude ?? null;
     return {
       id: `clinic-${clinic.id}`,
       rawId: clinic.id,
@@ -199,10 +238,14 @@ export const DoctorSearchSection: React.FC<DoctorSearchSectionProps> = ({ onOpen
       address: clinic.address || '',
       phone: clinic.phone || '',
       isVerified: Boolean(clinic.is_active ?? true),
+      latitude: lat != null ? Number(lat) : null,
+      longitude: lng != null ? Number(lng) : null,
     };
   }, [locale, t]);
 
   const mapBookingCenterToItem = useCallback((bc: any): DirectoryItem => {
+    const lat = bc.latitude ?? null;
+    const lng = bc.longitude ?? null;
     return {
       id: `bc-${bc.id}`,
       rawId: bc.id,
@@ -215,11 +258,15 @@ export const DoctorSearchSection: React.FC<DoctorSearchSectionProps> = ({ onOpen
       address: bc.address || '',
       phone: bc.phone || '',
       isVerified: bc.verification_status === 'verified',
+      latitude: lat != null ? Number(lat) : null,
+      longitude: lng != null ? Number(lng) : null,
     };
   }, [t]);
 
   const mapDiagnosticToItem = useCallback((dc: any, roleType: 'lab' | 'radiology'): DirectoryItem => {
     const isLab = roleType === 'lab';
+    const lat = dc.latitude ?? null;
+    const lng = dc.longitude ?? null;
     return {
       id: `dc-${dc.id}`,
       rawId: dc.id,
@@ -232,6 +279,8 @@ export const DoctorSearchSection: React.FC<DoctorSearchSectionProps> = ({ onOpen
       address: dc.address || '',
       phone: dc.phone || '',
       isVerified: Boolean(dc.is_active ?? true),
+      latitude: lat != null ? Number(lat) : null,
+      longitude: lng != null ? Number(lng) : null,
     };
   }, [t]);
 
@@ -527,17 +576,25 @@ export const DoctorSearchSection: React.FC<DoctorSearchSectionProps> = ({ onOpen
               </div>
 
               <div className="space-y-1.5 text-xs font-bold text-slate-500">
-                {item.address ? (
-                  <div className="flex items-start gap-2">
-                    <MapPin className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
-                    <span className="line-clamp-2">{item.address}</span>
+                {(item.address || item.wilaya) && (
+                  <div className="flex items-start justify-between gap-1.5">
+                    <div className="flex items-start gap-2 flex-1 min-w-0">
+                      <MapPin className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
+                      <span className="line-clamp-2">{item.address || item.wilaya}</span>
+                    </div>
+                    <a
+                      href={getGoogleMapsUrl(item)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      title={t('open_in_google_maps')}
+                      aria-label={t('open_in_google_maps')}
+                      className="inline-flex items-center justify-center p-1.5 rounded-lg bg-slate-100/80 hover:bg-red-50 text-slate-500 hover:text-red-600 border border-slate-200/60 hover:border-red-200 transition-all shrink-0 group/gmaps shadow-2xs"
+                    >
+                      <GoogleMapsPinIcon className="w-4 h-4 transition-transform group-hover/gmaps:scale-115" />
+                    </a>
                   </div>
-                ) : item.wilaya ? (
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
-                    <span>{item.wilaya}</span>
-                  </div>
-                ) : null}
+                )}
 
                 {item.phone && (
                   <div className="flex items-center gap-2 text-slate-400">

@@ -54,8 +54,8 @@ export const PackageCalculator: React.FC<PackageCalculatorProps> = ({ onOpenAuth
             id: p.id,
             name: p.name,
             package_code: p.package_code,
-            quota_units: p.quota_units || p.quota || 100,
-            price_dzd: p.price_dzd || p.price || 5000,
+            quota_units: p.quota_units ?? p.quota ?? 100,
+            price_dzd: p.price_dzd !== undefined && p.price_dzd !== null ? Number(p.price_dzd) : (p.price !== undefined ? Number(p.price) : 5000),
             description: p.description || '',
             popular: idx === 1 || p.quota_units === 500,
           }));
@@ -156,7 +156,13 @@ export const PackageCalculator: React.FC<PackageCalculatorProps> = ({ onOpenAuth
 
                   <div className={`pb-6 border-b ${pkg.popular ? 'border-white/10' : 'border-slate-100'}`}>
                     <div className="text-4xl font-black tracking-tight font-sans">
-                      {pkg.price_dzd.toLocaleString()} <span className="text-sm font-bold opacity-60">{t('currency')}</span>
+                      {pkg.price_dzd <= 0 ? (
+                        <span className="text-emerald-500 font-bold">{t('free')}</span>
+                      ) : (
+                        <>
+                          {pkg.price_dzd.toLocaleString()} <span className="text-sm font-bold opacity-60">{t('currency')}</span>
+                        </>
+                      )}
                     </div>
                     <div className={`text-xs mt-2 font-black uppercase tracking-widest ${pkg.popular ? 'text-primary' : 'text-primary'}`}>
                       {pkg.quota_units} {t('op_confirmed')}

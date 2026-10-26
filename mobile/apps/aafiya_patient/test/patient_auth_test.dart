@@ -36,9 +36,7 @@ void main() {
           ),
         );
 
-        expect(find.text('ع'), findsOneWidget);
-        expect(find.text('عافية'), findsOneWidget);
-        expect(find.text('بوابتك إلى العافية'), findsOneWidget);
+        expect(find.byType(Image), findsOneWidget);
         expect(find.text('العربية'), findsOneWidget);
         expect(find.text('EN'), findsOneWidget);
         expect(find.text('FR'), findsOneWidget);
@@ -168,7 +166,7 @@ void main() {
 
         // Initial Arabic state: RTL
         expect(Directionality.of(tester.element(find.byType(PatientSplashShell))), TextDirection.rtl);
-        expect(find.text('عافية'), findsOneWidget);
+        expect(find.byType(Image), findsOneWidget);
 
         // Switch to English
         await tester.tap(find.text('EN'));
@@ -176,8 +174,7 @@ void main() {
 
         // Directionality becomes LTR
         expect(Directionality.of(tester.element(find.byType(PatientSplashShell))), TextDirection.ltr);
-        expect(find.text('AAFIYA'), findsOneWidget);
-        expect(find.text('Your Gateway To Aafiya'), findsOneWidget);
+        expect(find.byType(Image), findsOneWidget);
 
         // Drain pending splash timer
         await tester.pump(const Duration(milliseconds: 700));
@@ -546,6 +543,8 @@ void main() {
         // Registration fields now visible
         expect(find.text('الاسم الكامل'), findsOneWidget);
         expect(find.text('رقم الهاتف'), findsOneWidget);
+        expect(find.text('الولاية'), findsOneWidget);
+        expect(find.text('البلدية'), findsOneWidget);
         expect(find.text('البريد الإلكتروني'), findsOneWidget);
         expect(find.text('كلمة المرور'), findsOneWidget);
         expect(find.text('تأكيد كلمة المرور'), findsOneWidget);
@@ -636,7 +635,47 @@ void main() {
         addTearDown(() => tester.view.resetPhysicalSize());
 
         final mockHttp = MockClient((request) async {
-          if (request.url.path.contains('/auth/register')) {
+          if (request.url.path.contains('/master/wilayas')) {
+            if (request.url.path.contains('/communes')) {
+              return http.Response(
+                jsonEncode({
+                  'status': 'success',
+                  'data': [
+                    {
+                      'code': '1601',
+                      'wilaya_code': '16',
+                      'name_ar': 'الجزائر الوسطى',
+                      'name_fr': 'Alger Centre',
+                      'name_en': 'Algiers Center',
+                      'postal_code': '16000',
+                      'is_active': true,
+                      'display_order': 1,
+                    }
+                  ],
+                }),
+                200,
+                headers: {'content-type': 'application/json; charset=utf-8'},
+              );
+            }
+            return http.Response(
+              jsonEncode({
+                'status': 'success',
+                'data': [
+                  {
+                    'id': 16,
+                    'code': '16',
+                    'name_ar': 'الجزائر',
+                    'name_fr': 'Alger',
+                    'name_en': 'Algiers',
+                    'is_active': true,
+                    'display_order': 16,
+                  }
+                ],
+              }),
+              200,
+              headers: {'content-type': 'application/json; charset=utf-8'},
+            );
+          } else if (request.url.path.contains('/auth/register')) {
             return http.Response(
               jsonEncode({
                 'status': 'error',
@@ -670,6 +709,28 @@ void main() {
         await tester.enterText(find.widgetWithText(AafiyaTextField, 'كلمة المرور'), 'password123');
         await tester.enterText(find.widgetWithText(AafiyaTextField, 'تأكيد كلمة المرور'), 'password123');
 
+        // Select Wilaya
+        final wilayaField = find.byType(AafiyaWilayaSelector);
+        await tester.ensureVisible(wilayaField);
+        await tester.tap(wilayaField);
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('16 - الجزائر').last);
+        await tester.pumpAndSettle();
+
+        // Select Commune
+        final communeField = find.byType(AafiyaCommuneSelector);
+        await tester.ensureVisible(communeField);
+        await tester.tap(communeField);
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('الجزائر الوسطى (16000)').last);
+        await tester.pumpAndSettle();
+
+        // Accept terms
+        final termsCheckbox = find.byType(Checkbox);
+        await tester.ensureVisible(termsCheckbox);
+        await tester.tap(termsCheckbox);
+        await tester.pumpAndSettle();
+
         final submitBtn = find.widgetWithText(AafiyaButton, 'إنشاء حساب');
         await tester.ensureVisible(submitBtn);
         await tester.tap(submitBtn);
@@ -689,12 +750,54 @@ void main() {
 
         bool registerCalled = false;
         final mockHttp = MockClient((request) async {
-          if (request.url.path.contains('/auth/register')) {
+          if (request.url.path.contains('/master/wilayas')) {
+            if (request.url.path.contains('/communes')) {
+              return http.Response(
+                jsonEncode({
+                  'status': 'success',
+                  'data': [
+                    {
+                      'code': '1601',
+                      'wilaya_code': '16',
+                      'name_ar': 'الجزائر الوسطى',
+                      'name_fr': 'Alger Centre',
+                      'name_en': 'Algiers Center',
+                      'postal_code': '16000',
+                      'is_active': true,
+                      'display_order': 1,
+                    }
+                  ],
+                }),
+                200,
+                headers: {'content-type': 'application/json; charset=utf-8'},
+              );
+            }
+            return http.Response(
+              jsonEncode({
+                'status': 'success',
+                'data': [
+                  {
+                    'id': 16,
+                    'code': '16',
+                    'name_ar': 'الجزائر',
+                    'name_fr': 'Alger',
+                    'name_en': 'Algiers',
+                    'is_active': true,
+                    'display_order': 16,
+                  }
+                ],
+              }),
+              200,
+              headers: {'content-type': 'application/json; charset=utf-8'},
+            );
+          } else if (request.url.path.contains('/auth/register')) {
             registerCalled = true;
             final body = jsonDecode(request.body) as Map<String, dynamic>;
             expect(body['name'], equals('مراد قادري'));
             expect(body['phone'], equals('0555333444'));
             expect(body['email'], equals('mourad@aafiya.dz'));
+            expect(body['wilaya_code'], equals('16'));
+            expect(body['commune_code'], equals('1601'));
 
             return http.Response(
               jsonEncode({
@@ -742,6 +845,28 @@ void main() {
         await tester.enterText(find.widgetWithText(AafiyaTextField, 'البريد الإلكتروني'), 'mourad@aafiya.dz');
         await tester.enterText(find.widgetWithText(AafiyaTextField, 'كلمة المرور'), 'password123');
         await tester.enterText(find.widgetWithText(AafiyaTextField, 'تأكيد كلمة المرور'), 'password123');
+
+        // Select Wilaya
+        final wilayaField = find.byType(AafiyaWilayaSelector);
+        await tester.ensureVisible(wilayaField);
+        await tester.tap(wilayaField);
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('16 - الجزائر').last);
+        await tester.pumpAndSettle();
+
+        // Select Commune
+        final communeField = find.byType(AafiyaCommuneSelector);
+        await tester.ensureVisible(communeField);
+        await tester.tap(communeField);
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('الجزائر الوسطى (16000)').last);
+        await tester.pumpAndSettle();
+
+        // Accept terms
+        final termsCheckbox = find.byType(Checkbox);
+        await tester.ensureVisible(termsCheckbox);
+        await tester.tap(termsCheckbox);
+        await tester.pumpAndSettle();
 
         final submitBtn = find.widgetWithText(AafiyaButton, 'إنشاء حساب');
         await tester.ensureVisible(submitBtn);

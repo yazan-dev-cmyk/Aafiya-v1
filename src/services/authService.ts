@@ -106,11 +106,49 @@ export const authService = {
     clinic_phone?: string;
     commercial_register?: string;
     manager_name?: string;
+    wilaya_code?: string;
+    commune_code?: string;
+    wilaya_id?: number;
+    commune_id?: number;
     wilaya?: string;
+    commune?: string;
     address?: string;
+    latitude?: number;
+    longitude?: number;
+    google_maps_link?: string;
     [key: string]: any;
   }): Promise<AuthResponse> => {
     const response = await api.publicPost<AuthResponse>('/auth/register', data);
+    if (response.data?.token) {
+      setStoredToken(response.data.token);
+    }
+    return response.data;
+  },
+
+  registerDoctor: async (data: {
+    name: string;
+    email: string;
+    phone: string;
+    password: string;
+    specialty?: string;
+    specialty_id?: number;
+    license_number: string;
+    bio?: string;
+    clinic_name?: string;
+    wilaya?: string;
+    commune?: string;
+    wilaya_code?: string;
+    commune_code?: string;
+    wilaya_id?: number;
+    commune_id?: number;
+    address?: string;
+    latitude?: number;
+    longitude?: number;
+    google_maps_link?: string;
+    clinic_phone?: string;
+    [key: string]: any;
+  }): Promise<AuthResponse> => {
+    const response = await api.publicPost<AuthResponse>('/auth/register-doctor', data);
     if (response.data?.token) {
       setStoredToken(response.data.token);
     }

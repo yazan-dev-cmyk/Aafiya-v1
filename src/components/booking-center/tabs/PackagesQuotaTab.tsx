@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { PackageDetails, AuditLogEntry, SystemNotification } from '../../../types';
 import { bookingCenterService } from '@/services/bookingCenterService';
+import { getStoredToken } from '@/lib/api';
 import {
   Package,
   CheckCircle2,
@@ -20,7 +21,8 @@ import {
   Check,
   Eye,
   Info,
-  History
+  History,
+  Download,
 } from 'lucide-react';
 
 interface PackageOption {
@@ -43,6 +45,7 @@ interface PurchaseRequest {
   paymentMethod: 'baridimob' | 'bank_transfer';
   transactionRef: string;
   receiptFileName: string;
+  hasReceipt?: boolean;
   requestDate: string;
   status: 'pending_review' | 'approved' | 'rejected';
   rejectionReason?: string;
@@ -87,8 +90,8 @@ export const PackagesQuotaTab: React.FC<PackagesQuotaTabProps> = ({
           const mapped: PackageOption[] = res.data.map((p: any) => ({
             id: p.id,
             name: p.name,
-            quota: p.quota_units || p.quota || 100,
-            priceDzd: p.price_dzd || p.price || 5000,
+            quota: p.quota_units ?? p.quota ?? 100,
+            priceDzd: p.price_dzd !== undefined && p.price_dzd !== null ? Number(p.price_dzd) : (p.price !== undefined ? Number(p.price) : 5000),
             validityMonths: 12,
             description: p.description || '',
             tag: p.quota_units >= 500 ? (isRtl ? 'الأكثر طلباً' : 'Popular') : undefined,
@@ -123,6 +126,33 @@ export const PackagesQuotaTab: React.FC<PackagesQuotaTabProps> = ({
 
   // Selected request preview modal
   const [viewingRequest, setViewingRequest] = useState<PurchaseRequest | null>(null);
+  const [isDownloadingReceipt, setIsDownloadingReceipt] = useState(false);
+
+  const handleDownloadReceipt = async (requestId: string, filename: string) => {
+    try {
+      setIsDownloadingReceipt(true);
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+      const clean = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+      const token = getStoredToken();
+      const res = await fetch(`${clean}/booking-centers/purchase-requests/${requestId}/receipt`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (!res.ok) throw new Error('فشل جلب ملف الإيصال');
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename || 'receipt_document.pdf';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err: any) {
+      alert(err.message || 'تعذر تحميل الإيصال');
+    } finally {
+      setIsDownloadingReceipt(false);
+    }
+  };
 
   // Load real purchase requests and quota balance from API
   const fetchRequestsAndBalance = async () => {
@@ -140,7 +170,8 @@ export const PackagesQuotaTab: React.FC<PackagesQuotaTabProps> = ({
           priceDzd: Number(r.price_dzd) || 0,
           paymentMethod: r.payment_method === 'bank_transfer' ? 'bank_transfer' : 'baridimob',
           transactionRef: r.transaction_reference || '--',
-          receiptFileName: r.receipt_document_path || 'receipt_document.pdf',
+          receiptFileName: r.receipt_file_name || r.receipt_document_path || 'receipt_document.pdf',
+          hasReceipt: !!r.has_receipt || !!r.receipt_document_path,
           requestDate: r.created_at ? r.created_at.substring(0, 16).replace('T', ' ') : '',
           status: r.status === 'approved' ? 'approved' : r.status === 'rejected' ? 'rejected' : 'pending_review',
           rejectionReason: r.rejection_reason,
@@ -177,14 +208,21 @@ export const PackagesQuotaTab: React.FC<PackagesQuotaTabProps> = ({
   const handleSubmitRequest = async () => {
     if (!selectedPackage?.id) return;
 
+    // Enforce mandatory receipt for paid packages
+    if (selectedPackage.priceDzd > 0 && !receiptFile) {
+      setSubmitError(isRtl ? 'إرفاق إثبات الدفع (وصل التحويل عبر بريدي موب) إلزامي عند طلب باقة مدفوعة.' : 'Uploading payment proof is mandatory for paid packages.');
+      return;
+    }
+
     setIsSubmitting(true);
     setSubmitError(null);
 
     try {
       const res = await bookingCenterService.createPurchaseRequest({
         package_id: selectedPackage.id,
-        payment_method: paymentMethod,
+        payment_method: selectedPackage.priceDzd > 0 ? 'baridimob' : undefined,
         transaction_reference: transactionRef.trim() || undefined,
+        receipt_file: receiptFile || undefined,
         receipt_document_path: receiptFileName || undefined,
         notes: additionalNote.trim() || undefined,
       });
@@ -371,7 +409,15 @@ export const PackagesQuotaTab: React.FC<PackagesQuotaTabProps> = ({
                   <td className="p-3 font-mono font-bold text-blue-700">{req.refNumber}</td>
                   <td className="p-3 font-bold text-slate-900">{req.packageName}</td>
                   <td className="p-3 font-semibold text-slate-800">{t('detailsModal.quotaCount', { count: req.quota })}</td>
-                  <td className="p-3 font-bold text-emerald-700">{req.priceDzd.toLocaleString()} {t('detailsModal.dzd')}</td>
+                  <td className="p-3 font-bold text-emerald-700">
+                    {req.priceDzd <= 0 ? (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
+                        {isRtl ? 'مجاناً' : 'Free'}
+                      </span>
+                    ) : (
+                      `${req.priceDzd.toLocaleString()} ${t('detailsModal.dzd')}`
+                    )}
+                  </td>
                   <td className="p-3 font-medium text-slate-700">
                     {req.paymentMethod === 'baridimob' ? (
                       <span className="inline-flex items-center gap-1 text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
@@ -453,7 +499,9 @@ export const PackagesQuotaTab: React.FC<PackagesQuotaTabProps> = ({
                 </div>
                 <div>
                   <span className="text-slate-500 block">{t('detailsModal.totalAmount')}</span>
-                  <strong className="text-slate-900 block">{viewingRequest.priceDzd.toLocaleString()} {t('detailsModal.dzd')}</strong>
+                  <strong className="text-slate-900 block">
+                    {viewingRequest.priceDzd <= 0 ? (isRtl ? 'مجاناً' : 'Free') : `${viewingRequest.priceDzd.toLocaleString()} ${t('detailsModal.dzd')}`}
+                  </strong>
                 </div>
                 <div>
                   <span className="text-slate-500 block">{t('tableColumns.paymentMethod')}:</span>
@@ -463,10 +511,25 @@ export const PackagesQuotaTab: React.FC<PackagesQuotaTabProps> = ({
                 </div>
               </div>
 
-              <div className="p-3 bg-blue-50 rounded-xl border border-blue-200 space-y-1">
+              <div className="p-3 bg-blue-50 rounded-xl border border-blue-200 space-y-1.5">
                 <span className="text-blue-900 font-bold block">{t('detailsModal.paymentProofData')}</span>
                 <p className="text-blue-800">{t('detailsModal.transactionRef')} <strong className="font-mono">{viewingRequest.transactionRef}</strong></p>
-                <p className="text-blue-800">{t('detailsModal.receiptFileName')} <strong className="underline">{viewingRequest.receiptFileName}</strong></p>
+                <div className="flex items-center justify-between gap-2 pt-1 border-t border-blue-200/60">
+                  <p className="text-blue-800 text-xs">
+                    {t('detailsModal.receiptFileName')} <strong className="underline font-mono">{viewingRequest.receiptFileName}</strong>
+                  </p>
+                  {viewingRequest.hasReceipt && (
+                    <button
+                      type="button"
+                      disabled={isDownloadingReceipt}
+                      onClick={() => handleDownloadReceipt(viewingRequest.id, viewingRequest.receiptFileName)}
+                      className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold cursor-pointer flex items-center gap-1.5 shadow-xs transition-colors disabled:opacity-50"
+                    >
+                      <Download className={`w-3.5 h-3.5 ${isDownloadingReceipt ? 'animate-bounce' : ''}`} />
+                      <span>{isRtl ? 'تحميل الإيصال' : 'Download Receipt'}</span>
+                    </button>
+                  )}
+                </div>
                 <p className="text-blue-800">{t('detailsModal.requestDate')} {viewingRequest.requestDate}</p>
               </div>
 
@@ -546,66 +609,95 @@ export const PackagesQuotaTab: React.FC<PackagesQuotaTabProps> = ({
             </div>
 
             {/* STEP 1: PACKAGE SELECTION */}
-            {currentStep === 1 && (
-              <div className="space-y-4">
-                <div className="bg-blue-50/80 p-3 rounded-xl border border-blue-200 text-xs text-blue-900 flex items-center gap-2">
-                  <Info className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                  <span>{t('wizard.infoRequirement')}</span>
-                </div>
+            {currentStep === 1 && (() => {
+              const hasClaimedFreePackage = requestsHistory.some(r => r.priceDzd === 0 && r.status !== 'rejected');
+              return (
+                <div className="space-y-4">
+                  <div className="bg-blue-50/80 p-3 rounded-xl border border-blue-200 text-xs text-blue-900 flex items-center gap-2">
+                    <Info className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                    <span>{t('wizard.infoRequirement')}</span>
+                  </div>
 
-                <div className="space-y-3">
-                  {availablePackages.map((pkg) => {
-                    const isSelected = selectedPackage?.id === pkg.id;
-                    return (
-                      <div
-                        key={pkg.id}
-                        onClick={() => setSelectedPackage(pkg)}
-                        className={`p-4 rounded-2xl border-2 transition-all cursor-pointer relative ${
-                          isSelected
-                            ? 'border-blue-600 bg-blue-50/40 shadow-xs'
-                            : 'border-slate-200 hover:border-slate-300'
-                        }`}
-                      >
-                        {pkg.tag && (
-                          <span className="absolute top-3 start-3 bg-amber-400 text-slate-950 font-bold text-[10px] px-2 py-0.5 rounded-full">
-                            {pkg.tag}
-                          </span>
-                        )}
+                  <div className="space-y-3">
+                    {availablePackages.map((pkg) => {
+                      const isSelected = selectedPackage?.id === pkg.id;
+                      const isFree = pkg.priceDzd === 0;
+                      const isClaimed = isFree && hasClaimedFreePackage;
 
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h4 className="font-bold text-slate-900 text-sm flex items-center gap-2">
-                              {pkg.name}
-                              {isSelected && <Check className="w-4 h-4 text-blue-600" />}
-                            </h4>
-                            <p className="text-xs text-slate-500 mt-1">{pkg.description}</p>
-                            <div className="flex items-center gap-4 mt-2 text-xs font-semibold text-slate-700">
-                              <span className="text-blue-700">{t('wizard.quotaLabel', { count: pkg.quota })}</span>
-                              <span className="text-slate-500">{t('wizard.validityMonths', { count: pkg.validityMonths })}</span>
+                      return (
+                        <div
+                          key={pkg.id}
+                          onClick={() => {
+                            if (!isClaimed) {
+                              setSelectedPackage(pkg);
+                            }
+                          }}
+                          className={`p-4 rounded-2xl border-2 transition-all relative ${
+                            isClaimed
+                              ? 'border-slate-200 bg-slate-50/70 opacity-60 cursor-not-allowed'
+                              : isSelected
+                              ? 'border-blue-600 bg-blue-50/40 shadow-xs cursor-pointer'
+                              : 'border-slate-200 hover:border-slate-300 cursor-pointer'
+                          }`}
+                        >
+                          {isClaimed ? (
+                            <span className="absolute top-3 start-3 bg-slate-200 text-slate-700 font-bold text-[10px] px-2.5 py-0.5 rounded-full">
+                              {isRtl ? 'تمت الاستفادة منها مسبقاً (تمنح مرة واحدة)' : 'Already Claimed (One-time only)'}
+                            </span>
+                          ) : isFree ? (
+                            <span className="absolute top-3 start-3 bg-emerald-500 text-white font-bold text-[10px] px-2.5 py-0.5 rounded-full">
+                              {isRtl ? 'مجانية (فترة تجريبية لمرة واحدة)' : 'Free Trial (One-time)'}
+                            </span>
+                          ) : pkg.tag ? (
+                            <span className="absolute top-3 start-3 bg-amber-400 text-slate-950 font-bold text-[10px] px-2 py-0.5 rounded-full">
+                              {pkg.tag}
+                            </span>
+                          ) : null}
+
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h4 className="font-bold text-slate-900 text-sm flex items-center gap-2">
+                                {pkg.name}
+                                {isSelected && !isClaimed && <Check className="w-4 h-4 text-blue-600" />}
+                              </h4>
+                              <p className="text-xs text-slate-500 mt-1">{pkg.description}</p>
+                              <div className="flex items-center gap-4 mt-2 text-xs font-semibold text-slate-700">
+                                <span className="text-blue-700">{t('wizard.quotaLabel', { count: pkg.quota })}</span>
+                                <span className="text-slate-500">{t('wizard.validityMonths', { count: pkg.validityMonths })}</span>
+                              </div>
+                            </div>
+
+                            <div className="text-left">
+                              <span className="text-lg font-extrabold text-blue-700 block">
+                                {pkg.priceDzd === 0 ? (isRtl ? 'مجاناً' : 'FREE') : `${pkg.priceDzd.toLocaleString()} ${t('detailsModal.dzd')}`}
+                              </span>
                             </div>
                           </div>
-
-                          <div className="text-left">
-                            <span className="text-lg font-extrabold text-blue-700 block">
-                              {pkg.priceDzd.toLocaleString()} {t('detailsModal.dzd')}
-                            </span>
-                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                      );
+                    })}
+                  </div>
 
-                <div className="flex justify-end pt-2">
-                  <button
-                    onClick={() => setCurrentStep(2)}
-                    className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs cursor-pointer shadow-md"
-                  >
-                    {t('wizard.nextPayment')}
-                  </button>
+                  <div className="flex justify-end pt-2">
+                    <button
+                      disabled={selectedPackage?.priceDzd === 0 && hasClaimedFreePackage}
+                      onClick={() => {
+                        if (selectedPackage?.priceDzd === 0) {
+                          setCurrentStep(3); // Skip payment for free package
+                        } else {
+                          setCurrentStep(2);
+                        }
+                      }}
+                      className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold text-xs cursor-pointer shadow-md"
+                    >
+                      {selectedPackage?.priceDzd === 0
+                        ? (isRtl ? 'متابعة تأكيد الباقة المجانية' : 'Confirm Free Package')
+                        : t('wizard.nextPayment')}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
 
             {/* STEP 2: PAYMENT METHOD SELECTION */}
             {currentStep === 2 && (
@@ -614,6 +706,7 @@ export const PackagesQuotaTab: React.FC<PackagesQuotaTabProps> = ({
 
                 <div className="grid grid-cols-2 gap-4">
                   <button
+                    type="button"
                     onClick={() => setPaymentMethod('baridimob')}
                     className={`p-4 rounded-2xl border-2 text-start transition-all cursor-pointer ${
                       paymentMethod === 'baridimob'
@@ -630,45 +723,42 @@ export const PackagesQuotaTab: React.FC<PackagesQuotaTabProps> = ({
                   </button>
 
                   <button
-                    onClick={() => setPaymentMethod('bank_transfer')}
-                    className={`p-4 rounded-2xl border-2 text-start transition-all cursor-pointer ${
-                      paymentMethod === 'bank_transfer'
-                        ? 'border-blue-600 bg-blue-50/50 shadow-xs'
-                        : 'border-slate-200 hover:border-slate-300'
-                    }`}
+                    type="button"
+                    disabled
+                    className="p-4 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/60 opacity-60 text-start transition-all cursor-not-allowed relative"
                   >
+                    <span className="absolute top-3 end-3 bg-rose-100 text-rose-800 text-[9px] font-bold px-2 py-0.5 rounded-full border border-rose-200">
+                      {isRtl ? 'غير مفعل حالياً' : 'Currently Unavailable'}
+                    </span>
                     <div className="flex items-center justify-between mb-2">
-                      <Building className="w-6 h-6 text-blue-600" />
-                      {paymentMethod === 'bank_transfer' && <Check className="w-4 h-4 text-blue-600" />}
+                      <Building className="w-6 h-6 text-slate-400" />
                     </div>
-                    <strong className="text-slate-900 text-sm block">{t('wizard.bankTransferOfficial')}</strong>
-                    <span className="text-[11px] text-slate-500 block mt-1">{t('wizard.bankTransferDesc')}</span>
+                    <strong className="text-slate-600 text-sm block">{t('wizard.bankTransferOfficial')}</strong>
+                    <span className="text-[11px] text-slate-400 block mt-1">{t('wizard.bankTransferDesc')}</span>
                   </button>
                 </div>
 
                 {/* Account Details Box */}
                 <div className="bg-slate-900 text-white rounded-2xl p-5 space-y-3 dir-ltr">
                   <div className="flex justify-between items-center border-b border-slate-800 pb-2">
-                    <span className="text-xs text-amber-400 font-bold">{t('wizard.paymentAccountInfo')}</span>
+                    <span className="text-xs text-amber-400 font-bold">{t('wizard.paymentAccountInfo')} (BaridiMob)</span>
                     <span className="text-[10px] text-slate-400">{t('wizard.officialPlatformAdmin')}</span>
                   </div>
 
-                  {paymentMethod === 'baridimob' ? (
-                    <div className="space-y-1 text-xs font-mono">
-                      <p className="text-slate-300"><strong className="text-slate-100">RIP BaridiMob:</strong> 00799999002348102934</p>
-                      <p className="text-slate-300"><strong className="text-slate-100">Beneficiary:</strong> SPA AAFIYA PLATFORMS ALGERIA</p>
-                      <p className="text-slate-300"><strong className="text-slate-100">CCP Account:</strong> 2348102 Key 94</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-1 text-xs font-mono">
-                      <p className="text-slate-300"><strong className="text-slate-100">Bank Name:</strong> Banque Nationale d&apos;Algérie (BNA) - Agence Didouche</p>
-                      <p className="text-slate-300"><strong className="text-slate-100">RIB:</strong> 0010061203000492019482</p>
-                      <p className="text-slate-300"><strong className="text-slate-100">Beneficiary:</strong> SPA AAFIYA PLATFORMS ALGERIA</p>
-                    </div>
-                  )}
+                  <div className="space-y-1.5 text-xs font-mono">
+                    <p className="text-slate-300"><strong className="text-slate-100">RIP BaridiMob:</strong> 00799999000524419939</p>
+                    <p className="text-slate-300"><strong className="text-slate-100">Beneficiary:</strong> SPA AAFIYA PLATFORMS ALGERIA</p>
+                    <p className="text-slate-300"><strong className="text-slate-100">CCP Account:</strong> 0005244199 Key 39</p>
+                  </div>
 
-                  <div className={`pt-1 text-[11px] text-emerald-400 border-t border-slate-800 font-sans ${isRtl ? 'dir-rtl text-start' : 'dir-ltr text-end'}`}>
-                    {t('wizard.amountToTransfer')} <strong className="text-white">{selectedPackage.priceDzd.toLocaleString()} {t('detailsModal.dzd')}</strong>
+                  <div className={`pt-2 text-xs text-emerald-400 border-t border-slate-800 font-sans ${isRtl ? 'dir-rtl text-start' : 'dir-ltr text-end'}`}>
+                    {isRtl ? 'المبلغ المطلوب تحويله (exact):' : 'Amount to transfer (exact):'}{' '}
+                    <strong className="text-white text-sm font-bold font-mono">
+                      {selectedPackage.priceDzd.toLocaleString()} {t('detailsModal.dzd')}
+                    </strong>
+                    <span className="text-[11px] text-slate-400 block mt-0.5">
+                      {isRtl ? 'حسب الباقة المختارة' : 'According to selected package'}
+                    </span>
                   </div>
                 </div>
 
@@ -692,53 +782,82 @@ export const PackagesQuotaTab: React.FC<PackagesQuotaTabProps> = ({
             {/* STEP 3: UPLOAD PAYMENT RECEIPT */}
             {currentStep === 3 && (
               <div className="space-y-4">
-                <h4 className="font-bold text-slate-900 text-sm">{t('wizard.step3Title')}</h4>
-
-                {/* File Upload Zone */}
-                <div className="border-2 border-dashed border-slate-300 rounded-2xl p-6 text-center hover:border-blue-500 transition-colors bg-slate-50 cursor-pointer">
-                  <Upload className="w-10 h-10 text-blue-600 mx-auto mb-2" />
-                  <p className="text-xs font-bold text-slate-800">{t('wizard.dragDrop')}</p>
-                  <p className="text-[11px] text-slate-500 mt-1">{t('wizard.acceptedFormats')}</p>
-                  
-                  <div className="mt-3 inline-block">
-                    <input
-                      type="file"
-                      id="receipt-upload"
-                      className="hidden"
-                      onChange={(e) => {
-                        if (e.target.files && e.target.files[0]) {
-                          setReceiptFile(e.target.files[0]);
-                          setReceiptFileName(e.target.files[0].name);
-                        }
-                      }}
-                    />
-                    <label
-                      htmlFor="receipt-upload"
-                      className="px-4 py-2 bg-white border border-slate-300 rounded-xl text-xs font-bold text-slate-700 cursor-pointer shadow-xs hover:bg-slate-100"
-                    >
-                      {t('wizard.browseFiles')}
-                    </label>
-                  </div>
-
-                  {receiptFileName && (
-                    <p className="text-xs text-emerald-700 font-bold mt-3 flex items-center justify-center gap-1">
-                      <CheckCircle2 className="w-4 h-4" />
-                      {t('wizard.attachedFile', { name: receiptFileName || '' })}
-                    </p>
+                <div className="flex items-center justify-between">
+                  <h4 className="font-bold text-slate-900 text-sm">{t('wizard.step3Title')}</h4>
+                  {selectedPackage.priceDzd > 0 ? (
+                    <span className="text-xs font-bold text-rose-600 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200">
+                      * {isRtl ? 'إثبات الدفع إلزامي' : 'Payment Proof Required'}
+                    </span>
+                  ) : (
+                    <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                      {isRtl ? 'باقة مجانية (لا يتطلب دفع)' : 'Free Package'}
+                    </span>
                   )}
                 </div>
 
+                {selectedPackage.priceDzd === 0 ? (
+                  <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-900 space-y-1">
+                    <p className="font-bold flex items-center gap-1.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                      {isRtl ? 'باقة تجريبية مجانية (تمنح مرة واحدة فقط)' : 'One-time Free Trial Package'}
+                    </p>
+                    <p className="text-[11px] text-emerald-800">
+                      {isRtl ? 'هذه الباقة مجانية بالكامل ولا تتطلب تحويلاً مالياً عبر بريدي موب أو إرفاق إيصال دفع. يمكنك الضغط على تأكيد وإرسال الطلب مباشرة.' : 'This package is completely free. No payment transfer or receipt upload required.'}
+                    </p>
+                  </div>
+                ) : (
+                  /* File Upload Zone for Paid Packages */
+                  <div className="border-2 border-dashed border-slate-300 rounded-2xl p-6 text-center hover:border-blue-500 transition-colors bg-slate-50 cursor-pointer">
+                    <Upload className="w-10 h-10 text-blue-600 mx-auto mb-2" />
+                    <p className="text-xs font-bold text-slate-800">
+                      {t('wizard.dragDrop')}{' '}
+                      <span className="text-rose-600 font-bold">* ({isRtl ? 'إلزامي' : 'Required'})</span>
+                    </p>
+                    <p className="text-[11px] text-slate-500 mt-1">{t('wizard.acceptedFormats')}</p>
+                    
+                    <div className="mt-3 inline-block">
+                      <input
+                        type="file"
+                        id="receipt-upload"
+                        className="hidden"
+                        accept="image/png,image/jpeg,image/jpg,application/pdf"
+                        onChange={(e) => {
+                          if (e.target.files && e.target.files[0]) {
+                            setReceiptFile(e.target.files[0]);
+                            setReceiptFileName(e.target.files[0].name);
+                          }
+                        }}
+                      />
+                      <label
+                        htmlFor="receipt-upload"
+                        className="px-4 py-2 bg-white border border-slate-300 rounded-xl text-xs font-bold text-slate-700 cursor-pointer shadow-xs hover:bg-slate-100"
+                      >
+                        {t('wizard.browseFiles')}
+                      </label>
+                    </div>
+
+                    {receiptFileName && (
+                      <p className="text-xs text-emerald-700 font-bold mt-3 flex items-center justify-center gap-1 font-mono">
+                        <CheckCircle2 className="w-4 h-4" />
+                        {t('wizard.attachedFile', { name: receiptFileName || '' })}
+                      </p>
+                    )}
+                  </div>
+                )}
+
                 {/* Reference ID input */}
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-700 block">{t('wizard.transactionRefLabel')}</label>
-                  <input
-                    type="text"
-                    value={transactionRef}
-                    onChange={(e) => setTransactionRef(e.target.value)}
-                    placeholder={t('wizard.transactionRefPlaceholder')}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-mono focus:ring-2 focus:ring-blue-500 outline-none"
-                  />
-                </div>
+                {selectedPackage.priceDzd > 0 && (
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-slate-700 block">{t('wizard.transactionRefLabel')}</label>
+                    <input
+                      type="text"
+                      value={transactionRef}
+                      onChange={(e) => setTransactionRef(e.target.value)}
+                      placeholder={t('wizard.transactionRefPlaceholder')}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-mono focus:ring-2 focus:ring-blue-500 outline-none"
+                    />
+                  </div>
+                )}
 
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-700 block">{t('wizard.additionalNotesLabel')}</label>
@@ -760,7 +879,7 @@ export const PackagesQuotaTab: React.FC<PackagesQuotaTabProps> = ({
 
                 <div className="flex justify-between pt-2">
                   <button
-                    onClick={() => setCurrentStep(2)}
+                    onClick={() => setCurrentStep(selectedPackage.priceDzd === 0 ? 1 : 2)}
                     disabled={isSubmitting}
                     className="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 text-xs font-medium cursor-pointer disabled:opacity-50"
                   >
@@ -812,7 +931,9 @@ export const PackagesQuotaTab: React.FC<PackagesQuotaTabProps> = ({
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-500">{t('detailsModal.totalAmount')}</span>
-                    <strong className="text-emerald-700">{selectedPackage.priceDzd.toLocaleString()} {t('detailsModal.dzd')}</strong>
+                    <strong className="text-emerald-700">
+                      {selectedPackage.priceDzd <= 0 ? (isRtl ? 'باقة ترحيبية مجانية' : 'Complimentary Welcome Package') : `${selectedPackage.priceDzd.toLocaleString()} ${t('detailsModal.dzd')}`}
+                    </strong>
                   </div>
                   <div className="flex justify-between border-t border-slate-200 pt-2">
                     <span className="text-slate-500">{t('detailsModal.transactionRef')}</span>

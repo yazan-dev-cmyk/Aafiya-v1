@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Models\BookingCenter;
+use App\Models\Commune;
 use App\Models\User;
+use App\Models\Wilaya;
 use App\Services\LegacyWilayaMigrationService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -33,8 +35,46 @@ class BookingCenterService
             ]);
         }
 
-        $wilayaStr = $data['wilaya'] ?? 'الجزائر العاصمة';
-        $wilayaId = $data['wilaya_id'] ?? ($wilayaStr !== null ? $this->wilayaResolver->resolveWilaya($wilayaStr)?->id : null);
+        $wilayaStr = $data['wilaya'] ?? null;
+        $wilayaId = $data['wilaya_id'] ?? null;
+        $communeId = $data['commune_id'] ?? null;
+        $wilayaCode = $data['wilaya_code'] ?? null;
+        $communeCode = $data['commune_code'] ?? null;
+
+        // Resolve Wilaya via canonical code
+        if (! empty($wilayaCode)) {
+            $wilayaModel = Wilaya::where('code', $wilayaCode)->first();
+            if ($wilayaModel) {
+                $wilayaId = $wilayaModel->id;
+                $wilayaStr = $wilayaModel->name_ar;
+            }
+        } elseif ($wilayaId !== null) {
+            $wilayaModel = Wilaya::find($wilayaId);
+            if ($wilayaModel) {
+                $wilayaStr = $wilayaModel->name_ar;
+            }
+        } elseif (! empty($wilayaStr)) {
+            $resolved = $this->wilayaResolver->resolveWilaya($wilayaStr);
+            if ($resolved) {
+                $wilayaId = $resolved->id;
+                $wilayaStr = $resolved->name_ar;
+            }
+        }
+
+        // Resolve Commune via canonical code
+        if (! empty($communeCode)) {
+            $communeQuery = Commune::where('code', $communeCode);
+            if ($wilayaId !== null) {
+                $communeQuery->where('wilaya_id', $wilayaId);
+            }
+            $communeModel = $communeQuery->first();
+            if ($communeModel) {
+                $communeId = $communeModel->id;
+                if ($wilayaId === null) {
+                    $wilayaId = $communeModel->wilaya_id;
+                }
+            }
+        }
 
         return BookingCenter::create([
             'user_id'             => $user->id,
@@ -43,9 +83,13 @@ class BookingCenterService
             'license_number'      => $data['license_number'] ?? null,
             'phone'               => $data['phone'] ?? $user->phone,
             'email'               => $data['email'] ?? $user->email,
-            'address'             => $data['address'] ?? 'الجزائر',
-            'wilaya'              => $wilayaStr,
+            'address'             => $data['address'] ?? ($wilayaStr ?? 'الجزائر'),
+            'wilaya'              => $wilayaStr ?? 'الجزائر العاصمة',
             'wilaya_id'           => $wilayaId,
+            'commune_id'          => $communeId,
+            'latitude'            => $data['latitude'] ?? null,
+            'longitude'           => $data['longitude'] ?? null,
+            'google_maps_link'    => $data['google_maps_link'] ?? null,
             'quota_balance'       => 0,
             'verification_status' => BookingCenter::STATUS_PENDING,
             'is_active'           => false,

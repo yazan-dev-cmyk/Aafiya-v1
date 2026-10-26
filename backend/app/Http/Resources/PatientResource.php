@@ -35,6 +35,13 @@ class PatientResource extends JsonResource
             'national_id' => $this->national_id,
             'address' => $this->address,
             'wilaya' => $this->wilaya,
+            'wilaya_id' => $this->wilaya_id,
+            'commune_id' => $this->commune_id,
+            'commune' => $this->relationLoaded('commune') && $this->commune ? [
+                'code' => $this->commune->code,
+                'name_ar' => $this->commune->name_ar,
+                'name_fr' => $this->commune->name_fr,
+            ] : null,
             'is_active' => (bool) $this->is_active,
             'emergency_contacts' => EmergencyContactResource::collection($this->whenLoaded('emergencyContacts')),
             'allergies' => PatientAllergyResource::collection($this->whenLoaded('allergies')),

@@ -9,6 +9,7 @@ import '../models/package_purchase_request.dart';
 import '../models/patient_search_result.dart';
 import '../network/api_client.dart';
 import '../network/api_endpoints.dart';
+import 'package:http/http.dart' as http;
 import '../network/api_result.dart';
 
 /// Service responsible for communicating with Booking Center commercial & quota APIs.
@@ -55,8 +56,62 @@ class BookingCenterService {
     String? paymentMethod,
     String? transactionReference,
     String? receiptDocumentPath,
+    String? receiptFilePath,
+    List<int>? receiptFileBytes,
+    String? receiptFileName,
     String? notes,
   }) async {
+    final hasFileAttachment =
+        (receiptFilePath != null && receiptFilePath.isNotEmpty) ||
+            (receiptFileBytes != null && receiptFileBytes.isNotEmpty);
+
+    if (hasFileAttachment) {
+      final fields = <String, String>{
+        'package_id': packageId,
+      };
+      if (paymentMethod != null && paymentMethod.trim().isNotEmpty) {
+        fields['payment_method'] = paymentMethod.trim();
+      }
+      if (transactionReference != null &&
+          transactionReference.trim().isNotEmpty) {
+        fields['transaction_reference'] = transactionReference.trim();
+      }
+      if (receiptDocumentPath != null &&
+          receiptDocumentPath.trim().isNotEmpty) {
+        fields['receipt_document_path'] = receiptDocumentPath.trim();
+      }
+      if (notes != null && notes.trim().isNotEmpty) {
+        fields['notes'] = notes.trim();
+      }
+
+      final files = <http.MultipartFile>[];
+      if (receiptFileBytes != null && receiptFileBytes.isNotEmpty) {
+        files.add(http.MultipartFile.fromBytes(
+          'receipt_file',
+          receiptFileBytes,
+          filename: receiptFileName ?? 'receipt.jpg',
+        ));
+      } else if (receiptFilePath != null && receiptFilePath.isNotEmpty) {
+        files.add(await http.MultipartFile.fromPath(
+          'receipt_file',
+          receiptFilePath,
+          filename: receiptFileName,
+        ));
+      }
+
+      final result = await _apiClient.postMultipart(
+        ApiEndpoints.bookingCenterPurchaseRequests,
+        fields: fields,
+        files: files,
+        requiresAuth: true,
+      );
+
+      return switch (result) {
+        ApiSuccess(:final data) => _parseSinglePurchaseRequest(data),
+        ApiFailure(:final exception) => ApiFailure(exception),
+      };
+    }
+
     final body = <String, dynamic>{
       'package_id': packageId,
     };

@@ -20,7 +20,12 @@ import {
   ArrowRight,
   Shield,
   History,
-  Globe
+  Globe,
+  Compass,
+  HelpCircle,
+  ExternalLink,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { RoleType } from '../types';
 import { Modal } from './ui/Modal';
@@ -31,6 +36,7 @@ import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
 
 import { useAuth } from '../auth/AuthProvider';
+import { AuthResponse } from '../services/authService';
 import { WilayaSelect, CommuneSelect, SpecialtySelect } from './master-data';
 
 const getDashboardPathForRole = (role: string, loc: string): string => {
@@ -75,7 +81,7 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
   isRegisterMode = false
 }) => {
   const router = useRouter();
-  const { login: authLogin, register: authRegister } = useAuth();
+  const { login: authLogin, register: authRegister, registerDoctor: authRegisterDoctor } = useAuth();
   const t = useTranslations('auth');
   const locale = useLocale();
   const isRtl = locale === 'ar';
@@ -111,9 +117,63 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
   const [address, setAddress] = useState('');
   const [wilaya, setWilaya] = useState('');
   const [commune, setCommune] = useState('');
+  const [latitude, setLatitude] = useState('');
+  const [longitude, setLongitude] = useState('');
   const [mapsLink, setMapsLink] = useState('');
+  const [smartPasteInput, setSmartPasteInput] = useState('');
+  const [showGeoGuide, setShowGeoGuide] = useState(false);
   const [commercialRegister, setCommercialRegister] = useState('');
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+
+  const handleParseAndFillCoords = (text: string) => {
+    setSmartPasteInput(text);
+    if (!text) return;
+    const clean = text.trim();
+
+    // 1. Coordinates pair "lat, lng" or "lat lng" (e.g. 34.89777154, 1.23764942)
+    const coordPairMatch = clean.match(/^(-?\d+(?:\.\d+)?)[,\s]+(-?\d+(?:\.\d+)?)$/);
+    if (coordPairMatch) {
+      const lat = parseFloat(coordPairMatch[1]);
+      const lng = parseFloat(coordPairMatch[2]);
+      if (!isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+        setLatitude(lat.toString());
+        setLongitude(lng.toString());
+        setMapsLink(`https://maps.google.com/?q=${lat},${lng}`);
+        return;
+      }
+    }
+
+    // 2. URL containing @lat,lng
+    const atMatch = clean.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+    if (atMatch) {
+      const lat = parseFloat(atMatch[1]);
+      const lng = parseFloat(atMatch[2]);
+      if (!isNaN(lat) && !isNaN(lng)) {
+        setLatitude(lat.toString());
+        setLongitude(lng.toString());
+        setMapsLink(clean);
+        return;
+      }
+    }
+
+    // 3. URL containing ?q=lat,lng or &ll=lat,lng
+    const queryMatch = clean.match(/[?&](?:q|ll)=(-?\d+\.\d+),(-?\d+\.\d+)/);
+    if (queryMatch) {
+      const lat = parseFloat(queryMatch[1]);
+      const lng = parseFloat(queryMatch[2]);
+      if (!isNaN(lat) && !isNaN(lng)) {
+        setLatitude(lat.toString());
+        setLongitude(lng.toString());
+        setMapsLink(clean);
+        return;
+      }
+    }
+
+    // If it's a URL without recognizable coordinates (e.g. shortened link)
+    if (clean.startsWith('http://') || clean.startsWith('https://')) {
+      setMapsLink(clean);
+    }
+  };
 
   const handleReset = () => {
     setSubmitted(false);
@@ -133,7 +193,11 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
     setAddress('');
     setWilaya('');
     setCommune('');
+    setLatitude('');
+    setLongitude('');
     setMapsLink('');
+    setSmartPasteInput('');
+    setShowGeoGuide(false);
     setCommercialRegister('');
     setAcceptedTerms(false);
   };
@@ -147,9 +211,26 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
     e.preventDefault();
     setError(null);
 
+    // Guard against submitting registration for restricted diagnostic roles
+    if (isRegister && (selectedRole === 'lab' || selectedRole === 'radiology')) {
+      setError(t('diagnosticRegistrationUnavailable'));
+      return;
+    }
+
     if (isRegister && !acceptedTerms) {
       setError(t('termsRequiredError') || 'يجب قبول شروط الخدمة والاطلاع على إشعار الخصوصية لإنشاء الحساب');
       return;
+    }
+
+    if (isRegister) {
+      if (!wilaya) {
+        setError(t('wilayaRequired') || 'يرجى اختيار الولاية.');
+        return;
+      }
+      if (!commune) {
+        setError(t('communeRequired') || 'يرجى اختيار البلدية.');
+        return;
+      }
     }
 
     setLoading(true);
@@ -168,8 +249,10 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
         window.location.assign(targetPath);
       } catch (err: any) {
         setLoading(false);
-        const status = err?.status || err?.response?.status || (err?.errors ? 422 : 0);
-        if (status === 422 || status === 401) {
+        const status = err?.status || err?.code || err?.response?.status || (err?.errors ? 422 : 0);
+        if (status === 429) {
+          setError(t('errors.rateLimitExceeded') || t('rateLimitError'));
+        } else if (status === 422 || status === 401) {
           setError(t('invalidCredentials'));
         } else {
           setError(err?.message || t('loginFailed'));
@@ -177,25 +260,57 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
       }
     } else {
       try {
-        const response = await authRegister({
-          name,
-          email,
-          phone,
-          password,
-          password_confirmation: password,
-          role: selectedRole,
-          accepted_terms: true,
-          terms_version: '2026.1',
-          specialty_id: selectedRole === 'doctor' && specialtyId ? parseInt(specialtyId, 10) : undefined,
-          specialty: specialty || undefined,
-          license_number: licenseNumber || (selectedRole === 'doctor' ? `DZ-ALG-2026-DOC-001` : undefined),
-          clinic_name: facilityName || (selectedRole === 'doctor' ? `عيادة ${name}` : undefined),
-          commercial_register: commercialRegister || undefined,
-          manager_name: directorName || undefined,
-          wilaya: wilaya || '16',
-          commune: commune || undefined,
-          address: address || 'الجزائر',
-        });
+        let response: AuthResponse;
+
+        const latNum = latitude.trim() !== '' ? parseFloat(latitude.trim()) : undefined;
+        const lngNum = longitude.trim() !== '' ? parseFloat(longitude.trim()) : undefined;
+        const finalMapsLink = mapsLink.trim() !== '' 
+          ? mapsLink.trim() 
+          : (latNum !== undefined && lngNum !== undefined && !isNaN(latNum) && !isNaN(lngNum) ? `https://maps.google.com/?q=${latNum},${lngNum}` : undefined);
+
+        if (selectedRole === 'doctor') {
+          response = await authRegisterDoctor({
+            name,
+            email,
+            phone,
+            password,
+            specialty: specialty || undefined,
+            specialty_id: specialtyId ? parseInt(specialtyId, 10) : undefined,
+            license_number: licenseNumber,
+            clinic_name: facilityName || undefined,
+            clinic_phone: phone || undefined,
+            wilaya: wilaya || undefined,
+            wilaya_code: wilaya || undefined,
+            commune: commune || undefined,
+            commune_code: commune || undefined,
+            address: address || undefined,
+            latitude: latNum,
+            longitude: lngNum,
+            google_maps_link: finalMapsLink,
+          });
+        } else {
+          response = await authRegister({
+            name,
+            email,
+            phone,
+            password,
+            password_confirmation: password,
+            role: selectedRole,
+            accepted_terms: true,
+            terms_version: '2026.1',
+            commercial_register: commercialRegister || undefined,
+            manager_name: directorName || undefined,
+            wilaya_code: wilaya || undefined,
+            commune_code: commune || undefined,
+            wilaya: wilaya || undefined,
+            commune: commune || undefined,
+            address: address || undefined,
+            latitude: latNum,
+            longitude: lngNum,
+            google_maps_link: finalMapsLink,
+          });
+        }
+
         const userRoles = response?.user?.roles || [];
         const primaryRole = userRoles[0] || selectedRole;
         const targetPath = getDashboardPathForRole(primaryRole, locale);
@@ -203,8 +318,55 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
         window.location.assign(targetPath);
       } catch (err: any) {
         setLoading(false);
-        const errMsg = err?.response?.data?.message || err?.message || t('registrationFailed') || 'فشل إنشاء الحساب';
-        setError(errMsg);
+        const status = err?.status || err?.code || err?.response?.status;
+
+        // Rate limit 429 handled independently
+        if (status === 429) {
+          setError(t('errors.rateLimitExceeded') || t('rateLimitError'));
+          return;
+        }
+
+        // Structural validation error handling (422)
+        if (status === 422 || err?.errors) {
+          // If future backend contract provides explicit rule keys/codes (without fragile string/regex matching)
+          const emailRule = err?.rules?.email || err?.errorCodes?.email;
+          const phoneRule = err?.rules?.phone || err?.errorCodes?.phone;
+
+          if (emailRule === 'unique') {
+            setError(t('errors.emailTaken') || t('emailTakenError'));
+            return;
+          }
+          if (phoneRule === 'unique') {
+            setError(t('errors.phoneTaken') || t('phoneTakenError'));
+            return;
+          }
+
+          // In the current backend contract, Laravel returns messages in errors object without rule codes.
+          // In accordance with instructions: do NOT use fragile English string or regex matching,
+          // and do not assume errors.email is a duplicate without a reliable rule signal.
+          // Display the first validation error message returned by backend or general validation error.
+          const firstValidationError = err?.errors
+            ? (Object.values(err.errors).flat()[0] as string)
+            : null;
+
+          setError(
+            firstValidationError ||
+            err?.message ||
+            t('errors.generalValidation') ||
+            t('validationError') ||
+            t('registrationFailed') ||
+            'بيانات الإدخال غير صالحة.'
+          );
+          return;
+        }
+
+        // Fallback for general unexpected errors
+        setError(
+          err?.response?.data?.message ||
+          err?.message ||
+          t('registrationFailed') ||
+          'فشل إنشاء الحساب'
+        );
       }
     }
   };
@@ -306,235 +468,321 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
               </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {isRegister && (
-                <>
-                  {/* Common Name Field with Role-Specific Labels */}
-                  <div className="md:col-span-2">
+            {isRegister && (selectedRole === 'lab' || selectedRole === 'radiology') ? (
+              <div className="space-y-4">
+                <div className="p-5 rounded-2xl bg-amber-50/90 border border-amber-200 text-amber-900">
+                  <div className="flex items-start gap-3">
+                    <Building2 className="w-5 h-5 text-amber-600 mt-0.5 shrink-0" />
+                    <p className="text-sm font-bold leading-relaxed">
+                      {t('diagnosticRegistrationUnavailable')}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="text-center pt-2">
+                  <button 
+                    type="button" 
+                    onClick={() => setIsRegister(!isRegister)}
+                    className="text-xs font-black text-slate-500 hover:text-primary transition-colors"
+                  >
+                    {t('toggleLogin')}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  {isRegister && (
+                    <>
+                      {/* Common Name Field with Role-Specific Labels */}
+                      <div className="md:col-span-2">
+                        <Input
+                          label={
+                            selectedRole === 'patient_registered' ? t('fullName') : 
+                            selectedRole === 'doctor' ? t('doctorFullName') :
+                            selectedRole === 'booking_center' ? t('agencyName') :
+                            selectedRole === 'lab' ? t('laboratoryName') :
+                            t('centerName')
+                          }
+                          required
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          placeholder={t('placeholderName')}
+                        />
+                      </div>
+
+                      {/* Role-Specific Fields */}
+                      {selectedRole === 'doctor' && (
+                        <>
+                          <Input
+                            label={t('clinicName')}
+                            required
+                            value={facilityName}
+                            onChange={(e) => setFacilityName(e.target.value)}
+                            placeholder={t('placeholderClinic')}
+                          />
+                          <SpecialtySelect
+                            label={t('specialty')}
+                            required
+                            value={specialtyId}
+                            onChange={(idStr, selectedSpec) => {
+                              setSpecialtyId(idStr);
+                              if (selectedSpec) {
+                                setSpecialty(selectedSpec.name_ar);
+                              } else {
+                                setSpecialty('');
+                              }
+                            }}
+                            placeholder={t('placeholderSpecialty')}
+                          />
+                          <Input
+                            label={t('licenseNumber')}
+                            required
+                            value={licenseNumber}
+                            onChange={(e) => setLicenseNumber(e.target.value)}
+                            placeholder="12345678"
+                          />
+                        </>
+                      )}
+
+                      {selectedRole === 'booking_center' && (
+                        <>
+                          <Input
+                            label={t('commercialRegister')}
+                            required
+                            value={commercialRegister}
+                            onChange={(e) => setCommercialRegister(e.target.value)}
+                            placeholder="RC-23/00-123456"
+                          />
+                          <Input
+                            label={t('managerName')}
+                            required
+                            value={directorName}
+                            onChange={(e) => setDirectorName(e.target.value)}
+                            placeholder={t('placeholderName')}
+                          />
+                        </>
+                      )}
+
+                      <Input
+                        label={t('phone')}
+                        type="tel"
+                        required
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        icon={<Phone className="w-5 h-5" />}
+                        placeholder="+213 --- -- -- --"
+                      />
+                      
+                      <WilayaSelect
+                        label={t('wilaya')}
+                        required
+                        value={wilaya}
+                        onChange={(code) => {
+                          setWilaya(code);
+                          setCommune('');
+                        }}
+                        placeholder={t('placeholderWilaya')}
+                      />
+
+                      <CommuneSelect
+                        label={t('commune')}
+                        required
+                        wilayaCode={wilaya}
+                        value={commune}
+                        onChange={setCommune}
+                      />
+
+                      {selectedRole === 'patient_registered' ? (
+                        <div className="md:col-span-2">
+                          <Input
+                            label={`${t('exactAddress')} (${t('optional') || 'اختياري'})`}
+                            value={address}
+                            onChange={(e) => setAddress(e.target.value)}
+                            icon={<MapPin className="w-5 h-5" />}
+                            placeholder={t('placeholderAddress')}
+                          />
+                        </div>
+                      ) : (
+                        <>
+                          <div className="md:col-span-2">
+                            <Input
+                              label={t('exactAddress')}
+                              required
+                              value={address}
+                              onChange={(e) => setAddress(e.target.value)}
+                              icon={<MapPin className="w-5 h-5" />}
+                              placeholder={t('placeholderAddress')}
+                            />
+                          </div>
+                          {/* Coordinates Section with Smart Paste & Visual Guide */}
+                          <div className="md:col-span-2 space-y-3 pt-1 border-t border-slate-100">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-1.5">
+                                <Compass className="w-4 h-4 text-teal-600" />
+                                <span className="text-xs font-bold text-slate-800">{t('coordinates')}</span>
+                                <span className="text-[11px] text-slate-400">({t('optional') || 'اختياري'})</span>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => setShowGeoGuide(!showGeoGuide)}
+                                className="text-xs text-teal-600 hover:text-teal-800 font-semibold inline-flex items-center gap-1 cursor-pointer transition-colors"
+                              >
+                                <HelpCircle className="w-3.5 h-3.5" />
+                                <span>{t('coordinatesHelpTitle')}</span>
+                                {showGeoGuide ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                              </button>
+                            </div>
+
+                            {/* Collapsible Visual Help Guide */}
+                            {showGeoGuide && (
+                              <div className="p-3.5 rounded-xl bg-teal-50/70 border border-teal-200/80 text-xs text-slate-700 space-y-2 animate-in fade-in duration-200">
+                                <div className="font-bold text-teal-950 flex items-center gap-1.5">
+                                  <span>📍</span>
+                                  <span>{t('coordinatesHelpTitle')}</span>
+                                </div>
+                                <div className="space-y-1.5 text-[11px] leading-relaxed text-slate-600">
+                                  <p><strong>💻 {locale === 'ar' ? 'على الكمبيوتر:' : 'On PC:'}</strong> {t('coordinatesHelpDesktop')}</p>
+                                  <p><strong>📱 {locale === 'ar' ? 'على الهاتف:' : 'On Phone:'}</strong> {t('coordinatesHelpMobile')}</p>
+                                  <p className="font-mono text-teal-800 bg-teal-100/80 px-2 py-1 rounded-md inline-block mt-1">
+                                    {t('coordinatesHelpExample')}
+                                  </p>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Smart Paste Field */}
+                            <div>
+                              <Input
+                                label={t('smartPastePlaceholder')}
+                                value={smartPasteInput}
+                                onChange={(e) => handleParseAndFillCoords(e.target.value)}
+                                icon={<Globe className="w-5 h-5 text-slate-400" />}
+                                placeholder={t('coordinatesHelpExample')}
+                              />
+                            </div>
+
+                            {/* Dual Latitude & Longitude Inputs */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              <Input
+                                label={t('latitude')}
+                                value={latitude}
+                                onChange={(e) => setLatitude(e.target.value)}
+                                placeholder="34.89777154"
+                              />
+                              <Input
+                                label={t('longitude')}
+                                value={longitude}
+                                onChange={(e) => setLongitude(e.target.value)}
+                                placeholder="1.23764942"
+                              />
+                            </div>
+
+                            {/* Live Map Preview Link if valid coordinates */}
+                            {latitude && longitude && !isNaN(parseFloat(latitude)) && !isNaN(parseFloat(longitude)) && (
+                              <div className="pt-0.5">
+                                <a
+                                  href={`https://maps.google.com/?q=${latitude},${longitude}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1.5 text-xs text-teal-700 hover:text-teal-900 font-bold bg-teal-50 px-2.5 py-1 rounded-lg border border-teal-200 hover:bg-teal-100 transition-colors"
+                                >
+                                  <ExternalLink className="w-3.5 h-3.5" />
+                                  <span>{t('previewOnMap')}</span>
+                                </a>
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      )}
+                    </>
+                  )}
+
+                  <div className={cn(isRegister ? "md:col-span-1" : "md:col-span-1")}>
                     <Input
-                      label={
-                        selectedRole === 'patient_registered' ? t('fullName') : 
-                        selectedRole === 'doctor' ? t('doctorFullName') :
-                        selectedRole === 'booking_center' ? t('agencyName') :
-                        selectedRole === 'lab' ? t('laboratoryName') :
-                        t('centerName')
-                      }
+                      label={t('email')}
+                      type="email"
                       required
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder={t('placeholderName')}
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      icon={<Mail className="w-5 h-5" />}
+                      placeholder={t('placeholderEmail')}
                     />
                   </div>
 
-                  {/* Role-Specific Fields */}
-                  {selectedRole === 'doctor' && (
-                    <>
-                      <Input
-                        label={t('clinicName')}
-                        required
-                        value={facilityName}
-                        onChange={(e) => setFacilityName(e.target.value)}
-                        placeholder={t('placeholderClinic')}
-                      />
-                      <SpecialtySelect
-                        label={t('specialty')}
-                        required
-                        value={specialtyId}
-                        onChange={(idStr, selectedSpec) => {
-                          setSpecialtyId(idStr);
-                          if (selectedSpec) {
-                            setSpecialty(selectedSpec.name_ar);
-                          } else {
-                            setSpecialty('');
-                          }
-                        }}
-                        placeholder={t('placeholderSpecialty')}
-                      />
-                      <Input
-                        label={t('licenseNumber')}
-                        required
-                        value={licenseNumber}
-                        onChange={(e) => setLicenseNumber(e.target.value)}
-                        placeholder="12345678"
-                      />
-                    </>
-                  )}
+                  <div className={cn(isRegister ? "md:col-span-1" : "md:col-span-1")}>
+                    <Input
+                      label={t('password')}
+                      type="password"
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      icon={<Lock className="w-5 h-5" />}
+                      placeholder={t('placeholderPassword')}
+                    />
+                  </div>
+                </div>
 
-                  {selectedRole === 'booking_center' && (
-                    <>
-                      <Input
-                        label={t('commercialRegister')}
+                {isRegister ? (
+                  <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                    <label className="flex items-start gap-3 cursor-pointer group select-none">
+                      <input
+                        type="checkbox"
                         required
-                        value={commercialRegister}
-                        onChange={(e) => setCommercialRegister(e.target.value)}
-                        placeholder="RC-23/00-123456"
+                        checked={acceptedTerms}
+                        onChange={(e) => setAcceptedTerms(e.target.checked)}
+                        className="mt-0.5 w-4 h-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500/20"
                       />
-                      <Input
-                        label={t('managerName')}
-                        required
-                        value={directorName}
-                        onChange={(e) => setDirectorName(e.target.value)}
-                        placeholder={t('placeholderName')}
-                      />
-                    </>
-                  )}
+                      <span className="text-xs text-slate-600 font-medium leading-relaxed group-hover:text-slate-800 transition-colors">
+                        {t('acceptTermsPrefix')}{' '}
+                        <a
+                          href={`/${locale}/terms`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-teal-600 font-bold hover:underline"
+                        >
+                          {t('termsOfService')}
+                        </a>{' '}
+                        {t('andAcknowledge')}{' '}
+                        <a
+                          href={`/${locale}/privacy`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-teal-600 font-bold hover:underline"
+                        >
+                          {t('privacyPolicy')}
+                        </a>
+                      </span>
+                    </label>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between">
+                    <label className="flex items-center gap-2 cursor-pointer group">
+                      <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary/20" />
+                      <span className="text-xs text-slate-500 font-bold group-hover:text-slate-700 transition-colors">{t('rememberMe')}</span>
+                    </label>
+                    <button type="button" className="text-xs text-primary font-black hover:underline">{t('forgotPassword')}</button>
+                  </div>
+                )}
 
-                  {(selectedRole === 'lab' || selectedRole === 'radiology') && (
-                    <>
-                      <Input
-                        label={t('directorName')}
-                        required
-                        value={directorName}
-                        onChange={(e) => setDirectorName(e.target.value)}
-                        placeholder={t('placeholderName')}
-                      />
-                      <Input
-                        label={t('licenseNumber')}
-                        required
-                        value={licenseNumber}
-                        onChange={(e) => setLicenseNumber(e.target.value)}
-                        placeholder="LIC-12345"
-                      />
-                    </>
-                  )}
-
-                  <Input
-                    label={t('phone')}
-                    type="tel"
-                    required
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    icon={<Phone className="w-5 h-5" />}
-                    placeholder="+213 --- -- -- --"
-                  />
+                <div className="space-y-3 pt-2">
+                  <Button type="submit" fullWidth size="lg" loading={loading}>
+                    <ShieldCheck className={cn("w-5 h-5", isRtl ? "ml-2" : "mr-2")} />
+                    {isRegister ? t('submitRegister') : t('submitLogin')}
+                  </Button>
                   
-                  <WilayaSelect
-                    label={t('wilaya')}
-                    required
-                    value={wilaya}
-                    onChange={(code) => {
-                      setWilaya(code);
-                      setCommune('');
-                    }}
-                    placeholder={t('placeholderWilaya')}
-                  />
-
-                  <CommuneSelect
-                    label={t('commune')}
-                    wilayaCode={wilaya}
-                    value={commune}
-                    onChange={setCommune}
-                  />
-
-                  {selectedRole !== 'patient_registered' && (
-                    <>
-                      <div className="md:col-span-2">
-                        <Input
-                          label={t('exactAddress')}
-                          required
-                          value={address}
-                          onChange={(e) => setAddress(e.target.value)}
-                          icon={<MapPin className="w-5 h-5" />}
-                          placeholder={t('placeholderAddress')}
-                        />
-                      </div>
-                      <div className="md:col-span-2">
-                        <Input
-                          label={t('googleMapsLink')}
-                          value={mapsLink}
-                          onChange={(e) => setMapsLink(e.target.value)}
-                          icon={<Globe className="w-5 h-5" />}
-                          placeholder={t('placeholderMaps')}
-                        />
-                      </div>
-                    </>
-                  )}
-                </>
-              )}
-
-              <div className={cn(isRegister ? "md:col-span-1" : "md:col-span-1")}>
-                <Input
-                  label={t('email')}
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  icon={<Mail className="w-5 h-5" />}
-                  placeholder={t('placeholderEmail')}
-                />
-              </div>
-
-              <div className={cn(isRegister ? "md:col-span-1" : "md:col-span-1")}>
-                <Input
-                  label={t('password')}
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  icon={<Lock className="w-5 h-5" />}
-                  placeholder={t('placeholderPassword')}
-                />
-              </div>
-            </div>
-
-            {isRegister ? (
-              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
-                <label className="flex items-start gap-3 cursor-pointer group select-none">
-                  <input
-                    type="checkbox"
-                    required
-                    checked={acceptedTerms}
-                    onChange={(e) => setAcceptedTerms(e.target.checked)}
-                    className="mt-0.5 w-4 h-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500/20"
-                  />
-                  <span className="text-xs text-slate-600 font-medium leading-relaxed group-hover:text-slate-800 transition-colors">
-                    {t('acceptTermsPrefix')}{' '}
-                    <a
-                      href={`/${locale}/terms`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-teal-600 font-bold hover:underline"
+                  <div className="text-center">
+                    <button 
+                      type="button" 
+                      onClick={() => setIsRegister(!isRegister)}
+                      className="text-xs font-black text-slate-500 hover:text-primary transition-colors"
                     >
-                      {t('termsOfService')}
-                    </a>{' '}
-                    {t('andAcknowledge')}{' '}
-                    <a
-                      href={`/${locale}/privacy`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-teal-600 font-bold hover:underline"
-                    >
-                      {t('privacyPolicy')}
-                    </a>
-                  </span>
-                </label>
-              </div>
-            ) : (
-              <div className="flex items-center justify-between">
-                <label className="flex items-center gap-2 cursor-pointer group">
-                  <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary/20" />
-                  <span className="text-xs text-slate-500 font-bold group-hover:text-slate-700 transition-colors">{t('rememberMe')}</span>
-                </label>
-                <button type="button" className="text-xs text-primary font-black hover:underline">{t('forgotPassword')}</button>
-              </div>
+                      {isRegister ? t('toggleLogin') : t('toggleRegister')}
+                    </button>
+                  </div>
+                </div>
+              </>
             )}
-
-            <div className="space-y-3 pt-2">
-              <Button type="submit" fullWidth size="lg" loading={loading}>
-                <ShieldCheck className={cn("w-5 h-5", isRtl ? "ml-2" : "mr-2")} />
-                {isRegister ? t('submitRegister') : t('submitLogin')}
-              </Button>
-              
-              <div className="text-center">
-                <button 
-                  type="button" 
-                  onClick={() => setIsRegister(!isRegister)}
-                  className="text-xs font-black text-slate-500 hover:text-primary transition-colors"
-                >
-                  {isRegister ? t('toggleLogin') : t('toggleRegister')}
-                </button>
-              </div>
-            </div>
           </form>
         )}
 

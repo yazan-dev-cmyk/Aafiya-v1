@@ -184,6 +184,80 @@ class ApiClient {
     );
   }
 
+  /// Executes a multipart POST request with form fields and file attachments.
+  Future<ApiResult<Map<String, dynamic>>> postMultipart(
+    String endpoint, {
+    Map<String, String>? fields,
+    List<http.MultipartFile>? files,
+    Map<String, String>? queryParameters,
+    Map<String, String>? headers,
+    bool requiresAuth = true,
+    bool includeClinicContext = true,
+    bool notifyUnauthorized = true,
+  }) async {
+    final baseUri = Uri.parse(_config.apiBaseUrl);
+    final cleanEndpoint = endpoint.startsWith('/') ? endpoint : '/$endpoint';
+
+    final uri = Uri(
+      scheme: baseUri.scheme,
+      host: baseUri.host,
+      port: baseUri.port,
+      path: '${baseUri.path}$cleanEndpoint',
+      queryParameters: queryParameters,
+    );
+
+    try {
+      final requestHeaders = await _buildHeaders(
+        extraHeaders: headers,
+        requiresAuth: requiresAuth,
+        includeClinicContext: includeClinicContext,
+      );
+      // Remove Content-Type so MultipartRequest sets multipart/form-data boundary
+      requestHeaders.remove('Content-Type');
+
+      final request = http.MultipartRequest('POST', uri);
+      request.headers.addAll(requestHeaders);
+
+      if (fields != null) {
+        request.fields.addAll(fields);
+      }
+
+      if (files != null) {
+        request.files.addAll(files);
+      }
+
+      final streamedResponse =
+          await _httpClient.send(request).timeout(_config.receiveTimeout);
+      final response = await http.Response.fromStream(streamedResponse);
+
+      return _handleResponse(
+        response,
+        requiresAuth: requiresAuth,
+        notifyUnauthorized: notifyUnauthorized,
+      );
+    } on SocketException catch (e) {
+      return ApiFailure(NetworkConnectionException(
+        'Unable to connect to server. Please check your internet connection.',
+        e,
+      ));
+    } on http.ClientException catch (e) {
+      return ApiFailure(NetworkConnectionException(
+        'Unable to connect to server. Please check your internet connection.',
+        e,
+      ));
+    } on TimeoutException catch (e) {
+      return ApiFailure(NetworkTimeoutException(
+        'The server took too long to respond. Please try again.',
+        e,
+      ));
+    } catch (e) {
+      return ApiFailure(NetworkConnectionException(
+        'Failed to communicate with server. Please try again.',
+        e,
+      ));
+    }
+  }
+
   /// Core request executor with timeout and exception translation.
   Future<ApiResult<Map<String, dynamic>>> _sendRequest({
     required String method,

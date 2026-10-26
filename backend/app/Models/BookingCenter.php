@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -20,6 +21,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
     'address',
     'wilaya',
     'wilaya_id',
+    'commune_id',
+    'latitude',
+    'longitude',
+    'google_maps_link',
     'quota_balance',
     'verification_status',
     'verified_at',
@@ -47,7 +52,21 @@ class BookingCenter extends Model
             'quota_balance' => 'integer',
             'is_active' => 'boolean',
             'verified_at' => 'datetime',
+            'latitude' => 'float',
+            'longitude' => 'float',
         ];
+    }
+
+    /**
+     * Get the Google Maps link (stored value, or dynamically generated from coordinates).
+     */
+    protected function googleMapsLink(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ?: ($this->latitude !== null && $this->longitude !== null
+                ? "https://maps.google.com/?q={$this->latitude},{$this->longitude}"
+                : null)
+        );
     }
 
     /**
@@ -64,6 +83,14 @@ class BookingCenter extends Model
     public function wilaya(): BelongsTo
     {
         return $this->belongsTo(Wilaya::class, 'wilaya_id');
+    }
+
+    /**
+     * Authoritative Commune relationship.
+     */
+    public function commune(): BelongsTo
+    {
+        return $this->belongsTo(Commune::class, 'commune_id');
     }
 
     /**

@@ -13,10 +13,14 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
+use App\Services\GoogleDriveService;
+use Illuminate\Support\Facades\Storage;
+
 class PackagePurchaseRequestController extends Controller
 {
     public function __construct(
-        protected PackagePurchaseRequestService $service
+        protected PackagePurchaseRequestService $service,
+        protected GoogleDriveService $googleDriveService
     ) {}
 
     /**
@@ -172,6 +176,97 @@ class PackagePurchaseRequestController extends Controller
             'message' => 'تم رفض طلب شراء الباقة.',
             'data' => new PackagePurchaseRequestResource($rejected),
         ], 200);
+    }
+
+    /**
+     * Stream receipt for Platform Admin or authorized Admin Assistant.
+     */
+    public function showReceipt(Request $request, PackagePurchaseRequest $packagePurchaseRequest)
+    {
+        $user = $request->user();
+        if (! $this->canReview($user)) {
+            abort(403, 'غير مصرح لك بمعاينة إيصال الدفع.');
+        }
+
+        return $this->streamReceiptFile($packagePurchaseRequest);
+    }
+
+    /**
+     * Stream receipt for owning Booking Center.
+     */
+    public function showOwnReceipt(Request $request, PackagePurchaseRequest $packagePurchaseRequest)
+    {
+        $user = $request->user();
+        $center = $user?->bookingCenter;
+
+        if (! $center || $center->id !== $packagePurchaseRequest->booking_center_id) {
+            abort(403, 'غير مصرح لك بالوصول إلى إيصال هذا الطلب.');
+        }
+
+        return $this->streamReceiptFile($packagePurchaseRequest);
+    }
+
+    /**
+     * Helper to stream receipt securely from Google Drive or local storage.
+     */
+    protected function streamReceiptFile(PackagePurchaseRequest $packagePurchaseRequest)
+    {
+        $path = $packagePurchaseRequest->receipt_document_path;
+        if (! $path) {
+            return response()->json(['message' => 'لا يوجد ملف إيصال دفع مرفق بهذا الطلب.'], 404);
+        }
+
+        if (str_starts_with($path, 'gdrive:')) {
+            $parts = explode(':', $path, 3);
+            $fileId = $parts[1] ?? null;
+            $fileName = $parts[2] ?? 'receipt_document';
+
+            if (! $fileId) {
+                return response()->json(['message' => 'بيانات إيصال Google Drive غير صالحة.'], 422);
+            }
+
+            try {
+                $file = $this->googleDriveService->downloadFile($fileId);
+
+                return response($file['content'], 200, [
+                    'Content-Type' => $file['mime_type'],
+                    'Content-Disposition' => 'inline; filename="' . ($file['name'] ?? $fileName) . '"',
+                    'Content-Length' => $file['size'],
+                    'Cache-Control' => 'private, no-cache, no-store, must-revalidate',
+                ]);
+            } catch (\Throwable $e) {
+                return response()->json([
+                    'message' => 'تعذر جلب ملف الإيصال من Google Drive: ' . $e->getMessage(),
+                ], 502);
+            }
+        }
+
+        if (str_starts_with($path, 'local:')) {
+            $parts = explode(':', $path, 3);
+            $relPath = $parts[1] ?? null;
+            $fileName = $parts[2] ?? 'receipt_document.pdf';
+
+            if (! $relPath || ! Storage::disk('local')->exists($relPath)) {
+                return response()->json(['message' => 'ملف الإيصال غير موجود على الخادم.'], 404);
+            }
+
+            $mimeType = Storage::disk('local')->mimeType($relPath) ?: 'application/octet-stream';
+            $fileContent = Storage::disk('local')->get($relPath);
+
+            return response($fileContent, 200, [
+                'Content-Type' => $mimeType,
+                'Content-Disposition' => 'inline; filename="' . $fileName . '"',
+                'Content-Length' => strlen($fileContent),
+                'Cache-Control' => 'private, no-cache, no-store, must-revalidate',
+            ]);
+        }
+
+        // Direct local storage fallback
+        if (Storage::disk('local')->exists($path)) {
+            return Storage::disk('local')->response($path);
+        }
+
+        return response()->json(['message' => 'ملف الإيصال غير متوفر حالياً.'], 404);
     }
 
     /**

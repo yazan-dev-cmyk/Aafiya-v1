@@ -42,8 +42,15 @@ class DoctorOnboardingController extends Controller
         if (! empty($validated['clinic_name'])) {
             $clinicData = [
                 'name' => $validated['clinic_name'],
-                'wilaya' => $validated['wilaya'] ?? 'الجزائر العاصمة',
-                'address' => $validated['address'] ?? 'الجزائر',
+                'wilaya' => $validated['wilaya'] ?? null,
+                'wilaya_code' => $validated['wilaya_code'] ?? null,
+                'commune_code' => $validated['commune_code'] ?? null,
+                'wilaya_id' => $validated['wilaya_id'] ?? null,
+                'commune_id' => $validated['commune_id'] ?? null,
+                'address' => $validated['address'] ?? null,
+                'latitude' => $validated['latitude'] ?? null,
+                'longitude' => $validated['longitude'] ?? null,
+                'google_maps_link' => $validated['google_maps_link'] ?? null,
                 'phone' => $validated['clinic_phone'] ?? $validated['phone'],
             ];
         }

@@ -182,7 +182,7 @@ class BookingCenterController extends Controller
         }
 
         $validated = $request->validated();
-        $allowed = ['name', 'phone', 'email', 'wilaya', 'address'];
+        $allowed = ['name', 'phone', 'email', 'wilaya', 'address', 'latitude', 'longitude', 'google_maps_link'];
         $updateData = array_intersect_key($validated, array_flip($allowed));
 
         if (isset($updateData['wilaya'])) {

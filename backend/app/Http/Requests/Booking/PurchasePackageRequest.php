@@ -18,6 +18,11 @@ class PurchasePackageRequest extends FormRequest
     {
         return [
             'package_id' => ['required', 'uuid', 'exists:booking_packages,id'],
+            'payment_method' => ['nullable', 'string', 'max:50'],
+            'transaction_reference' => ['nullable', 'string', 'max:100'],
+            'receipt_document_path' => ['nullable', 'string', 'max:255'],
+            'receipt_file' => ['nullable', 'file', 'mimes:jpeg,png,jpg,pdf', 'max:5120'],
+            'notes' => ['nullable', 'string', 'max:1000'],
         ];
     }
 }

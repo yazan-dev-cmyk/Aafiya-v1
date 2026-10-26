@@ -12,6 +12,7 @@ class PatientAuthShell extends StatefulWidget {
     required this.sessionManager,
     required this.apiClient,
     required this.onLoginSuccess,
+    this.masterDataService,
     this.onLocaleChanged,
     this.currentLocale,
     this.initialMode = AuthMode.login,
@@ -20,6 +21,7 @@ class PatientAuthShell extends StatefulWidget {
   final AuthSessionManager sessionManager;
   final ApiClient apiClient;
   final VoidCallback onLoginSuccess;
+  final MasterDataService? masterDataService;
   final ValueChanged<Locale>? onLocaleChanged;
   final Locale? currentLocale;
   final AuthMode initialMode;
@@ -30,13 +32,18 @@ class PatientAuthShell extends StatefulWidget {
 
 class _PatientAuthShellState extends State<PatientAuthShell> {
   late AuthMode _mode;
+  late final MasterDataService _masterDataService;
 
   // Controllers
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
+  final _addressController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+
+  String? _selectedWilayaCode;
+  String? _selectedCommuneCode;
 
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
@@ -47,6 +54,8 @@ class _PatientAuthShellState extends State<PatientAuthShell> {
   void initState() {
     super.initState();
     _mode = widget.initialMode;
+    _masterDataService =
+        widget.masterDataService ?? MasterDataService(widget.apiClient);
   }
 
   @override
@@ -55,6 +64,7 @@ class _PatientAuthShellState extends State<PatientAuthShell> {
     _passwordController.dispose();
     _nameController.dispose();
     _phoneController.dispose();
+    _addressController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
   }
@@ -271,6 +281,22 @@ class _PatientAuthShellState extends State<PatientAuthShell> {
       return;
     }
 
+    if (_selectedWilayaCode == null || _selectedWilayaCode!.isEmpty) {
+      await _showErrorDialog(
+        title: strings.registrationFailedTitle,
+        message: strings.wilayaRequired,
+      );
+      return;
+    }
+
+    if (_selectedCommuneCode == null || _selectedCommuneCode!.isEmpty) {
+      await _showErrorDialog(
+        title: strings.registrationFailedTitle,
+        message: strings.communeRequired,
+      );
+      return;
+    }
+
     if (!_acceptedTerms) {
       await _showErrorDialog(
         title: strings.registrationFailedTitle,
@@ -281,6 +307,8 @@ class _PatientAuthShellState extends State<PatientAuthShell> {
 
     setState(() => _isLoading = true);
 
+    final address = _addressController.text.trim();
+
     // Registration is a non-idempotent mutation: allowRetry is strictly false
     final result = await widget.apiClient.post(
       ApiEndpoints.register,
@@ -289,6 +317,9 @@ class _PatientAuthShellState extends State<PatientAuthShell> {
         'email': email,
         'phone': phone,
         'password': password,
+        'wilaya_code': _selectedWilayaCode,
+        'commune_code': _selectedCommuneCode,
+        if (address.isNotEmpty) 'address': address,
         'accepted_terms': true,
         'terms_version': '2026.1',
       },
@@ -455,7 +486,7 @@ class _PatientAuthShellState extends State<PatientAuthShell> {
                       AafiyaTextField(
                         label: strings.fullNameLabel,
                         controller: _nameController,
-                        hintText: 'فاطمة بن علي',
+                        hintText: 'خالد جديد',
                         prefixIcon: const Icon(Icons.person_outline),
                         enabled: !_isLoading,
                       ),
@@ -466,6 +497,44 @@ class _PatientAuthShellState extends State<PatientAuthShell> {
                         keyboardType: TextInputType.phone,
                         hintText: '0555123456',
                         prefixIcon: const Icon(Icons.phone_outlined),
+                        enabled: !_isLoading,
+                      ),
+                      const SizedBox(height: 16),
+                      AafiyaWilayaSelector(
+                        masterDataService: _masterDataService,
+                        selectedCode: _selectedWilayaCode,
+                        onChanged: (wilaya) {
+                          setState(() {
+                            _selectedWilayaCode = wilaya?.code;
+                            _selectedCommuneCode = null;
+                          });
+                        },
+                        label: strings.wilayaLabel,
+                        hint: strings.selectWilaya,
+                        enabled: !_isLoading,
+                      ),
+                      const SizedBox(height: 16),
+                      AafiyaCommuneSelector(
+                        masterDataService: _masterDataService,
+                        wilayaCode: _selectedWilayaCode,
+                        selectedCode: _selectedCommuneCode,
+                        onChanged: (commune) {
+                          setState(() {
+                            _selectedCommuneCode = commune?.code;
+                          });
+                        },
+                        label: strings.communeLabel,
+                        hint: _selectedWilayaCode == null
+                            ? strings.selectWilayaFirst
+                            : strings.selectCommune,
+                        enabled: !_isLoading && _selectedWilayaCode != null,
+                      ),
+                      const SizedBox(height: 16),
+                      AafiyaTextField(
+                        label: '${strings.addressLabel} (${strings.optional})',
+                        controller: _addressController,
+                        hintText: strings.addressPlaceholder,
+                        prefixIcon: const Icon(Icons.location_on_outlined),
                         enabled: !_isLoading,
                       ),
                       const SizedBox(height: 16),

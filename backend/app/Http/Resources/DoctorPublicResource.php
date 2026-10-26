@@ -36,7 +36,17 @@ class DoctorPublicResource extends JsonResource
                         'id' => $clinic->id,
                         'name' => $clinic->name,
                         'wilaya' => $clinic->wilaya,
+                        'wilaya_id' => $clinic->wilaya_id,
+                        'commune_id' => $clinic->commune_id,
+                        'commune' => ($clinic->relationLoaded('commune') && $clinic->commune) ? [
+                            'code' => $clinic->commune->code,
+                            'name_ar' => $clinic->commune->name_ar,
+                            'name_fr' => $clinic->commune->name_fr,
+                        ] : null,
                         'address' => $clinic->address,
+                        'latitude' => $clinic->latitude !== null ? (float) $clinic->latitude : null,
+                        'longitude' => $clinic->longitude !== null ? (float) $clinic->longitude : null,
+                        'google_maps_link' => $clinic->google_maps_link,
                         'phone' => $clinic->phone,
                         'position' => $clinic->pivot?->position,
                     ]);

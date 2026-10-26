@@ -410,6 +410,27 @@ export function PlatformAdminDashboard({ onBackToMainPlatform, onOpenAssistantDa
     }
   };
 
+  const handleDownloadAdminReceipt = async (requestId: string, filename: string) => {
+    try {
+      const blob = await adminService.downloadPackagePurchaseRequestReceipt(requestId);
+      const url = window.URL.createObjectURL(blob);
+      const isPdf = blob.type.includes('pdf');
+      const isImage = blob.type.includes('image');
+      if (isPdf || isImage) {
+        window.open(url, '_blank');
+      } else {
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename || 'receipt_document.pdf';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+    } catch (err: any) {
+      alert(err.message || (isRtl ? 'تعذر تحميل إيصال الدفع من Google Drive' : 'Failed to download receipt'));
+    }
+  };
+
   const handleApproveDoctor = async (doc: AdminDoctorItem) => {
     if (!confirm(isRtl ? `هل أنت متأكد من مراجعة واعتماد حساب الطبيب (${doc.name}) ورقم الترخيص (${doc.license_number}) وتفعيل لوحة التحكم الكلينيكية؟` : `Approve doctor ${doc.name} (${doc.license_number})?`)) {
       return;
@@ -1539,7 +1560,13 @@ export function PlatformAdminDashboard({ onBackToMainPlatform, onOpenAssistantDa
                       </div>
 
                       <p className="text-2xl font-black text-teal-600">
-                        {priceVal.toLocaleString()} <span className="text-xs font-bold text-slate-500">{isRtl ? 'د.ج' : 'DZD'}</span>
+                        {priceVal <= 0 ? (
+                          <span className="text-emerald-700">{isRtl ? 'مجاناً' : 'Free'}</span>
+                        ) : (
+                          <>
+                            {priceVal.toLocaleString()} <span className="text-xs font-bold text-slate-500">{isRtl ? 'د.ج' : 'DZD'}</span>
+                          </>
+                        )}
                       </p>
 
                       <div className="p-2.5 bg-white border border-slate-200 rounded-xl space-y-1">
@@ -1738,7 +1765,13 @@ export function PlatformAdminDashboard({ onBackToMainPlatform, onOpenAssistantDa
                           </span>
                         </td>
                         <td className="p-3 font-bold text-slate-900 font-mono">
-                          {Number(req.price_dzd).toLocaleString()} {isRtl ? 'دج' : 'DZD'}
+                          {Number(req.price_dzd) <= 0 ? (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 font-sans">
+                              {isRtl ? 'مجاناً' : 'Free'}
+                            </span>
+                          ) : (
+                            `${Number(req.price_dzd).toLocaleString()} ${isRtl ? 'دج' : 'DZD'}`
+                          )}
                         </td>
                         <td className="p-3">
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-slate-100 text-slate-800 font-medium text-[11px]">
@@ -1877,17 +1910,39 @@ export function PlatformAdminDashboard({ onBackToMainPlatform, onOpenAssistantDa
                       </div>
                       <div>
                         <span className="text-slate-500 block">{isRtl ? 'السعر المتفق عليه:' : 'Price:'}</span>
-                        <strong className="text-slate-900 block">{Number(selectedRequestDetails.price_dzd).toLocaleString()} {isRtl ? 'دج' : 'DZD'}</strong>
+                        <strong className="text-slate-900 block">
+                          {Number(selectedRequestDetails.price_dzd) <= 0 ? (
+                            <span className="text-emerald-700 font-bold">{isRtl ? 'مجاناً (بدون رسوم)' : 'Free (No fee)'}</span>
+                          ) : (
+                            `${Number(selectedRequestDetails.price_dzd).toLocaleString()} ${isRtl ? 'دج' : 'DZD'}`
+                          )}
+                        </strong>
                       </div>
                     </div>
 
-                    <div className="p-3 bg-blue-50 rounded-xl border border-blue-200 space-y-1 text-blue-950">
+                    <div className="p-3 bg-blue-50 rounded-xl border border-blue-200 space-y-1.5 text-blue-950">
                       <span className="font-bold block">{isRtl ? 'بيانات التحويل والدفع:' : 'Payment Information:'}</span>
                       <p>{isRtl ? 'وسيلة التحويل:' : 'Method:'} <strong>{selectedRequestDetails.payment_method || 'BaridiMob'}</strong></p>
                       <p>{isRtl ? 'رقم الحوالة المرجعي:' : 'Reference:'} <strong className="font-mono">{selectedRequestDetails.transaction_reference || '--'}</strong></p>
                       {selectedRequestDetails.notes && (
                         <p>{isRtl ? 'ملاحظات المركز:' : 'Notes:'} <span>{selectedRequestDetails.notes}</span></p>
                       )}
+                      <div className="flex items-center justify-between gap-2 pt-1 border-t border-blue-200/60">
+                        <p className="text-xs text-blue-900">
+                          {isRtl ? 'إيصال الدفع المرفق:' : 'Payment Receipt:'}{' '}
+                          <span className="font-mono underline">{selectedRequestDetails.receipt_file_name || (selectedRequestDetails.has_receipt ? 'receipt.pdf' : (isRtl ? 'لا يوجد إيصال' : 'No receipt'))}</span>
+                        </p>
+                        {selectedRequestDetails.has_receipt && (
+                          <button
+                            type="button"
+                            onClick={() => handleDownloadAdminReceipt(selectedRequestDetails.id, selectedRequestDetails.receipt_file_name || 'receipt.pdf')}
+                            className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold cursor-pointer flex items-center gap-1.5 shadow-xs transition-colors"
+                          >
+                            <Download className="w-3.5 h-3.5" />
+                            <span>{isRtl ? 'معاينة / تحميل الإيصال' : 'View / Download Receipt'}</span>
+                          </button>
+                        )}
+                      </div>
                     </div>
 
                     {selectedRequestDetails.status === 'approved' && (
@@ -2182,7 +2237,15 @@ export function PlatformAdminDashboard({ onBackToMainPlatform, onOpenAssistantDa
                           +{payment.quota_units}
                         </td>
                         <td className="p-3 font-black text-slate-900 font-mono">
-                          {isRevenueMasked ? '•••••• دج' : `${Number(payment.price_dzd).toLocaleString()} ${isRtl ? 'دج' : 'DZD'}`}
+                          {Number(payment.price_dzd) <= 0 ? (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 font-sans">
+                              {isRtl ? 'مجانية' : 'Free'}
+                            </span>
+                          ) : isRevenueMasked ? (
+                            '•••••• دج'
+                          ) : (
+                            `${Number(payment.price_dzd).toLocaleString()} ${isRtl ? 'دج' : 'DZD'}`
+                          )}
                         </td>
                         <td className="p-3">
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-slate-100 text-slate-800 font-medium text-[11px]">
@@ -2294,7 +2357,13 @@ export function PlatformAdminDashboard({ onBackToMainPlatform, onOpenAssistantDa
                       </div>
                       <div>
                         <span className="text-slate-500 block">{isRtl ? 'المبلغ المحصل:' : 'Amount Paid:'}</span>
-                        <strong className="text-slate-900 text-sm block font-mono">{Number(selectedPaymentDetails.price_dzd).toLocaleString()} {isRtl ? 'دج' : 'DZD'}</strong>
+                        <strong className="text-slate-900 text-sm block font-mono">
+                          {Number(selectedPaymentDetails.price_dzd) <= 0 ? (
+                            <span className="text-emerald-700 font-sans font-bold">{isRtl ? 'باقة مجانية' : 'Free Package'}</span>
+                          ) : (
+                            `${Number(selectedPaymentDetails.price_dzd).toLocaleString()} ${isRtl ? 'دج' : 'DZD'}`
+                          )}
+                        </strong>
                       </div>
                     </div>
 

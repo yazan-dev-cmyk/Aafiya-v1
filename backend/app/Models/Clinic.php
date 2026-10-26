@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -31,6 +32,10 @@ class Clinic extends Model
         'address',
         'wilaya',
         'wilaya_id',
+        'commune_id',
+        'latitude',
+        'longitude',
+        'google_maps_link',
         'phone',
         'director_doctor_id',
         'max_patients_per_slot',
@@ -49,7 +54,21 @@ class Clinic extends Model
             'is_active' => 'boolean',
             'max_patients_per_slot' => 'integer',
             'slot_duration_min' => 'integer',
+            'latitude' => 'float',
+            'longitude' => 'float',
         ];
+    }
+
+    /**
+     * Get the Google Maps link (stored value, or dynamically generated from coordinates).
+     */
+    protected function googleMapsLink(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ?: ($this->latitude !== null && $this->longitude !== null
+                ? "https://maps.google.com/?q={$this->latitude},{$this->longitude}"
+                : null)
+        );
     }
 
     /**
@@ -58,6 +77,14 @@ class Clinic extends Model
     public function wilaya(): BelongsTo
     {
         return $this->belongsTo(Wilaya::class, 'wilaya_id');
+    }
+
+    /**
+     * The authoritative Commune of the clinic.
+     */
+    public function commune(): BelongsTo
+    {
+        return $this->belongsTo(Commune::class, 'commune_id');
     }
 
     /**

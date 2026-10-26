@@ -2,12 +2,14 @@
 
 namespace App\Services;
 
+use App\Models\Commune;
 use App\Models\EmergencyContact;
 use App\Models\Patient;
 use App\Models\PatientAllergy;
 use App\Models\PatientChronicCondition;
 use App\Models\PatientCurrentMedication;
 use App\Models\User;
+use App\Models\Wilaya;
 use App\Services\LegacyWilayaMigrationService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -31,7 +33,36 @@ class EhrService
             $mrn = $this->generateMrn();
 
             $wilayaStr = $data['wilaya'] ?? null;
-            $wilayaId = $data['wilaya_id'] ?? ($wilayaStr !== null ? $this->wilayaResolver->resolveWilaya($wilayaStr)?->id : null);
+            $wilayaCode = $data['wilaya_code'] ?? null;
+            $communeCode = $data['commune_code'] ?? null;
+            $wilayaId = $data['wilaya_id'] ?? null;
+            $communeId = $data['commune_id'] ?? null;
+
+            // Resolve Wilaya via canonical code or legacy resolver
+            if (! empty($wilayaCode)) {
+                $wilayaModel = Wilaya::where('code', $wilayaCode)->first();
+                if ($wilayaModel) {
+                    $wilayaId = $wilayaModel->id;
+                    $wilayaStr = $wilayaModel->name_ar;
+                }
+            } elseif ($wilayaId === null && $wilayaStr !== null) {
+                $wilayaId = $this->wilayaResolver->resolveWilaya($wilayaStr)?->id;
+            }
+
+            // Resolve Commune via canonical code
+            if (! empty($communeCode)) {
+                $communeQuery = Commune::where('code', $communeCode);
+                if ($wilayaId !== null) {
+                    $communeQuery->where('wilaya_id', $wilayaId);
+                }
+                $communeModel = $communeQuery->first();
+                if ($communeModel) {
+                    $communeId = $communeModel->id;
+                    if ($wilayaId === null) {
+                        $wilayaId = $communeModel->wilaya_id;
+                    }
+                }
+            }
 
             return Patient::create([
                 'user_id' => $data['user_id'] ?? null,
@@ -47,6 +78,7 @@ class EhrService
                 'address' => $data['address'] ?? null,
                 'wilaya' => $wilayaStr,
                 'wilaya_id' => $wilayaId,
+                'commune_id' => $communeId,
                 'is_active' => true,
             ]);
         }, 5);
@@ -72,13 +104,24 @@ class EhrService
             'is_active' => isset($data['is_active']) ? (bool) $data['is_active'] : $patient->is_active,
         ];
 
-        if (array_key_exists('wilaya', $data)) {
+        if (array_key_exists('wilaya_code', $data)) {
+            $wilayaModel = ! empty($data['wilaya_code']) ? Wilaya::where('code', $data['wilaya_code'])->first() : null;
+            $updateData['wilaya_id'] = $wilayaModel?->id;
+            $updateData['wilaya'] = $wilayaModel?->name_ar;
+        } elseif (array_key_exists('wilaya', $data)) {
             $wilayaStr = $data['wilaya'];
             $wilayaId = $data['wilaya_id'] ?? ($wilayaStr !== null ? $this->wilayaResolver->resolveWilaya($wilayaStr)?->id : null);
             $updateData['wilaya'] = $wilayaStr;
             $updateData['wilaya_id'] = $wilayaId;
         } elseif (array_key_exists('wilaya_id', $data)) {
             $updateData['wilaya_id'] = $data['wilaya_id'];
+        }
+
+        if (array_key_exists('commune_code', $data)) {
+            $communeModel = ! empty($data['commune_code']) ? Commune::where('code', $data['commune_code'])->first() : null;
+            $updateData['commune_id'] = $communeModel?->id;
+        } elseif (array_key_exists('commune_id', $data)) {
+            $updateData['commune_id'] = $data['commune_id'];
         }
 
         $patient->update(array_filter($updateData, fn ($val) => $val !== null));

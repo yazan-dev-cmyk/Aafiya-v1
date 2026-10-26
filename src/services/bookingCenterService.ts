@@ -41,6 +41,8 @@ export interface PackagePurchaseRequestItem {
   payment_method?: string;
   transaction_reference?: string;
   receipt_document_path?: string;
+  has_receipt?: boolean;
+  receipt_file_name?: string;
   status: 'pending' | 'approved' | 'rejected';
   notes?: string;
   reviewed_by?: {
@@ -77,9 +79,28 @@ export const bookingCenterService = {
     payment_method?: string;
     transaction_reference?: string;
     receipt_document_path?: string;
+    receipt_file?: File;
     notes?: string;
-  }): Promise<ApiResponse<PackagePurchaseRequestItem>> => {
-    return api.post<PackagePurchaseRequestItem>('/booking-centers/purchase-requests', data);
+  } | FormData): Promise<ApiResponse<PackagePurchaseRequestItem>> => {
+    let payload: FormData | any = data;
+    if (!(data instanceof FormData) && (data as any).receipt_file) {
+      const typed = data as {
+        package_id: string;
+        payment_method?: string;
+        transaction_reference?: string;
+        receipt_document_path?: string;
+        receipt_file?: File;
+        notes?: string;
+      };
+      const fd = new FormData();
+      fd.append('package_id', typed.package_id);
+      if (typed.payment_method) fd.append('payment_method', typed.payment_method);
+      if (typed.transaction_reference) fd.append('transaction_reference', typed.transaction_reference);
+      if (typed.notes) fd.append('notes', typed.notes);
+      fd.append('receipt_file', typed.receipt_file!);
+      payload = fd;
+    }
+    return api.post<PackagePurchaseRequestItem>('/booking-centers/purchase-requests', payload);
   },
 
   getPurchaseRequests: async (params?: Record<string, any>): Promise<ApiResponse<PackagePurchaseRequestItem[]>> => {

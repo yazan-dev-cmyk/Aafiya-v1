@@ -113,6 +113,7 @@ Route::middleware(['auth:sanctum', 'throttle:api.general', 'active.clinic'])->gr
     Route::post('/booking-centers/purchase-package', [\App\Http\Controllers\Api\V1\BookingCenterController::class, 'purchasePackage']);
     Route::post('/booking-centers/purchase-requests', [\App\Http\Controllers\Api\V1\PackagePurchaseRequestController::class, 'store']);
     Route::get('/booking-centers/purchase-requests', [\App\Http\Controllers\Api\V1\PackagePurchaseRequestController::class, 'indexOwn']);
+    Route::get('/booking-centers/purchase-requests/{packagePurchaseRequest}/receipt', [\App\Http\Controllers\Api\V1\PackagePurchaseRequestController::class, 'showOwnReceipt']);
     Route::post('/booking-centers/resubmit', [\App\Http\Controllers\Api\V1\BookingCenterController::class, 'resubmit']);
     Route::put('/booking-centers/profile', [\App\Http\Controllers\Api\V1\BookingCenterController::class, 'updateSettings']);
     Route::get('/booking-centers/financial-summary', [\App\Http\Controllers\Api\V1\FinancialReportController::class, 'bookingCenterSummary']);
@@ -233,6 +234,7 @@ Route::middleware(['auth:sanctum', 'throttle:api.general', 'active.clinic'])->gr
     Route::get('/admin/package-purchase-requests/{packagePurchaseRequest}', [\App\Http\Controllers\Api\V1\PackagePurchaseRequestController::class, 'show']);
     Route::post('/admin/package-purchase-requests/{packagePurchaseRequest}/approve', [\App\Http\Controllers\Api\V1\PackagePurchaseRequestController::class, 'approve']);
     Route::post('/admin/package-purchase-requests/{packagePurchaseRequest}/reject', [\App\Http\Controllers\Api\V1\PackagePurchaseRequestController::class, 'reject']);
+    Route::get('/admin/package-purchase-requests/{packagePurchaseRequest}/receipt', [\App\Http\Controllers\Api\V1\PackagePurchaseRequestController::class, 'showReceipt']);
 
     // Doctor Profile Verification (Admin & Authorized Assistant)
     Route::put('/admin/doctors/{id}/verify', [\App\Http\Controllers\Api\V1\DoctorController::class, 'verifyDoctor'])->whereUuid('id');

@@ -3,10 +3,12 @@
 namespace App\Services;
 
 use App\Models\Clinic;
+use App\Models\Commune;
 use App\Models\Doctor;
 use App\Models\DoctorClinic;
 use App\Models\MedicalSpecialty;
 use App\Models\User;
+use App\Models\Wilaya;
 use App\Services\LegacySpecialtyResolutionService;
 use App\Services\LegacyWilayaMigrationService;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -66,13 +68,56 @@ class DoctorProvisioningService
 
             // 4. Provision Clinic for Founding Director (Pending until Director is verified)
             $clinicName = $clinicData['name'] ?? ('عيادة ' . $userData['name']);
-            $wilayaStr = $clinicData['wilaya'] ?? 'الجزائر العاصمة';
-            $wilayaId = $clinicData['wilaya_id'] ?? ($wilayaStr !== null ? $this->wilayaResolver->resolveWilaya($wilayaStr)?->id : null);
+            $wilayaStr = $clinicData['wilaya'] ?? null;
+            $wilayaId = $clinicData['wilaya_id'] ?? null;
+            $communeId = $clinicData['commune_id'] ?? null;
+            $wilayaCode = $clinicData['wilaya_code'] ?? null;
+            $communeCode = $clinicData['commune_code'] ?? null;
+
+            // Resolve Wilaya via canonical code
+            if (! empty($wilayaCode)) {
+                $wilayaModel = Wilaya::where('code', $wilayaCode)->first();
+                if ($wilayaModel) {
+                    $wilayaId = $wilayaModel->id;
+                    $wilayaStr = $wilayaModel->name_ar;
+                }
+            } elseif ($wilayaId !== null) {
+                $wilayaModel = Wilaya::find($wilayaId);
+                if ($wilayaModel) {
+                    $wilayaStr = $wilayaModel->name_ar;
+                }
+            } elseif (! empty($wilayaStr)) {
+                $resolved = $this->wilayaResolver->resolveWilaya($wilayaStr);
+                if ($resolved) {
+                    $wilayaId = $resolved->id;
+                    $wilayaStr = $resolved->name_ar;
+                }
+            }
+
+            // Resolve Commune via canonical code
+            if (! empty($communeCode)) {
+                $communeQuery = Commune::where('code', $communeCode);
+                if ($wilayaId !== null) {
+                    $communeQuery->where('wilaya_id', $wilayaId);
+                }
+                $communeModel = $communeQuery->first();
+                if ($communeModel) {
+                    $communeId = $communeModel->id;
+                    if ($wilayaId === null) {
+                        $wilayaId = $communeModel->wilaya_id;
+                    }
+                }
+            }
+
             $clinic = Clinic::create([
                 'name' => $clinicName,
-                'address' => $clinicData['address'] ?? 'الجزائر',
-                'wilaya' => $wilayaStr,
+                'address' => $clinicData['address'] ?? ($wilayaStr ?? 'الجزائر'),
+                'wilaya' => $wilayaStr ?? 'الجزائر العاصمة',
                 'wilaya_id' => $wilayaId,
+                'commune_id' => $communeId,
+                'latitude' => $clinicData['latitude'] ?? null,
+                'longitude' => $clinicData['longitude'] ?? null,
+                'google_maps_link' => $clinicData['google_maps_link'] ?? null,
                 'phone' => $clinicData['phone'] ?? $userData['phone'],
                 'director_doctor_id' => $doctor->id,
                 'max_patients_per_slot' => $clinicData['max_patients_per_slot'] ?? 1,
