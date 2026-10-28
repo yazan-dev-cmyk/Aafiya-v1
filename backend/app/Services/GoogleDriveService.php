@@ -64,51 +64,55 @@ class GoogleDriveService
             ];
         }
 
-        $accessToken = $this->getAccessToken();
         $mimeType = $file->getMimeType() ?: 'application/octet-stream';
         $fileContent = file_get_contents($file->getRealPath());
 
-        $boundary = '-------' . bin2hex(random_bytes(16));
-        $delimiter = "\r\n--" . $boundary . "\r\n";
-        $closeDelimiter = "\r\n--" . $boundary . "--";
+        try {
+            $accessToken = $this->getAccessToken();
 
-        $metadata = json_encode([
-            'name' => $customFileName,
-            'parents' => array_filter([$this->folderId]),
-        ]);
+            $boundary = '-------' . bin2hex(random_bytes(16));
+            $delimiter = "\r\n--" . $boundary . "\r\n";
+            $closeDelimiter = "\r\n--" . $boundary . "--";
 
-        $multipartBody = $delimiter
-            . "Content-Type: application/json; charset=UTF-8\r\n\r\n"
-            . $metadata
-            . $delimiter
-            . "Content-Type: " . $mimeType . "\r\n\r\n"
-            . $fileContent
-            . $closeDelimiter;
+            $metadata = json_encode([
+                'name' => $customFileName,
+                'parents' => array_filter([$this->folderId]),
+            ]);
 
-        $ch = curl_init('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,mimeType,size');
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => $multipartBody,
-            CURLOPT_HTTPHEADER => [
-                'Authorization: Bearer ' . $accessToken,
-                'Content-Type: multipart/related; boundary=' . $boundary,
-                'Content-Length: ' . strlen($multipartBody),
-            ],
-            CURLOPT_TIMEOUT => 30,
-        ]);
+            $multipartBody = $delimiter
+                . "Content-Type: application/json; charset=UTF-8\r\n\r\n"
+                . $metadata
+                . $delimiter
+                . "Content-Type: " . $mimeType . "\r\n\r\n"
+                . $fileContent
+                . $closeDelimiter;
 
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $curlError = curl_error($ch);
-        curl_close($ch);
+            $ch = curl_init('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,mimeType,size');
+            curl_setopt_array($ch, [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST => true,
+                CURLOPT_POSTFIELDS => $multipartBody,
+                CURLOPT_HTTPHEADER => [
+                    'Authorization: Bearer ' . $accessToken,
+                    'Content-Type: multipart/related; boundary=' . $boundary,
+                    'Content-Length: ' . strlen($multipartBody),
+                ],
+                CURLOPT_TIMEOUT => 30,
+            ]);
 
-        if ($curlError || $httpCode < 200 || $httpCode >= 300) {
-            // If Google Drive quota is exceeded (common for Service Accounts on personal folders), fallback to private local storage
-            if ($httpCode === 403 && str_contains($response, 'storageQuotaExceeded')) {
-                Log::warning('Google Drive Service Account lacks quota on personal drive folder. Seamlessly falling back to secure private storage.', [
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+
+            if ($curlError || $httpCode < 200 || $httpCode >= 300) {
+                Log::warning("Google Drive Upload encountered HTTP {$httpCode}. Seamlessly falling back to secure private local storage.", [
                     'filename' => $customFileName,
+                    'http_code' => $httpCode,
+                    'curl_error' => $curlError,
+                    'response' => $response,
                 ]);
+
                 $localRelPath = 'receipts/' . $customFileName;
                 \Illuminate\Support\Facades\Storage::disk('local')->put($localRelPath, $fileContent);
 
@@ -122,26 +126,36 @@ class GoogleDriveService
                 ];
             }
 
-            Log::error('Google Drive Upload Failed', [
-                'http_code' => $httpCode,
-                'curl_error' => $curlError,
-                'response' => $response,
+            $data = json_decode($response, true);
+            if (empty($data['id'])) {
+                throw new RuntimeException('فشل استلام معرّف الملف من Google Drive بعد الرفع.');
+            }
+
+            return [
+                'file_id' => $data['id'],
+                'name' => $data['name'] ?? $customFileName,
+                'mime_type' => $data['mimeType'] ?? $mimeType,
+                'size' => (int) ($data['size'] ?? strlen($fileContent)),
+                'storage' => 'gdrive',
+            ];
+        } catch (\Throwable $e) {
+            Log::warning('Google Drive Upload or Authentication failed. Seamlessly falling back to secure private local storage.', [
+                'error' => $e->getMessage(),
+                'filename' => $customFileName,
             ]);
-            throw new RuntimeException("فشل رفع إيصال الدفع إلى Google Drive (رمز الخطأ: {$httpCode})");
-        }
 
-        $data = json_decode($response, true);
-        if (empty($data['id'])) {
-            throw new RuntimeException('فشل استلام معرّف الملف من Google Drive بعد الرفع.');
-        }
+            $localRelPath = 'receipts/' . $customFileName;
+            \Illuminate\Support\Facades\Storage::disk('local')->put($localRelPath, $fileContent);
 
-        return [
-            'file_id' => $data['id'],
-            'name' => $data['name'] ?? $customFileName,
-            'mime_type' => $data['mimeType'] ?? $mimeType,
-            'size' => (int) ($data['size'] ?? strlen($fileContent)),
-            'storage' => 'gdrive',
-        ];
+            return [
+                'file_id' => 'local_' . bin2hex(random_bytes(8)),
+                'name' => $customFileName,
+                'mime_type' => $mimeType,
+                'size' => strlen($fileContent),
+                'storage' => 'local',
+                'storage_path' => $localRelPath,
+            ];
+        }
     }
 
     /**
@@ -298,6 +312,16 @@ class GoogleDriveService
      */
     protected function loadCredentials(): array
     {
+        // 1. Check if raw JSON credentials are provided directly in environment variable (e.g. on Railway/Heroku)
+        $envJson = env('GOOGLE_SERVICE_ACCOUNT_JSON') ?: config('services.google.drive.credentials_json');
+        if (!empty($envJson)) {
+            $data = is_array($envJson) ? $envJson : json_decode((string) $envJson, true);
+            if ($data && !empty($data['client_email']) && !empty($data['private_key'])) {
+                return $data;
+            }
+        }
+
+        // 2. Otherwise load from credentials file path
         $path = $this->credentialsPath;
         if (!file_exists($path)) {
             $basePath = base_path($path);
