@@ -95,6 +95,8 @@ abstract final class ApiEndpoints {
 
   // Notifications & Escalations (PHASE-COMMS-02)
   static const String patientNotifications = '/patient/notifications';
+  static const String patientNotificationsUnreadCount =
+      '/patient/notifications/unread-count';
   static String patientNotificationAcknowledge(String id) =>
       '/patient/notifications/$id/acknowledge';
   static const String clinicEscalations = '/clinic/notifications/escalations';

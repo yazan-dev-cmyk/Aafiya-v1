@@ -21,6 +21,7 @@ class AdvertisementController extends Controller
 
     /**
      * Public list of active targeted advertisements.
+     * Note: Pure read-only query to prevent state mutation on GET requests.
      */
     public function index(Request $request): AnonymousResourceCollection
     {
@@ -30,11 +31,6 @@ class AdvertisementController extends Controller
             'target_specialty',
             'target_wilaya',
         ]));
-
-        // Record impressions
-        foreach ($ads as $ad) {
-            $this->adService->recordImpression($ad);
-        }
 
         return AdvertisementResource::collection($ads);
     }
@@ -71,10 +67,19 @@ class AdvertisementController extends Controller
     }
 
     /**
-     * Show single advertisement.
+     * Show single advertisement (Protected against IDOR).
      */
-    public function show(Advertisement $advertisement): JsonResponse
+    public function show(Request $request, Advertisement $advertisement): JsonResponse
     {
+        $user = $request->user();
+        if (! $user || ($advertisement->user_id !== $user->id && ! $user->hasRole('admin'))) {
+            return response()->json([
+                'status' => 'error',
+                'code' => 403,
+                'message' => 'غير مصرح لك بعرض تفاصيل هذه الحملة الإعلانية.',
+            ], 403);
+        }
+
         return response()->json([
             'data' => new AdvertisementResource($advertisement->load(['clinic', 'doctor.user'])),
         ]);

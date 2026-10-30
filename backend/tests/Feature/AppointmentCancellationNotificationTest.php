@@ -114,7 +114,7 @@ class AppointmentCancellationNotificationTest extends TestCase
             'phone' => '+213553300003',
             'is_active' => true,
         ]);
-        $this->patientUser->assignRole('patient');
+        $this->patientUser->assignRole('patient_registered');
 
         $this->patient = Patient::create([
             'id' => (string) Str::uuid(),
@@ -137,7 +137,7 @@ class AppointmentCancellationNotificationTest extends TestCase
             'phone' => '+213554400004',
             'is_active' => true,
         ]);
-        $this->otherPatientUser->assignRole('patient');
+        $this->otherPatientUser->assignRole('patient_registered');
 
         $this->otherPatient = Patient::create([
             'id' => (string) Str::uuid(),
@@ -220,6 +220,9 @@ class AppointmentCancellationNotificationTest extends TestCase
             ])
             ->assertStatus(200);
 
+        // Flush in-memory auth guard state before authenticating as patient
+        $this->app['auth']->forgetGuards();
+
         // Query patient notifications
         $response = $this->withHeader('Authorization', 'Bearer ' . $this->patientToken)
             ->getJson('/api/v1/patient/notifications');
@@ -290,6 +293,9 @@ class AppointmentCancellationNotificationTest extends TestCase
         $this->withHeader('Authorization', 'Bearer ' . $this->assistantToken)
             ->postJson("/api/v1/appointments/{$appointment->id}/cancel", ['reason' => 'إلغاء خاص'])
             ->assertStatus(200);
+
+        // Flush in-memory auth guard state before authenticating as other patient
+        $this->app['auth']->forgetGuards();
 
         // Other patient queries their notifications
         $response = $this->withHeader('Authorization', 'Bearer ' . $this->otherPatientToken)

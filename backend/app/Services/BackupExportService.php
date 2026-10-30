@@ -23,18 +23,17 @@ class BackupExportService
 
     /**
      * Verify if user possesses required administrative authority to export backups.
+     *
+     * In AAFIYA V1, backup export is strictly restricted to administrator accounts ('admin').
+     * Note on Primary/Super Admin: The current database schema does not distinguish multiple
+     * admin accounts (no 'is_primary_admin' flag or separate 'super_admin' role exists).
+     * Assistant delegation ('admin_assistant') for backup export is explicitly disallowed.
+     * Architectural resolution of a distinct primary administrator identity remains a pending human decision.
      */
     public function canExport(User $user): bool
     {
-        if ($user->hasRole('admin')) {
-            return true;
-        }
-
-        if ($user->hasRole('admin_assistant') && $user->has4DAccess('platform.export_backup')) {
-            return true;
-        }
-
-        return false;
+        // Strictly restrict to 'admin' role; admin_assistant delegation is revoked.
+        return $user->hasRole('admin');
     }
 
     /**

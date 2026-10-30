@@ -12,8 +12,7 @@ import {
   ScanLine, 
   CheckCircle2, 
   ArrowLeft,
-  ShieldCheck,
-  Zap
+  ShieldCheck
 } from 'lucide-react';
 import { RoleType } from '../types';
 import { Button } from './ui/Button';
@@ -143,11 +142,6 @@ export const StakeholderBenefits: React.FC<StakeholderBenefitsProps> = ({ onOpen
                       <span>{t('cta_prefix')} {t(`${selectedBenefit.id}.title`).split('(')[0]}</span>
                       <ArrowLeft className={cn("w-5 h-5", locale === 'en' && "rotate-180")} />
                     </Button>
-                    
-                    <div className="text-xs font-black text-slate-400 flex items-center gap-2">
-                      <Zap className="w-4 h-4 text-primary" />
-                      {t('trust_text')}
-                    </div>
                   </div>
 
                 </div>

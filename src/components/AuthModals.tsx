@@ -444,22 +444,22 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
             {isRegister && (
               <div className="space-y-4">
                 <label className={cn("text-xs font-black text-slate-800 block", isRtl ? "mr-1" : "ml-1")}>{t('chooseAccountType')}</label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
                   {accountTypes.map((type) => (
                     <button
                       key={type.id}
                       type="button"
                       onClick={() => setSelectedRole(type.id)}
-                      className={`p-4 rounded-2xl border-2 transition-all text-center flex flex-col items-center gap-2 group ${
+                      className={`p-2.5 sm:p-4 rounded-xl sm:rounded-2xl border-2 transition-all text-center flex flex-col items-center gap-1.5 sm:gap-2 group ${
                         selectedRole === type.id 
                           ? 'bg-primary/5 border-primary shadow-lg shadow-primary/5' 
                           : 'bg-white border-slate-100 hover:border-slate-200'
                       }`}
                     >
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 ${type.bg} ${type.color}`}>
-                        <type.icon className="w-5 h-5" />
+                      <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 ${type.bg} ${type.color}`}>
+                        <type.icon className="w-4 h-4 sm:w-5 sm:h-5" />
                       </div>
-                      <span className={`text-[10px] font-black ${selectedRole === type.id ? 'text-primary' : 'text-slate-600'}`}>
+                      <span className={`text-[10px] font-black line-clamp-1 ${selectedRole === type.id ? 'text-primary' : 'text-slate-600'}`}>
                         {type.label}
                       </span>
                     </button>
@@ -724,10 +724,12 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
                 </div>
 
                 {isRegister ? (
-                  <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                  <div key="register-terms-section" className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
                     <label className="flex items-start gap-3 cursor-pointer group select-none">
                       <input
+                        key="register-terms-checkbox"
                         type="checkbox"
+                        name="acceptedTerms"
                         required
                         checked={acceptedTerms}
                         onChange={(e) => setAcceptedTerms(e.target.checked)}
@@ -756,9 +758,15 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
                     </label>
                   </div>
                 ) : (
-                  <div className="flex items-center justify-between">
+                  <div key="login-remember-section" className="flex items-center justify-between">
                     <label className="flex items-center gap-2 cursor-pointer group">
-                      <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary/20" />
+                      <input
+                        key="login-remember-checkbox"
+                        type="checkbox"
+                        name="rememberMe"
+                        defaultChecked={false}
+                        className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary/20"
+                      />
                       <span className="text-xs text-slate-500 font-bold group-hover:text-slate-700 transition-colors">{t('rememberMe')}</span>
                     </label>
                     <button type="button" className="text-xs text-primary font-black hover:underline">{t('forgotPassword')}</button>

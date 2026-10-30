@@ -80,7 +80,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
       onClose={onClose}
       position="top"
       size="lg"
-      className="!rounded-[24px]"
+      className="!rounded-2xl sm:!rounded-[24px]"
     >
       <div className="space-y-6">
         {/* Search Input */}

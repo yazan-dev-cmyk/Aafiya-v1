@@ -7,6 +7,7 @@ export 'tokens/aafiya_spacing.dart';
 export 'tokens/aafiya_typography.dart';
 export 'widgets/aafiya_app_bar.dart';
 export 'widgets/aafiya_button.dart';
+export 'widgets/aafiya_locked_action.dart';
 export 'widgets/aafiya_card.dart';
 export 'widgets/aafiya_crash_boundary.dart';
 export 'widgets/aafiya_empty_view.dart';

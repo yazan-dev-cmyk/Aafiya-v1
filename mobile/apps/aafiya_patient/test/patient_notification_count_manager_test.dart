@@ -158,7 +158,8 @@ void main() {
 
       // A NEW refresh starts and completes with stale data
       await manager.refresh();
-      expect(requestCount, 2);
+      // 2 refreshes x 2 requests each (fetchUnreadCount attempt + fetchNotifications fallback) = 4
+      expect(requestCount, 4);
 
       // Local tombstone prevents resurrecting notif-101
       expect(manager.unreadCount, 0);
@@ -330,6 +331,118 @@ void main() {
       await manager.refresh();
       expect(manager.unreadCount, 0);
       expect(manager.unacknowledgedIds, isEmpty);
+
+      manager.dispose();
+      sessionManager.dispose();
+    });
+
+    test(
+        '5. Queries /patient/notifications/unread-count directly in a single request and handles counts > 20 without truncation',
+        () async {
+      int endpointCalls = 0;
+      String? requestedPath;
+
+      final client = MockClient((request) async {
+        endpointCalls++;
+        requestedPath = request.url.path;
+        if (request.url.path.contains('/patient/notifications/unread-count')) {
+          return http.Response(
+            jsonEncode({'unread_count': 45}),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        }
+        return http.Response('Not Found', 404);
+      });
+
+      final apiClient = ApiClient(httpClient: client);
+      final sessionManager = AuthSessionManager(
+        tokenStorage: InMemoryTokenStorage('token-patient'),
+        apiClient: apiClient,
+      );
+      await sessionManager.setAuthenticatedUser(
+        user: testPatientUserA,
+        token: 'token-patient',
+      );
+
+      final service = PatientNotificationService(apiClient: apiClient);
+      final manager = PatientNotificationCountManager(
+        sessionManager: sessionManager,
+        service: service,
+      );
+
+      // Refresh queries the dedicated unread count endpoint
+      await manager.refresh();
+
+      expect(endpointCalls, equals(1));
+      expect(requestedPath, contains('/patient/notifications/unread-count'));
+      // Verifies that count > 20 is fully preserved without truncation
+      expect(manager.unreadCount, equals(45));
+
+      // Local acknowledgment decrements count
+      manager.markAcknowledged('notif-999');
+      expect(manager.unreadCount, equals(44));
+      expect(manager.locallyAcknowledgedIds.contains('notif-999'), isTrue);
+
+      manager.dispose();
+      sessionManager.dispose();
+    });
+
+    test(
+        '6. Server reconciliation with authoritative count: server count reduction clears tombstones',
+        () async {
+      int currentServerCount = 5;
+
+      final client = MockClient((request) async {
+        if (request.url.path.contains('/patient/notifications/unread-count')) {
+          return http.Response(
+            jsonEncode({'unread_count': currentServerCount}),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        }
+        return http.Response('Not Found', 404);
+      });
+
+      final apiClient = ApiClient(httpClient: client);
+      final sessionManager = AuthSessionManager(
+        tokenStorage: InMemoryTokenStorage('token-patient'),
+        apiClient: apiClient,
+      );
+      await sessionManager.setAuthenticatedUser(
+        user: testPatientUserA,
+        token: 'token-patient',
+      );
+
+      final service = PatientNotificationService(apiClient: apiClient);
+      final manager = PatientNotificationCountManager(
+        sessionManager: sessionManager,
+        service: service,
+      );
+
+      // 1. Initial count is 5
+      await manager.refresh();
+      expect(manager.unreadCount, equals(5));
+
+      // 2. User acknowledges 2 items locally
+      manager.markAcknowledged('item-1');
+      manager.markAcknowledged('item-2');
+      expect(manager.unreadCount, equals(3));
+      expect(manager.locallyAcknowledgedIds.length, equals(2));
+
+      // 3. Server now reflects acknowledgment (count decreases to 3)
+      currentServerCount = 3;
+      await manager.refresh();
+
+      // Local tombstones cleared because server count decreased to reflect acknowledgments
+      expect(manager.unreadCount, equals(3));
+      expect(manager.locallyAcknowledgedIds, isEmpty);
+
+      // 4. Server returns 0: all cleared
+      currentServerCount = 0;
+      await manager.refresh();
+      expect(manager.unreadCount, equals(0));
+      expect(manager.locallyAcknowledgedIds, isEmpty);
 
       manager.dispose();
       sessionManager.dispose();

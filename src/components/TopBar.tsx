@@ -57,13 +57,13 @@ export const TopBar: React.FC<TopBarProps> = ({
           <span className="truncate opacity-90 text-[11px]">
             {t('topbar.announcement')}
           </span>
-          <button
-            onClick={onOpenCalculator}
+          <a
+            href="#packages"
             className="hidden md:inline-flex items-center gap-1 text-white/80 hover:text-white underline cursor-pointer transition-colors shrink-0"
           >
-            {t('navigation.calculator')}
+            {t('navigation.packages')}
             <ArrowLeft className={cn("w-3 h-3", locale === 'en' && "rotate-180")} />
-          </button>
+          </a>
         </div>
 
         {/* Controls */}

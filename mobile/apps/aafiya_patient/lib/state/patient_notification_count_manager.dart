@@ -71,7 +71,9 @@ class PatientNotificationCountManager extends ChangeNotifier {
     }
   }
 
-  /// Refreshes the unread count by querying the latest page (up to 20 notifications).
+  int? _lastServerCount;
+
+  /// Refreshes the unread count by querying the server-authoritative unread count endpoint.
   Future<void> refresh() async {
     if (!_sessionManager.isAuthenticated) {
       reset();
@@ -85,7 +87,7 @@ class PatientNotificationCountManager extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
 
-    final result = await _service.fetchNotifications(page: 1);
+    final result = await _service.fetchUnreadCount();
 
     // Session isolation and in-flight invalidation check
     if (_sessionManager.sessionGeneration != sessionGen ||
@@ -94,32 +96,64 @@ class PatientNotificationCountManager extends ChangeNotifier {
       return;
     }
 
-    _isLoading = false;
-
     switch (result) {
       case ApiSuccess(:final data):
+        _isLoading = false;
         _errorMessage = null;
+        final serverCount = data;
 
-        // Purge locally acknowledged tombstones that server has confirmed as acknowledged
-        for (final item in data.items) {
-          if (item.isAcknowledged) {
-            _locallyAcknowledgedIds.remove(item.id);
-          }
+        // If server count decreased or reached 0, server has confirmed local acknowledgments
+        if ((_lastServerCount != null && serverCount < _lastServerCount!) ||
+            serverCount == 0) {
+          _locallyAcknowledgedIds.clear();
         }
 
-        // Rebuild unacknowledged set, strictly excluding anything still in local tombstones
-        _unacknowledgedIds = data.items
-            .where((n) =>
-                !n.isAcknowledged && !_locallyAcknowledgedIds.contains(n.id))
-            .map((n) => n.id)
-            .toSet();
-
-        _unreadCount = _unacknowledgedIds.length;
+        _lastServerCount = serverCount;
+        _unreadCount = (serverCount - _locallyAcknowledgedIds.length)
+            .clamp(0, serverCount);
+        if (_unreadCount == 0) {
+          _unacknowledgedIds.clear();
+        }
         notifyListeners();
 
       case ApiFailure(:final exception):
-        _errorMessage = exception.message;
-        notifyListeners();
+        // Fallback to paginated fetch for backwards compatibility or offline mocking
+        final fallbackResult = await _service.fetchNotifications(page: 1);
+        if (_sessionManager.sessionGeneration != sessionGen ||
+            _requestGeneration != requestGen ||
+            !_sessionManager.isAuthenticated) {
+          return;
+        }
+
+        _isLoading = false;
+
+        switch (fallbackResult) {
+          case ApiSuccess(data: final pageData):
+            _errorMessage = null;
+
+            // Purge locally acknowledged tombstones that server has confirmed as acknowledged
+            for (final item in pageData.items) {
+              if (item.isAcknowledged) {
+                _locallyAcknowledgedIds.remove(item.id);
+              }
+            }
+
+            // Rebuild unacknowledged set, strictly excluding anything still in local tombstones
+            _unacknowledgedIds = pageData.items
+                .where((n) =>
+                    !n.isAcknowledged &&
+                    !_locallyAcknowledgedIds.contains(n.id))
+                .map((n) => n.id)
+                .toSet();
+
+            _unreadCount = _unacknowledgedIds.length;
+            _lastServerCount = _unreadCount;
+            notifyListeners();
+
+          case ApiFailure():
+            _errorMessage = exception.message;
+            notifyListeners();
+        }
     }
   }
 
@@ -136,11 +170,11 @@ class PatientNotificationCountManager extends ChangeNotifier {
     // Invalidate any in-flight refresh requests that were dispatched before this acknowledgment
     _requestGeneration++;
 
-    final removed = _unacknowledgedIds.remove(id);
-    if (removed || _unreadCount != _unacknowledgedIds.length) {
-      _unreadCount = _unacknowledgedIds.length;
-      notifyListeners();
+    _unacknowledgedIds.remove(id);
+    if (_unreadCount > 0) {
+      _unreadCount--;
     }
+    notifyListeners();
   }
 
   /// Resets state and clears in-memory tracking.
@@ -148,6 +182,7 @@ class PatientNotificationCountManager extends ChangeNotifier {
     _unreadCount = 0;
     _isLoading = false;
     _errorMessage = null;
+    _lastServerCount = null;
     _unacknowledgedIds.clear();
     _locallyAcknowledgedIds.clear();
     _requestGeneration++;

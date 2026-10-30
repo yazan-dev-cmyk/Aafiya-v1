@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { useTranslations, useLocale } from 'next-intl';
 import { WaitingPatient } from '../../../data/doctorDashboardData';
+import { LockedActionButton } from '../../ui/LockedActionButton';
 
 interface CurrentConsultationTabProps {
   patient?: WaitingPatient | null;
@@ -106,13 +107,11 @@ export const CurrentConsultationTab: React.FC<CurrentConsultationTabProps> = ({
             <Scan className="w-4 h-4" />
             <span>{t('requestRad')}</span>
           </button>
-          <button
-            onClick={onCompleteConsultation}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs cursor-pointer transition-all flex items-center gap-1.5"
+          <LockedActionButton
+            className="px-4 py-2 bg-blue-600/60 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5"
           >
-            <CheckCircle2 className="w-4 h-4" />
             <span>{t('completeVisit')}</span>
-          </button>
+          </LockedActionButton>
         </div>
       </div>
 

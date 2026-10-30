@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "title": "Aafiya | Plateforme Médicale Numérique Nationale Unifiée",
+    "title": "Aafiya | Plateforme Numérique de Prise de Rendez-vous Médicaux en Algérie",
     "description": "La plateforme algérienne unifiée pour la gestion des services médicaux, réservations, laboratoires et centres de radiologie"
   },
   "doctorAssistant": {
@@ -177,7 +177,8 @@
     "logout": "Déconnexion"
   },
   "common": {
-    "title": "Aafiya | Plateforme Médicale Numérique Nationale Unifiée",
+    "featureLockedNotice": "Cette fonctionnalité est temporairement désactivée pour des raisons administratives et organisationnelles.",
+    "title": "Aafiya | Plateforme Numérique de Prise de Rendez-vous Médicaux en Algérie",
     "description": "La plateforme algérienne unifiée pour la gestion des services médicaux, réservations, laboratoires et centres de radiologie",
     "welcome": "Bienvenue sur Aafiya",
     "version": "Aafiya V1.0",
@@ -219,7 +220,7 @@
     "calculator": "Simulateur de Réservation"
   },
   "topbar": {
-    "announcement": "Plateforme de santé numérique unifiée — Ouverture de l'accréditation pour les centres agréés dans les 48 wilayas",
+    "announcement": "Plateforme de santé numérique unifiée — Ouverture de l'accréditation pour les centres agréés",
     "packageCalculator": "Calculateur de Forfait"
   },
   "hero": {
@@ -260,7 +261,7 @@
     "section_badge": "Fonctions Structurelles de la Plateforme",
     "title": "Fonctionnalités de la Plateforme Numérique Aafiya",
     "subtitle": "Chaque fonctionnalité est conçue selon des règles de gestion approuvées, au service de toutes les parties avec les plus hauts niveaux de transparence et d'efficacité.",
-    "official_function": "Fonction Opérationnelle Officielle",
+    "official_function": "Fonction Opérationnelle de la Plateforme",
     "booking_engine": {
       "title": "Système de Réservation Accrédité",
       "description": "Permet aux centres de réservation de gérer et confirmer facilement les demandes et d'utiliser les soldes de forfaits avec une précision extrême.",
@@ -303,7 +304,7 @@
     "title": "Quelle est la valeur ajoutée que nous vous offrons ?",
     "subtitle": "La plateforme garantit une valeur ajoutée pour toutes les catégories concernées avec un engagement total envers les limites de responsabilité et les règles opérationnelles numériques.",
     "cta_prefix": "Commencez maintenant en tant que ",
-    "trust_text": "Rejoignez plus de 500 établissements médicaux accrédités",
+    "trust_text": "Rejoignez l'écosystème de santé numérique",
     "reg_patient": {
       "title": "Patient Inscrit (Compte Permanent)",
       "highlight": "Dossier Médical Électronique Unifié",
@@ -415,17 +416,17 @@
     }
   },
   "packages": {
-    "section_badge": "Chapitre 12 : Forfaits et Centres de Réservation",
+    "section_badge": "Forfaits des Centres de Réservation Agréés",
     "title": "Forfaits Opérationnels Flexibles",
-    "subtitle": "Rentable et Durable",
-    "description": "Achetez des crédits d'opérations en gros et offrez des services de prise de rendez-vous aux citoyens tout en réalisant d'excellents rendements opérationnels et une transparence totale.",
+    "subtitle": "Services Opérationnels Durables",
+    "description": "Achetez des crédits d'opérations et offrez des services de prise de rendez-vous en toute transparence opérationnelle.",
     "most_popular": "Le plus populaire",
     "free": "Gratuit",
     "currency": "DZD",
     "op_confirmed": "Opération de Réservation Confirmée",
     "buy_cta": "Demander l'Achat de Forfait",
-    "calc_title": "Calculateur de Rentabilité (ROI)",
-    "calc_subtitle": "Calculez le bénéfice net mensuel attendu pour votre centre",
+    "calc_title": "Détails des Forfaits Opérationnels",
+    "calc_subtitle": "Forfaits opérationnels adaptés aux cliniques et centres médicaux",
     "daily_bookings_label": "Réservations Journalières Attendues",
     "daily_bookings_unit": "Réservations",
     "service_fee_label": "Frais de Service de Réservation Perçus",
@@ -436,7 +437,7 @@
     "total_fees": "Total des Frais de Service",
     "required_cost": "Coût des Forfaits Requis",
     "monthly_total": "Total des Réservations Mensuelles",
-    "net_profit": "Bénéfice Net Mensuel",
+    "net_profit": "Abonnement Mensuel",
     "calc_note": "Basé sur 25 jours ouvrables par mois et l'utilisation du forfait \"Le plus populaire\"",
     "start_cta": "Devenir un Centre de Réservation Accrédité",
     "starter": {
@@ -489,7 +490,7 @@
     "subtitle": "Document Opérationnel de la Plateforme",
     "description": "Tout ce que vous voulez savoir sur le modèle économique, les forfaits, l'accréditation des rendez-vous et la sécurité numérique approuvée sur la plateforme.",
     "search_placeholder": "Rechercher une réponse à votre question...",
-    "source_note": "Basé sur les Chapitres 12, 13, 14 du Document Commercial Officiel",
+    "source_note": "",
     "no_results": "Nous n'avons trouvé aucune question correspondant à votre recherche. Essayez un autre mot.",
     "categories": {
       "all": "Toutes les Questions",
@@ -712,9 +713,9 @@
     "scenario_diagnostic_comment": "Transmission des comptes rendus directement dans le dossier du patient via le numéro de commande officiel pour éviter tout conflit."
   },
   "medical_file": {
-    "demo_watermark": "Modèle Illustratif de Démonstration — Ce n'est pas un vrai dossier patient",
+    "demo_watermark": "Exemple Illustratif : Architecture du Dossier Médical Chiffré",
     "demo_patient_initials": "M.P",
-    "demo_patient_name": "Modèle Patient Démo",
+    "demo_patient_name": "Architecture du Dossier Chiffré",
     "demo_patient_sub": "Simulation d'Identifiant Numérique EMR",
     "encryption_standard": "Chiffré AES-256",
     "latest_medical_event": "Historique Médical Type",
@@ -724,7 +725,7 @@
     "simulated_consultation_desc": "Enregistrement automatique du diagnostic, des ordonnances validées et des résultats dans le dossier unifié.",
     "prescription_approved": "Ordonnance Validée",
     "lab_results_uploaded": "Résultats d'Analyses Téléversés",
-    "immutability_note": "Article 7.10: Le dossier médical historique est inaltérable; toute correction fait l'objet d'un nouvel enregistrement complémentaire.",
+    "immutability_note": "Le dossier médical historique est inaltérable; toute correction fait l'objet d'un nouvel enregistrement complémentaire.",
     "section_badge": "Architecture du Dossier Médical",
     "title": "Dossier Médical Électronique (EMR)",
     "subtitle": "Dossier de Santé Numérique Unifié",
@@ -737,7 +738,10 @@
       "guest_patient_title": "Patient Visiteur (Guest Patient)",
       "guest_patient_desc": "Le patient visiteur reçoit ses ordonnances et demandes imprimées immédiatement sans ouverture de dossier électronique permanent."
     },
-    "create_account_cta": "Créer un Compte Patient Inscrit (UUID)"
+    "create_account_cta": "Créer un Compte Patient Inscrit (UUID)",
+    "spec_encryption": "Chiffrement Standard",
+    "spec_integrity": "Intégrité des Données",
+    "spec_governance": "Gouvernance d'Accès"
   },
   "news": {
     "section_badge": "Guides de la Plateforme & Transformation Sanitaire",
@@ -773,12 +777,12 @@
     "description": "Whether you are a booking center seeking to expand your operational returns, or a doctor wishing to organize your clinic and medical record, our platform is the ideal choice for the future.",
     "cta_booking": "Join as a Certified Booking Center",
     "cta_doctor": "Join as a Doctor / Clinic",
-    "trust1": "Immediate activation after official review",
+    "trust1": "Activation du compte après vérification",
     "trust2": "Technical support and free training for teams"
   },
   "footer": {
     "slogan": "The certified digital ecosystem for coordinating appointment booking services and managing electronic medical records in Algeria, following a transparent operational package model.",
-    "official_ref": "Official Operational Reference v1.0",
+    "official_ref": "Référence Opérationnelle de la Plateforme v1.0",
     "quick_links": "Quick Links",
     "role_portals": "Role Portals",
     "booking_center_portal": "Booking Center Portal",
@@ -787,7 +791,7 @@
     "lab_portal": "Laboratory Portal",
     "radiology_portal": "Radiology Portal",
     "contact": "Contact",
-    "address": "Algiers",
+    "address": "Tiaret - Algérie",
     "copyright_prefix": "All Rights Reserved © 2026",
     "privacy": "Privacy",
     "terms": "Terms",
@@ -915,7 +919,7 @@
     "radiology": {
       "title": "Gestion des Centres de Radiologie",
       "description": "Contrôle d'accès radiologue, gestion de l'archivage PACS et intégration DICOM",
-      "activeCount": "{count} centres de radiologie avancés activés dans les 48 wilayas."
+      "activeCount": "Intégration des centres d imagerie avec les systèmes PACS et DICOM."
     },
     "packages": {
       "title": "Gestion des Forfaits & Abonnements",
@@ -2834,7 +2838,8 @@
       "filesUploaded": "Fichiers Imagerie Téléversés",
       "inRooms": "En Salle d'Examen",
       "highResponse": "Haute Vitesse de Réponse",
-      "noTat": "N/D"
+      "noTat": "N/D",
+      "activeCount": "{count} centres de radiologie avancés activés."
     },
     "directives": {
       "title": "Dernières Directives du Gestionnaire du Centre",
@@ -3421,7 +3426,7 @@
     "mobileNotice": "Ou téléchargez directement le fichier APK sur votre appareil Android",
     "directDownload": "Téléchargement direct (APK)",
     "scanWithPhone": "Scannez avec votre téléphone",
-    "officialBuild": "Package Android officiel certifié",
+    "officialBuild": "Package Android (APK)",
     "patient": {
       "badge": "Application Patients",
       "name": "AAFIYA",

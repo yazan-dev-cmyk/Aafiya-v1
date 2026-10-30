@@ -41,6 +41,39 @@ class PatientNotificationService {
     };
   }
 
+  /// Fetches authoritative unread count of in-app notifications for the authenticated patient.
+  Future<ApiResult<int>> fetchUnreadCount() async {
+    final result = await _apiClient.get(
+      ApiEndpoints.patientNotificationsUnreadCount,
+      allowRetry: true,
+    );
+
+    return switch (result) {
+      ApiSuccess(:final data) => () {
+          final count = data['unread_count'];
+          if (count is int) {
+            return ApiSuccess(count);
+          }
+          if (count is num) {
+            return ApiSuccess(count.toInt());
+          }
+          if (count is String) {
+            final parsed = int.tryParse(count);
+            if (parsed != null) {
+              return ApiSuccess(parsed);
+            }
+          }
+          return const ApiFailure<int>(
+            GenericApiException(
+              statusCode: 0,
+              message: 'Invalid or missing unread_count in server response',
+            ),
+          );
+        }(),
+      ApiFailure(:final exception) => ApiFailure(exception),
+    };
+  }
+
   /// Submits receipt acknowledgment for a specific notification.
   ///
   /// On successful server response, extracts the updated record from `data`.

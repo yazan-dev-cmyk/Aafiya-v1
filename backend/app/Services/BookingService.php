@@ -1201,13 +1201,39 @@ class BookingService
                 $reasonNote .= " - ملاحظة: {$newSlotData['notes']}";
             }
 
-            AppointmentStatusHistory::create([
+            $history = AppointmentStatusHistory::create([
                 'appointment_id' => $locked->id,
                 'from_status'    => $currentStatus,
                 'to_status'      => $currentStatus,
                 'changed_by_id'  => $user->id,
                 'reason'         => $reasonNote,
             ]);
+
+            $clinicName = $clinic->name ?? 'العيادة';
+            $doctorName = $doctor->user?->name ?? 'الطبيب المعالج';
+            $idempotencyKey = "appointment_rescheduled_{$locked->id}_{$history->id}";
+
+            $this->createInAppNotification(
+                appointment: $locked,
+                template: 'appointment_rescheduled',
+                idempotencyKey: $idempotencyKey,
+                payloadData: [
+                    'appointment_id'      => $locked->id,
+                    'booking_reference'   => $locked->booking_reference,
+                    'old_date'            => $oldDate,
+                    'old_slot'            => $oldSlot,
+                    'new_date'            => $newDate,
+                    'new_slot'            => $newSlot,
+                    'clinic_name'         => $clinicName,
+                    'doctor_name'         => $doctorName,
+                    'rescheduled_by'      => $user->name,
+                    'rescheduled_by_role' => $user->roles->first()?->name ?? 'staff',
+                    'reason'              => $reasonNote,
+                    'message'             => "تمت إعادة جدولة موعدكم الطبي ({$locked->booking_reference}) إلى تاريخ {$newDate} الساعة {$newSlot}.",
+                    'message_en'          => "Your medical appointment ({$locked->booking_reference}) has been rescheduled to {$newDate} at {$newSlot}.",
+                    'message_fr'          => "Votre rendez-vous médical ({$locked->booking_reference}) a été reporté au {$newDate} à {$newSlot}.",
+                ]
+            );
 
             return $locked->fresh(['clinic', 'doctor.user', 'patient', 'bookingCenter', 'statusHistory']);
         }, 5);

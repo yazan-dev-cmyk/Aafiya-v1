@@ -20,7 +20,7 @@ import { cn } from '../lib/utils';
 
 interface HeroProps {
   onOpenAuth: (role?: RoleType, isRegister?: boolean) => void;
-  onOpenCalculator: () => void;
+  onOpenCalculator?: () => void;
 }
 
 export const Hero: React.FC<HeroProps> = ({

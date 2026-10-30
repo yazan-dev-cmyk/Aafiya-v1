@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "title": "Aafiya | Unified National Digital Medical Platform",
+    "title": "Aafiya | Digital Healthcare Appointments Platform in Algeria",
     "description": "The unified Algerian platform for managing medical services, bookings, laboratories, and radiology centers"
   },
   "doctorAssistant": {
@@ -177,7 +177,8 @@
     "logout": "Log Out"
   },
   "common": {
-    "title": "Aafiya | Unified National Digital Medical Platform",
+    "featureLockedNotice": "This feature is currently unavailable for administrative and organizational reasons.",
+    "title": "Aafiya | Digital Healthcare Appointments Platform in Algeria",
     "description": "The unified Algerian platform for managing medical services, bookings, laboratories, and radiology centers",
     "welcome": "Welcome to Aafiya",
     "version": "Aafiya V1.0",
@@ -206,7 +207,7 @@
     "packages": "Operational Packages",
     "faq": "FAQ",
     "landing": "Landing Page",
-    "doctor_dashboard": "Live Doctor Dashboard",
+    "doctor_dashboard": "Doctor Dashboard",
     "assistant_dashboard": "Doctor Assistant Dashboard",
     "booking_center_dashboard": "Booking Center Console",
     "laboratory_dashboard": "Lab Manager Console",
@@ -219,7 +220,7 @@
     "calculator": "Booking Simulator"
   },
   "topbar": {
-    "announcement": "Unified Digital Healthcare Platform — Accreditation open for certified booking centers across 48 provinces",
+    "announcement": "Unified Digital Healthcare Platform — Accreditation open for certified booking centers",
     "packageCalculator": "Package Calculator"
   },
   "hero": {
@@ -260,7 +261,7 @@
     "section_badge": "Structural Platform Functions",
     "title": "Aafiya Digital Platform Features",
     "subtitle": "Each feature is designed based on approved business rules, serving all parties with the highest levels of transparency and efficiency.",
-    "official_function": "Official Operational Function",
+    "official_function": "Platform Operational Function",
     "booking_engine": {
       "title": "Accredited Booking System",
       "description": "Enabling booking centers to manage and confirm booking requests easily and use operational package balances with extreme accuracy.",
@@ -303,7 +304,7 @@
     "title": "What is the added value we offer you?",
     "subtitle": "The platform ensures added value for all concerned categories with full commitment to liability limits and digital operational rules.",
     "cta_prefix": "Start now as a ",
-    "trust_text": "Join more than 500 accredited medical institutions",
+    "trust_text": "Join the digital healthcare ecosystem",
     "reg_patient": {
       "title": "Registered Patient (Permanent Account)",
       "highlight": "Unified Electronic Medical Record",
@@ -415,17 +416,17 @@
     }
   },
   "packages": {
-    "section_badge": "Chapter 12: Packages and Booking Centers",
+    "section_badge": "Certified Booking Center Packages",
     "title": "Flexible Operational Packages",
-    "subtitle": "Profitable and Sustainable",
-    "description": "Buy bulk operation credits and provide appointment booking services to citizens while achieving excellent operational returns and full transparency.",
+    "subtitle": "Sustainable Operational Services",
+    "description": "Purchase operation credits and provide appointment booking services with complete operational transparency.",
     "most_popular": "Most Popular",
     "free": "Free",
     "currency": "DZD",
     "op_confirmed": "Confirmed Booking Operation",
     "buy_cta": "Request Package Purchase",
-    "calc_title": "Operational ROI Calculator",
-    "calc_subtitle": "Calculate the expected net profit for your center monthly",
+    "calc_title": "Operational Package Details",
+    "calc_subtitle": "Operational packages tailored for clinics and medical centers",
     "daily_bookings_label": "Expected Daily Bookings",
     "daily_bookings_unit": "Bookings",
     "service_fee_label": "Collected Booking Service Fee",
@@ -436,7 +437,7 @@
     "total_fees": "Total Service Fees",
     "required_cost": "Cost of Required Packages",
     "monthly_total": "Total Monthly Bookings",
-    "net_profit": "Monthly Net Profit",
+    "net_profit": "Monthly Subscription",
     "calc_note": "Based on 25 working days per month and using the \"Most Popular\" package",
     "start_cta": "Start as an Accredited Booking Center",
     "starter": {
@@ -489,7 +490,7 @@
     "subtitle": "Platform Operational Document",
     "description": "Everything you want to know about the business model, packages, appointment accreditation, and approved digital security on the platform.",
     "search_placeholder": "Search for an answer to your question...",
-    "source_note": "Based on Chapters 12, 13, 14 of the Official Business Document",
+    "source_note": "",
     "no_results": "We didn't find any questions matching your search. Try another word.",
     "categories": {
       "all": "All Questions",
@@ -712,9 +713,9 @@
     "scenario_diagnostic_comment": "Delivering lab and radiology reports directly into the patient EMR via accredited order ID to eliminate record conflicts and expedite follow-ups."
   },
   "medical_file": {
-    "demo_watermark": "Demonstrative Showcase Model — Not an actual patient record",
+    "demo_watermark": "Illustrative Example: Encrypted Health Record Structure",
     "demo_patient_initials": "S.P",
-    "demo_patient_name": "Sample Patient Model",
+    "demo_patient_name": "Encrypted Record Architecture",
     "demo_patient_sub": "Digital EMR Identifier Simulation",
     "encryption_standard": "AES-256 Encrypted",
     "latest_medical_event": "Standard Medical History",
@@ -724,7 +725,7 @@
     "simulated_consultation_desc": "Automated logging of diagnosis, approved prescriptions, and lab results within the unified EMR.",
     "prescription_approved": "Approved Prescription",
     "lab_results_uploaded": "Test Results Uploaded",
-    "immutability_note": "Clause 7.10: Historical medical records cannot be altered; any corrections require a new complementary record.",
+    "immutability_note": "Historical medical records cannot be altered; any corrections require a new complementary record.",
     "section_badge": "Medical Record Architecture",
     "title": "Electronic Medical Record (EMR)",
     "subtitle": "Unified Digital Health Record",
@@ -737,7 +738,10 @@
       "guest_patient_title": "Guest Patient (Walk-in)",
       "guest_patient_desc": "Guest patients receive physical printed documents immediately without opening a permanent electronic health record."
     },
-    "create_account_cta": "Register Patient Account (UUID)"
+    "create_account_cta": "Register Patient Account (UUID)",
+    "spec_encryption": "Standard Encryption",
+    "spec_integrity": "Data Integrity",
+    "spec_governance": "Access Governance"
   },
   "news": {
     "section_badge": "Platform Guides & Healthcare Transformation",
@@ -773,12 +777,12 @@
     "description": "Whether you are a booking center seeking to expand your operational returns, or a doctor wishing to organize your clinic and medical record, our platform is the ideal choice for the future.",
     "cta_booking": "Join as a Certified Booking Center",
     "cta_doctor": "Join as a Doctor / Clinic",
-    "trust1": "Immediate activation after official review",
+    "trust1": "Account activation upon verification",
     "trust2": "Technical support and free training for teams"
   },
   "footer": {
     "slogan": "The certified digital ecosystem for coordinating appointment booking services and managing electronic medical records in Algeria, following a transparent operational package model.",
-    "official_ref": "Official Operational Reference v1.0",
+    "official_ref": "Platform Operational Reference v1.0",
     "quick_links": "Quick Links",
     "role_portals": "Role Portals",
     "booking_center_portal": "Booking Center Portal",
@@ -787,7 +791,7 @@
     "lab_portal": "Laboratory Portal",
     "radiology_portal": "Radiology Portal",
     "contact": "Contact",
-    "address": "Algiers",
+    "address": "Tiaret - Algeria",
     "copyright_prefix": "All Rights Reserved © 2026",
     "privacy": "Privacy",
     "terms": "Terms",
@@ -915,7 +919,7 @@
     "radiology": {
       "title": "Radiology Centers Management",
       "description": "Control radiologist access, manage PACS archiving, and DICOM integration",
-      "activeCount": "{count} advanced radiology centers activated across 48 provinces."
+      "activeCount": "Radiology centers integration with PACS and DICOM systems."
     },
     "packages": {
       "title": "Packages & Subscription Plans Management",
@@ -2834,7 +2838,8 @@
       "filesUploaded": "Radiology Files Uploaded",
       "inRooms": "Currently in Scanning Rooms",
       "highResponse": "High Response Speed",
-      "noTat": "N/A"
+      "noTat": "N/A",
+      "activeCount": "{count} advanced radiology centers activated."
     },
     "directives": {
       "title": "Latest Radiology Center Manager Directives",
@@ -3421,7 +3426,7 @@
     "mobileNotice": "Or download the APK package directly to your Android device",
     "directDownload": "Direct Download (APK)",
     "scanWithPhone": "Scan with your phone to download",
-    "officialBuild": "Official Verified Android Build",
+    "officialBuild": "Android Package (APK)",
     "patient": {
       "badge": "Patient Application",
       "name": "AAFIYA",

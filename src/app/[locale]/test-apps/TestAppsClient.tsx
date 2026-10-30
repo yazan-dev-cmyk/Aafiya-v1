@@ -150,7 +150,7 @@ export default function TestAppsClient({ locale }: TestAppsClientProps) {
                 </div>
 
                 <span className="bg-teal-900/40 text-teal-300 text-[11px] font-bold px-3 py-1 rounded-full border border-teal-500/30 shrink-0">
-                  v0.1.0 (Code 1)
+                  v0.1.1 (Code 10)
                 </span>
               </div>
 
@@ -158,7 +158,7 @@ export default function TestAppsClient({ locale }: TestAppsClientProps) {
               <div className="bg-slate-900/90 rounded-2xl p-4 border border-slate-800/80 space-y-2.5 text-xs">
                 <div className="flex justify-between items-center text-slate-400">
                   <span>{isRtl ? 'حجم الملف:' : 'File Size:'}</span>
-                  <span className="text-white font-mono font-bold">48.5 MB (50,905,925 bytes)</span>
+                  <span className="text-white font-mono font-bold">57.9 MB (60,734,223 bytes)</span>
                 </div>
                 <div className="flex justify-between items-center text-slate-400">
                   <span>{isRtl ? 'النظام المدعوم:' : 'Target OS:'}</span>
@@ -176,7 +176,7 @@ export default function TestAppsClient({ locale }: TestAppsClientProps) {
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider font-bold">SHA-256 Checksum:</span>
                     <button
-                      onClick={() => copyToClipboard('b4f4b81ffe4a616d1b191b229dc4ec538b3c2f9320d0ceac7f396064f9ef8bea', 'patient-hash')}
+                      onClick={() => copyToClipboard('15f3168812ea5ff4ca60ac59faae74d0fa68d3871cd60aa8a14d940e72749dc8', 'patient-hash')}
                       className="text-[10px] text-teal-400 hover:text-teal-300 flex items-center gap-1 transition-colors cursor-pointer"
                     >
                       {copiedKey === 'patient-hash' ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
@@ -184,7 +184,7 @@ export default function TestAppsClient({ locale }: TestAppsClientProps) {
                     </button>
                   </div>
                   <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800/80 font-mono text-[10px] text-slate-300 break-all select-all">
-                    b4f4b81ffe4a616d1b191b229dc4ec538b3c2f9320d0ceac7f396064f9ef8bea
+                    15f3168812ea5ff4ca60ac59faae74d0fa68d3871cd60aa8a14d940e72749dc8
                   </div>
                 </div>
               </div>
@@ -209,7 +209,7 @@ export default function TestAppsClient({ locale }: TestAppsClientProps) {
             <div className="space-y-2 pt-4">
               <a
                 href="/downloads/aafiya-patient.apk"
-                download="aafiya-patient-v0.1.0.apk"
+                download="aafiya-patient-v0.1.1.apk"
                 className="w-full py-3.5 px-6 rounded-2xl bg-teal-600 hover:bg-teal-500 text-white font-bold flex items-center justify-center gap-2.5 shadow-lg shadow-teal-900/30 transition-all cursor-pointer"
               >
                 <Download className="w-5 h-5" />
@@ -246,7 +246,7 @@ export default function TestAppsClient({ locale }: TestAppsClientProps) {
                 </div>
 
                 <span className="bg-emerald-900/40 text-emerald-300 text-[11px] font-bold px-3 py-1 rounded-full border border-emerald-500/30 shrink-0">
-                  v0.1.0 (Code 1)
+                  v0.1.1 (Code 10)
                 </span>
               </div>
 
@@ -254,7 +254,7 @@ export default function TestAppsClient({ locale }: TestAppsClientProps) {
               <div className="bg-slate-900/90 rounded-2xl p-4 border border-slate-800/80 space-y-2.5 text-xs">
                 <div className="flex justify-between items-center text-slate-400">
                   <span>{isRtl ? 'حجم الملف:' : 'File Size:'}</span>
-                  <span className="text-white font-mono font-bold">51.9 MB (54,366,833 bytes)</span>
+                  <span className="text-white font-mono font-bold">77.7 MB (81,472,109 bytes)</span>
                 </div>
                 <div className="flex justify-between items-center text-slate-400">
                   <span>{isRtl ? 'النظام المدعوم:' : 'Target OS:'}</span>
@@ -272,7 +272,7 @@ export default function TestAppsClient({ locale }: TestAppsClientProps) {
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider font-bold">SHA-256 Checksum:</span>
                     <button
-                      onClick={() => copyToClipboard('2cb3f661e0235b06ed915287417bd5b7432ba16ed0ccca63764e0612e3985a4e', 'pro-hash')}
+                      onClick={() => copyToClipboard('50e8f14f1e72c2a609217959719e3e061057232878871d90b1f0373213a8bb07', 'pro-hash')}
                       className="text-[10px] text-emerald-400 hover:text-emerald-300 flex items-center gap-1 transition-colors cursor-pointer"
                     >
                       {copiedKey === 'pro-hash' ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
@@ -280,7 +280,7 @@ export default function TestAppsClient({ locale }: TestAppsClientProps) {
                     </button>
                   </div>
                   <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800/80 font-mono text-[10px] text-slate-300 break-all select-all">
-                    2cb3f661e0235b06ed915287417bd5b7432ba16ed0ccca63764e0612e3985a4e
+                    50e8f14f1e72c2a609217959719e3e061057232878871d90b1f0373213a8bb07
                   </div>
                 </div>
               </div>
@@ -305,7 +305,7 @@ export default function TestAppsClient({ locale }: TestAppsClientProps) {
             <div className="space-y-2 pt-4">
               <a
                 href="/downloads/aafiya-pro.apk"
-                download="aafiya-pro-v0.1.0.apk"
+                download="aafiya-pro-v0.1.1.apk"
                 className="w-full py-3.5 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold flex items-center justify-center gap-2.5 shadow-lg shadow-emerald-900/30 transition-all cursor-pointer"
               >
                 <Download className="w-5 h-5" />

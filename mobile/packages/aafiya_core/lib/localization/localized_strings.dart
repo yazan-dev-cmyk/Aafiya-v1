@@ -29,6 +29,13 @@ class LocalizedStrings {
   String get patientAppTitle => isArabic ? 'عافية للمرضى' : 'AAFIYA Patient';
   String get proAppTitle => isArabic ? 'عافية للمهنيين' : 'AAFIYA Pro';
 
+  // Administrative / Feature Lock Notice (AAFIYA-UI-FEATURE-LOCK-01 / AAFIYA-MOBILE-UI-FEATURE-LOCK-01)
+  String get featureLockedNotice => isArabic
+      ? 'هذه الميزة مغلقة حاليًا لأسباب إدارية وتنظيمية.'
+      : isFrench
+          ? 'Cette fonctionnalité est temporairement désactivée pour des raisons administratives et organisationnelles.'
+          : 'This feature is currently unavailable for administrative and organizational reasons.';
+
   // Navigation & Shells
   String get splashLoading => isArabic
       ? 'جاري التحميل...'
@@ -4068,6 +4075,11 @@ class LocalizedStrings {
       : isFrench
           ? 'La demande de rendez-vous médical a été refusée.'
           : 'Medical appointment request has been rejected.';
+  String get appointmentRescheduledNotification => isArabic
+      ? 'تمت إعادة جدولة موعدكم الطبي بنجاح.'
+      : isFrench
+          ? 'Votre rendez-vous médical a été reporté avec succès.'
+          : 'Your medical appointment has been rescheduled.';
   String get vacationRescheduleNotification => isArabic
       ? 'تمت إعادة جدولة موعدكم الطبي نظراً لإجازة الطبيب.'
       : isFrench

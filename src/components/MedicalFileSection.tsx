@@ -56,8 +56,8 @@ export const MedicalFileSection: React.FC<MedicalFileSectionProps> = ({ onOpenAu
 
               <div className="p-8 space-y-6 relative z-20">
                 {/* Demo Watermark Notice */}
-                <div className="flex items-center justify-center p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-black text-center">
-                  <ShieldAlert className="w-4 h-4 me-2 text-amber-400 shrink-0" />
+                <div className="flex items-center justify-center p-2.5 rounded-xl bg-teal-500/10 border border-teal-500/20 text-teal-300 text-xs font-black text-center">
+                  <ShieldAlert className="w-4 h-4 me-2 text-teal-400 shrink-0" />
                   <span>{t('demo_watermark')}</span>
                 </div>
 
@@ -65,7 +65,7 @@ export const MedicalFileSection: React.FC<MedicalFileSectionProps> = ({ onOpenAu
                 <div className="flex items-center justify-between border-b border-white/5 pb-6">
                   <div className="flex items-center gap-4">
                     <div className="w-14 h-14 rounded-2xl bg-teal-500/20 text-teal-400 flex items-center justify-center font-black text-xl border border-teal-500/30">
-                      {t('demo_patient_initials')}
+                      EMR
                     </div>
                     <div className="text-start">
                       <h4 className="font-black text-lg text-white">{t('demo_patient_name')}</h4>
@@ -76,18 +76,18 @@ export const MedicalFileSection: React.FC<MedicalFileSectionProps> = ({ onOpenAu
                   <div className="text-end">
                     <div className="inline-flex items-center gap-2 px-3 py-1 bg-teal-500/10 border border-teal-500/20 rounded-full mb-1">
                       <Cpu className="w-3 h-3 text-teal-400" />
-                      <span className="text-[10px] text-teal-400 font-black font-mono">UUID-DEMO-SAMPLE</span>
+                      <span className="text-[10px] text-teal-400 font-black font-mono">ENCRYPTED-ARCH</span>
                     </div>
                     <div className="text-[10px] text-slate-500 font-black uppercase tracking-widest block">{t('encryption_standard')}</div>
                   </div>
                 </div>
 
-                {/* Health Metrics Strip */}
+                {/* Health Metrics Strip - Architectural Security Indicators */}
                 <div className="grid grid-cols-3 gap-4">
                   {[
-                    { label: 'فصيلة الدم', value: 'O+ Positive', color: 'teal' },
-                    { label: 'الحساسية', value: 'البنسلين', color: 'rose' },
-                    { label: 'الأمراض المزمنة', value: 'الضغط', color: 'amber' }
+                    { label: t('spec_encryption'), value: 'AES-256', color: 'teal' },
+                    { label: t('spec_integrity'), value: 'SHA-256', color: 'sky' },
+                    { label: t('spec_governance'), value: 'RBAC Strict', color: 'emerald' }
                   ].map((metric, i) => (
                     <div key={i} className="bg-white/[0.03] p-4 rounded-2xl border border-white/5 text-center">
                       <span className="text-[10px] text-slate-500 font-black uppercase block mb-1">{metric.label}</span>

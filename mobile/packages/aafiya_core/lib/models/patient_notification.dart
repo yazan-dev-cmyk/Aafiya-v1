@@ -69,6 +69,7 @@ class PatientNotification {
         'appointment_confirmed' => strings.appointmentConfirmedNotification,
         'appointment_cancelled' => strings.appointmentCancelledNotification,
         'appointment_rejected' => strings.appointmentRejectedNotification,
+        'appointment_rescheduled' => strings.appointmentRescheduledNotification,
         'vacation_reschedule_success' => strings.vacationRescheduleNotification,
         _ => message,
       };
@@ -81,6 +82,7 @@ class PatientNotification {
         'appointment_confirmed' => strings.appointmentConfirmedNotification,
         'appointment_cancelled' => strings.appointmentCancelledNotification,
         'appointment_rejected' => strings.appointmentRejectedNotification,
+        'appointment_rescheduled' => strings.appointmentRescheduledNotification,
         'vacation_reschedule_success' => strings.vacationRescheduleNotification,
         _ => message,
       };
@@ -159,6 +161,8 @@ class PatientNotification {
           'تم تسجيل طلب حجز موعدكم الطبي بنجاح وهو قيد المراجعة.',
         'appointment_confirmed' =>
           'تم تأكيد موعدكم الطبي بنجاح. تذكرة الحضور متاحة الآن في التطبيق.',
+        'appointment_rescheduled' =>
+          'تمت إعادة جدولة موعدكم الطبي بنجاح.',
         'vacation_reschedule_success' =>
           'تمت إعادة جدولة موعدكم الطبي نظراً لإجازة الطبيب.',
         'appointment_cancelled' => 'تم إلغاء الموعد الطبي.',

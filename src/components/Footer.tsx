@@ -85,13 +85,17 @@ export const Footer: React.FC<FooterProps> = ({ viewMode, onViewModeChange }) =>
                 <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                   <Mail className="w-5 h-5 text-primary" />
                 </div>
-                <span className="text-sm">support@aafiya.dz</span>
+                <a href="mailto:no-reply@aafiya.site" className="text-sm hover:text-white transition-colors">
+                  no-reply@aafiya.site
+                </a>
               </li>
               <li className="flex items-center gap-4 group">
                 <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                   <Phone className="w-5 h-5 text-primary" />
                 </div>
-                <span className="text-sm">+213 (0) 23 45 67 89</span>
+                <a href="tel:+213655363136" dir="ltr" className="text-sm hover:text-white transition-colors">
+                  +213655363136
+                </a>
               </li>
               <li className="flex items-center gap-4 group">
                 <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-primary/20 transition-colors">

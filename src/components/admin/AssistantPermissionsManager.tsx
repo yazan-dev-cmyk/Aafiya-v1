@@ -525,8 +525,8 @@ export function AssistantPermissionsManager() {
 
       {/* CREATE ASSISTANT MODAL */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full space-y-5 shadow-2xl relative">
+        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-8 max-w-md w-full space-y-4 sm:space-y-5 shadow-2xl relative max-h-[calc(100vh-1rem)] sm:max-h-[calc(100vh-2rem)] max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2rem)] overflow-y-auto my-auto">
             <button
               onClick={() => {
                 setShowCreateModal(false);

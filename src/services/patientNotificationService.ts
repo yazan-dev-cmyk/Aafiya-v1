@@ -51,4 +51,9 @@ export const patientNotificationService = {
     const res = await api.post<{ message: string; notification?: PatientNotificationItem }>(`/patient/notifications/${id}/acknowledge`);
     return (res as any)?.data || res;
   },
+
+  getUnreadCount: async (): Promise<{ unread_count: number }> => {
+    const res = await api.get<{ unread_count: number }>('/patient/notifications/unread-count');
+    return res.data;
+  },
 };

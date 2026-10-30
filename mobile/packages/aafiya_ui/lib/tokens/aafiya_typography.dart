@@ -11,13 +11,14 @@ abstract final class AafiyaTypography {
   static const String package = 'aafiya_ui';
 
   /// The official Arabic typeface for AAFIYA mobile applications.
-  static const String fontFamily = 'IBMPlexSansArabic';
+  static const String fontFamily = 'Amiri';
 
   /// Secondary Latin and digital UI fallback typeface.
   static const String fallbackFontFamily = 'PlusJakartaSans';
 
   /// Standard font fallback list for dual-script robustness.
   static const List<String> fontFallbacks = [
+    'IBMPlexSansArabic',
     'PlusJakartaSans',
     'Noto Sans Arabic',
     'sans-serif',

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../tokens/aafiya_colors.dart';
 import '../tokens/aafiya_radius.dart';
 import '../tokens/aafiya_typography.dart';
+import 'aafiya_locked_action.dart';
 
 enum AafiyaButtonVariant { primary, secondary, outline, action }
 
@@ -13,6 +14,7 @@ class AafiyaButton extends StatelessWidget {
     required this.onPressed,
     this.variant = AafiyaButtonVariant.primary,
     this.isLoading = false,
+    this.isLocked = false,
     this.icon,
   });
 
@@ -20,10 +22,37 @@ class AafiyaButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final AafiyaButtonVariant variant;
   final bool isLoading;
+  final bool isLocked;
   final Widget? icon;
 
   @override
   Widget build(BuildContext context) {
+    if (isLocked) {
+      final effectiveIcon = icon ??
+          const Icon(
+            Icons.lock_outline_rounded,
+            size: 18,
+            color: Color(0xFFD97706),
+          );
+
+      return SizedBox(
+        height: 48,
+        child: ElevatedButton.icon(
+          onPressed: () => AafiyaLockedNotice.showNotice(context),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFFF1F5F9),
+            foregroundColor: AafiyaColors.secondaryText,
+            textStyle: AafiyaTypography.labelLarge,
+            side: const BorderSide(color: Color(0xFFCBD5E1), width: 1.5),
+            shape: const RoundedRectangleBorder(borderRadius: AafiyaRadius.borderMd),
+            elevation: 0,
+          ),
+          icon: effectiveIcon,
+          label: Text(label),
+        ),
+      );
+    }
+
     if (isLoading) {
       final spinnerColor = switch (variant) {
         AafiyaButtonVariant.primary => AafiyaColors.pureWhite,

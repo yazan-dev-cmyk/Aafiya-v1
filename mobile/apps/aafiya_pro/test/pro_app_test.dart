@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:aafiya_core/aafiya_core.dart';
+import 'package:aafiya_ui/aafiya_ui.dart';
 import 'package:aafiya_pro/app.dart';
 
 void main() {
@@ -28,8 +29,8 @@ void main() {
         ),
       );
 
-      expect(find.text('عافية للمهنيين'), findsOneWidget);
-      expect(find.text('بوابتك إلى العافية'), findsOneWidget);
+      expect(find.byType(Image), findsOneWidget);
+      expect(find.byType(AafiyaLoadingView), findsOneWidget);
       await tester.pump(const Duration(milliseconds: 700));
     });
 

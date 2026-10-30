@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:aafiya_core/aafiya_core.dart';
 import 'package:aafiya_ui/aafiya_ui.dart';
 
 void main() {
@@ -140,12 +142,12 @@ void main() {
   });
 
   group('AafiyaTypography & IBM Plex Sans Arabic Tokens', () {
-    test('fontFamily is IBMPlexSansArabic', () {
-      expect(AafiyaTypography.fontFamily, equals('IBMPlexSansArabic'));
+    test('fontFamily is Amiri', () {
+      expect(AafiyaTypography.fontFamily, equals('Amiri'));
       expect(AafiyaTypography.package, equals('aafiya_ui'));
     });
 
-    test('all text styles bind to IBMPlexSansArabic font family and aafiya_ui package', () {
+    test('all text styles bind to Amiri font family and aafiya_ui package', () {
       final styles = [
         AafiyaTypography.displayLarge,
         AafiyaTypography.displayMedium,
@@ -165,7 +167,7 @@ void main() {
       ];
 
       for (final style in styles) {
-        expect(style.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+        expect(style.fontFamily?.contains('Amiri'), isTrue);
       }
     });
 
@@ -216,27 +218,27 @@ void main() {
       expect(AafiyaTypography.caption.fontWeight, equals(FontWeight.normal));
     });
 
-    test('textTheme getter produces full Material 3 text theme with IBMPlexSansArabic', () {
+    test('textTheme getter produces full Material 3 text theme with Amiri', () {
       final textTheme = AafiyaTypography.textTheme;
-      expect(textTheme.displayLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
-      expect(textTheme.displayMedium?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
-      expect(textTheme.headlineLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
-      expect(textTheme.headlineMedium?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
-      expect(textTheme.headlineSmall?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
-      expect(textTheme.titleLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
-      expect(textTheme.titleMedium?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
-      expect(textTheme.titleSmall?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
-      expect(textTheme.bodyLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
-      expect(textTheme.bodyMedium?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
-      expect(textTheme.bodySmall?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
-      expect(textTheme.labelLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
-      expect(textTheme.labelMedium?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
-      expect(textTheme.labelSmall?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(textTheme.displayLarge?.fontFamily?.contains('Amiri'), isTrue);
+      expect(textTheme.displayMedium?.fontFamily?.contains('Amiri'), isTrue);
+      expect(textTheme.headlineLarge?.fontFamily?.contains('Amiri'), isTrue);
+      expect(textTheme.headlineMedium?.fontFamily?.contains('Amiri'), isTrue);
+      expect(textTheme.headlineSmall?.fontFamily?.contains('Amiri'), isTrue);
+      expect(textTheme.titleLarge?.fontFamily?.contains('Amiri'), isTrue);
+      expect(textTheme.titleMedium?.fontFamily?.contains('Amiri'), isTrue);
+      expect(textTheme.titleSmall?.fontFamily?.contains('Amiri'), isTrue);
+      expect(textTheme.bodyLarge?.fontFamily?.contains('Amiri'), isTrue);
+      expect(textTheme.bodyMedium?.fontFamily?.contains('Amiri'), isTrue);
+      expect(textTheme.bodySmall?.fontFamily?.contains('Amiri'), isTrue);
+      expect(textTheme.labelLarge?.fontFamily?.contains('Amiri'), isTrue);
+      expect(textTheme.labelMedium?.fontFamily?.contains('Amiri'), isTrue);
+      expect(textTheme.labelSmall?.fontFamily?.contains('Amiri'), isTrue);
     });
 
-    test('darkTextTheme getter produces text theme with dark-mode colors and IBMPlexSansArabic', () {
+    test('darkTextTheme getter produces text theme with dark-mode colors and Amiri', () {
       final darkTextTheme = AafiyaTypography.darkTextTheme;
-      expect(darkTextTheme.displayLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(darkTextTheme.displayLarge?.fontFamily?.contains('Amiri'), isTrue);
       expect(darkTextTheme.displayLarge?.color, equals(AafiyaColors.darkPrimaryText));
       expect(darkTextTheme.titleLarge?.color, equals(AafiyaColors.darkPrimaryText));
       expect(darkTextTheme.bodyLarge?.color, equals(AafiyaColors.darkPrimaryText));
@@ -245,10 +247,10 @@ void main() {
   });
 
   group('AafiyaTheme Configuration', () {
-    test('lightTheme contains official brand colors, IBMPlexSansArabic font, and textTheme', () {
+    test('lightTheme contains official brand colors, Amiri font, and textTheme', () {
       final theme = AafiyaTheme.lightTheme;
-      expect(theme.textTheme.bodyLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
-      expect(theme.textTheme.titleLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(theme.textTheme.bodyLarge?.fontFamily?.contains('Amiri'), isTrue);
+      expect(theme.textTheme.titleLarge?.fontFamily?.contains('Amiri'), isTrue);
       expect(theme.colorScheme.primary, equals(AafiyaColors.healthBlue));
       expect(theme.colorScheme.secondary, equals(AafiyaColors.healingGreen));
       expect(theme.colorScheme.onSecondary, equals(AafiyaColors.onHealingGreen));
@@ -256,10 +258,10 @@ void main() {
       expect(theme.inputDecorationTheme.contentPadding, equals(const EdgeInsetsDirectional.symmetric(horizontal: 16, vertical: 14)));
     });
 
-    test('darkTheme contains dark surfaces, IBMPlexSansArabic font, and dark textTheme', () {
+    test('darkTheme contains dark surfaces, Amiri font, and dark textTheme', () {
       final theme = AafiyaTheme.darkTheme;
-      expect(theme.textTheme.bodyLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
-      expect(theme.textTheme.titleLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(theme.textTheme.bodyLarge?.fontFamily?.contains('Amiri'), isTrue);
+      expect(theme.textTheme.titleLarge?.fontFamily?.contains('Amiri'), isTrue);
       expect(theme.colorScheme.primary, equals(AafiyaColors.healthBlue));
       expect(theme.colorScheme.secondary, equals(AafiyaColors.healingGreen));
       expect(theme.colorScheme.onSecondary, equals(AafiyaColors.onHealingGreen));
@@ -418,5 +420,112 @@ void main() {
 
       expect(find.text('عافية'), findsOneWidget);
     });
+
+    testWidgets('AafiyaButton with isLocked displays lock icon and shows notice on tap', (tester) async {
+      bool tapped = false;
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('ar'),
+          supportedLocales: AafiyaSupportedLocale.supportedLocales,
+          localizationsDelegates: const [
+            AafiyaLocalizationsDelegate(),
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          theme: AafiyaTheme.lightTheme,
+          home: Scaffold(
+            body: AafiyaButton(
+              label: 'إنشاء وصفة',
+              isLocked: true,
+              onPressed: () {
+                tapped = true;
+              },
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('إنشاء وصفة'), findsOneWidget);
+      expect(find.byIcon(Icons.lock_outline_rounded), findsOneWidget);
+
+      await tester.tap(find.text('إنشاء وصفة'));
+      await tester.pumpAndSettle();
+
+      expect(tapped, isFalse);
+      expect(find.text('هذه الميزة مغلقة حاليًا لأسباب إدارية وتنظيمية.'), findsOneWidget);
+    });
+
+    testWidgets('AafiyaLockedButton displays lock icon and shows notice on tap in English', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('en'),
+          supportedLocales: AafiyaSupportedLocale.supportedLocales,
+          localizationsDelegates: const [
+            AafiyaLocalizationsDelegate(),
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          theme: AafiyaTheme.lightTheme,
+          home: const Scaffold(
+            body: AafiyaLockedButton(
+              label: 'Download Lab Results',
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Download Lab Results'), findsOneWidget);
+      expect(find.byIcon(Icons.lock_outline_rounded), findsOneWidget);
+
+      await tester.tap(find.text('Download Lab Results'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text('This feature is currently unavailable for administrative and organizational reasons.'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('AafiyaLockedAction wraps child and intercepts tap in French', (tester) async {
+      bool innerTapped = false;
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('fr'),
+          supportedLocales: AafiyaSupportedLocale.supportedLocales,
+          localizationsDelegates: const [
+            AafiyaLocalizationsDelegate(),
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          theme: AafiyaTheme.lightTheme,
+          home: Scaffold(
+            body: AafiyaLockedAction(
+              child: ElevatedButton(
+                onPressed: () {
+                  innerTapped = true;
+                },
+                child: const Text('Action'),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Action'), findsOneWidget);
+      expect(find.byIcon(Icons.lock_outline_rounded), findsOneWidget);
+
+      await tester.tap(find.byType(AafiyaLockedAction));
+      await tester.pumpAndSettle();
+
+      expect(innerTapped, isFalse);
+      expect(
+        find.text('Cette fonctionnalité est temporairement désactivée pour des raisons administratives et organisationnelles.'),
+        findsOneWidget,
+      );
+    });
   });
 }
+

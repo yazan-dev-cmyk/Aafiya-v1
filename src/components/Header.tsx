@@ -82,13 +82,13 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header 
       className={cn(
-        "sticky top-0 z-40 transition-all duration-300 w-full max-w-full overflow-hidden [contain:paint]",
+        "sticky top-0 z-40 transition-all duration-300 w-full max-w-full",
         isScrolled 
           ? 'bg-white/90 backdrop-blur-md shadow-lg shadow-slate-900/5 border-b border-slate-100 py-3' 
           : 'bg-slate-50/80 backdrop-blur-sm py-5 border-b border-transparent'
       )}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         <div className="flex items-center justify-between gap-3 xl:gap-5 min-w-0">
           
           {/* Logo */}

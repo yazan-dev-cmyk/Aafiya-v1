@@ -28,12 +28,11 @@
   --color-slate-900: #0F172A;
   --color-slate-950: #020617;
 
-  /* Typography */
+  --font-amiri: var(--font-amiri);
   --font-ibm-plex-arabic: var(--font-ibm-plex-arabic);
   --font-plus-jakarta: var(--font-plus-jakarta);
-  --font-amiri: var(--font-amiri);
   --font-satisfy: var(--font-satisfy);
-  --font-sans: var(--font-ibm-plex-arabic), var(--font-plus-jakarta), var(--font-amiri), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --font-sans: var(--font-amiri), var(--font-ibm-plex-arabic), var(--font-plus-jakarta), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
 
   /* Radius */
   --radius-sm: 0.25rem; /* 4px */
@@ -153,5 +152,9 @@ html, body {
   max-width: 100%;
   overflow-x: hidden;
   position: relative;
+}
+
+html[dir="rtl"], body[dir="rtl"], [dir="rtl"] {
+  font-family: var(--font-amiri), serif;
 }
 

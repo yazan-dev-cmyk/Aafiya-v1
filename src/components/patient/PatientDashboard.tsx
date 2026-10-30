@@ -49,6 +49,7 @@ import { NavItem } from '../ui/Sidebar';
 import { Badge } from '../ui/Badge';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
+import { LockedActionButton } from '../ui/LockedActionButton';
 
 import { authService, UserProfile } from '@/services/authService';
 import { appointmentService, AppointmentItem as ApiAppointmentItem } from '@/services/appointmentService';
@@ -1298,8 +1299,8 @@ export function PatientDashboard({
 
             {/* Informative Guidance Modal when clicking on a card */}
             {bookingNoticeOpen && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-xs animate-in fade-in">
-                <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 text-center space-y-4">
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/40 backdrop-blur-xs animate-in fade-in overflow-y-auto">
+                <div className="bg-white rounded-2xl sm:rounded-3xl max-w-md w-full p-4 sm:p-6 shadow-2xl border border-slate-100 text-center space-y-4 max-h-[calc(100vh-1rem)] sm:max-h-[calc(100vh-2rem)] max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2rem)] overflow-y-auto my-auto">
                   <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center mx-auto">
                     <Info className="w-6 h-6" />
                   </div>
@@ -1990,12 +1991,11 @@ export function PatientDashboard({
                                   <QrCode className="w-3.5 h-3.5" />
                                 </button>
                                 {lab.status === 'ready' && (
-                                  <button
-                                    onClick={() => handleSimulateDownload(`Lab_Report_${lab.id}.pdf`, 'LAB')}
-                                    className="bg-teal-600 hover:bg-teal-700 text-white font-bold text-[11px] px-3 py-1 rounded-lg transition-colors cursor-pointer"
+                                  <LockedActionButton
+                                    className="bg-teal-600/60 text-white font-bold text-[11px] px-3 py-1 rounded-lg"
                                   >
-                                    {isRtl ? 'تحميل PDF' : 'Download'}
-                                  </button>
+                                    <span>{isRtl ? 'تحميل PDF' : 'Download'}</span>
+                                  </LockedActionButton>
                                 )}
                               </div>
                             </td>
@@ -2114,12 +2114,11 @@ export function PatientDashboard({
                           </button>
                         </div>
 
-                        <button
-                          onClick={() => handleSimulateDownload(`Radiology_Scan_Report_${rad.id}.pdf`, 'RAD')}
-                          className="bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition-colors cursor-pointer shadow-xs"
+                        <LockedActionButton
+                          className="bg-teal-600/60 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-xs"
                         >
-                          {isRtl ? 'تحميل التقرير الطبي PDF' : 'Download Report PDF'}
-                        </button>
+                          <span>{isRtl ? 'تحميل التقرير الطبي PDF' : 'Download Report PDF'}</span>
+                        </LockedActionButton>
                       </div>
                     </div>
                   ))}
@@ -2501,8 +2500,8 @@ export function PatientDashboard({
 
       {/* QR MODAL */}
       {showQrModal && (
-        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full space-y-5 text-center shadow-2xl relative animate-in fade-in zoom-in duration-200">
+        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-8 max-w-sm w-full space-y-4 sm:space-y-5 text-center shadow-2xl relative animate-in fade-in zoom-in duration-200 max-h-[calc(100vh-1rem)] sm:max-h-[calc(100vh-2rem)] max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2rem)] overflow-y-auto my-auto">
             <button
               onClick={() => setShowQrModal(false)}
               className="absolute top-4 left-4 p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full cursor-pointer"
@@ -2544,8 +2543,8 @@ export function PatientDashboard({
 
       {/* PRESCRIPTION QR VERIFICATION MODAL */}
       {selectedRxForQr && (
-        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full space-y-5 text-center shadow-2xl relative animate-in fade-in zoom-in duration-200">
+        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-8 max-w-sm w-full space-y-4 sm:space-y-5 text-center shadow-2xl relative animate-in fade-in zoom-in duration-200 max-h-[calc(100vh-1rem)] sm:max-h-[calc(100vh-2rem)] max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2rem)] overflow-y-auto my-auto">
             <button
               onClick={() => setSelectedRxForQr(null)}
               className="absolute top-4 left-4 p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full cursor-pointer"

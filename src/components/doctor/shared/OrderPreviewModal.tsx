@@ -53,12 +53,13 @@ export const OrderPreviewModal: React.FC<OrderPreviewModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className={`fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 ${isRtl ? 'dir-rtl' : 'dir-ltr'}`}>
-      <div className="bg-white text-slate-900 rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl flex flex-col">
+    <div className={`fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 overflow-y-auto ${isRtl ? 'dir-rtl' : 'dir-ltr'}`}>
+      <div className="bg-white text-slate-900 rounded-2xl max-w-lg w-full max-h-[calc(100vh-1rem)] sm:max-h-[calc(100vh-2rem)] max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2.5rem)] my-auto overflow-hidden shadow-2xl flex flex-col">
         {/* Modal Header */}
-        <div className={`p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 ${isRtl ? 'flex-row' : 'flex-row-reverse'}`}>
+        <div className={`p-3.5 sm:p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 shrink-0 ${isRtl ? 'flex-row' : 'flex-row-reverse'}`}>
           <button 
             onClick={onClose}
+            aria-label="Close"
             className="p-2 hover:bg-slate-200 rounded-lg transition-colors text-slate-400"
           >
             <X className="w-4 h-4" />
@@ -68,14 +69,14 @@ export const OrderPreviewModal: React.FC<OrderPreviewModalProps> = ({
               <h3 className="text-sm font-bold text-slate-900">{title}</h3>
               <p className="text-[10px] text-slate-500">{subtitle}</p>
             </div>
-            <div className={`w-8 h-8 rounded-lg ${accentColor} text-white flex items-center justify-center`}>
+            <div className={`w-8 h-8 rounded-lg ${accentColor} text-white flex items-center justify-center shrink-0`}>
               <Activity className="w-4 h-4" />
             </div>
           </div>
         </div>
 
         {/* Modal Content (Print Area) */}
-        <div className="p-6 space-y-6 flex-1 overflow-y-auto">
+        <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 flex-1 min-h-0 overflow-y-auto overscroll-contain">
           {/* Clinic Header (Simulated) */}
           <div className={`flex justify-between items-start border-b-2 border-slate-900 pb-4 ${isRtl ? 'flex-row' : 'flex-row-reverse'}`}>
             <div className={isRtl ? 'text-right' : 'text-left'}>
@@ -149,7 +150,7 @@ export const OrderPreviewModal: React.FC<OrderPreviewModalProps> = ({
         </div>
 
         {/* Modal Footer (Actions) */}
-        <div className={`p-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-end gap-3 ${isRtl ? 'flex-row' : 'flex-row-reverse'}`}>
+        <div className={`p-3.5 sm:p-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-end gap-2 sm:gap-3 shrink-0 ${isRtl ? 'flex-row' : 'flex-row-reverse'}`}>
           <button
             onClick={onClose}
             className="px-4 py-2 bg-white border border-slate-200 text-slate-600 font-bold text-xs rounded-xl hover:bg-slate-50 transition-colors"

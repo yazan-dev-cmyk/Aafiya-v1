@@ -17,6 +17,7 @@ import {
 import { EngineHeader } from '../shared/EngineHeader';
 import { TemplateSection } from '../shared/TemplateSection';
 import { OrderPreviewModal } from '../shared/OrderPreviewModal';
+import { LockedActionButton } from '../../ui/LockedActionButton';
 
 interface LabOrdersTabProps {
   patientName?: string;
@@ -85,9 +86,9 @@ export const LabOrdersTab: React.FC<LabOrdersTabProps> = ({
 
   return (
     <div className={`space-y-6 ${isRtl ? 'text-right' : 'text-left'}`} dir={isRtl ? 'rtl' : 'ltr'}>
-      
+
       {/* Engine Header v1.0 */}
-      <EngineHeader 
+      <EngineHeader
         engineName={t('labTitle')}
         engineSubtitle={t('labSubtitle')}
         patientName={patientName}
@@ -103,7 +104,7 @@ export const LabOrdersTab: React.FC<LabOrdersTabProps> = ({
       />
 
       {/* Templates Section v1.0 */}
-      <TemplateSection 
+      <TemplateSection
         title={t('templateTitle')}
         subtitle={t('templateSubtitle')}
         templates={LABORATORY_FAVORITE_PANELS.map(p => ({
@@ -116,6 +117,7 @@ export const LabOrdersTab: React.FC<LabOrdersTabProps> = ({
         isDarkMode={isDarkMode}
         accentColor="text-purple-700"
         icon={Plus}
+        isLocked={true}
       />
 
       {/* Active Requisition Table v1.0 */}
@@ -125,13 +127,11 @@ export const LabOrdersTab: React.FC<LabOrdersTabProps> = ({
             <Beaker className="w-4 h-4 text-purple-600" />
             <span className={`text-xs font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{t('activeLabTitle')}</span>
           </div>
-          <button 
-             onClick={() => setIsAddModalOpen(true)}
-             className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-[10px] font-bold rounded-lg flex items-center gap-1.5 transition-all shadow-sm"
+          <LockedActionButton
+             className="px-3 py-1.5 bg-purple-600/60 text-white text-[10px] font-bold rounded-lg flex items-center gap-1.5 shadow-sm"
           >
-            <Plus className="w-3.5 h-3.5" />
             <span>{t('addLab')}</span>
-          </button>
+          </LockedActionButton>
         </div>
 
         {selectedTests.length === 0 ? (
@@ -203,7 +203,7 @@ export const LabOrdersTab: React.FC<LabOrdersTabProps> = ({
             </table>
           </div>
         )}
-        
+
         {selectedTests.length > 0 && (
           <div className={`p-4 rounded-xl border flex items-center gap-3 ${isDarkMode ? 'bg-amber-500/5 border-amber-500/20' : 'bg-amber-50 border-amber-200'}`}>
              <AlertCircle className="w-5 h-5 text-amber-600 shrink-0" />
@@ -215,7 +215,7 @@ export const LabOrdersTab: React.FC<LabOrdersTabProps> = ({
       </div>
 
       {/* Preview Modal */}
-      <OrderPreviewModal 
+      <OrderPreviewModal
         isOpen={isPreviewOpen}
         onClose={() => setIsPreviewOpen(false)}
         title={t('previewTitle')}
@@ -230,21 +230,21 @@ export const LabOrdersTab: React.FC<LabOrdersTabProps> = ({
 
       {/* Add/Edit Mock Modal */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className={`bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl ${isRtl ? 'text-right' : 'text-left'}`} dir={isRtl ? 'rtl' : 'ltr'}>
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+          <div className={`bg-white rounded-2xl max-w-md w-full p-4 sm:p-6 space-y-4 shadow-2xl max-h-[calc(100vh-1rem)] sm:max-h-[calc(100vh-2rem)] max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2rem)] overflow-y-auto my-auto ${isRtl ? 'text-right' : 'text-left'}`} dir={isRtl ? 'rtl' : 'ltr'}>
              <div className="flex items-center justify-between border-b pb-3">
                 <h3 className="font-bold text-slate-900">{editingIndex !== null ? t('modal.editLabTitle') : t('modal.addLabTitle')}</h3>
                 <button onClick={() => { setIsAddModalOpen(false); setEditingIndex(null); }} className={`text-slate-400 hover:text-slate-600 ${isRtl ? 'mr-auto' : 'ml-auto'}`}><Plus className="w-5 h-5 rotate-45" /></button>
              </div>
-             
+
              <div className="space-y-4">
                 <div>
                    <label className="text-[11px] font-bold text-slate-500 block mb-1">{t('modal.testNameLabel')}</label>
                    <div className="relative">
                       <Search className={`absolute ${isRtl ? 'right-3' : 'left-3'} top-2.5 w-4 h-4 text-slate-400`} />
-                      <input 
-                        type="text" 
-                        placeholder={t('modal.searchPlaceholder') || "ابحث عن تحليل..."} 
+                      <input
+                        type="text"
+                        placeholder={t('modal.searchPlaceholder') || "ابحث عن تحليل..."}
                         className={`w-full bg-slate-50 border border-slate-200 rounded-xl py-2 ${isRtl ? 'pr-10 pl-4' : 'pl-10 pr-4'} text-xs focus:ring-2 focus:ring-purple-500 outline-none`}
                         defaultValue={editingIndex !== null ? selectedTests[editingIndex].name : ''}
                       />
@@ -273,7 +273,7 @@ export const LabOrdersTab: React.FC<LabOrdersTabProps> = ({
 
                 <div>
                    <label className="text-[11px] font-bold text-slate-500 block mb-1">{t('modal.instructionsLabel')}</label>
-                   <textarea 
+                   <textarea
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2 px-3 text-xs h-20 outline-none focus:ring-2 focus:ring-purple-500"
                       placeholder={t('modal.instructionsPlaceholder') || "تعليمات للمختبر..."}
                       defaultValue={editingIndex !== null ? selectedTests[editingIndex].instructions : ''}
@@ -282,17 +282,17 @@ export const LabOrdersTab: React.FC<LabOrdersTabProps> = ({
              </div>
 
              <div className="flex gap-3 pt-2">
-                <button 
+                <button
                    onClick={() => { setIsAddModalOpen(false); setEditingIndex(null); }}
                    className="flex-1 py-2.5 bg-slate-100 text-slate-600 font-bold text-xs rounded-xl hover:bg-slate-200"
                 >
                    {t('modal.cancel')}
                 </button>
-                <button 
-                   onClick={() => { 
+                <button
+                   onClick={() => {
                       alert(t('modal.mockEditAlert') || 'تم حفظ التعديلات بنجاح');
-                      setIsAddModalOpen(false); 
-                      setEditingIndex(null); 
+                      setIsAddModalOpen(false);
+                      setEditingIndex(null);
                    }}
                    className="flex-1 py-2.5 bg-purple-600 text-white font-bold text-xs rounded-xl hover:bg-purple-700 shadow-lg shadow-purple-500/20"
                 >

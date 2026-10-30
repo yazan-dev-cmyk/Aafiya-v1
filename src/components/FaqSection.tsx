@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { FAQS_LIST } from '../data/content';
-import { CircleHelp, ChevronDown, Search, ShieldCheck } from 'lucide-react';
+import { CircleHelp, ChevronDown, Search } from 'lucide-react';
 import { Badge } from './ui/Badge';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -114,10 +114,6 @@ export const FaqSection: React.FC = () => {
                         >
                           <div className="px-6 pb-6 pt-2 text-slate-500 text-sm font-bold leading-relaxed border-t border-slate-50 text-start">
                             <p>{t(`${faq.id}.answer`)}</p>
-                            <div className="mt-6 flex items-center gap-3 text-[11px] text-primary font-black uppercase tracking-widest pt-4 border-t border-slate-50">
-                              <ShieldCheck className="w-4 h-4" />
-                              <span>{t('source_note')}</span>
-                            </div>
                           </div>
                         </motion.div>
                       )}

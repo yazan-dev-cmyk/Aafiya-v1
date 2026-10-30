@@ -40,12 +40,22 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
+const getSiteUrl = (): string => {
+  const envUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL;
+  if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
+    return envUrl.endsWith('/') ? envUrl.slice(0, -1) : envUrl;
+  }
+  if (process.env.NODE_ENV === 'production') {
+    return 'https://aafiya.site';
+  }
+  return envUrl ? (envUrl.endsWith('/') ? envUrl.slice(0, -1) : envUrl) : 'http://localhost:3000';
+};
+
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'metadata' });
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-  const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+  const cleanBaseUrl = getSiteUrl();
   
   return {
     title: {
@@ -133,8 +143,7 @@ export default async function LocaleLayout({
 
   const isRtl = locale === 'ar';
   const t = await getTranslations({ locale, namespace: 'metadata' });
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-  const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+  const cleanBaseUrl = getSiteUrl();
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -156,7 +165,7 @@ export default async function LocaleLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className={`${isRtl ? ibmPlexSansArabic.className : plusJakartaSans.className} bg-slate-50 text-slate-900 antialiased selection:bg-teal-500 selection:text-white overflow-x-hidden max-w-full`} suppressHydrationWarning>
+      <body className={`${isRtl ? amiri.className : plusJakartaSans.className} font-sans bg-slate-50 text-slate-900 antialiased selection:bg-teal-500 selection:text-white overflow-x-hidden max-w-full`} suppressHydrationWarning>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <AuthProvider>
             {children}

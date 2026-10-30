@@ -40,8 +40,8 @@ void main() {
         ),
       );
 
-      expect(find.text('عافية'), findsOneWidget);
-      expect(find.text('بوابتك إلى العافية'), findsOneWidget);
+      expect(find.byType(Image), findsOneWidget);
+      expect(find.byType(AafiyaLoadingView), findsOneWidget);
       await tester.pump(const Duration(milliseconds: 700));
     });
 

@@ -14,10 +14,7 @@ import { StakeholderBenefits } from './components/StakeholderBenefits';
 import { WorkflowStepper } from './components/WorkflowStepper';
 import { MedicalFileSection } from './components/MedicalFileSection';
 import { PackageCalculator } from './components/PackageCalculator';
-import { TestimonialsSection } from './components/TestimonialsSection';
-import { PartnersSection } from './components/PartnersSection';
 import { FaqSection } from './components/FaqSection';
-import { NewsSection } from './components/NewsSection';
 import { AppDownloadSection } from './components/AppDownloadSection';
 import { CtaSection } from './components/CtaSection';
 import { Footer } from './components/Footer';
@@ -62,12 +59,14 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans selection:bg-teal-500 selection:text-white" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
       
-      {/* Top Announcement Bar */}
-      <TopBar
-        viewMode={viewMode}
-        onViewModeChange={setViewMode}
-        onOpenCalculator={scrollToCalculator}
-      />
+      {/* Top Announcement Bar (Gated for internal preview only) */}
+      {process.env.NEXT_PUBLIC_SHOW_DEV_BAR === 'true' && (
+        <TopBar
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          onOpenCalculator={scrollToCalculator}
+        />
+      )}
 
       {viewMode === 'doctor_dashboard' ? (
         /* Doctor Interactive Enterprise Dashboard */
@@ -142,7 +141,6 @@ export default function App() {
           {/* Hero Section */}
           <Hero
             onOpenAuth={handleOpenAuth}
-            onOpenCalculator={scrollToCalculator}
           />
 
           {/* Unified Doctor & Healthcare Center Search Directory */}
@@ -176,22 +174,13 @@ export default function App() {
             onOpenAuth={handleOpenAuth}
           />
 
-          {/* Operational Packages & ROI Calculator */}
+          {/* Operational Packages */}
           <PackageCalculator
             onOpenAuth={handleOpenAuth}
           />
 
-          {/* Testimonials */}
-          <TestimonialsSection />
-
-          {/* Partners & Institutions */}
-          <PartnersSection />
-
           {/* FAQs */}
           <FaqSection />
-
-          {/* News & Updates */}
-          <NewsSection />
 
           {/* App Download */}
           <AppDownloadSection />

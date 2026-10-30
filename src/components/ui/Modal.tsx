@@ -43,12 +43,12 @@ export const Modal: React.FC<ModalProps> = ({
     md: 'max-w-lg',
     lg: 'max-w-2xl',
     xl: 'max-w-4xl',
-    full: 'max-w-[95vw] h-[90vh]',
+    full: 'max-w-[95vw] h-[90vh] sm:h-[90dvh]',
   };
 
   const positions = {
     center: 'items-center justify-center',
-    top: 'items-start justify-center pt-20',
+    top: 'items-start justify-center pt-3 sm:pt-20',
   };
 
   return (
@@ -66,7 +66,7 @@ export const Modal: React.FC<ModalProps> = ({
 
           {/* Modal Container */}
           <div className={cn(
-            "fixed inset-0 z-50 flex p-4 pointer-events-none",
+            "fixed inset-0 z-50 flex p-2 sm:p-4 pointer-events-none overflow-y-auto",
             positions[position]
           )}>
             <motion.div
@@ -74,16 +74,19 @@ export const Modal: React.FC<ModalProps> = ({
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: position === 'top' ? -20 : 20 }}
               className={cn(
-                "w-full bg-white rounded-[32px] shadow-2xl overflow-hidden flex flex-col pointer-events-auto border border-white/20",
+                "w-full bg-white rounded-2xl sm:rounded-[32px] shadow-2xl overflow-hidden flex flex-col pointer-events-auto border border-white/20",
+                "max-h-[calc(100vh-1rem)] sm:max-h-[calc(100vh-2rem)]",
+                "max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2.5rem)]",
+                position === 'center' ? 'my-auto' : 'my-0',
                 sizes[size],
                 className
               )}
             >
               {/* Header */}
-              <div className="px-8 py-6 flex items-start justify-between border-b border-slate-100 bg-white/50 backdrop-blur-md">
-                <div className="space-y-1">
+              <div className="px-4 py-3.5 sm:px-8 sm:py-6 flex items-start justify-between border-b border-slate-100 bg-white/50 backdrop-blur-md shrink-0">
+                <div className="space-y-1 pe-3">
                   {title && (
-                    <h3 className="text-xl font-black text-slate-900 leading-tight">
+                    <h3 className="text-lg sm:text-xl font-black text-slate-900 leading-tight">
                       {title}
                     </h3>
                   )}
@@ -94,21 +97,23 @@ export const Modal: React.FC<ModalProps> = ({
                   )}
                 </div>
                 <button
+                  type="button"
                   onClick={onClose}
-                  className="w-10 h-10 rounded-2xl bg-slate-100 text-slate-500 flex items-center justify-center hover:bg-slate-200 hover:text-slate-700 transition-all active:scale-95 cursor-pointer"
+                  aria-label="Close"
+                  className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-slate-100 text-slate-500 flex items-center justify-center hover:bg-slate-200 hover:text-slate-700 transition-all active:scale-95 cursor-pointer shrink-0"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               </div>
 
               {/* Content */}
-              <div className="p-8 flex-1 overflow-y-auto custom-scrollbar">
+              <div className="p-4 sm:p-8 flex-1 min-h-0 overflow-y-auto overscroll-contain custom-scrollbar">
                 {children}
               </div>
 
               {/* Footer */}
               {footer && (
-                <div className="px-8 py-6 bg-slate-50/80 border-t border-slate-100 flex items-center justify-end gap-3">
+                <div className="px-4 py-3 sm:px-8 sm:py-6 bg-slate-50/80 border-t border-slate-100 flex items-center justify-end gap-2 sm:gap-3 shrink-0">
                   {footer}
                 </div>
               )}

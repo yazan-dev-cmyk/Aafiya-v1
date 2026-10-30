@@ -153,6 +153,7 @@ Route::middleware(['auth:sanctum', 'throttle:api.general', 'active.clinic'])->gr
 
     // Patient In-App Notifications (TASK-DWH-08 / DEC-NOT-01 / DEC-GAP-04)
     Route::get('/patient/notifications', [\App\Http\Controllers\Api\V1\PatientNotificationController::class, 'index']);
+    Route::get('/patient/notifications/unread-count', [\App\Http\Controllers\Api\V1\PatientNotificationController::class, 'unreadCount']);
     Route::get('/patient/notifications/{id}', [\App\Http\Controllers\Api\V1\PatientNotificationController::class, 'show']);
     Route::post('/patient/notifications/{id}/acknowledge', [\App\Http\Controllers\Api\V1\PatientNotificationController::class, 'acknowledge']);
 

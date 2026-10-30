@@ -3,6 +3,7 @@
 import React from 'react';
 import { Sparkles, Bookmark, Plus, LucideIcon } from 'lucide-react';
 import { useTranslations, useLocale } from 'next-intl';
+import { LockedActionButton } from '../../ui/LockedActionButton';
 
 interface Template {
   id: string;
@@ -20,6 +21,7 @@ interface TemplateSectionProps {
   isDarkMode?: boolean;
   accentColor: string;
   icon?: LucideIcon;
+  isLocked?: boolean;
 }
 
 export const TemplateSection: React.FC<TemplateSectionProps> = ({
@@ -29,7 +31,8 @@ export const TemplateSection: React.FC<TemplateSectionProps> = ({
   onApply,
   isDarkMode = false,
   accentColor,
-  icon: Icon = Bookmark
+  icon: Icon = Bookmark,
+  isLocked = false
 }) => {
   const t = useTranslations('doctor.shared');
   const locale = useLocale();
@@ -70,16 +73,28 @@ export const TemplateSection: React.FC<TemplateSectionProps> = ({
                 </span>
               )}
             </div>
-            <button
-              onClick={() => onApply(tpl.id)}
-              className={`p-2 rounded-lg border cursor-pointer transition-all shrink-0 ${
-                isDarkMode 
-                  ? 'bg-slate-800 hover:bg-slate-700 text-white border-slate-700' 
-                  : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-200'
-              }`}
-            >
-              <Icon className="w-4 h-4" />
-            </button>
+            {isLocked ? (
+              <LockedActionButton
+                className={`p-2 rounded-lg border transition-all shrink-0 ${
+                  isDarkMode
+                    ? 'bg-slate-800 text-slate-400 border-slate-700'
+                    : 'bg-white text-slate-400 border-slate-200'
+                }`}
+              >
+                <span className="sr-only">{tpl.name}</span>
+              </LockedActionButton>
+            ) : (
+              <button
+                onClick={() => onApply(tpl.id)}
+                className={`p-2 rounded-lg border cursor-pointer transition-all shrink-0 ${
+                  isDarkMode
+                    ? 'bg-slate-800 hover:bg-slate-700 text-white border-slate-700'
+                    : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-200'
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+              </button>
+            )}
           </div>
         ))}
       </div>
