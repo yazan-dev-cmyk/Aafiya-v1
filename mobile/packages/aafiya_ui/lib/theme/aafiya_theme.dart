@@ -5,8 +5,18 @@ import '../tokens/aafiya_typography.dart';
 
 /// Central Theme builder for AAFIYA mobile applications.
 abstract final class AafiyaTheme {
-  /// Light theme matching official AAFIYA brand specifications.
-  static ThemeData get lightTheme {
+  /// Light theme matching official AAFIYA brand specifications (Arabic default).
+  static ThemeData get lightTheme => themeFor(const Locale('ar'));
+
+  /// Dark theme prepared for future dark-mode enablement (Arabic default).
+  static ThemeData get darkTheme => darkThemeFor(const Locale('ar'));
+
+  /// Returns light theme tailored for the given [locale].
+  static ThemeData themeFor(Locale locale) {
+    final languageCode = locale.languageCode;
+    final primaryFont = AafiyaTypography.fontFamilyFor(languageCode);
+    final textTheme = AafiyaTypography.textThemeFor(languageCode);
+
     const colorScheme = ColorScheme.light(
       primary: AafiyaColors.healthBlue,
       onPrimary: AafiyaColors.pureWhite,
@@ -21,9 +31,9 @@ abstract final class AafiyaTheme {
 
     return ThemeData(
       useMaterial3: true,
-      fontFamily: AafiyaTypography.fontFamily,
+      fontFamily: primaryFont,
       colorScheme: colorScheme,
-      textTheme: AafiyaTypography.textTheme,
+      textTheme: textTheme,
       scaffoldBackgroundColor: AafiyaColors.lightBackground,
       appBarTheme: AppBarTheme(
         backgroundColor: AafiyaColors.pureWhite,
@@ -31,13 +41,13 @@ abstract final class AafiyaTheme {
         elevation: 0,
         centerTitle: true,
         scrolledUnderElevation: 1,
-        titleTextStyle: AafiyaTypography.titleLarge,
+        titleTextStyle: textTheme.titleLarge ?? AafiyaTypography.titleLarge,
       ),
       cardTheme: const CardThemeData(
         color: AafiyaColors.pureWhite,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: AafiyaRadius.borderLg,
+          borderRadius: AafiyaRadius.borderCard,
           side: BorderSide(color: AafiyaColors.border, width: 1),
         ),
         margin: EdgeInsets.zero,
@@ -48,9 +58,9 @@ abstract final class AafiyaTheme {
           foregroundColor: AafiyaColors.pureWhite,
           minimumSize: const Size.fromHeight(48),
           shape: const RoundedRectangleBorder(
-            borderRadius: AafiyaRadius.borderMd,
+            borderRadius: AafiyaRadius.borderButton,
           ),
-          textStyle: AafiyaTypography.labelLarge,
+          textStyle: textTheme.labelLarge ?? AafiyaTypography.labelLarge,
           elevation: 0,
         ),
       ),
@@ -75,7 +85,7 @@ abstract final class AafiyaTheme {
           borderRadius: AafiyaRadius.borderMd,
           borderSide: BorderSide(color: AafiyaColors.error),
         ),
-        hintStyle: AafiyaTypography.bodyMedium,
+        hintStyle: textTheme.bodyMedium ?? AafiyaTypography.bodyMedium,
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: AafiyaColors.pureWhite,
@@ -91,12 +101,12 @@ abstract final class AafiyaTheme {
         }),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return AafiyaTypography.bodySmall.copyWith(
+            return (textTheme.bodySmall ?? AafiyaTypography.bodySmall).copyWith(
               color: AafiyaColors.tealInk,
               fontWeight: FontWeight.w700,
             );
           }
-          return AafiyaTypography.bodySmall.copyWith(
+          return (textTheme.bodySmall ?? AafiyaTypography.bodySmall).copyWith(
             color: AafiyaColors.secondaryText,
             fontWeight: FontWeight.w500,
           );
@@ -105,8 +115,12 @@ abstract final class AafiyaTheme {
     );
   }
 
-  /// Dark theme prepared for future dark-mode enablement.
-  static ThemeData get darkTheme {
+  /// Returns dark theme tailored for the given [locale].
+  static ThemeData darkThemeFor(Locale locale) {
+    final languageCode = locale.languageCode;
+    final primaryFont = AafiyaTypography.fontFamilyFor(languageCode);
+    final darkTextTheme = AafiyaTypography.darkTextThemeFor(languageCode);
+
     const colorScheme = ColorScheme.dark(
       primary: AafiyaColors.healthBlue,
       onPrimary: AafiyaColors.pureWhite,
@@ -121,16 +135,16 @@ abstract final class AafiyaTheme {
 
     return ThemeData(
       useMaterial3: true,
-      fontFamily: AafiyaTypography.fontFamily,
+      fontFamily: primaryFont,
       colorScheme: colorScheme,
-      textTheme: AafiyaTypography.darkTextTheme,
+      textTheme: darkTextTheme,
       scaffoldBackgroundColor: AafiyaColors.darkBackground,
       appBarTheme: AppBarTheme(
         backgroundColor: AafiyaColors.darkSurface,
         foregroundColor: AafiyaColors.darkPrimaryText,
         elevation: 0,
         centerTitle: true,
-        titleTextStyle: AafiyaTypography.titleLarge.copyWith(
+        titleTextStyle: (darkTextTheme.titleLarge ?? AafiyaTypography.titleLarge).copyWith(
           color: AafiyaColors.darkPrimaryText,
         ),
       ),
@@ -138,10 +152,9 @@ abstract final class AafiyaTheme {
         color: AafiyaColors.darkSurface,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: AafiyaRadius.borderLg,
+          borderRadius: AafiyaRadius.borderCard,
           side: BorderSide(color: AafiyaColors.darkBorder, width: 1),
         ),
-        margin: EdgeInsets.zero,
       ),
     );
   }

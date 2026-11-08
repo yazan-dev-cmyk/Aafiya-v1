@@ -26,7 +26,7 @@ import { DoctorPendingVerificationView } from './DoctorPendingVerificationView';
 
 import { WaitingPatient } from '../../data/doctorDashboardData';
 import { DashboardLayout } from '../ui/DashboardLayout';
-import { NavItem } from '../ui/Sidebar';
+import { NavItem, NavCategory } from '../ui/Sidebar';
 import { ClinicSwitcher } from './ClinicSwitcher';
 import { DoctorClinicSelectorView } from './DoctorClinicSelectorView';
 import { DoctorNoClinicView } from './DoctorNoClinicView';
@@ -259,28 +259,54 @@ export const DoctorDashboard: React.FC<DoctorDashboardProps> = ({
     fetchLiveQueue();
   }, [user, selectedOperationalDate]);
 
-  // Dynamic Navigation Items based on verified permissions & clinic position
-  const navItems: NavItem[] = [
-    { id: 'dashboard', label: t('tabs.dashboard'), icon: LayoutDashboard },
-    { id: 'patients', label: t('tabs.patients'), icon: UserCheck, badge: t('badges.new') },
-    { id: 'visits', label: t('tabs.visits'), icon: Calendar },
-    { id: 'waiting-room', label: t('tabs.waitingRoom'), icon: Users, badge: `${queue.length}` },
-    { id: 'consultation', label: t('tabs.consultation'), icon: Stethoscope, highlight: true },
-    { id: 'prescriptions', label: t('tabs.prescriptions'), icon: FileText },
-    { id: 'lab-orders', label: t('tabs.labOrders'), icon: FlaskConical },
-    { id: 'radiology-orders', label: t('tabs.radiologyOrders'), icon: Scan },
-    { id: 'lab-results', label: t('tabs.labResults'), icon: FileSpreadsheet },
-    { id: 'radiology-results', label: t('tabs.radiologyResults'), icon: Eye },
-    { id: 'ehr', label: t('tabs.ehr'), icon: User },
-    { id: 'analytics', label: t('tabs.analytics'), icon: BarChart3 },
-    { id: 'notifications', label: t('tabs.notifications'), icon: Bell, badge: t('badges.urgent') },
-    ...(hasStaffPermission ? [{ id: 'staff', label: t('tabs.staff'), icon: UserPlus }] : []),
-    ...(hasSettingsPermission
-      ? [{ id: 'settings', label: t('tabs.settings'), icon: Settings, badge: t('badges.schedule') }]
-      : (user?.doctor?.id ? [{ id: 'working-hours', label: t('tabs.workingHours'), icon: Clock, badge: t('badges.schedule') }] : [])),
-    ...(hasClinicStatsPermission ? [{ id: 'clinic-stats', label: t('tabs.clinicStats'), icon: TrendingUp }] : []),
-    { id: 'activity-log', label: t('tabs.activityLog'), icon: ShieldCheck }
+  // Dynamic Categorized Navigation Items based on verified permissions & clinical workflow
+  const navCategories: NavCategory[] = [
+    {
+      id: 'clinical',
+      title: t('categories.clinical'),
+      items: [
+        { id: 'dashboard', label: t('tabs.dashboard'), icon: LayoutDashboard },
+        { id: 'waiting-room', label: t('tabs.waitingRoom'), icon: Users, badge: queue.length > 0 ? `${queue.length}` : undefined },
+        { id: 'consultation', label: t('tabs.consultation'), icon: Stethoscope, highlight: true },
+        { id: 'visits', label: t('tabs.visits'), icon: Calendar },
+        { id: 'patients', label: t('tabs.patients'), icon: UserCheck, badge: t('badges.new') },
+      ]
+    },
+    {
+      id: 'diagnostics',
+      title: t('categories.diagnostics'),
+      items: [
+        { id: 'prescriptions', label: t('tabs.prescriptions'), icon: FileText },
+        { id: 'lab-orders', label: t('tabs.labOrders'), icon: FlaskConical },
+        { id: 'lab-results', label: t('tabs.labResults'), icon: FileSpreadsheet },
+        { id: 'radiology-orders', label: t('tabs.radiologyOrders'), icon: Scan },
+        { id: 'radiology-results', label: t('tabs.radiologyResults'), icon: Eye },
+        { id: 'ehr', label: t('tabs.ehr'), icon: User },
+      ]
+    },
+    {
+      id: 'insights',
+      title: t('categories.insights'),
+      items: [
+        { id: 'analytics', label: t('tabs.analytics'), icon: BarChart3 },
+        { id: 'notifications', label: t('tabs.notifications'), icon: Bell, badge: t('badges.urgent') },
+        ...(hasClinicStatsPermission ? [{ id: 'clinic-stats', label: t('tabs.clinicStats'), icon: TrendingUp }] : []),
+      ]
+    },
+    {
+      id: 'management',
+      title: t('categories.management'),
+      items: [
+        ...(hasStaffPermission ? [{ id: 'staff', label: t('tabs.staff'), icon: UserPlus }] : []),
+        ...(hasSettingsPermission
+          ? [{ id: 'settings', label: t('tabs.settings'), icon: Settings, badge: t('badges.schedule') }]
+          : (user?.doctor?.id ? [{ id: 'working-hours', label: t('tabs.workingHours'), icon: Clock, badge: t('badges.schedule') }] : [])),
+        { id: 'activity-log', label: t('tabs.activityLog'), icon: ShieldCheck },
+      ]
+    }
   ];
+
+  const navItems: NavItem[] = navCategories.flatMap(cat => cat.items);
 
   const handleConfirmAppointment = async (id: string) => {
     try {
@@ -359,6 +385,7 @@ export const DoctorDashboard: React.FC<DoctorDashboardProps> = ({
       activeTab={activeTab}
       onTabChange={handleTabChange}
       navItems={navItems}
+      navCategories={navCategories}
       isDarkMode={isDarkMode}
       onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
       onBackToMain={onBackToMainPlatform}
@@ -394,9 +421,51 @@ export const DoctorDashboard: React.FC<DoctorDashboardProps> = ({
         </div>
       )}
 
+      {/* Contextual Clinical Breadcrumb Strip */}
+      {activeTab !== 'dashboard' && (
+        <div className="mb-4 flex items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+            <button
+              onClick={() => handleTabChange('dashboard')}
+              className="hover:text-primary transition-colors font-medium flex items-center gap-1 cursor-pointer"
+            >
+              <LayoutDashboard className="w-3.5 h-3.5" />
+              <span>{t('tabs.dashboard')}</span>
+            </button>
+            <span>/</span>
+            {(() => {
+              const currentCategory = navCategories.find(cat => cat.items.some(item => item.id === activeTab));
+              return currentCategory ? (
+                <>
+                  <span className="text-slate-400 dark:text-slate-500">{currentCategory.title}</span>
+                  <span>/</span>
+                </>
+              ) : null;
+            })()}
+            {(() => {
+              const currentItem = navItems.find(item => item.id === activeTab);
+              return currentItem ? (
+                <span className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                  {React.createElement(currentItem.icon, { className: "w-3.5 h-3.5 text-primary" })}
+                  {currentItem.label}
+                </span>
+              ) : null;
+            })()}
+          </div>
+
+          <button
+            onClick={() => handleTabChange('dashboard')}
+            className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-800 text-[11px] font-bold text-slate-600 dark:text-slate-400 hover:text-primary hover:border-primary/40 transition-all cursor-pointer"
+          >
+            <span>{isRtl ? 'العودة للوحة الرئيسية' : 'Back to Dashboard'}</span>
+          </button>
+        </div>
+      )}
+
       {activeTab === 'dashboard' && (
         <DoctorOverviewTab
           onNavigateTab={handleTabChange}
+          onStartConsultation={handleStartConsultation}
           isDarkMode={isDarkMode}
           queueLength={queue.length}
           selectedOperationalDate={selectedOperationalDate}

@@ -54,6 +54,7 @@ class _BookingCenterDirectoryScreenState extends State<BookingCenterDirectoryScr
 
   String _searchQuery = '';
   String? _selectedWilaya;
+  String? _selectedWilayaCode;
 
   @override
   void initState() {
@@ -97,9 +98,10 @@ class _BookingCenterDirectoryScreenState extends State<BookingCenterDirectoryScr
     });
   }
 
-  void _onWilayaSelected(String? wilaya) {
+  void _onWilayaSelected(Wilaya? wilaya) {
     setState(() {
-      _selectedWilaya = wilaya;
+      _selectedWilayaCode = wilaya?.code;
+      _selectedWilaya = wilaya?.nameAr;
     });
     _fetchCenters(page: 1, reset: true);
   }
@@ -259,14 +261,15 @@ class _BookingCenterDirectoryScreenState extends State<BookingCenterDirectoryScr
               ),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
 
-          // Horizontal Dynamic Wilaya Filter Chips
-          AafiyaWilayaFilterChips(
+          // Searchable Dynamic Wilaya Dropdown Selector
+          AafiyaWilayaSelector(
             masterDataService: _masterDataService,
-            selectedWilaya: _selectedWilaya,
-            useArabicNamesForQuery: true,
-            onWilayaSelected: _onWilayaSelected,
+            selectedCode: _selectedWilayaCode,
+            includeAllOption: true,
+            label: '',
+            onChanged: _onWilayaSelected,
           ),
         ],
       ),

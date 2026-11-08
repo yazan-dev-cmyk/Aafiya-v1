@@ -473,21 +473,21 @@ export const PackagesQuotaTab: React.FC<PackagesQuotaTabProps> = ({
       {/* REQUEST DETAILS MODAL */}
       {viewingRequest && (
         <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 space-y-5 text-start">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+          <div className="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col p-6 text-start relative overflow-hidden shadow-2xl">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200 shrink-0">
               <h3 className="font-bold text-slate-900 text-base flex items-center gap-2">
                 <FileText className="w-5 h-5 text-blue-600" />
                 {t('detailsModal.title', { ref: viewingRequest.refNumber })}
               </h3>
               <button
                 onClick={() => setViewingRequest(null)}
-                className="text-slate-400 hover:text-slate-600 cursor-pointer"
+                className="text-slate-400 hover:text-slate-600 cursor-pointer p-1 rounded-lg hover:bg-slate-100 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="space-y-3 text-xs text-slate-700">
+            <div className="overflow-y-auto flex-1 py-3 space-y-3 text-xs text-slate-700">
               <div className="grid grid-cols-2 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
                 <div>
                   <span className="text-slate-500 block">{t('detailsModal.package')}</span>
@@ -549,10 +549,10 @@ export const PackagesQuotaTab: React.FC<PackagesQuotaTabProps> = ({
               )}
             </div>
 
-            <div className="flex justify-end pt-2">
+            <div className="flex justify-end pt-3 border-t border-slate-100 shrink-0">
               <button
                 onClick={() => setViewingRequest(null)}
-                className="px-5 py-2 rounded-xl bg-slate-900 text-white font-bold text-xs cursor-pointer"
+                className="px-5 py-2 rounded-xl bg-slate-900 text-white font-bold text-xs cursor-pointer shadow-xs"
               >
                 {t('detailsModal.close')}
               </button>
@@ -564,10 +564,10 @@ export const PackagesQuotaTab: React.FC<PackagesQuotaTabProps> = ({
       {/* SECTION 3.6 MULTI-STEP PURCHASE WIZARD MODAL */}
       {showPurchaseModal && (
         <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 space-y-6 text-start relative overflow-hidden">
+          <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col p-6 text-start relative overflow-hidden shadow-2xl">
             
             {/* Modal Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200 shrink-0">
               <div>
                 <h3 className="font-bold text-slate-900 text-lg flex items-center gap-2">
                   <Zap className="w-5 h-5 text-amber-500" />
@@ -578,14 +578,14 @@ export const PackagesQuotaTab: React.FC<PackagesQuotaTabProps> = ({
 
               <button
                 onClick={() => setShowPurchaseModal(false)}
-                className="text-slate-400 hover:text-slate-600 cursor-pointer"
+                className="text-slate-400 hover:text-slate-600 cursor-pointer p-1 rounded-lg hover:bg-slate-100 transition-colors"
               >
                 <X className="w-6 h-6" />
               </button>
             </div>
 
             {/* Stepper Progress Indicator */}
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-4 gap-2 py-3 shrink-0">
               {[
                 { step: 1, label: t('wizard.steps.1') },
                 { step: 2, label: t('wizard.steps.2') },
@@ -608,8 +608,10 @@ export const PackagesQuotaTab: React.FC<PackagesQuotaTabProps> = ({
               ))}
             </div>
 
-            {/* STEP 1: PACKAGE SELECTION */}
-            {currentStep === 1 && (() => {
+            {/* Scrollable Wizard Steps Body */}
+            <div className="overflow-y-auto flex-1 px-1 py-1 space-y-4">
+              {/* STEP 1: PACKAGE SELECTION */}
+              {currentStep === 1 && (() => {
               const hasClaimedFreePackage = requestsHistory.some(r => r.priceDzd === 0 && r.status !== 'rejected');
               return (
                 <div className="space-y-4">
@@ -956,6 +958,7 @@ export const PackagesQuotaTab: React.FC<PackagesQuotaTabProps> = ({
               </div>
             )}
 
+            </div>
           </div>
         </div>
       )}

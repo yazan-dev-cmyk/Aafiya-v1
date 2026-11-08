@@ -52,8 +52,22 @@ import {
   MessageSquare,
   Printer,
   Building,
-  AlertCircle
+  AlertCircle,
+  CreditCard,
+  ShieldCheck,
+  Sparkles,
+  ExternalLink,
+  QrCode,
+  Download,
+  Loader2
 } from 'lucide-react';
+import QRCode from 'react-qr-code';
+import {
+  openWhatsAppAppointmentShare,
+  downloadAppointmentCardPng,
+  AppointmentTicketData,
+  WhatsAppLanguage
+} from '@/lib/appointmentTicketCard';
 
 import { DashboardLayout } from '../ui/DashboardLayout';
 import { NavItem } from '../ui/Sidebar';
@@ -90,6 +104,7 @@ export const BookingCenterDashboard: React.FC<BookingCenterDashboardProps> = ({
   const [packageDetails, setPackageDetails] = useState<PackageDetails>(DEFAULT_EMPTY_PACKAGE_DETAILS);
   const [financialSummary, setFinancialSummary] = useState<BookingCenterFinancialSummary | null>(null);
   const [patients, setPatients] = useState<PatientRecord[]>([]);
+  const [preselectedPatient, setPreselectedPatient] = useState<PatientRecord | null>(null);
   const [employees] = useState<EmployeeRecord[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([]);
   const [notifications, setNotifications] = useState<SystemNotification[]>([]);
@@ -193,6 +208,7 @@ export const BookingCenterDashboard: React.FC<BookingCenterDashboardProps> = ({
               notes: app.notes,
               createdAt: app.appointment_date || new Date().toISOString().split('T')[0],
               createdBy: user?.name || 'موظف الحجز',
+              secureToken: app.secure_token,
             };
           });
           setBookings(liveBookings);
@@ -256,6 +272,14 @@ export const BookingCenterDashboard: React.FC<BookingCenterDashboardProps> = ({
 
   // Selected Booking Details Modal
   const [selectedBooking, setSelectedBooking] = useState<BookingRecord | null>(null);
+  const modalQrCardRef = React.useRef<HTMLDivElement>(null);
+  const [isExportingModalPng, setIsExportingModalPng] = useState(false);
+  const [ticketLanguage, setTicketLanguage] = useState<WhatsAppLanguage>('ar');
+  const [isOpeningWhatsApp, setIsOpeningWhatsApp] = useState(false);
+  const qrSvgRef = React.useRef<SVGSVGElement | null>(null);
+
+  const pendingCount = bookings.filter((b) => b.status === 'pending').length;
+  const unreadNotifsCount = notifications.filter((n) => !n.read).length;
 
   // Navigation Items according to the Navigation Architecture in Design Bible
   const navItems: NavItem[] = [
@@ -264,10 +288,25 @@ export const BookingCenterDashboard: React.FC<BookingCenterDashboardProps> = ({
     { id: 'bookings', label: t('tabs.bookings'), icon: FileText },
     { id: 'calendar', label: t('tabs.calendar'), icon: Calendar },
     { id: 'patients', label: t('tabs.patients'), icon: Users },
-    { id: 'status-tracker', label: t('tabs.statusTracker'), icon: Activity },
-    { id: 'packages', label: t('tabs.packages'), icon: Package, badge: `${packageDetails.remainingQuota} ${t('remaining')}` },
+    {
+      id: 'status-tracker',
+      label: t('tabs.statusTracker'),
+      icon: Activity,
+      badge: pendingCount > 0 ? `${pendingCount} معلق` : undefined,
+    },
+    {
+      id: 'packages',
+      label: t('tabs.packages'),
+      icon: Package,
+      badge: `${packageDetails.remainingQuota} ${t('remaining')}`,
+    },
     { id: 'billing', label: t('tabs.billing'), icon: Receipt },
-    { id: 'notifications', label: t('tabs.notifications'), icon: Bell, badge: `${notifications.filter(n => !n.read).length}` },
+    {
+      id: 'notifications',
+      label: t('tabs.notifications'),
+      icon: Bell,
+      badge: unreadNotifsCount > 0 ? `${unreadNotifsCount}` : undefined,
+    },
     { id: 'reports', label: t('tabs.reports'), icon: BarChart3 },
     { id: 'employees', label: t('tabs.employees'), icon: UserCheck },
     { id: 'settings', label: t('tabs.settings'), icon: Settings },
@@ -407,13 +446,55 @@ export const BookingCenterDashboard: React.FC<BookingCenterDashboardProps> = ({
       icon={<Building className="w-6 h-6" />}
     >
       
-      {/* Privacy Notice Banner */}
-      <div className="mb-6 flex items-center gap-3 p-4 rounded-2xl bg-primary/5 border border-primary/10">
-        <Lock className="w-5 h-5 text-primary" />
-        <p className="text-xs font-bold text-slate-600">
-          {t('privacyNotice')}
-        </p>
-        <Badge variant="success" className="ms-auto">{t('privacyStatus')}</Badge>
+      {/* Top Clinical Dispatcher Strip */}
+      <div className="mb-6 bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-3.5 shadow-2xs flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200/80 dark:border-blue-800 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+            <Building className="w-4 h-4" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-extrabold text-slate-900 dark:text-white text-xs sm:text-sm">
+                {user?.booking_center?.name || user?.name || 'مركز الحجز المعتمد'}
+              </span>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                معتمد رسمياً
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5 mt-0.5">
+              <Lock className="w-3 h-3 text-slate-400" />
+              <span>جدار خصوصية مطلق مشفر • {t('privacyNotice')}</span>
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {/* Quota Badge */}
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-xs">
+            <Package className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+            <span className="text-slate-500 dark:text-slate-400 text-[11px]">الرصيد:</span>
+            <span className={`font-mono font-black ${currentBalance > 10 ? 'text-emerald-600 dark:text-emerald-400' : currentBalance > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-rose-600 dark:text-rose-400'}`}>
+              {currentBalance}
+            </span>
+            <span className="text-[10.5px] text-slate-400">عملية</span>
+          </div>
+
+          <button
+            onClick={() => handleTabChange('packages')}
+            className="px-3 py-1.5 rounded-xl text-xs font-bold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 border border-blue-200 dark:border-blue-800 transition-colors cursor-pointer"
+          >
+            شحن الباقة
+          </button>
+
+          <button
+            onClick={handleOpenNewBooking}
+            className="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-2xs hover:shadow-xs active:scale-95 cursor-pointer flex items-center gap-1.5"
+          >
+            <PlusCircle className="w-3.5 h-3.5" />
+            <span>حجز جديد</span>
+          </button>
+        </div>
       </div>
 
       {activeTab === 'dashboard' && (
@@ -436,7 +517,11 @@ export const BookingCenterDashboard: React.FC<BookingCenterDashboardProps> = ({
             patients={patients}
             packageDetails={packageDetails}
             onCreateBooking={handleCreateBooking}
-            onCancel={() => handleTabChange('dashboard')}
+            onCancel={() => {
+              setPreselectedPatient(null);
+              handleTabChange('dashboard');
+            }}
+            initialPatient={preselectedPatient}
           />
         ) : null
       )}
@@ -510,88 +595,279 @@ export const BookingCenterDashboard: React.FC<BookingCenterDashboardProps> = ({
 
       {activeTab === 'settings' && <ProfileSettingsTab />}
 
-      {/* BOOKING DETAILS MODAL */}
+      {/* BOOKING DETAILS MODAL - CLINICAL VOUCHER */}
       {selectedBooking && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-[100] animate-in fade-in duration-300">
-          <div className="bg-white rounded-[32px] max-w-xl w-full p-8 space-y-6 text-right max-h-[90vh] overflow-y-auto shadow-2xl animate-in zoom-in-95 duration-300">
+        <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4 z-[100] animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-7 space-y-5 text-right max-h-[92vh] overflow-y-auto shadow-2xl border border-slate-200">
             
-            <div className="flex items-center justify-between border-b border-slate-100 pb-6">
+            {/* Voucher Top Header */}
+            <div className="flex items-start justify-between border-b border-slate-100 pb-4">
               <div>
-                <span className="text-xs font-mono font-bold text-primary block mb-1">{selectedBooking.refNumber}</span>
-                <h3 className="font-black text-slate-900 text-xl">{t('detailsModal.title')}</h3>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10.5px] font-mono font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                    {selectedBooking.refNumber}
+                  </span>
+                  <span className="text-[11px] font-bold text-slate-400">سند موعد معتمد</span>
+                </div>
+                <h3 className="font-black text-slate-900 text-lg sm:text-xl tracking-tight">
+                  {t('detailsModal.title')}
+                </h3>
               </div>
               <button
                 onClick={() => setSelectedBooking(null)}
-                className="p-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-500 transition-colors"
+                className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 transition-colors cursor-pointer"
               >
-                <X className="w-6 h-6" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+            {/* Operational Status Banner */}
+            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/90 flex items-center justify-between">
               <span className="text-xs font-bold text-slate-600">{t('detailsModal.operationalStatus')}:</span>
-              <Badge variant={selectedBooking.status === 'approved' ? 'success' : 'warning'}>
-                {selectedBooking.status}
-              </Badge>
+              {selectedBooking.status === 'approved' && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  مؤكد ومعتمد بالعيادة
+                </span>
+              )}
+              {selectedBooking.status === 'pending' && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                  <span className="w-2 h-2 rounded-full bg-amber-500" />
+                  بانتظار موافقة الطبيب
+                </span>
+              )}
+              {selectedBooking.status === 'rescheduled' && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                  معدل التوقيت ({selectedBooking.rescheduledTime})
+                </span>
+              )}
+              {selectedBooking.status === 'rejected' && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                  مرفوض (رصيد مسترجع)
+                </span>
+              )}
+              {selectedBooking.status === 'cancelled' && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-200 text-slate-700">
+                  ملغى
+                </span>
+              )}
+              {selectedBooking.status === 'completed' && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-cyan-50 text-cyan-700 border border-cyan-200">
+                  مكتمل الفحص
+                </span>
+              )}
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 bg-slate-50 rounded-2xl space-y-2 border border-slate-100">
+            {/* Patient & Clinic Split Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div className="p-4 bg-slate-50/80 rounded-2xl space-y-1.5 border border-slate-200/80">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">{t('detailsModal.patientData')}</span>
-                <span className="font-bold text-slate-900 text-sm block">{selectedBooking.patientName}</span>
-                <span className="text-slate-600 block dir-ltr text-start text-xs">{selectedBooking.patientPhone}</span>
-                <Badge variant="neutral" className="text-[10px]">
-                  {selectedBooking.patientType === 'registered' ? t('detailsModal.registeredPatient') : t('detailsModal.visitorPatient')}
-                </Badge>
+                <span className="font-extrabold text-slate-900 text-sm block">{selectedBooking.patientName}</span>
+                <span className="text-slate-600 block dir-ltr text-right font-mono text-xs font-semibold">{selectedBooking.patientPhone}</span>
+                <div className="pt-1">
+                  <span className="inline-flex px-2 py-0.5 rounded-md text-[10px] font-bold bg-white text-slate-600 border border-slate-200">
+                    {selectedBooking.patientType === 'registered' ? t('detailsModal.registeredPatient') : t('detailsModal.visitorPatient')}
+                  </span>
+                </div>
               </div>
 
-              <div className="p-4 bg-slate-50 rounded-2xl space-y-2 border border-slate-100">
+              <div className="p-4 bg-slate-50/80 rounded-2xl space-y-1.5 border border-slate-200/80">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">{t('detailsModal.medicalFacility')}</span>
-                <span className="font-bold text-slate-900 text-sm block">{selectedBooking.doctorName}</span>
-                <span className="text-primary font-bold block text-xs">{selectedBooking.specialty}</span>
-                <span className="text-slate-500 block text-[11px]">{selectedBooking.facilityName} ({selectedBooking.wilaya})</span>
+                <span className="font-extrabold text-slate-900 text-sm block">{selectedBooking.doctorName}</span>
+                <span className="text-blue-600 font-bold block text-xs">{selectedBooking.specialty}</span>
+                <span className="text-slate-500 block text-[11px] font-medium">{selectedBooking.facilityName} ({selectedBooking.wilaya})</span>
               </div>
             </div>
 
-            <div className="p-5 rounded-2xl bg-primary/5 border border-primary/10 text-xs space-y-3">
+            {/* Appointment Schedule Box */}
+            <div className="p-4 rounded-2xl bg-blue-50/60 border border-blue-200/70 text-xs space-y-2.5">
               <div className="flex justify-between items-center">
                 <span className="text-slate-600 font-bold">{t('detailsModal.bookingDate')}:</span>
-                <strong className="text-slate-900 font-black">{selectedBooking.date}</strong>
+                <strong className="text-slate-900 font-black font-mono">{selectedBooking.date}</strong>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-slate-600 font-bold">{t('detailsModal.bookingTime')}:</span>
-                <strong className="text-primary font-black text-sm dir-ltr text-start">{selectedBooking.timeSlot}</strong>
+                <strong className="text-blue-700 font-black text-sm dir-ltr text-right font-mono">{selectedBooking.timeSlot}</strong>
               </div>
-              <div className="flex justify-between items-center pt-2 border-t border-primary/10">
+              <div className="flex justify-between items-center pt-2 border-t border-blue-200/60 text-[11px]">
                 <span className="text-slate-500">{t('detailsModal.createdBy')}:</span>
-                <span className="text-slate-700 font-bold">{selectedBooking.createdBy}</span>
+                <span className="text-slate-800 font-bold">{selectedBooking.createdBy}</span>
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-slate-950 text-slate-400 text-[11px] flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
-                <Lock className="w-4 h-4 text-emerald-500" />
-              </div>
-              <span>{t('detailsModal.securityWarning')}</span>
-            </div>
+            {/* Visual QR Code Voucher Pass & Ticket Actions */}
+            {(() => {
+              const origin = typeof window !== 'undefined' && window.location.origin ? window.location.origin : 'https://aafiya.site';
+              const rawToken = selectedBooking.secureToken?.trim() || '';
+              const isValidToken = /^[A-Za-z0-9]{64}$/.test(rawToken);
+              const qrPassUrl = isValidToken ? `${origin}/ar/appointment/pass/${rawToken}` : '';
+              const isTicketEligible = (selectedBooking.status === 'pending' || selectedBooking.status === 'approved') && isValidToken;
 
-            <div className="grid grid-cols-2 gap-4 pt-4">
-              <button
-                onClick={() => alert(`إعادة إرسال تذكرة الموعد ${selectedBooking.refNumber} عبر SMS/WhatsApp...`)}
-                className="py-3.5 rounded-2xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs flex items-center justify-center gap-2 transition-all border border-emerald-200"
-              >
-                <MessageSquare className="w-4 h-4" />
-                <span>{t('detailsModal.sendTicket')}</span>
-              </button>
+              const ticketData: AppointmentTicketData = {
+                patientName: selectedBooking.patientName,
+                patientPhone: selectedBooking.patientPhone,
+                doctorName: selectedBooking.doctorName,
+                specialty: selectedBooking.specialty,
+                clinicName: selectedBooking.facilityName,
+                date: selectedBooking.date,
+                timeSlot: selectedBooking.timeSlot,
+                refNumber: selectedBooking.refNumber,
+                ticketUrl: qrPassUrl,
+                status: selectedBooking.status === 'approved' ? 'confirmed' : 'pending',
+              };
 
-              <button
-                onClick={() => alert(`جارٍ طباعة التذكرة الرسمية...`)}
-                className="py-3.5 rounded-2xl bg-primary/5 hover:bg-primary/10 text-primary font-bold text-xs flex items-center justify-center gap-2 transition-all border border-primary/20"
-              >
-                <Printer className="w-4 h-4" />
-                <span>{t('detailsModal.printTicket')}</span>
-              </button>
-            </div>
+              return (
+                <div className="space-y-3.5">
+                  {isValidToken ? (
+                    <div className="p-3.5 bg-slate-50/90 rounded-2xl border border-slate-200/90 shadow-2xs flex flex-col sm:flex-row items-center gap-4">
+                      <div 
+                        ref={(node) => {
+                          if (node) {
+                            const svg = node.querySelector('svg');
+                            if (svg) qrSvgRef.current = svg;
+                          }
+                        }}
+                        className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-xs shrink-0 flex items-center justify-center"
+                      >
+                        <QRCode
+                          value={qrPassUrl}
+                          size={96}
+                          style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                          viewBox="0 0 256 256"
+                        />
+                      </div>
+                      <div className="space-y-1 text-center sm:text-right">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">رمز الحضور السريع (QR Check-In Pass)</span>
+                        <p className="font-mono text-xs font-black text-blue-600 dir-ltr text-right">
+                          {selectedBooking.refNumber}
+                        </p>
+                        <p className="text-[11px] text-slate-600 font-medium leading-relaxed">
+                          نظام المسح المعتمد: متوافق كلياً مع كاميرا الماسح لمساعد الطبيب وقارئ الباركود لتسجيل الحضور وتأكيد الموعد فوراً.
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-4 bg-amber-50 rounded-2xl border border-amber-200/90 text-amber-900 text-xs flex items-start gap-3">
+                      <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                      <div className="space-y-1">
+                        <p className="font-bold">تنبيه أمني: الرمز السري الآمن للموعد (secure_token) غير متوفر أو غير مطابق للصيغة المعتمدة.</p>
+                        <p className="text-[11px] text-amber-800 leading-relaxed">
+                          تم منع إنشاء رمز QR للموعد لعدم توفر الرمز الأمني المشفر المكون من 64 محرفاً. يرجى مراجعة إدارة النظام لتحديث سجل الموعد.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Security Notice */}
+                  <div className="p-3 rounded-2xl bg-slate-900 text-slate-300 text-[11px] flex items-center gap-3">
+                    <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
+                      <Lock className="w-3.5 h-3.5 text-emerald-400" />
+                    </div>
+                    <span className="font-medium leading-relaxed">{t('detailsModal.securityWarning')}</span>
+                  </div>
+
+                  {/* Conditional Ticket Actions */}
+                  {isTicketEligible ? (
+                    <div className="space-y-3 pt-1">
+                      {/* Language Selection */}
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-bold text-slate-700">لغة رسالة WhatsApp المصاحبة:</span>
+                          <span className="text-[10px] text-slate-400">تحدد لغة الرسالة الموجهة للمريض</span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-2 bg-slate-100 p-1 rounded-xl border border-slate-200/80">
+                          <button
+                            type="button"
+                            onClick={() => setTicketLanguage('ar')}
+                            className={`py-1.5 text-xs font-bold rounded-lg transition-all ${ticketLanguage === 'ar' ? 'bg-white text-emerald-800 shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
+                          >
+                            العربية (افتراضي)
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setTicketLanguage('fr')}
+                            className={`py-1.5 text-xs font-bold rounded-lg transition-all ${ticketLanguage === 'fr' ? 'bg-white text-emerald-800 shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
+                          >
+                            Français
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setTicketLanguage('en')}
+                            className={`py-1.5 text-xs font-bold rounded-lg transition-all ${ticketLanguage === 'en' ? 'bg-white text-emerald-800 shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
+                          >
+                            English
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Download PNG Button */}
+                      <button
+                        type="button"
+                        disabled={isExportingModalPng}
+                        onClick={async () => {
+                          try {
+                            setIsExportingModalPng(true);
+                            await downloadAppointmentCardPng(ticketData, qrSvgRef.current);
+                          } catch (err) {
+                            console.error('Failed to download PNG ticket:', err);
+                          } finally {
+                            setIsExportingModalPng(false);
+                          }
+                        }}
+                        className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-xs cursor-pointer active:scale-95 disabled:opacity-50"
+                      >
+                        {isExportingModalPng ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <span>جاري إنشاء وتنزيل بطاقة PNG...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Download className="w-4 h-4" />
+                            <span>تنزيل بطاقة الموعد PNG</span>
+                          </>
+                        )}
+                      </button>
+
+                      {/* WhatsApp & Print Actions */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <button
+                          type="button"
+                          disabled={isOpeningWhatsApp}
+                          onClick={() => {
+                            setIsOpeningWhatsApp(true);
+                            openWhatsAppAppointmentShare(ticketData, ticketLanguage);
+                            setTimeout(() => setIsOpeningWhatsApp(false), 2000);
+                          }}
+                          className="py-2.5 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-xs cursor-pointer active:scale-95 disabled:opacity-50"
+                        >
+                          <MessageSquare className="w-4 h-4" />
+                          <span>{isOpeningWhatsApp ? 'جاري الفتح...' : 'فتح WhatsApp للمشاركة اليدوية'}</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => window.print()}
+                          className="py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center justify-center gap-2 transition-all border border-slate-200 cursor-pointer active:scale-95"
+                        >
+                          <Printer className="w-4 h-4 text-slate-600" />
+                          <span>{t('detailsModal.printTicket')}</span>
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-3.5 bg-slate-100 rounded-2xl border border-slate-200 text-slate-600 text-xs flex items-center gap-2.5">
+                      <AlertCircle className="w-4 h-4 text-slate-500 shrink-0" />
+                      <span>
+                        {!isValidToken 
+                          ? 'تنبيه: لا يمكن تنزيل بطاقة الموعد أو مشاركتها عبر WhatsApp لعدم توفر رمز أمني صالح للموعد.'
+                          : 'تنبيه: تنزيل بطاقة الموعد والمشاركة عبر WhatsApp مقتصران فقط على المواعيد المعلّقة والمؤكدة.'}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
 
           </div>
         </div>

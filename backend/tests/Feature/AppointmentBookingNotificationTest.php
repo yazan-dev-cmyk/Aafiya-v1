@@ -162,7 +162,7 @@ class AppointmentBookingNotificationTest extends TestCase
         $this->patient = Patient::create([
             'id' => (string) Str::uuid(),
             'user_id' => $this->patientUser->id,
-            'mrn' => 'MRN-2026-ORAN-' . rand(100, 999),
+            'mrn' => 'MRN-2026-ORAN-' . \Illuminate\Support\Str::upper(\Illuminate\Support\Str::random(8)),
             'first_name' => 'ياسين',
             'last_name' => 'براهيمي',
             'gender' => 'male',
@@ -186,7 +186,7 @@ class AppointmentBookingNotificationTest extends TestCase
         $this->otherPatient = Patient::create([
             'id' => (string) Str::uuid(),
             'user_id' => $this->otherPatientUser->id,
-            'mrn' => 'MRN-2026-ORAN-' . rand(100, 999),
+            'mrn' => 'MRN-2026-ORAN-' . \Illuminate\Support\Str::upper(\Illuminate\Support\Str::random(8)),
             'first_name' => 'عمر',
             'last_name' => 'خوجة',
             'gender' => 'male',
@@ -243,7 +243,7 @@ class AppointmentBookingNotificationTest extends TestCase
             ->first();
 
         $this->assertNotNull($outbox, 'Outbox record for appointment_booked must exist');
-        $this->assertSame($this->patient->phone, $outbox->recipient_phone);
+        $this->assertSame(app(\App\Services\NotificationOutboxService::class)->canonicalPhone($this->patient->phone), $outbox->recipient_phone);
         $this->assertSame('patient', $outbox->recipient_type);
         $this->assertSame('in_app', $outbox->channel);
         $this->assertSame(NotificationOutbox::STATUS_SENT, $outbox->status);
@@ -320,7 +320,7 @@ class AppointmentBookingNotificationTest extends TestCase
             ->first();
 
         $this->assertNotNull($outbox, 'Outbox record for appointment_confirmed must exist');
-        $this->assertSame($this->patient->phone, $outbox->recipient_phone);
+        $this->assertSame(app(\App\Services\NotificationOutboxService::class)->canonicalPhone($this->patient->phone), $outbox->recipient_phone);
         $this->assertSame('patient', $outbox->recipient_type);
         $this->assertSame('in_app', $outbox->channel);
         $this->assertSame(NotificationOutbox::STATUS_SENT, $outbox->status);

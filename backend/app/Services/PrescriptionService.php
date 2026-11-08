@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Clinic;
 use App\Models\ClinicalVisit;
+use App\Models\NotificationOutbox;
 use App\Models\Patient;
 use App\Models\Prescription;
 use App\Models\PrescriptionItem;
@@ -16,6 +17,11 @@ use Illuminate\Validation\ValidationException;
 
 class PrescriptionService
 {
+    public function __construct(
+        protected ?NotificationOutboxService $notificationOutboxService = null
+    ) {
+        $this->notificationOutboxService = $notificationOutboxService ?? app(NotificationOutboxService::class);
+    }
     /**
      * Issue an official digital prescription with medication items and verification token.
      *
@@ -43,6 +49,7 @@ class PrescriptionService
 
             $patient = Patient::findOrFail($data['patient_id']);
 
+            $visit = null;
             $visitId = $data['clinical_visit_id'] ?? null;
             if ($visitId) {
                 $visit = ClinicalVisit::where('id', $visitId)
@@ -86,6 +93,42 @@ class PrescriptionService
                     'duration' => $item['duration'],
                     'instructions' => $item['instructions'] ?? null,
                 ]);
+            }
+
+            // Dispatch in-app notification to patient (P0 In-App only, privacy-minimized)
+            $rawPhone = $patient->phone ?? $patient->user?->phone;
+            $recipientPhone = $this->notificationOutboxService->canonicalPhone($rawPhone);
+
+            if ($recipientPhone !== '') {
+                $idempotencyKey = "prescription_issued_{$prescription->id}";
+
+                if (! NotificationOutbox::where('idempotency_key', $idempotencyKey)->exists()) {
+                    $clinicName = $clinic->name ?? 'العيادة';
+                    $doctorName = $doctor->user?->name ?? 'الطبيب المعالج';
+                    $appointmentId = $visit?->appointment_id;
+
+                    NotificationOutbox::create([
+                        'id'              => (string) Str::uuid(),
+                        'appointment_id'  => $appointmentId,
+                        'recipient_phone' => $recipientPhone,
+                        'recipient_type'  => 'patient',
+                        'channel'         => 'in_app',
+                        'template'        => 'prescription_issued',
+                        'payload'         => [
+                            'prescription_id'        => $prescription->id,
+                            'prescription_reference' => $prescription->prescription_reference,
+                            'patient_id'             => $patient->id,
+                            'clinic_id'              => $clinic->id,
+                            'clinic_name'            => $clinicName,
+                            'doctor_name'            => $doctorName,
+                            'issue_date'             => $issueDate,
+                            'message'                => "تم إصدار وصفة طبية إلكترونية جديدة ({$prescription->prescription_reference}) من طرف {$doctorName} في {$clinicName}.",
+                        ],
+                        'idempotency_key' => $idempotencyKey,
+                        'status'          => NotificationOutbox::STATUS_SENT,
+                        'retry_count'     => 0,
+                    ]);
+                }
             }
 
             return $prescription->load(['patient', 'doctor.user', 'clinic', 'items']);

@@ -72,7 +72,7 @@ export const WhyUsSection: React.FC<WhyUsSectionProps> = ({ onOpenAuth }) => {
         <div className="text-center max-w-3xl mx-auto space-y-4">
           <Badge variant="info" icon={<CircleHelp className="w-4 h-4" />}>رؤية المنصة وقيمتها الحقيقية</Badge>
           <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">
-            لماذا <span className="text-primary font-satisfy">Aafiya</span>؟
+            لماذا <span className="text-primary font-black">منصة عافية (Aafiya)</span>؟
           </h2>
           <p className="text-lg text-slate-500 font-bold leading-relaxed">
             نحدث فرقاً حقيقياً في حياة المريض اليومية عبر الانتقال من المعاناة التقليدية إلى حل رقمي منظم ومنسق.
@@ -140,7 +140,7 @@ export const WhyUsSection: React.FC<WhyUsSectionProps> = ({ onOpenAuth }) => {
                       <Sparkles className="w-6 h-6" />
                     </div>
                     <div>
-                      <h3 className="text-2xl md:text-3xl font-black text-slate-900">مع <span className="text-primary font-satisfy">Aafiya</span></h3>
+                      <h3 className="text-2xl md:text-3xl font-black text-slate-900">مع <span className="text-primary font-black">عافية</span></h3>
                       <p className="text-xs text-primary font-black uppercase tracking-widest mt-1">التحول الرقمي الموثوق</p>
                     </div>
                   </div>

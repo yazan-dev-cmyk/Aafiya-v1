@@ -226,7 +226,7 @@ class NotificationOutboxTest extends TestCase
             ->first();
 
         $this->assertNotNull($outbox, 'Successful reschedule must generate vacation_reschedule_success outbox record');
-        $this->assertSame($this->patientUser->phone, $outbox->recipient_phone);
+        $this->assertSame(app(NotificationOutboxService::class)->canonicalPhone($this->patientUser->phone), $outbox->recipient_phone);
         $this->assertSame('in_app', $outbox->channel);
         $this->assertSame('patient', $outbox->recipient_type);
         $this->assertSame(NotificationOutbox::STATUS_SENT, $outbox->status);

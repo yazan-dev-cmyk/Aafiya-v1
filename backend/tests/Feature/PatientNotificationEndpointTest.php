@@ -12,6 +12,7 @@ use App\Models\NotificationOutbox;
 use App\Models\Patient;
 use App\Models\User;
 use App\Services\BookingService;
+use App\Services\PrescriptionService;
 use Carbon\Carbon;
 use Database\Seeders\BookingPackageSeeder;
 use Database\Seeders\PermissionSeeder;
@@ -400,5 +401,131 @@ class PatientNotificationEndpointTest extends TestCase
         $showResponse = $this->withHeader('Authorization', 'Bearer ' . $this->otherPatientToken)
             ->getJson("/api/v1/patient/notifications/{$notif->id}");
         $showResponse->assertStatus(403);
+    }
+
+    /**
+     * 6. Soft-deleted appointment does NOT cause persisted notification to disappear (N-02).
+     */
+    public function test_06_soft_deleted_appointment_preserves_notification(): void
+    {
+        $appointment = $this->bookingService->createAppointment([
+            'clinic_id' => $this->clinic->id,
+            'doctor_id' => $this->doctor->id,
+            'appointment_date' => $this->futureDate,
+            'time_slot' => '09:00',
+            'patient_id' => $this->patient->id,
+            'patient_name' => $this->patient->first_name . ' ' . $this->patient->last_name,
+            'patient_phone' => $this->patient->phone,
+        ], $this->patientUser);
+
+        $notif = NotificationOutbox::where('appointment_id', $appointment->id)->firstOrFail();
+
+        // Soft delete the appointment
+        $appointment->delete();
+        $this->assertSoftDeleted('appointments', ['id' => $appointment->id]);
+
+        // Notification must still be retrievable and visible in index & unread count
+        $indexResponse = $this->withHeader('Authorization', 'Bearer ' . $this->patientToken)
+            ->getJson('/api/v1/patient/notifications');
+        $indexResponse->assertStatus(200);
+        $ids = array_column($indexResponse->json('data'), 'id');
+        $this->assertContains($notif->id, $ids);
+
+        // Individual notification view must still be authorized (200, not 404/403)
+        $showResponse = $this->withHeader('Authorization', 'Bearer ' . $this->patientToken)
+            ->getJson("/api/v1/patient/notifications/{$notif->id}");
+        $showResponse->assertStatus(200);
+    }
+
+    /**
+     * 7. Unlinked notification (null appointment_id or missing appointment) is retrievable by verified patient phone (N-02).
+     */
+    public function test_07_unlinked_notification_retrievable_and_authorizable(): void
+    {
+        $unlinkedNotif = NotificationOutbox::create([
+            'id' => (string) Str::uuid(),
+            'appointment_id' => null,
+            'recipient_phone' => $this->patient->phone,
+            'recipient_type' => 'patient',
+            'channel' => 'in_app',
+            'template' => 'prescription_issued',
+            'payload' => [
+                'prescription_reference' => 'RX-TEST-999',
+                'clinic_name' => 'عيادة الواحة الطبية',
+                'message' => 'تم إصدار وصفة طبية إلكترونية جديدة.',
+            ],
+            'idempotency_key' => 'unlinked_notif_test_' . Str::random(8),
+            'status' => NotificationOutbox::STATUS_SENT,
+        ]);
+
+        $indexResponse = $this->withHeader('Authorization', 'Bearer ' . $this->patientToken)
+            ->getJson('/api/v1/patient/notifications');
+        $indexResponse->assertStatus(200);
+        $ids = array_column($indexResponse->json('data'), 'id');
+        $this->assertContains($unlinkedNotif->id, $ids);
+
+        $showResponse = $this->withHeader('Authorization', 'Bearer ' . $this->patientToken)
+            ->getJson("/api/v1/patient/notifications/{$unlinkedNotif->id}");
+        $showResponse->assertStatus(200);
+
+        // Multi-tenant check: Other patient cannot access unlinked notification
+        $forbiddenResponse = $this->actingAs($this->otherPatientUser, 'sanctum')
+            ->getJson("/api/v1/patient/notifications/{$unlinkedNotif->id}");
+        $forbiddenResponse->assertStatus(403);
+    }
+
+    /**
+     * 8. Prescription issuance creates in-app notification with safe payload and strict privacy minimization (N-04, N-14).
+     */
+    public function test_08_prescription_issuance_creates_in_app_notification_with_privacy_minimization(): void
+    {
+        $prescriptionService = app(PrescriptionService::class);
+
+        $prescription = $prescriptionService->createPrescription([
+            'clinic_id' => $this->clinic->id,
+            'patient_id' => $this->patient->id,
+            'issue_date' => Carbon::now('Africa/Algiers')->format('Y-m-d'),
+            'validity_days' => 30,
+            'notes' => 'ملاحظات سريرية خاصة للطبيب',
+        ], [
+            [
+                'medication_name' => 'Amoxicillin 500mg',
+                'dosage' => '500mg',
+                'frequency' => '3x/day',
+                'duration' => '7 days',
+                'instructions' => 'Take after food',
+            ],
+        ], $this->doctorUser);
+
+        // Assert notification created in outbox
+        $notif = NotificationOutbox::where('idempotency_key', "prescription_issued_{$prescription->id}")->first();
+        $this->assertNotNull($notif);
+        $this->assertEquals('patient', $notif->recipient_type);
+        $this->assertEquals('in_app', $notif->channel);
+        $this->assertEquals('prescription_issued', $notif->template);
+        $this->assertEquals(NotificationOutbox::STATUS_SENT, $notif->status);
+
+        // Assert privacy minimization: NO medication names, dosages, durations, or instructions in payload
+        $payload = $notif->payload;
+        $this->assertEquals($prescription->id, $payload['prescription_id']);
+        $this->assertEquals($prescription->prescription_reference, $payload['prescription_reference']);
+        $this->assertEquals($this->patient->id, $payload['patient_id']);
+        $this->assertArrayNotHasKey('medication_name', $payload);
+        $this->assertArrayNotHasKey('dosage', $payload);
+        $this->assertArrayNotHasKey('instructions', $payload);
+        $this->assertArrayNotHasKey('items', $payload);
+        $this->assertArrayNotHasKey('diagnosis', $payload);
+
+        // Assert patient receives the notification via API
+        $response = $this->withHeader('Authorization', 'Bearer ' . $this->patientToken)
+            ->getJson('/api/v1/patient/notifications');
+        $response->assertStatus(200);
+        $ids = array_column($response->json('data'), 'id');
+        $this->assertContains($notif->id, $ids);
+
+        // Assert cross-patient isolation: another patient cannot access this prescription notification
+        $forbiddenResponse = $this->actingAs($this->otherPatientUser, 'sanctum')
+            ->getJson("/api/v1/patient/notifications/{$notif->id}");
+        $forbiddenResponse->assertStatus(403);
     }
 }

@@ -34,12 +34,39 @@ export interface AssistantPermissions {
   editUsers: boolean;
   suspendUsers: boolean;
   deleteUsers: boolean;
+
+  confirmAssistantPayout: boolean;
+
+  // Granular Assistant Rewards Permissions (P2)
+  rewardsViewOverview: boolean;
+  rewardsViewAssistants: boolean;
+  rewardsViewLedger: boolean;
+  rewardsViewCheque: boolean;
+  rewardsDownloadCheque: boolean;
+  rewardsViewFullRip: boolean;
+  rewardsVerifyProfile: boolean;
+  rewardsRejectProfile: boolean;
+  rewardsGenerateBatch: boolean;
+  rewardsCancelBatch: boolean;
+  rewardsViewAuditLogs: boolean;
 }
 
 export const DEFAULT_NO_PERMISSIONS: AssistantPermissions = {
   viewDashboard: false,
   viewStatistics: false,
   viewTasks: false,
+
+  rewardsViewOverview: false,
+  rewardsViewAssistants: false,
+  rewardsViewLedger: false,
+  rewardsViewCheque: false,
+  rewardsDownloadCheque: false,
+  rewardsViewFullRip: false,
+  rewardsVerifyProfile: false,
+  rewardsRejectProfile: false,
+  rewardsGenerateBatch: false,
+  rewardsCancelBatch: false,
+  rewardsViewAuditLogs: false,
 
   viewRequests: false,
   reviewRequests: false,
@@ -72,6 +99,8 @@ export const DEFAULT_NO_PERMISSIONS: AssistantPermissions = {
   editUsers: false,
   suspendUsers: false,
   deleteUsers: false,
+
+  confirmAssistantPayout: false,
 };
 
 export const UI_TO_BACKEND_PERM_MAP: Record<keyof AssistantPermissions, string> = {
@@ -104,6 +133,19 @@ export const UI_TO_BACKEND_PERM_MAP: Record<keyof AssistantPermissions, string> 
   editUsers: 'platform.edit_users',
   suspendUsers: 'platform.suspend_users',
   deleteUsers: 'platform.delete_users',
+  confirmAssistantPayout: 'platform.confirm_assistant_payout',
+
+  rewardsViewOverview: 'platform.rewards.view_overview',
+  rewardsViewAssistants: 'platform.rewards.view_assistants',
+  rewardsViewLedger: 'platform.rewards.view_assistant_ledger',
+  rewardsViewCheque: 'platform.rewards.view_cheque_document',
+  rewardsDownloadCheque: 'platform.rewards.download_cheque_document',
+  rewardsViewFullRip: 'platform.rewards.view_full_rip',
+  rewardsVerifyProfile: 'platform.rewards.verify_payout_profile',
+  rewardsRejectProfile: 'platform.rewards.reject_payout_profile',
+  rewardsGenerateBatch: 'platform.rewards.generate_payout_batch',
+  rewardsCancelBatch: 'platform.rewards.cancel_payout_batch',
+  rewardsViewAuditLogs: 'platform.rewards.view_audit_logs',
 };
 
 /**

@@ -39,7 +39,9 @@ class EnsureActiveClinicContext
             $request->is('*doctor/invitations*') ||
             $request->is('*doctor/vacations*') ||
             $request->is('*doctors*') ||
-            $request->is('*auth/*')
+            $request->is('*auth/*') ||
+            $request->is('*assistant/rewards*') ||
+            $request->is('*admin/*')
         ) {
             return $next($request);
         }

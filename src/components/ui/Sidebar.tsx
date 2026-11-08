@@ -11,8 +11,15 @@ export interface NavItem {
   highlight?: boolean;
 }
 
+export interface NavCategory {
+  id: string;
+  title: string;
+  items: NavItem[];
+}
+
 interface SidebarProps {
   items: NavItem[];
+  categories?: NavCategory[];
   activeId: string;
   onItemClick: (id: string) => void;
   isMobileOpen: boolean;
@@ -23,6 +30,7 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({
   items,
+  categories,
   activeId,
   onItemClick,
   isMobileOpen,
@@ -84,62 +92,136 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Navigation Items */}
         <nav className="flex-1 space-y-1.5 overflow-y-auto no-scrollbar">
-          {items.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeId === item.id;
-
-            return (
-              <button
-                key={item.id}
-                onClick={() => {
-                  onItemClick(item.id);
-                  onCloseMobile();
-                }}
-                className={cn(
-                  "w-full px-4 py-3 rounded-xl font-bold text-xs flex items-center justify-between transition-all cursor-pointer group relative overflow-hidden",
-                  isActive
-                    ? "bg-primary text-white shadow-lg shadow-primary/20 scale-[1.02]"
-                    : item.highlight
-                    ? isDarkMode 
-                      ? "bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20"
-                      : "bg-primary/5 text-primary border border-primary/10 hover:bg-primary/10"
-                    : isDarkMode 
-                      ? "text-slate-400 hover:bg-slate-800/80 hover:text-slate-200"
-                      : "text-slate-600 hover:bg-slate-50 hover:text-primary"
-                )}
-              >
-                <div className="flex items-center gap-3">
-                  <Icon className={cn(
-                    "w-4.5 h-4.5 shrink-0 transition-transform group-hover:scale-110",
-                    isActive ? "text-white" : "text-primary/70"
-                  )} />
-                  <span className="truncate">{item.label}</span>
-                </div>
-
-                {item.badge && (
-                  <span
-                    className={cn(
-                      "text-[10px] px-2 py-0.5 rounded-full font-bold transition-colors",
-                      isActive
-                        ? "bg-white/20 text-white"
-                        : isDarkMode 
-                          ? "bg-slate-800 text-primary border border-slate-700" 
-                          : "bg-primary/10 text-primary border border-primary/10"
-                    )}
-                  >
-                    {item.badge}
+          {categories && categories.length > 0 ? (
+            categories.map((cat, catIdx) => (
+              <div key={cat.id || cat.title} className="space-y-1">
+                <div className={cn(
+                  "px-3 pb-1 pt-3 first:pt-0",
+                  catIdx > 0 && "mt-1.5 border-t",
+                  isDarkMode ? "border-slate-800/60" : "border-slate-100"
+                )}>
+                  <span className={cn(
+                    "text-[10px] font-bold uppercase tracking-wider block",
+                    isDarkMode ? "text-slate-400" : "text-slate-500"
+                  )}>
+                    {cat.title}
                   </span>
-                )}
+                </div>
+                {cat.items.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activeId === item.id;
 
-                {/* Hover Indicator */}
-                {!isActive && (
-                  <div className={cn(
-                    "absolute top-0 bottom-0 w-1 bg-primary scale-y-0 group-hover:scale-y-100 transition-transform origin-top start-0"
-                  )} />
-                )}
-              </button>
-            );
-          })}
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => {
+                        onItemClick(item.id);
+                        onCloseMobile();
+                      }}
+                      className={cn(
+                        "w-full px-3.5 py-2.5 rounded-xl font-bold text-xs flex items-center justify-between transition-all cursor-pointer group relative overflow-hidden",
+                        isActive
+                          ? "bg-primary text-white shadow-lg shadow-primary/20 scale-[1.01]"
+                          : item.highlight
+                          ? isDarkMode 
+                            ? "bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20"
+                            : "bg-primary/5 text-primary border border-primary/10 hover:bg-primary/10"
+                          : isDarkMode 
+                            ? "text-slate-400 hover:bg-slate-800/80 hover:text-slate-200"
+                            : "text-slate-600 hover:bg-slate-50 hover:text-primary"
+                      )}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <Icon className={cn(
+                          "w-4 h-4 shrink-0 transition-transform group-hover:scale-110",
+                          isActive ? "text-white" : "text-primary/70"
+                        )} />
+                        <span className="truncate">{item.label}</span>
+                      </div>
+
+                      {item.badge && (
+                        <span
+                          className={cn(
+                            "text-[10px] px-2 py-0.5 rounded-full font-bold transition-colors shrink-0 ms-1.5",
+                            isActive
+                              ? "bg-white/20 text-white"
+                              : isDarkMode 
+                                ? "bg-slate-800 text-primary border border-slate-700" 
+                                : "bg-primary/10 text-primary border border-primary/10"
+                          )}
+                        >
+                          {item.badge}
+                        </span>
+                      )}
+
+                      {!isActive && (
+                        <div className={cn(
+                          "absolute top-0 bottom-0 w-1 bg-primary scale-y-0 group-hover:scale-y-100 transition-transform origin-top start-0"
+                        )} />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            ))
+          ) : (
+            items.map((item) => {
+              const Icon = item.icon;
+              const isActive = activeId === item.id;
+
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    onItemClick(item.id);
+                    onCloseMobile();
+                  }}
+                  className={cn(
+                    "w-full px-4 py-3 rounded-xl font-bold text-xs flex items-center justify-between transition-all cursor-pointer group relative overflow-hidden",
+                    isActive
+                      ? "bg-primary text-white shadow-lg shadow-primary/20 scale-[1.02]"
+                      : item.highlight
+                      ? isDarkMode 
+                        ? "bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20"
+                        : "bg-primary/5 text-primary border border-primary/10 hover:bg-primary/10"
+                      : isDarkMode 
+                        ? "text-slate-400 hover:bg-slate-800/80 hover:text-slate-200"
+                        : "text-slate-600 hover:bg-slate-50 hover:text-primary"
+                  )}
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon className={cn(
+                      "w-4.5 h-4.5 shrink-0 transition-transform group-hover:scale-110",
+                      isActive ? "text-white" : "text-primary/70"
+                    )} />
+                    <span className="truncate">{item.label}</span>
+                  </div>
+
+                  {item.badge && (
+                    <span
+                      className={cn(
+                        "text-[10px] px-2 py-0.5 rounded-full font-bold transition-colors",
+                        isActive
+                          ? "bg-white/20 text-white"
+                          : isDarkMode 
+                            ? "bg-slate-800 text-primary border border-slate-700" 
+                            : "bg-primary/10 text-primary border border-primary/10"
+                      )}
+                    >
+                      {item.badge}
+                    </span>
+                  )}
+
+                  {/* Hover Indicator */}
+                  {!isActive && (
+                    <div className={cn(
+                      "absolute top-0 bottom-0 w-1 bg-primary scale-y-0 group-hover:scale-y-100 transition-transform origin-top start-0"
+                    )} />
+                  )}
+                </button>
+              );
+            })
+          )}
         </nav>
 
         {/* Sidebar Footer (Optional) */}

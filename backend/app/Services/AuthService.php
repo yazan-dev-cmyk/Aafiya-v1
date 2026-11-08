@@ -2,22 +2,35 @@
 
 namespace App\Services;
 
+use App\Mail\PasswordChangedSecurityAlertMail;
+use App\Mail\PasswordResetNotificationMail;
 use App\Models\User;
 use App\Models\UserConsent;
+use App\Services\Security\PasswordRecoveryRateLimiter;
+use App\Services\Security\RecaptchaVerificationService;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class AuthService
 {
     public function __construct(
         protected ?DoctorProvisioningService $doctorProvisioningService = null,
         protected ?EhrService $ehrService = null,
-        protected ?BookingCenterService $bookingCenterService = null
+        protected ?BookingCenterService $bookingCenterService = null,
+        protected ?PasswordRecoveryRateLimiter $recoveryRateLimiter = null,
+        protected ?RecaptchaVerificationService $recaptchaService = null
     ) {
         $this->doctorProvisioningService = $this->doctorProvisioningService ?? app(DoctorProvisioningService::class);
         $this->ehrService = $this->ehrService ?? app(EhrService::class);
         $this->bookingCenterService = $this->bookingCenterService ?? app(BookingCenterService::class);
+        $this->recoveryRateLimiter = $this->recoveryRateLimiter ?? app(PasswordRecoveryRateLimiter::class);
+        $this->recaptchaService = $this->recaptchaService ?? app(RecaptchaVerificationService::class);
     }
 
     /**
@@ -274,9 +287,9 @@ class AuthService
     }
 
     /**
-     * Change the authenticated user's password.
+     * Change the authenticated user's password with strict multi-device session revocation.
      *
-     * @throws ValidationException
+     * @throws ValidationException|AuthenticationException
      */
     public function changePassword(User $user, string $currentPassword, string $newPassword): void
     {
@@ -286,8 +299,161 @@ class AuthService
             ]);
         }
 
-        $user->forceFill([
-            'password' => Hash::make($newPassword),
-        ])->save();
+        $currentToken = $user->currentAccessToken();
+
+        // Strict Fail-Closed Check:
+        // Multi-device session revocation requires isolating the active token.
+        // If not a PersonalAccessToken instance, abort immediately.
+        if (! $currentToken instanceof PersonalAccessToken) {
+            throw new AuthenticationException(
+                'Unable to isolate active session token for multi-device revocation.'
+            );
+        }
+
+        DB::transaction(function () use ($user, $newPassword, $currentToken) {
+            $user->forceFill([
+                'password' => Hash::make($newPassword),
+            ])->save();
+
+            // Revoke all personal access tokens EXCEPT the verified active token
+            $user->tokens()->where('id', '!=', $currentToken->id)->delete();
+
+            // Credential hygiene: cycle remember_token
+            $user->setRememberToken(Str::random(60));
+            $user->save();
+        });
+    }
+
+    /**
+     * Request a password reset link with strict anti-enumeration and tiered reCAPTCHA rate limiting.
+     *
+     * @param string $email
+     * @param string|null $recaptchaToken
+     * @param string $locale
+     * @param string|null $ip
+     * @return array{status: string, message: string}
+     * @throws ValidationException
+     */
+    public function sendPasswordResetLink(
+        string $email,
+        ?string $recaptchaToken = null,
+        string $locale = 'ar',
+        ?string $ip = null
+    ): array {
+        $normalizedEmail = strtolower(trim($email));
+
+        // 1. Check if email is currently under a 30-minute lockout
+        if ($this->recoveryRateLimiter->isLockedOut($normalizedEmail)) {
+            throw ValidationException::withMessages([
+                'email' => ['تم استنفاد المحاولات المتاحة لهذا البريد. تم إيقاف طلبات الاستعادة مؤقتاً لمدة 30 دقيقة.'],
+            ])->status(429);
+        }
+
+        // 2. Check if reCAPTCHA is mandatory (Attempts 4 & 5)
+        if ($this->recoveryRateLimiter->isCaptchaRequired($normalizedEmail)) {
+            $isValidCaptcha = $this->recaptchaService->verify($recaptchaToken, $ip);
+
+            if (! $isValidCaptcha) {
+                $failure = $this->recoveryRateLimiter->recordFailedCaptcha($normalizedEmail);
+
+                if ($failure['locked_out']) {
+                    throw ValidationException::withMessages([
+                        'email' => ['تم استنفاد المحاولات المتاحة لهذا البريد. تم إيقاف طلبات الاستعادة مؤقتاً لمدة 30 دقيقة.'],
+                    ])->status(429);
+                }
+
+                throw ValidationException::withMessages([
+                    'recaptcha_token' => ['يرجى التحقق من أنك لست روبوت (reCAPTCHA) لمتابعة الاستعادة.'],
+                ])->status(422);
+            }
+        }
+
+        // 3. Record successful attempt (advances attempt counter or triggers 30m lockout on 5th success)
+        $this->recoveryRateLimiter->recordSuccessfulRequest($normalizedEmail);
+
+        // 4. Resolve account via unified User model
+        $user = User::where('email', $normalizedEmail)->first();
+
+        // 5. If account exists and is active, create token and queue email
+        if ($user && $user->is_active) {
+            $token = Password::broker()->createToken($user);
+            Mail::to($user->email)->queue(
+                new PasswordResetNotificationMail($user, $token, $locale)
+            );
+        } else {
+            // Constant-time mitigation against timing enumeration
+            usleep(random_int(120000, 250000));
+        }
+
+        // 6. Return canonical uniform message
+        return [
+            'status' => 'success',
+            'message' => 'إذا كان هذا البريد مرتبطاً بحساب، فستصلك رسالة استعادة كلمة المرور.',
+        ];
+    }
+
+    /**
+     * Verify whether a password reset token is active, unexpired, and valid.
+     */
+    public function verifyResetToken(string $email, string $token): bool
+    {
+        $normalizedEmail = strtolower(trim($email));
+        $user = User::where('email', $normalizedEmail)->first();
+
+        if (! $user) {
+            return false;
+        }
+
+        return Password::broker()->tokenExists($user, $token);
+    }
+
+    /**
+     * Reset password using a valid reset token with total session invalidation.
+     *
+     * @throws ValidationException
+     */
+    public function resetPasswordWithToken(
+        string $email,
+        string $token,
+        string $newPassword,
+        string $locale = 'ar'
+    ): void {
+        $normalizedEmail = strtolower(trim($email));
+
+        DB::transaction(function () use ($normalizedEmail, $token, $newPassword, $locale) {
+            $user = User::where('email', $normalizedEmail)->lockForUpdate()->first();
+
+            if (! $user || ! Password::broker()->tokenExists($user, $token)) {
+                throw ValidationException::withMessages([
+                    'token' => ['رابط استعادة كلمة المرور غير صالح أو انتهت صلاحيته.'],
+                ]);
+            }
+
+            // 1. Update password
+            $user->forceFill([
+                'password' => Hash::make($newPassword),
+            ])->save();
+
+            // 2. Consume and invalidate reset token
+            Password::broker()->deleteToken($user);
+
+            // 3. Invalidate ALL Sanctum personal access tokens across ALL devices
+            $user->tokens()->delete();
+
+            // 4. Invalidate database sessions
+            DB::table('sessions')->where('user_id', $user->id)->delete();
+
+            // 5. Cycle remember_token
+            $user->setRememberToken(Str::random(60));
+            $user->save();
+
+            // 6. Clear rate limiter counters upon successful reset
+            $this->recoveryRateLimiter->clear($normalizedEmail);
+
+            // 7. Queue security alert email
+            Mail::to($user->email)->queue(
+                new PasswordChangedSecurityAlertMail($user, $locale)
+            );
+        }, 5);
     }
 }

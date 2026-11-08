@@ -72,6 +72,14 @@ class PackagePurchaseRequestController extends Controller
     }
 
     /**
+     * Alias for indexAll for backwards compatibility with legacy routes.
+     */
+    public function index(Request $request): AnonymousResourceCollection
+    {
+        return $this->indexAll($request);
+    }
+
+    /**
      * List all package purchase requests for Platform Admin or authorized Admin Assistant.
      */
     public function indexAll(Request $request): AnonymousResourceCollection
@@ -176,6 +184,14 @@ class PackagePurchaseRequestController extends Controller
             'message' => 'تم رفض طلب شراء الباقة.',
             'data' => new PackagePurchaseRequestResource($rejected),
         ], 200);
+    }
+
+    /**
+     * Alias for showReceipt for backwards compatibility with legacy routes.
+     */
+    public function receipt(Request $request, PackagePurchaseRequest $packagePurchaseRequest)
+    {
+        return $this->showReceipt($request, $packagePurchaseRequest);
     }
 
     /**

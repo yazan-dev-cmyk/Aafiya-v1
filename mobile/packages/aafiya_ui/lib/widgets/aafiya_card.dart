@@ -30,7 +30,7 @@ class AafiyaCard extends StatelessWidget {
     return Material(
       color: backgroundColor ?? AafiyaColors.pureWhite,
       shape: RoundedRectangleBorder(
-        borderRadius: AafiyaRadius.borderLg,
+        borderRadius: AafiyaRadius.borderCard,
         side: BorderSide(
           color: borderColor ?? AafiyaColors.border,
           width: 1.0,
@@ -39,7 +39,7 @@ class AafiyaCard extends StatelessWidget {
       child: onTap != null
           ? InkWell(
               onTap: onTap,
-              borderRadius: AafiyaRadius.borderLg,
+              borderRadius: AafiyaRadius.borderCard,
               child: content,
             )
           : content,

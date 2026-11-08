@@ -47,14 +47,16 @@ import {
   QrCode,
   Trash2,
   Receipt,
-  Database
+  Database,
+  Coins
 } from 'lucide-react';
 
 import { DocumentScanner } from '../shared/DocumentScanner';
 import { MedicalDocumentCode } from '../shared/MedicalDocumentCode';
 import { AssistantPermissionsManager } from './AssistantPermissionsManager';
+import { AssistantRewardsManagement } from './rewards/AssistantRewardsManagement';
 import { MasterDataManagement } from './MasterDataManagement';
-import { AdvertisementManagement } from './AdvertisementManagement';
+import { AdsTickerManagement } from './ticker/AdsTickerManagement';
 import { AdminBookingPoliciesCard } from './AdminBookingPoliciesCard';
 import { BackupExportManagement } from './BackupExportManagement';
 import { ChangePasswordCard } from '../shared/ChangePasswordCard';
@@ -91,6 +93,7 @@ export type AdminTab =
   | 'audit_logs'
   | 'roles_permissions'
   | 'assistant_permissions'
+  | 'assistant_rewards'
   | 'master_data'
   | 'backups'
   | 'system_settings'
@@ -839,6 +842,7 @@ export function PlatformAdminDashboard({ onBackToMainPlatform, onOpenAssistantDa
     { id: 'audit_logs', label: t('tabs.audit_logs'), icon: ShieldCheck },
     { id: 'roles_permissions', label: t('tabs.roles_permissions'), icon: KeyRound },
     { id: 'assistant_permissions', label: isRtl ? 'صلاحيات المساعد' : 'Assistant RBAC', icon: Sliders },
+    { id: 'assistant_rewards', label: isRtl ? 'مكافآت المساعدين' : 'Assistant Rewards', icon: Coins },
     { id: 'master_data', label: isRtl ? 'البيانات المرجعية' : 'Master Data', icon: Stethoscope },
     { id: 'backups', label: isRtl ? 'النسخ الاحتياطي' : 'Database Backups', icon: Database },
     { id: 'system_settings', label: t('tabs.system_settings'), icon: Settings },
@@ -2396,7 +2400,7 @@ export function PlatformAdminDashboard({ onBackToMainPlatform, onOpenAssistantDa
 
         {/* SECTION 10: ADVERTISEMENTS */}
         {activeTab === 'advertisements' && (
-          <AdvertisementManagement />
+          <AdsTickerManagement />
         )}
 
         {/* SECTION 11: REPORTS */}
@@ -2485,6 +2489,11 @@ export function PlatformAdminDashboard({ onBackToMainPlatform, onOpenAssistantDa
         {/* SECTION 14: ASSISTANT PERMISSIONS MANAGER */}
         {activeTab === 'assistant_permissions' && (
           <AssistantPermissionsManager />
+        )}
+
+        {/* SECTION: ASSISTANT REWARDS MANAGEMENT */}
+        {activeTab === 'assistant_rewards' && (
+          <AssistantRewardsManagement />
         )}
 
         {/* SECTION: DATABASE BACKUPS & EXPORTS */}

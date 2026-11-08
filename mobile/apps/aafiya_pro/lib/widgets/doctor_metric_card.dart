@@ -11,6 +11,7 @@ class DoctorMetricCard extends StatelessWidget {
     this.color = AafiyaColors.healthBlue,
     this.onTap,
     this.maxLines = 2,
+    this.useExpanded = true,
   });
 
   final String label;
@@ -19,11 +20,11 @@ class DoctorMetricCard extends StatelessWidget {
   final Color color;
   final VoidCallback? onTap;
   final int maxLines;
+  final bool useExpanded;
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Material(
+    final cardContent = Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
@@ -74,7 +75,8 @@ class DoctorMetricCard extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
+      );
+
+    return useExpanded ? Expanded(child: cardContent) : cardContent;
   }
 }

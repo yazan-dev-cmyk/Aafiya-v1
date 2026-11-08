@@ -15,6 +15,9 @@ class AafiyaTextField extends StatelessWidget {
     this.prefixIcon,
     this.suffixIcon,
     this.enabled = true,
+    this.textInputAction,
+    this.focusNode,
+    this.onFieldSubmitted,
   });
 
   final String label;
@@ -26,6 +29,9 @@ class AafiyaTextField extends StatelessWidget {
   final Widget? prefixIcon;
   final Widget? suffixIcon;
   final bool enabled;
+  final TextInputAction? textInputAction;
+  final FocusNode? focusNode;
+  final ValueChanged<String>? onFieldSubmitted;
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +48,9 @@ class AafiyaTextField extends StatelessWidget {
           controller: controller,
           obscureText: obscureText,
           keyboardType: keyboardType,
+          textInputAction: textInputAction,
+          focusNode: focusNode,
+          onFieldSubmitted: onFieldSubmitted,
           validator: validator,
           enabled: enabled,
           style: AafiyaTypography.bodyLarge,

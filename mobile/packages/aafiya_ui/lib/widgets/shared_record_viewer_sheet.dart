@@ -505,85 +505,119 @@ class _SharedRecordViewerSheetState extends State<SharedRecordViewerSheet> {
         ),
         const SizedBox(height: AafiyaSpacing.lg),
 
-        // Allergies Section
-        _buildSectionHeader(Icons.warning_amber_rounded, strings.sharedRecordAllergiesTitle),
-        const SizedBox(height: AafiyaSpacing.sm),
-        if (patient.allergies.isEmpty)
-          _buildEmptyItem(strings.sharedRecordNoAllergies)
-        else
-          ...patient.allergies.map((allergy) => Card(
-                elevation: 0,
-                margin: const EdgeInsets.only(bottom: AafiyaSpacing.xs),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AafiyaRadius.sm),
-                  side: const BorderSide(color: AafiyaColors.border),
+        if (patient.allergies.isEmpty &&
+            patient.chronicConditions.isEmpty &&
+            patient.currentMedications.isEmpty) ...[
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(AafiyaSpacing.lg),
+            decoration: BoxDecoration(
+              color: AafiyaColors.lightBackground,
+              borderRadius: BorderRadius.circular(AafiyaRadius.md),
+              border: Border.all(color: AafiyaColors.border),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(
+                  Icons.info_outline_rounded,
+                  color: AafiyaColors.secondaryText,
+                  size: 20,
                 ),
-                child: ListTile(
-                  dense: true,
-                  title: Text(allergy.allergen, style: const TextStyle(fontWeight: FontWeight.w600)),
-                  subtitle: Text(
-                    [
-                      if (allergy.severity != null) allergy.severity,
-                      if (allergy.reaction != null) allergy.reaction,
-                      if (allergy.diagnosedAt != null) allergy.diagnosedAt,
-                    ].join(' • '),
+                const SizedBox(width: AafiyaSpacing.sm),
+                Expanded(
+                  child: Text(
+                    strings.neutralMedicalRecordsEmptyState,
+                    style: AafiyaTypography.bodyMedium.copyWith(
+                      color: AafiyaColors.secondaryText,
+                      height: 1.4,
+                    ),
                   ),
                 ),
-              )),
-        const SizedBox(height: AafiyaSpacing.lg),
+              ],
+            ),
+          ),
+        ] else ...[
+          // Allergies Section
+          _buildSectionHeader(Icons.warning_amber_rounded, strings.sharedRecordAllergiesTitle),
+          const SizedBox(height: AafiyaSpacing.sm),
+          if (patient.allergies.isEmpty)
+            _buildEmptyItem(strings.sharedRecordNoAllergies)
+          else
+            ...patient.allergies.map((allergy) => Card(
+                  elevation: 0,
+                  margin: const EdgeInsets.only(bottom: AafiyaSpacing.xs),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AafiyaRadius.sm),
+                    side: const BorderSide(color: AafiyaColors.border),
+                  ),
+                  child: ListTile(
+                    dense: true,
+                    title: Text(allergy.allergen, style: const TextStyle(fontWeight: FontWeight.w600)),
+                    subtitle: Text(
+                      [
+                        if (allergy.severity != null) allergy.severity,
+                        if (allergy.reaction != null) allergy.reaction,
+                        if (allergy.diagnosedAt != null) allergy.diagnosedAt,
+                      ].join(' • '),
+                    ),
+                  ),
+                )),
+          const SizedBox(height: AafiyaSpacing.lg),
 
-        // Chronic Conditions Section
-        _buildSectionHeader(Icons.healing_outlined, strings.sharedRecordConditionsTitle),
-        const SizedBox(height: AafiyaSpacing.sm),
-        if (patient.chronicConditions.isEmpty)
-          _buildEmptyItem(strings.sharedRecordNoConditions)
-        else
-          ...patient.chronicConditions.map((condition) => Card(
-                elevation: 0,
-                margin: const EdgeInsets.only(bottom: AafiyaSpacing.xs),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AafiyaRadius.sm),
-                  side: const BorderSide(color: AafiyaColors.border),
-                ),
-                child: ListTile(
-                  dense: true,
-                  title: Text(condition.conditionName, style: const TextStyle(fontWeight: FontWeight.w600)),
-                  subtitle: Text(
-                    [
-                      if (condition.icd10Code != null) 'ICD: ${condition.icd10Code}',
-                      if (condition.status != null) condition.status,
-                      if (condition.diagnosedDate != null) condition.diagnosedDate,
-                    ].join(' • '),
+          // Chronic Conditions Section
+          _buildSectionHeader(Icons.healing_outlined, strings.sharedRecordConditionsTitle),
+          const SizedBox(height: AafiyaSpacing.sm),
+          if (patient.chronicConditions.isEmpty)
+            _buildEmptyItem(strings.sharedRecordNoConditions)
+          else
+            ...patient.chronicConditions.map((condition) => Card(
+                  elevation: 0,
+                  margin: const EdgeInsets.only(bottom: AafiyaSpacing.xs),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AafiyaRadius.sm),
+                    side: const BorderSide(color: AafiyaColors.border),
                   ),
-                ),
-              )),
-        const SizedBox(height: AafiyaSpacing.lg),
+                  child: ListTile(
+                    dense: true,
+                    title: Text(condition.conditionName, style: const TextStyle(fontWeight: FontWeight.w600)),
+                    subtitle: Text(
+                      [
+                        if (condition.icd10Code != null) 'ICD: ${condition.icd10Code}',
+                        if (condition.status != null) condition.status,
+                        if (condition.diagnosedDate != null) condition.diagnosedDate,
+                      ].join(' • '),
+                    ),
+                  ),
+                )),
+          const SizedBox(height: AafiyaSpacing.lg),
 
-        // Current Medications Section
-        _buildSectionHeader(Icons.medication_outlined, strings.sharedRecordMedicationsTitle),
-        const SizedBox(height: AafiyaSpacing.sm),
-        if (patient.currentMedications.isEmpty)
-          _buildEmptyItem(strings.sharedRecordNoMedications)
-        else
-          ...patient.currentMedications.map((med) => Card(
-                elevation: 0,
-                margin: const EdgeInsets.only(bottom: AafiyaSpacing.xs),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AafiyaRadius.sm),
-                  side: const BorderSide(color: AafiyaColors.border),
-                ),
-                child: ListTile(
-                  dense: true,
-                  title: Text(med.medicationName, style: const TextStyle(fontWeight: FontWeight.w600)),
-                  subtitle: Text(
-                    [
-                      if (med.dosage != null) med.dosage,
-                      if (med.frequency != null) med.frequency,
-                      if (med.startDate != null) 'Since: ${med.startDate}',
-                    ].join(' • '),
+          // Current Medications Section
+          _buildSectionHeader(Icons.medication_outlined, strings.sharedRecordMedicationsTitle),
+          const SizedBox(height: AafiyaSpacing.sm),
+          if (patient.currentMedications.isEmpty)
+            _buildEmptyItem(strings.sharedRecordNoMedications)
+          else
+            ...patient.currentMedications.map((med) => Card(
+                  elevation: 0,
+                  margin: const EdgeInsets.only(bottom: AafiyaSpacing.xs),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AafiyaRadius.sm),
+                    side: const BorderSide(color: AafiyaColors.border),
                   ),
-                ),
-              )),
+                  child: ListTile(
+                    dense: true,
+                    title: Text(med.medicationName, style: const TextStyle(fontWeight: FontWeight.w600)),
+                    subtitle: Text(
+                      [
+                        if (med.dosage != null) med.dosage,
+                        if (med.frequency != null) med.frequency,
+                        if (med.startDate != null) 'Since: ${med.startDate}',
+                      ].join(' • '),
+                    ),
+                  ),
+                )),
+        ],
       ],
     );
   }

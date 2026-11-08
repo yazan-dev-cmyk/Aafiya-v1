@@ -128,7 +128,10 @@ class _AafiyaWilayaSelectorState extends State<AafiyaWilayaSelector> {
     String displayText = '';
     if (_selectedWilaya != null) {
       displayText = '${_selectedWilaya!.code} - ${_selectedWilaya!.localizedName(locale)}';
-    } else if (widget.includeAllOption && widget.selectedCode == 'all') {
+    } else if (widget.includeAllOption &&
+        (widget.selectedCode == null ||
+            widget.selectedCode!.isEmpty ||
+            widget.selectedCode == 'all')) {
       displayText = widget.allOptionLabel ?? strings.allWilayas;
     }
 

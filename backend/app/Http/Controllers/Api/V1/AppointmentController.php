@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Booking\CreateAppointmentRequest;
 use App\Http\Requests\Booking\RescheduleAppointmentRequest;
 use App\Http\Requests\Booking\UpdateAppointmentStatusRequest;
+use App\Http\Resources\AppointmentPublicPassResource;
 use App\Http\Resources\AppointmentResource;
 use App\Models\Appointment;
 use App\Models\Clinic;
@@ -326,24 +327,76 @@ class AppointmentController extends Controller
             'doctor_id' => ['required', 'uuid', 'exists:doctors,id'],
             'clinic_id' => ['required', 'uuid', 'exists:clinics,id'],
             'date' => ['required', 'date_format:Y-m-d'],
+            'patient_phone' => ['nullable', 'string', 'max:50'],
+            'patient_id' => ['nullable', 'uuid'],
         ]);
 
         $doctor = Doctor::findOrFail($request->input('doctor_id'));
         $clinic = Clinic::findOrFail($request->input('clinic_id'));
 
-        $slots = $this->bookingService->getAvailableSlots(
+        $details = $this->bookingService->getSlotAvailabilityDetails(
             $doctor,
             $clinic,
-            $request->input('date')
+            $request->input('date'),
+            $request->input('patient_phone'),
+            $request->input('patient_id')
         );
 
         return response()->json([
+            'status' => 'success',
             'data' => [
                 'doctor_id' => $doctor->id,
                 'clinic_id' => $clinic->id,
                 'date' => $request->input('date'),
-                'slots' => $slots,
+                'slots' => $details['slots'],
+                'is_available' => $details['is_available'],
+                'reason_code' => $details['reason_code'],
+                'reason_message' => $details['reason_message'],
             ],
+            'slots' => $details['slots'],
+            'is_available' => $details['is_available'],
+            'reason_code' => $details['reason_code'],
+            'reason_message' => $details['reason_message'],
         ]);
+    }
+
+    /**
+     * Public QR verification and digital pass endpoint for appointments.
+     */
+    public function publicPass(string $token): JsonResponse
+    {
+        $trimmed = trim($token);
+        if (strlen($trimmed) !== 64 || ! preg_match('/^[A-Za-z0-9]{64}$/', $trimmed)) {
+            return response()->json([
+                'message' => 'رمز التحقق غير صالح أو غير موجود في منظومة عافية.',
+            ], 404)->withHeaders([
+                'Cache-Control' => 'no-store, no-cache, must-revalidate',
+                'Referrer-Policy' => 'no-referrer',
+                'X-Robots-Tag' => 'noindex, nofollow',
+            ]);
+        }
+
+        $appointment = Appointment::with(['clinic', 'doctor.user', 'patient', 'bookingCenter'])
+            ->where('secure_token', $trimmed)
+            ->first();
+
+        if (! $appointment) {
+            return response()->json([
+                'message' => 'رمز التحقق غير صالح أو غير موجود في منظومة عافية.',
+            ], 404)->withHeaders([
+                'Cache-Control' => 'no-store, no-cache, must-revalidate',
+                'Referrer-Policy' => 'no-referrer',
+                'X-Robots-Tag' => 'noindex, nofollow',
+            ]);
+        }
+
+        return (new AppointmentPublicPassResource($appointment))
+            ->response()
+            ->setStatusCode(200)
+            ->withHeaders([
+                'Cache-Control' => 'no-store, no-cache, must-revalidate',
+                'Referrer-Policy' => 'no-referrer',
+                'X-Robots-Tag' => 'noindex, nofollow',
+            ]);
     }
 }

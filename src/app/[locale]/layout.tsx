@@ -1,6 +1,4 @@
-import React from 'react';
-import type { Metadata } from 'next';
-import { Amiri, Satisfy, Inter, IBM_Plex_Sans_Arabic, Plus_Jakarta_Sans } from 'next/font/google';
+import { Amiri, Playfair_Display, Satisfy, Inter, IBM_Plex_Sans_Arabic, Plus_Jakarta_Sans } from 'next/font/google';
 import '../../index.css';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, setRequestLocale, getTranslations } from 'next-intl/server';
@@ -8,21 +6,28 @@ import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { AuthProvider } from '@/auth';
 
-const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({
-  subsets: ['arabic'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-ibm-plex-arabic',
-});
-
-const plusJakartaSans = Plus_Jakarta_Sans({
-  subsets: ['latin'],
-  variable: '--font-plus-jakarta',
-});
-
 const amiri = Amiri({
   subsets: ['arabic'],
   weight: ['400', '700'],
   variable: '--font-amiri',
+});
+
+const playfairDisplay = Playfair_Display({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800', '900'],
+  variable: '--font-playfair',
+});
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-plus-jakarta',
+});
+
+const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({
+  subsets: ['arabic'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-ibm-plex-arabic',
 });
 
 const inter = Inter({
@@ -142,6 +147,12 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   const isRtl = locale === 'ar';
+  const isFrench = locale === 'fr';
+  const bodyFontClass = isRtl
+    ? amiri.className
+    : isFrench
+    ? playfairDisplay.className
+    : plusJakartaSans.className;
   const t = await getTranslations({ locale, namespace: 'metadata' });
   const cleanBaseUrl = getSiteUrl();
 
@@ -158,14 +169,14 @@ export default async function LocaleLayout({
   };
 
   return (
-    <html lang={locale} dir={isRtl ? 'rtl' : 'ltr'} className={`${ibmPlexSansArabic.variable} ${plusJakartaSans.variable} ${amiri.variable} ${satisfy.variable} ${inter.variable}`} suppressHydrationWarning>
+    <html lang={locale} dir={isRtl ? 'rtl' : 'ltr'} className={`${amiri.variable} ${playfairDisplay.variable} ${plusJakartaSans.variable} ${ibmPlexSansArabic.variable} ${satisfy.variable} ${inter.variable}`} suppressHydrationWarning>
       <head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className={`${isRtl ? amiri.className : plusJakartaSans.className} font-sans bg-slate-50 text-slate-900 antialiased selection:bg-teal-500 selection:text-white overflow-x-hidden max-w-full`} suppressHydrationWarning>
+      <body className={`${bodyFontClass} bg-slate-50 text-slate-900 antialiased selection:bg-teal-500 selection:text-white overflow-x-hidden max-w-full`} suppressHydrationWarning>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <AuthProvider>
             {children}

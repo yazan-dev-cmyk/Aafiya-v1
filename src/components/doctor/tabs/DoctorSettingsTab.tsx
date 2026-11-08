@@ -464,7 +464,6 @@ export const DoctorSettingsTab: React.FC<DoctorSettingsTabProps> = ({
 
   const [notificationSettings, setNotificationSettings] = useState({
     smsAlerts: true,
-    whatsappConfirmations: true,
     urgentPush: true,
     doctorDirectivesSound: true
   });
@@ -793,6 +792,27 @@ export const DoctorSettingsTab: React.FC<DoctorSettingsTabProps> = ({
     { id: 'about', label: t('tabs.about'), icon: Info }
   ];
 
+  const [selectedGroup, setSelectedGroup] = useState<'all' | 'schedule' | 'practice' | 'security' | 'system'>('all');
+
+  const groups = [
+    { id: 'all', label: isRtl ? 'جميع الأقسام' : 'All Sections' },
+    { id: 'schedule', label: isRtl ? 'الجدول ومواعيد العمل' : 'Schedule & Hours' },
+    { id: 'practice', label: isRtl ? 'الملف والعيادة' : 'Profile & Practice' },
+    { id: 'security', label: isRtl ? 'الأمان والإشعارات' : 'Security & Alerts' },
+    { id: 'system', label: isRtl ? 'النظام والتفضيلات' : 'System & Prefs' }
+  ];
+
+  const groupTabsMap: Record<string, string[]> = {
+    schedule: ['working-hours', 'vacation-exceptions', 'booking-rules'],
+    practice: ['personal', 'clinic', 'assistants'],
+    security: ['security', 'privacy', 'notifications'],
+    system: ['appearance', 'export', 'about']
+  };
+
+  const filteredTabsList = selectedGroup === 'all' 
+    ? tabsList 
+    : tabsList.filter(tab => groupTabsMap[selectedGroup]?.includes(tab.id));
+
   return (
     <div className={`space-y-6 ${isRtl ? 'text-right' : 'text-left'}`} dir={isRtl ? 'rtl' : 'ltr'}>
       
@@ -841,8 +861,33 @@ export const DoctorSettingsTab: React.FC<DoctorSettingsTabProps> = ({
         </div>
       </div>
 
-      {/* Sub-Tabs Navigation Bar with Independent Scroll, Auto-Centering & Direction Controls */}
-      <div className={`${containerClass} rounded-2xl p-2 border relative transition-all`}>
+      {/* Sub-Tabs Navigation Bar with Category Filter, Independent Scroll, Auto-Centering & Direction Controls */}
+      <div className={`${containerClass} rounded-2xl p-2.5 sm:p-3 border space-y-2.5 relative transition-all`}>
+        {/* Category Filter Pills */}
+        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-1.5 border-b border-slate-100 dark:border-slate-800">
+          {groups.map(g => (
+            <button
+              key={g.id}
+              type="button"
+              onClick={() => {
+                setSelectedGroup(g.id as any);
+                if (g.id !== 'all' && !groupTabsMap[g.id]?.includes(activeSubTab)) {
+                  handleSubTabChange(groupTabsMap[g.id][0]);
+                }
+              }}
+              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer ${
+                selectedGroup === g.id
+                  ? 'bg-primary text-white shadow-xs'
+                  : isDarkMode
+                  ? 'bg-slate-800/80 text-slate-400 hover:text-white hover:bg-slate-700'
+                  : 'bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200'
+              }`}
+            >
+              {g.label}
+            </button>
+          ))}
+        </div>
+
         <div className="flex items-center gap-1.5 relative">
           
           {/* Scroll Left Button */}
@@ -860,7 +905,7 @@ export const DoctorSettingsTab: React.FC<DoctorSettingsTabProps> = ({
             ref={tabsContainerRef}
             className="overflow-x-auto scroll-smooth flex items-center gap-1.5 flex-1 scrollbar-none py-0.5 px-0.5"
           >
-            {tabsList.map((tab) => {
+            {filteredTabsList.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeSubTab === tab.id;
               return (

@@ -252,4 +252,124 @@ class ChangePasswordTest extends TestCase
             'rad_assistant' => ['rad_assistant'],
         ];
     }
+
+    /**
+     * Test multi-device session revocation: Device A changes password, Device A remains valid, Devices B & C revoked.
+     */
+    public function test_password_change_revokes_other_device_tokens_while_preserving_current_token(): void
+    {
+        $oldPass = 'SecretOld2026!';
+        $newPass = 'SecretNew2026!';
+
+        $user = User::factory()->create([
+            'email' => 'device.test@aafiya.dz',
+            'password' => Hash::make($oldPass),
+            'is_active' => true,
+        ]);
+        $user->assignRole('patient_registered');
+
+        // Create 3 tokens representing 3 devices
+        $tokenDeviceA = $user->createToken('device_a')->plainTextToken;
+        $tokenDeviceB = $user->createToken('device_b')->plainTextToken;
+        $tokenDeviceC = $user->createToken('device_c')->plainTextToken;
+
+        $this->assertEquals(3, $user->tokens()->count());
+
+        // Device A executes Change Password
+        $response = $this->withHeader('Authorization', 'Bearer ' . $tokenDeviceA)
+            ->postJson('/api/v1/auth/change-password', [
+                'current_password' => $oldPass,
+                'new_password' => $newPass,
+                'new_password_confirmation' => $newPass,
+            ]);
+
+        $response->assertStatus(200);
+
+        // Verify only 1 token remains in database (Device A)
+        $this->assertEquals(1, $user->tokens()->count());
+
+        // Device A remains valid
+        $this->flushHeaders();
+        app('auth')->forgetGuards();
+        $meA = $this->withHeader('Authorization', 'Bearer ' . $tokenDeviceA)
+            ->getJson('/api/v1/auth/me');
+        $meA->assertStatus(200);
+
+        // Device B receives 401
+        $this->flushHeaders();
+        app('auth')->forgetGuards();
+        $meB = $this->withHeader('Authorization', 'Bearer ' . $tokenDeviceB)
+            ->getJson('/api/v1/auth/me');
+        $meB->assertStatus(401);
+
+        // Device C receives 401
+        $this->flushHeaders();
+        app('auth')->forgetGuards();
+        $meC = $this->withHeader('Authorization', 'Bearer ' . $tokenDeviceC)
+            ->getJson('/api/v1/auth/me');
+        $meC->assertStatus(401);
+    }
+
+    /**
+     * Test failed password change preserves all active tokens.
+     */
+    public function test_failed_password_change_preserves_all_active_tokens(): void
+    {
+        $oldPass = 'SecretOld2026!';
+
+        $user = User::factory()->create([
+            'email' => 'fail.test@aafiya.dz',
+            'password' => Hash::make($oldPass),
+            'is_active' => true,
+        ]);
+        $user->assignRole('patient_registered');
+
+        $tokenDeviceA = $user->createToken('device_a')->plainTextToken;
+        $tokenDeviceB = $user->createToken('device_b')->plainTextToken;
+
+        $this->assertEquals(2, $user->tokens()->count());
+
+        // Attempt change with wrong current password
+        $response = $this->withHeader('Authorization', 'Bearer ' . $tokenDeviceA)
+            ->postJson('/api/v1/auth/change-password', [
+                'current_password' => 'WrongSecret!',
+                'new_password' => 'BrandNewSecret2026!',
+                'new_password_confirmation' => 'BrandNewSecret2026!',
+            ]);
+
+        $response->assertStatus(422);
+
+        // Both tokens must remain intact
+        $this->assertEquals(2, $user->tokens()->count());
+
+        // Both tokens can still access protected routes
+        $this->flushHeaders();
+        app('auth')->forgetGuards();
+        $this->withHeader('Authorization', 'Bearer ' . $tokenDeviceA)->getJson('/api/v1/auth/me')->assertStatus(200);
+
+        $this->flushHeaders();
+        app('auth')->forgetGuards();
+        $this->withHeader('Authorization', 'Bearer ' . $tokenDeviceB)->getJson('/api/v1/auth/me')->assertStatus(200);
+    }
+
+    /**
+     * Test fail-closed abort when active token cannot be verified as PersonalAccessToken.
+     */
+    public function test_password_change_aborts_if_token_cannot_be_isolated(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'transient.test@aafiya.dz',
+            'password' => Hash::make('CurrentSecret2026!'),
+            'is_active' => true,
+        ]);
+        $user->assignRole('patient_registered');
+
+        $token = $user->createToken('device_a')->plainTextToken;
+
+        // Call AuthService directly with User instance lacking PersonalAccessToken context
+        $authService = app(\App\Services\AuthService::class);
+
+        $this->expectException(\Illuminate\Auth\AuthenticationException::class);
+        $authService->changePassword($user, 'CurrentSecret2026!', 'NewSecret2026!');
+    }
 }

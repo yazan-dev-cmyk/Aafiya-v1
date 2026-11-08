@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable([
@@ -29,10 +30,30 @@ use Illuminate\Database\Eloquent\SoftDeletes;
     'end_date',
     'impressions_count',
     'clicks_count',
+    'ticker_clicks_count',
+    'starts_at',
+    'ends_at',
+    'priority',
 ])]
 class Advertisement extends Model
 {
     use HasFactory, HasUuids, SoftDeletes;
+
+    protected static function booted(): void
+    {
+        static::creating(function (Advertisement $ad) {
+            if (empty($ad->start_date)) {
+                $ad->start_date = !empty($ad->starts_at)
+                    ? \Illuminate\Support\Carbon::parse($ad->starts_at)->format('Y-m-d')
+                    : now()->format('Y-m-d');
+            }
+            if (empty($ad->end_date)) {
+                $ad->end_date = !empty($ad->ends_at)
+                    ? \Illuminate\Support\Carbon::parse($ad->ends_at)->format('Y-m-d')
+                    : now()->addYears(1)->format('Y-m-d');
+            }
+        });
+    }
 
     protected function casts(): array
     {
@@ -42,6 +63,10 @@ class Advertisement extends Model
             'end_date' => 'date:Y-m-d',
             'impressions_count' => 'integer',
             'clicks_count' => 'integer',
+            'ticker_clicks_count' => 'integer',
+            'starts_at' => 'datetime',
+            'ends_at' => 'datetime',
+            'priority' => 'integer',
         ];
     }
 
@@ -76,6 +101,16 @@ class Advertisement extends Model
         return $this->targetWilaya();
     }
 
+    public function placements(): HasMany
+    {
+        return $this->hasMany(AdvertisementPlacement::class, 'advertisement_id');
+    }
+
+    public function tickerClicks(): HasMany
+    {
+        return $this->hasMany(AdvertisementUserClick::class, 'advertisement_id');
+    }
+
     public function isActive(): bool
     {
         $today = now()->format('Y-m-d');
@@ -85,5 +120,16 @@ class Advertisement extends Model
         return $this->status === 'active'
             && ($start === null || $start <= $today)
             && ($end === null || $end >= $today);
+    }
+
+    public function isTickerActive(): bool
+    {
+        $now = now();
+        $start = $this->starts_at;
+        $end = $this->ends_at;
+
+        return $this->status === 'active'
+            && ($start === null || $start <= $now)
+            && ($end === null || $end > $now);
     }
 }

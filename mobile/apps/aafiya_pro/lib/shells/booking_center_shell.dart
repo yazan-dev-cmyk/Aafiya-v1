@@ -19,6 +19,7 @@ class BookingCenterShell extends StatefulWidget {
     required this.sessionManager,
     this.apiClient,
     this.bookingCenterService,
+    this.adsTickerService,
     required this.onSignOut,
   });
 
@@ -26,6 +27,7 @@ class BookingCenterShell extends StatefulWidget {
   final AuthSessionManager sessionManager;
   final ApiClient? apiClient;
   final BookingCenterService? bookingCenterService;
+  final AdsTickerService? adsTickerService;
   final VoidCallback onSignOut;
 
   @override
@@ -34,6 +36,8 @@ class BookingCenterShell extends StatefulWidget {
 
 class _BookingCenterShellState extends State<BookingCenterShell> {
   late final BookingCenterService _service;
+  late final AdsTickerService _adsTickerService;
+  List<AdsTickerItem> _tickerAds = [];
   bool _isLoadingQuota = true;
   String? _quotaError;
   BookingCenterQuota? _quotaData;
@@ -44,7 +48,28 @@ class _BookingCenterShellState extends State<BookingCenterShell> {
     final client = widget.apiClient ?? widget.sessionManager.apiClient;
     _service =
         widget.bookingCenterService ?? BookingCenterService(apiClient: client);
+    _adsTickerService =
+        widget.adsTickerService ?? AdsTickerService(apiClient: client);
     _fetchQuota();
+    _fetchTickerAds();
+  }
+
+  Future<void> _fetchTickerAds() async {
+    final result =
+        await _adsTickerService.getEligibleAds(destination: 'ticker');
+    if (!mounted) return;
+    switch (result) {
+      case ApiSuccess(:final data):
+        setState(() => _tickerAds = data);
+      case ApiFailure():
+        setState(() => _tickerAds = []);
+    }
+  }
+
+  Future<void> _handleAdClick(AdsTickerItem ad) async {
+    await _adsTickerService.recordClick(ad.id, destination: 'ticker');
+    final urlValidation = AafiyaAdsTicker.validateTargetUrl(ad.targetUrl);
+    if (!urlValidation.isSafe || !mounted) return;
   }
 
   Future<void> _fetchQuota() async {
@@ -135,6 +160,18 @@ class _BookingCenterShellState extends State<BookingCenterShell> {
         showBrandMark: true,
         actions: [
           IconButton(
+            icon: const Icon(Icons.lock_reset_rounded),
+            tooltip: strings.changePassword,
+            onPressed: () {
+              final client =
+                  widget.apiClient ?? widget.sessionManager.apiClient;
+              AafiyaChangePasswordCard.show(
+                context,
+                apiClient: client,
+              );
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.logout_rounded),
             tooltip: strings.signOut,
             onPressed: () async {
@@ -146,6 +183,7 @@ class _BookingCenterShellState extends State<BookingCenterShell> {
                 confirmLabel: strings.signOut,
               );
               if (confirmed == true) {
+                _adsTickerService.clearCache();
                 await widget.sessionManager.logout();
                 widget.onSignOut();
               }
@@ -154,7 +192,12 @@ class _BookingCenterShellState extends State<BookingCenterShell> {
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: _fetchQuota,
+        onRefresh: () async {
+          await Future.wait([
+            _fetchQuota(),
+            _fetchTickerAds(),
+          ]);
+        },
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           padding: AafiyaSpacing.insetScreen,
@@ -245,6 +288,13 @@ class _BookingCenterShellState extends State<BookingCenterShell> {
                 ),
               ],
               const SizedBox(height: 16),
+
+              // Advertising Ticker (TASK-MOBILE-ADS-TICKER-INTEGRATION)
+              AafiyaAdsTicker(
+                ads: _tickerAds,
+                onAdClick: _handleAdClick,
+                margin: const EdgeInsets.only(bottom: 12.0),
+              ),
 
               // Action card to open Quota Dashboard & Packages
               AafiyaCard(

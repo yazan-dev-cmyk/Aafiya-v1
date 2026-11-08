@@ -61,6 +61,7 @@ class _DoctorDirectoryScreenState extends State<DoctorDirectoryScreen> {
   String _searchQuery = '';
   int? _selectedSpecialtyId;
   String? _selectedWilaya;
+  String? _selectedWilayaCode;
 
   @override
   void initState() {
@@ -112,9 +113,10 @@ class _DoctorDirectoryScreenState extends State<DoctorDirectoryScreen> {
     _fetchDoctors(page: 1, reset: true);
   }
 
-  void _onWilayaSelected(String? wilaya) {
+  void _onWilayaSelected(Wilaya? wilaya) {
     setState(() {
-      _selectedWilaya = wilaya;
+      _selectedWilayaCode = wilaya?.code;
+      _selectedWilaya = wilaya?.nameAr;
     });
     _fetchDoctors(page: 1, reset: true);
   }
@@ -267,22 +269,25 @@ class _DoctorDirectoryScreenState extends State<DoctorDirectoryScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
 
-          // Horizontal Canonical Specialty Filter Chips
-          AafiyaSpecialtyFilterChips(
+          // Searchable Canonical Specialty Dropdown Selector
+          AafiyaSpecialtySelector(
             masterDataService: _masterDataService,
             selectedSpecialtyId: _selectedSpecialtyId,
-            onSpecialtySelected: _onSpecialtySelected,
+            includeAllOption: true,
+            label: '',
+            onChanged: (specialty) => _onSpecialtySelected(specialty?.id),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
 
-          // Horizontal Dynamic Wilaya Filter Chips
-          AafiyaWilayaFilterChips(
+          // Searchable Dynamic Wilaya Dropdown Selector
+          AafiyaWilayaSelector(
             masterDataService: _masterDataService,
-            selectedWilaya: _selectedWilaya,
-            useArabicNamesForQuery: true,
-            onWilayaSelected: _onWilayaSelected,
+            selectedCode: _selectedWilayaCode,
+            includeAllOption: true,
+            label: '',
+            onChanged: _onWilayaSelected,
           ),
         ],
       ),

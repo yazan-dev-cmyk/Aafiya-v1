@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { BookingRecord, BookingStatus } from '../../../types';
 import {
   Clock,
@@ -10,7 +10,9 @@ import {
   Send,
   Eye,
   RefreshCw,
-  MessageSquare
+  MessageSquare,
+  Search,
+  Activity
 } from 'lucide-react';
 
 interface BookingStatusTrackerTabProps {
@@ -25,7 +27,9 @@ export const BookingStatusTrackerTab: React.FC<BookingStatusTrackerTabProps> = (
   onUpdateStatus,
 }) => {
   const [activeStatus, setActiveStatus] = useState<BookingStatus | 'all'>('pending');
+  const [searchQuery, setSearchQuery] = useState('');
 
+  const total = bookings.length || 1;
   const pendingCount = bookings.filter((b) => b.status === 'pending').length;
   const approvedCount = bookings.filter((b) => b.status === 'approved').length;
   const rescheduledCount = bookings.filter((b) => b.status === 'rescheduled').length;
@@ -33,10 +37,19 @@ export const BookingStatusTrackerTab: React.FC<BookingStatusTrackerTabProps> = (
   const cancelledCount = bookings.filter((b) => b.status === 'cancelled').length;
   const completedCount = bookings.filter((b) => b.status === 'completed').length;
 
-  const filteredBookings = bookings.filter((b) => {
-    if (activeStatus === 'all') return true;
-    return b.status === activeStatus;
-  });
+  const filteredBookings = useMemo(() => {
+    return bookings.filter((b) => {
+      if (activeStatus !== 'all' && b.status !== activeStatus) return false;
+      if (!searchQuery.trim()) return true;
+      const q = searchQuery.toLowerCase();
+      return (
+        b.refNumber.toLowerCase().includes(q) ||
+        b.patientName.toLowerCase().includes(q) ||
+        b.doctorName.toLowerCase().includes(q) ||
+        (b.patientPhone && b.patientPhone.includes(q))
+      );
+    });
+  }, [bookings, activeStatus, searchQuery]);
 
   return (
     <div className="space-y-6">
@@ -57,113 +70,157 @@ export const BookingStatusTrackerTab: React.FC<BookingStatusTrackerTabProps> = (
         {/* Card 1: Pending */}
         <div
           onClick={() => setActiveStatus('pending')}
-          className={`p-4 rounded-2xl border transition-all cursor-pointer text-center ${
+          className={`p-4 rounded-2xl border transition-all cursor-pointer text-center relative ${
             activeStatus === 'pending'
-              ? 'border-amber-500 bg-amber-50/80 shadow-xs ring-2 ring-amber-500/20'
+              ? 'border-amber-500 bg-amber-50/90 shadow-2xs ring-2 ring-amber-500/20'
               : 'border-slate-200 bg-white hover:border-slate-300'
           }`}
         >
           <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center mx-auto mb-2">
             <Clock className="w-4 h-4" />
           </div>
-          <span className="text-xs font-semibold text-slate-700 block">بانتظار الاعتماد</span>
-          <span className="text-2xl font-bold text-amber-600 block mt-1">{pendingCount}</span>
+          <span className="text-xs font-bold text-slate-700 block">بانتظار الاعتماد</span>
+          <span className="text-2xl font-black text-amber-600 block mt-1 font-mono">{pendingCount}</span>
+          <span className="text-[10px] font-bold text-amber-700/80 bg-amber-100/60 px-2 py-0.5 rounded-full inline-block mt-1 font-mono">
+            {Math.round((pendingCount / total) * 100)}%
+          </span>
         </div>
 
         {/* Card 2: Approved */}
         <div
           onClick={() => setActiveStatus('approved')}
-          className={`p-4 rounded-2xl border transition-all cursor-pointer text-center ${
+          className={`p-4 rounded-2xl border transition-all cursor-pointer text-center relative ${
             activeStatus === 'approved'
-              ? 'border-emerald-500 bg-emerald-50/80 shadow-xs ring-2 ring-emerald-500/20'
+              ? 'border-emerald-500 bg-emerald-50/90 shadow-2xs ring-2 ring-emerald-500/20'
               : 'border-slate-200 bg-white hover:border-slate-300'
           }`}
         >
           <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto mb-2">
             <CheckCircle2 className="w-4 h-4" />
           </div>
-          <span className="text-xs font-semibold text-slate-700 block">مؤكد ومقر</span>
-          <span className="text-2xl font-bold text-emerald-600 block mt-1">{approvedCount}</span>
+          <span className="text-xs font-bold text-slate-700 block">مؤكد ومقر</span>
+          <span className="text-2xl font-black text-emerald-600 block mt-1 font-mono">{approvedCount}</span>
+          <span className="text-[10px] font-bold text-emerald-700/80 bg-emerald-100/60 px-2 py-0.5 rounded-full inline-block mt-1 font-mono">
+            {Math.round((approvedCount / total) * 100)}%
+          </span>
         </div>
 
         {/* Card 3: Rescheduled */}
         <div
           onClick={() => setActiveStatus('rescheduled')}
-          className={`p-4 rounded-2xl border transition-all cursor-pointer text-center ${
+          className={`p-4 rounded-2xl border transition-all cursor-pointer text-center relative ${
             activeStatus === 'rescheduled'
-              ? 'border-indigo-500 bg-indigo-50/80 shadow-xs ring-2 ring-indigo-500/20'
+              ? 'border-indigo-500 bg-indigo-50/90 shadow-2xs ring-2 ring-indigo-500/20'
               : 'border-slate-200 bg-white hover:border-slate-300'
           }`}
         >
           <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center mx-auto mb-2">
             <Calendar className="w-4 h-4" />
           </div>
-          <span className="text-xs font-semibold text-slate-700 block">معدّل الموعد</span>
-          <span className="text-2xl font-bold text-indigo-600 block mt-1">{rescheduledCount}</span>
+          <span className="text-xs font-bold text-slate-700 block">معدّل الموعد</span>
+          <span className="text-2xl font-black text-indigo-600 block mt-1 font-mono">{rescheduledCount}</span>
+          <span className="text-[10px] font-bold text-indigo-700/80 bg-indigo-100/60 px-2 py-0.5 rounded-full inline-block mt-1 font-mono">
+            {Math.round((rescheduledCount / total) * 100)}%
+          </span>
         </div>
 
         {/* Card 4: Rejected */}
         <div
           onClick={() => setActiveStatus('rejected')}
-          className={`p-4 rounded-2xl border transition-all cursor-pointer text-center ${
+          className={`p-4 rounded-2xl border transition-all cursor-pointer text-center relative ${
             activeStatus === 'rejected'
-              ? 'border-rose-500 bg-rose-50/80 shadow-xs ring-2 ring-rose-500/20'
+              ? 'border-rose-500 bg-rose-50/90 shadow-2xs ring-2 ring-rose-500/20'
               : 'border-slate-200 bg-white hover:border-slate-300'
           }`}
         >
           <div className="w-8 h-8 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center mx-auto mb-2">
             <XCircle className="w-4 h-4" />
           </div>
-          <span className="text-xs font-semibold text-slate-700 block">مرفوض من الطبيب</span>
-          <span className="text-2xl font-bold text-rose-600 block mt-1">{rejectedCount}</span>
+          <span className="text-xs font-bold text-slate-700 block">مرفوض (رصيد مسترجع)</span>
+          <span className="text-2xl font-black text-rose-600 block mt-1 font-mono">{rejectedCount}</span>
+          <span className="text-[10px] font-bold text-rose-700/80 bg-rose-100/60 px-2 py-0.5 rounded-full inline-block mt-1 font-mono">
+            {Math.round((rejectedCount / total) * 100)}%
+          </span>
         </div>
 
         {/* Card 5: Cancelled */}
         <div
           onClick={() => setActiveStatus('cancelled')}
-          className={`p-4 rounded-2xl border transition-all cursor-pointer text-center ${
+          className={`p-4 rounded-2xl border transition-all cursor-pointer text-center relative ${
             activeStatus === 'cancelled'
-              ? 'border-slate-400 bg-slate-100 shadow-xs ring-2 ring-slate-400/20'
+              ? 'border-slate-400 bg-slate-100 shadow-2xs ring-2 ring-slate-400/20'
               : 'border-slate-200 bg-white hover:border-slate-300'
           }`}
         >
           <div className="w-8 h-8 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center mx-auto mb-2">
             <AlertCircle className="w-4 h-4" />
           </div>
-          <span className="text-xs font-semibold text-slate-700 block">ملغى</span>
-          <span className="text-2xl font-bold text-slate-700 block mt-1">{cancelledCount}</span>
+          <span className="text-xs font-bold text-slate-700 block">ملغى</span>
+          <span className="text-2xl font-black text-slate-700 block mt-1 font-mono">{cancelledCount}</span>
+          <span className="text-[10px] font-bold text-slate-600 bg-slate-200/80 px-2 py-0.5 rounded-full inline-block mt-1 font-mono">
+            {Math.round((cancelledCount / total) * 100)}%
+          </span>
         </div>
 
         {/* Card 6: Completed */}
         <div
           onClick={() => setActiveStatus('completed')}
-          className={`p-4 rounded-2xl border transition-all cursor-pointer text-center ${
+          className={`p-4 rounded-2xl border transition-all cursor-pointer text-center relative ${
             activeStatus === 'completed'
-              ? 'border-cyan-500 bg-cyan-50/80 shadow-xs ring-2 ring-cyan-500/20'
+              ? 'border-cyan-500 bg-cyan-50/90 shadow-2xs ring-2 ring-cyan-500/20'
               : 'border-slate-200 bg-white hover:border-slate-300'
           }`}
         >
           <div className="w-8 h-8 rounded-full bg-cyan-100 text-cyan-700 flex items-center justify-center mx-auto mb-2">
             <Check className="w-4 h-4" />
           </div>
-          <span className="text-xs font-semibold text-slate-700 block">مكتمل</span>
-          <span className="text-2xl font-bold text-cyan-600 block mt-1">{completedCount}</span>
+          <span className="text-xs font-bold text-slate-700 block">مكتمل الفحص</span>
+          <span className="text-2xl font-black text-cyan-600 block mt-1 font-mono">{completedCount}</span>
+          <span className="text-[10px] font-bold text-cyan-700/80 bg-cyan-100/60 px-2 py-0.5 rounded-full inline-block mt-1 font-mono">
+            {Math.round((completedCount / total) * 100)}%
+          </span>
         </div>
 
       </div>
 
       {/* Filtered Status Table */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-          <h3 className="font-bold text-slate-900 text-sm">
-            قائمة الحجوزات بالحالة: <span className="text-blue-600 uppercase">{activeStatus}</span>
-          </h3>
-          <button
-            onClick={() => setActiveStatus('all')}
-            className="text-xs text-slate-500 hover:text-slate-800"
-          >
-            عرض الكل
-          </button>
+      <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
+        <div className="px-5 py-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <h3 className="font-extrabold text-slate-900 text-sm flex items-center gap-2">
+              <span>قائمة الحجوزات بالحالة:</span>
+              <span className="px-2.5 py-0.5 rounded-lg text-xs font-mono font-bold bg-blue-50 text-blue-700 border border-blue-200 uppercase">
+                {activeStatus === 'all' ? 'كافة الحالات' : activeStatus}
+              </span>
+              <span className="text-xs font-bold font-mono text-slate-400">
+                ({filteredBookings.length})
+              </span>
+            </h3>
+          </div>
+
+          <div className="flex items-center gap-2.5">
+            <div className="relative min-w-[200px]">
+              <Search className="w-3.5 h-3.5 absolute top-2.5 right-3 text-slate-400" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="بحث في الحجوزات..."
+                className="w-full py-1.5 pr-8 pl-3 text-xs rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 text-right"
+              />
+            </div>
+
+            <button
+              onClick={() => setActiveStatus('all')}
+              className={`text-xs font-bold px-3 py-1.5 rounded-xl border transition-colors cursor-pointer ${
+                activeStatus === 'all'
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'bg-slate-50 hover:bg-slate-100 text-slate-600 border-slate-200'
+              }`}
+            >
+              عرض الكل
+            </button>
+          </div>
         </div>
 
         {filteredBookings.length === 0 ? (

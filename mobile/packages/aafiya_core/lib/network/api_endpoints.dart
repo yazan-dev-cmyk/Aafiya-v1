@@ -6,6 +6,9 @@ abstract final class ApiEndpoints {
   static const String me = '/auth/me';
   static const String logout = '/auth/logout';
   static const String changePassword = '/auth/change-password';
+  static const String forgotPassword = '/auth/forgot-password';
+  static const String verifyResetToken = '/auth/verify-reset-token';
+  static const String resetPassword = '/auth/reset-password';
 
   // System & Health
   static const String health = '/health';
@@ -102,4 +105,17 @@ abstract final class ApiEndpoints {
   static const String clinicEscalations = '/clinic/notifications/escalations';
   static String clinicEscalationAcknowledge(String id) =>
       '/clinic/notifications/escalations/$id/acknowledge';
+
+  // Assistant Rewards (TASK-ASSISTANT-REWARDS-P1-UI)
+  static const String assistantRewardsSummary = '/assistant/rewards/summary';
+  static const String assistantRewardsTransactions =
+      '/assistant/rewards/transactions';
+  static const String assistantRewardsPayouts = '/assistant/rewards/payouts';
+  static const String assistantRewardsProfiles = '/assistant/rewards/profiles';
+  static String assistantRewardsCheque(String profileId) =>
+      '/assistant/rewards/profiles/$profileId/cheque';
+
+  // Advertising Ticker (TASK-MOBILE-ADS-TICKER-INTEGRATION)
+  static const String adsTicker = '/ads/ticker';
+  static String adsTickerClick(String id) => '/ads/ticker/$id/click';
 }

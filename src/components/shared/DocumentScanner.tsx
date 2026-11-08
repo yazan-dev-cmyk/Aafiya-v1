@@ -50,7 +50,21 @@ export function detectQrPayloadType(rawValue: string): DetectedQrPayload {
   if (trimmed.includes('/appointment/pass/') || trimmed.includes('/appointments/pass/')) {
     const parts = trimmed.split(/\/appointments?\/pass\//);
     const token = parts[1]?.split('?')[0].split('#')[0].replace(/\/$/, '');
-    if (token && token.length >= 20) {
+    if (token && token.length >= 8) {
+      return { type: 'APPOINTMENT', rawValue: trimmed, extractedToken: token };
+    }
+  }
+
+  // 1b. Direct Booking Barcode / Reference (e.g., BK-20261106-ABCD)
+  if (/^BK-[A-Za-z0-9\-]+$/i.test(trimmed)) {
+    return { type: 'APPOINTMENT', rawValue: trimmed, extractedToken: trimmed };
+  }
+
+  // 1c. Legacy Appointment Token format fallback
+  if (trimmed.startsWith('AAFIYA-APPT:')) {
+    const parts = trimmed.split(':');
+    const token = parts[1];
+    if (token) {
       return { type: 'APPOINTMENT', rawValue: trimmed, extractedToken: token };
     }
   }
@@ -232,7 +246,9 @@ export const DocumentScanner: React.FC<DocumentScannerProps> = ({
       try {
         const appsRes = await appointmentService.getAppointments();
         if (appsRes.data && Array.isArray(appsRes.data)) {
-          const matched = appsRes.data.find((a: AppointmentItem) => a.secure_token === token);
+          const matched = appsRes.data.find(
+            (a: AppointmentItem) => a.secure_token === token || a.booking_reference === token || a.id === token
+          );
           if (matched) {
             setAppointmentPreview(matched);
             if (matched.status === 'attended' || matched.checked_in_at) {

@@ -140,6 +140,14 @@ class Appointment extends Model
     }
 
     /**
+     * Associated assistant reward.
+     */
+    public function assistantReward(): HasOne
+    {
+        return $this->hasOne(AssistantReward::class, 'appointment_id');
+    }
+
+    /**
      * Scope to filter appointments occupying capacity.
      */
     public function scopeOccupyingCapacity(Builder $query): Builder

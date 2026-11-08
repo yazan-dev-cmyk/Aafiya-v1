@@ -68,6 +68,7 @@ class ClinicResource extends JsonResource
                     'position' => $doc->pivot?->position ?? 'doctor',
                     'is_primary' => (bool) ($doc->pivot?->is_primary ?? false),
                     'is_active' => (bool) ($doc->pivot?->is_active ?? true),
+                    'is_working_hours_activated' => (bool) ($doc->pivot?->is_working_hours_activated ?? false),
                     'joined_at' => $this->formatDateTime($doc->pivot?->joined_at ?? $doc->pivot?->created_at),
                 ]);
             }),

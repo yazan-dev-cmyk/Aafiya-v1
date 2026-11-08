@@ -77,6 +77,38 @@ class User extends Authenticatable
     }
 
     /**
+     * All Clinic Assistant tenure records (including departed/historical).
+     */
+    public function clinicAssistants(): HasMany
+    {
+        return $this->hasMany(ClinicAssistant::class, 'user_id')->withTrashed();
+    }
+
+    /**
+     * Associated Assistant Reward Balance.
+     */
+    public function rewardBalance(): HasOne
+    {
+        return $this->hasOne(AssistantRewardBalance::class, 'assistant_id');
+    }
+
+    /**
+     * Associated Assistant Payout Profiles.
+     */
+    public function payoutProfiles(): HasMany
+    {
+        return $this->hasMany(AssistantPayoutProfile::class, 'assistant_id');
+    }
+
+    /**
+     * Associated Assistant Reward Transactions.
+     */
+    public function rewardTransactions(): HasMany
+    {
+        return $this->hasMany(AssistantRewardTransaction::class, 'assistant_id');
+    }
+
+    /**
      * Scoped permission assignments for fine-grained delegation.
      */
     public function scopedPermissions(): HasMany
@@ -146,5 +178,37 @@ class User extends Authenticatable
     public function clinicalAccessLogs(): HasMany
     {
         return $this->hasMany(ClinicalAccessLog::class, 'actor_id');
+    }
+
+    /**
+     * Assistant reward balance.
+     */
+    public function assistantRewardBalance(): HasOne
+    {
+        return $this->hasOne(AssistantRewardBalance::class, 'assistant_id');
+    }
+
+    /**
+     * Assistant reward transactions.
+     */
+    public function assistantRewardTransactions(): HasMany
+    {
+        return $this->hasMany(AssistantRewardTransaction::class, 'assistant_id');
+    }
+
+    /**
+     * Assistant payout profiles.
+     */
+    public function assistantPayoutProfiles(): HasMany
+    {
+        return $this->hasMany(AssistantPayoutProfile::class, 'assistant_id');
+    }
+
+    /**
+     * Active assistant payout profile.
+     */
+    public function activeAssistantPayoutProfile(): HasOne
+    {
+        return $this->hasOne(AssistantPayoutProfile::class, 'assistant_id')->where('status', 'active');
     }
 }

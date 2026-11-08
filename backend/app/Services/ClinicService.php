@@ -410,8 +410,12 @@ class ClinicService
             throw new AuthorizationException('Forbidden: Assistant does not belong to this clinic.');
         }
 
-        return DB::transaction(function () use ($assistant) {
-            return (bool) $assistant->delete();
+        return DB::transaction(function () use ($actor, $assistant) {
+            $deleted = (bool) $assistant->delete();
+            if ($deleted) {
+                app(\App\Services\AssistantDepartureSettlementService::class)->processDeparture($assistant, $actor);
+            }
+            return $deleted;
         });
     }
 

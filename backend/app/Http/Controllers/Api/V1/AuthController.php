@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\ChangePasswordRequest;
+use App\Http\Requests\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Requests\Auth\ResetPasswordRequest;
+use App\Http\Requests\Auth\VerifyResetTokenRequest;
 use App\Http\Resources\UserResource;
 use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
@@ -97,6 +100,63 @@ class AuthController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Password updated successfully.',
+        ]);
+    }
+
+    /**
+     * Request a password reset link.
+     */
+    public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
+    {
+        $result = $this->authService->sendPasswordResetLink(
+            email: $request->validated('email'),
+            recaptchaToken: $request->validated('recaptcha_token'),
+            locale: $request->validated('locale', 'ar'),
+            ip: $request->ip()
+        );
+
+        return response()->json($result);
+    }
+
+    /**
+     * Verify whether a password reset token is valid before displaying reset UI.
+     */
+    public function verifyResetToken(VerifyResetTokenRequest $request): JsonResponse
+    {
+        $isValid = $this->authService->verifyResetToken(
+            email: $request->validated('email'),
+            token: $request->validated('token')
+        );
+
+        if (! $isValid) {
+            return response()->json([
+                'status' => 'error',
+                'code' => 'INVALID_OR_EXPIRED_TOKEN',
+                'message' => 'رابط استعادة كلمة المرور غير صالح أو انتهت صلاحيته.',
+            ], 422);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'رابط الاستعادة صالح للاستخدام.',
+        ]);
+    }
+
+    /**
+     * Reset the user password using a valid token and revoke all device sessions.
+     */
+    public function resetPassword(ResetPasswordRequest $request): JsonResponse
+    {
+        $this->authService->resetPasswordWithToken(
+            email: $request->validated('email'),
+            token: $request->validated('token'),
+            newPassword: $request->validated('password'),
+            locale: $request->validated('locale', 'ar')
+        );
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'تم تغيير كلمة المرور بنجاح. يرجى تسجيل الدخول باستخدام كلمة المرور الجديدة.',
         ]);
     }
 }

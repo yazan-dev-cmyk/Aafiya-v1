@@ -1,6 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:aafiya_core/aafiya_core.dart';
 import 'package:aafiya_ui/aafiya_ui.dart';
+
+import 'prescriptions_screen.dart';
 
 /// Patient Notifications Screen.
 ///
@@ -40,7 +43,8 @@ class NotificationsScreen extends StatefulWidget {
   State<NotificationsScreen> createState() => _NotificationsScreenState();
 }
 
-class _NotificationsScreenState extends State<NotificationsScreen> {
+class _NotificationsScreenState extends State<NotificationsScreen>
+    with WidgetsBindingObserver {
   late final PatientNotificationService _service;
   final ScrollController _scrollController = ScrollController();
 
@@ -54,24 +58,60 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   final Set<String> _inFlightAcks = <String>{};
   int _requestGeneration = 0;
   int? _lastSessionGeneration;
+  Timer? _refreshTimer;
+  static const Duration _refreshInterval = Duration(seconds: 30);
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _service = widget.service ??
         PatientNotificationService(apiClient: widget.apiClient);
     _lastSessionGeneration = widget.sessionManager.sessionGeneration;
     _scrollController.addListener(_onScroll);
     widget.sessionManager.addListener(_onSessionChanged);
     _loadData();
+    _startPeriodicRefresh();
+  }
+
+  void _startPeriodicRefresh() {
+    _stopPeriodicRefresh();
+    _refreshTimer = Timer.periodic(_refreshInterval, (_) {
+      if (mounted &&
+          widget.sessionManager.isAuthenticated &&
+          !_isLoading &&
+          !_isLoadingMore) {
+        _loadData(isRefresh: true, isSilent: true);
+      }
+    });
+  }
+
+  void _stopPeriodicRefresh() {
+    _refreshTimer?.cancel();
+    _refreshTimer = null;
   }
 
   @override
   void dispose() {
+    _stopPeriodicRefresh();
+    WidgetsBinding.instance.removeObserver(this);
     widget.sessionManager.removeListener(_onSessionChanged);
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      if (!_isLoading && !_isLoadingMore) {
+        _loadData(isRefresh: true, isSilent: true);
+      }
+      _startPeriodicRefresh();
+    } else if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      _stopPeriodicRefresh();
+    }
   }
 
   void _onSessionChanged() {
@@ -117,7 +157,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
-  Future<void> _loadData({bool isRefresh = false}) async {
+  Future<void> _loadData({bool isRefresh = false, bool isSilent = false}) async {
     if (!widget.sessionManager.isAuthenticated) {
       setState(() {
         _items = [];
@@ -158,7 +198,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           if (!isRefresh) {
             _errorMessage = exception.message;
             _items = [];
-          } else {
+          } else if (!isSilent && mounted) {
             // Ordinary refresh failure: preserve existing list and notify via snackbar
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(exception.message)),
@@ -347,12 +387,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             Row(
               children: [
                 Icon(
-                  item.isAcknowledged
-                      ? Icons.mark_email_read_outlined
-                      : Icons.mark_email_unread_rounded,
+                  item.template == 'prescription_issued'
+                      ? Icons.receipt_long_outlined
+                      : (item.isAcknowledged
+                          ? Icons.mark_email_read_outlined
+                          : Icons.mark_email_unread_rounded),
                   color: item.isAcknowledged
                       ? AafiyaColors.secondaryText
-                      : AafiyaColors.primaryBlue,
+                      : (item.template == 'prescription_issued'
+                          ? AafiyaColors.healthBlue
+                          : AafiyaColors.primaryBlue),
                   size: 22,
                 ),
                 const SizedBox(width: AafiyaSpacing.sm),
@@ -393,7 +437,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ),
             if (item.newDate != null ||
                 item.clinicName != null ||
-                item.bookingReference != null) ...[
+                item.bookingReference != null ||
+                item.prescriptionReference != null) ...[
               const SizedBox(height: 12.0),
               Container(
                 padding: const EdgeInsets.all(12.0),
@@ -415,7 +460,31 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     if (item.bookingReference != null)
                       _buildDetailRow(Icons.confirmation_number_outlined,
                           item.bookingReference!),
+                    if (item.prescriptionReference != null)
+                      _buildDetailRow(Icons.description_outlined,
+                          item.prescriptionReference!),
                   ],
+                ),
+              ),
+            ],
+            if (item.template == 'prescription_issued' ||
+                item.prescriptionId != null) ...[
+              const SizedBox(height: AafiyaSpacing.sm),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  onPressed: () {
+                    PrescriptionsScreen.show(context,
+                        apiClient: widget.apiClient);
+                  },
+                  icon: const Icon(Icons.medication_outlined, size: 18),
+                  label: Text(
+                    strings.isArabic
+                        ? 'عرض الوصفات الطبية'
+                        : strings.isFrench
+                            ? 'Voir les ordonnances'
+                            : 'View Prescriptions',
+                  ),
                 ),
               ),
             ],

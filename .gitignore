@@ -25,3 +25,6 @@ tsconfig.tsbuildinfo
 diag_tmp/
 scratch/
 legacy_archive/*.bak
+.npmrc
+imgs/
+

@@ -24,6 +24,7 @@
       "notifications": "Alerts & Notifications",
       "calendar": "Clinic Working Schedule",
       "reports": "Operational Reports",
+      "rewards": "Financial Rewards",
       "profile": "Assistant Profile",
       "settings": "Account Settings"
     },
@@ -174,6 +175,85 @@
     "common": {
       "cancel": "Cancel"
     },
+    "rewards": {
+      "title": "Doctor Assistant Rewards & Compensation",
+      "subtitle": "Track your earned rewards, transaction history, payouts, and postal CCP / RIP bank details",
+      "eligibilityBadge": "Payout Eligibility",
+      "eligible": "Eligible for Payout",
+      "thresholdNotMet": "Threshold (10,000 DZD) not yet reached",
+      "missingProfile": "Verified RIP Profile Required",
+      "kpis": {
+        "currentBalance": "Current Available Balance",
+        "totalEarned": "Total Rewards Earned",
+        "totalPaid": "Total Amount Paid",
+        "pendingPayout": "Pending Monthly Payout",
+        "totalDeductions": "Reversals & Cancellations"
+      },
+      "subtabs": {
+        "overview": "Overview & Ledger",
+        "payouts": "Payout History",
+        "profile": "CCP / RIP Payout Profile"
+      },
+      "ledger": {
+        "title": "Financial Ledger (Double-Entry)",
+        "description": "Immutable chronological ledger of confirmed appointment rewards, deductions, and payout settlements.",
+        "columns": {
+          "date": "Date & Time",
+          "type": "Operation Type",
+          "direction": "Direction",
+          "amount": "Amount",
+          "balanceAfter": "Balance After",
+          "reference": "Reference / Origin"
+        },
+        "types": {
+          "reward_earned": "Reward Earned",
+          "cancellation_deduction": "Cancellation Deduction",
+          "payout_settlement": "Payout Settlement",
+          "departure_deficit_relief": "Platform Deficit Relief",
+          "reversal": "Correction Reversal"
+        },
+        "credit": "Credit (+)",
+        "debit": "Debit (-)",
+        "empty": "No transactions recorded yet."
+      },
+      "payouts": {
+        "title": "Payout Settlement History",
+        "description": "Monthly payout cycles processed via Algérie Poste CCP / Bank transfer.",
+        "batch": "Batch",
+        "period": "Period",
+        "amount": "Amount",
+        "status": "Status",
+        "transferRef": "Transfer Reference",
+        "date": "Transfer Date",
+        "statuses": {
+          "pending": "Pending Processing",
+          "paid": "Paid & Transferred",
+          "failed": "Processing Failed"
+        },
+        "empty": "No payout records found."
+      },
+      "profile": {
+        "title": "CCP / RIP Profile Management",
+        "subtitle": "Submit your 20-digit Algerian CCP RIP and crossed cheque scan for monthly reward transfers.",
+        "activeProfile": "Current Active RIP Profile",
+        "ripLabel": "CCP RIP Number",
+        "version": "Version",
+        "status": "Status",
+        "viewCheque": "View Crossed Cheque Document",
+        "noActive": "No active payout profile. Please submit your RIP details below to receive payouts.",
+        "newProfileTitle": "Submit New RIP / Update Profile",
+        "newProfileDesc": "Submitting a new profile will supersede prior versions once verified by platform administration.",
+        "ripInputPlaceholder": "20 digits (e.g. 00799999000123456789)",
+        "chequeFileLabel": "Crossed Cheque Scan (Chèque Barré - JPG, PNG, PDF up to 5MB)",
+        "submitBtn": "Submit Profile for Verification",
+        "submitting": "Submitting...",
+        "successMsg": "Profile submitted successfully! It is currently pending administrative verification.",
+        "invalidRip": "RIP number must be exactly 20 numeric digits.",
+        "missingCheque": "Please attach a clear scan of your crossed cheque.",
+        "historyTitle": "Profile Submission History"
+      },
+      "currency": "DZD"
+    },
     "logout": "Log Out"
   },
   "common": {
@@ -259,7 +339,7 @@
   },
   "features": {
     "section_badge": "Structural Platform Functions",
-    "title": "Aafiya Digital Platform Features",
+    "title": "An Interconnected Healthcare Ecosystem",
     "subtitle": "Each feature is designed based on approved business rules, serving all parties with the highest levels of transparency and efficiency.",
     "official_function": "Platform Operational Function",
     "booking_engine": {
@@ -523,7 +603,7 @@
   },
   "directory": {
     "section_badge": "Unified Search Directory",
-    "title": "Search for your doctor or suitable service center",
+    "title": "Search the AAFIYA Healthcare Network",
     "description": "Explore the list of certified doctors, booking centers, test labs, and radiology centers in one place.",
     "search_placeholder": "Search by name, specialty, or location...",
     "all_provinces": "All Provinces",
@@ -804,7 +884,45 @@
     "darkMode": "Dark Mode",
     "platform": "Platform",
     "quickStats": "Quick Stats",
-    "platformStable": "Platform performance is 100% stable"
+    "platformStable": "Platform performance is 100% stable",
+    "header": {
+      "platformName": "AAFIYA",
+      "platformTagline": "Your Gateway To Health",
+      "welcome": "Welcome",
+      "welcomeWithName": "Welcome, {name}",
+      "welcomeDoctor": "Welcome, Dr. {name}",
+      "welcomeBack": "Welcome back, {name}",
+      "adminSubtitle": "Responsible for overseeing the AAFIYA platform",
+      "roles": {
+        "doctor": "Attending Physician",
+        "doctorDirector": "Physician & Clinic Director",
+        "doctorAssistant": "Clinical & Admin Assistant",
+        "patient": "Digital Health Record",
+        "bookingCenter": "Booking Center Director",
+        "bookingCenterStaff": "Certified Booking Agent",
+        "labManager": "Laboratory Director",
+        "labAssistant": "Laboratory Technician",
+        "radManager": "Radiology Director",
+        "radAssistant": "Radiology Technician",
+        "admin": "Platform Administration",
+        "platformAdmin": "Platform Administrator",
+        "adminAssistant": "Platform Operations Assistant",
+        "superAdmin": "Super Administration"
+      },
+      "context": {
+        "clinic": "Active Clinic",
+        "laboratory": "Diagnostic Lab",
+        "radiology": "Imaging Center",
+        "bookingCenter": "Booking Center",
+        "centralOperations": "Central Operations - AAFIYA",
+        "verifiedAccount": "Verified Account"
+      },
+      "logout": "Logout",
+      "home": "Home",
+      "menuToggle": "Toggle Sidebar",
+      "notifications": "Notifications & Alerts",
+      "language": "Language"
+    }
   },
   "admin": {
     "title": "Platform Administration Control Center",
@@ -826,6 +944,7 @@
       "audit_logs": "Audit Logs",
       "roles_permissions": "Permissions",
       "assistant_permissions": "Assistant Management",
+      "assistant_rewards": "Doctor Assistant Rewards",
       "system_settings": "System Settings",
       "notifications_center": "Notifications Center"
     },
@@ -1006,7 +1125,166 @@
         "LAB_STAFF": "Lab Staff",
         "RAD_STAFF": "Rad Staff",
         "BOOKING_AGENTS": "Booking Agents",
-        "ALL": "All"
+        "ALL": "All",
+        "public": "Public",
+        "patient": "Patients",
+        "doctor": "Doctors",
+        "doctor_assistant": "Doctor Assistants",
+        "booking_center": "Booking Center",
+        "lab": "Laboratories",
+        "lab_assistant": "Lab Assistants",
+        "radiology": "Radiology",
+        "rad_assistant": "Radiology Assistants",
+        "all": "All Audiences"
+      }
+    },
+    "adsTicker": {
+      "title": "Advertising Ticker & Campaign Management",
+      "subtitle": "Manage, publish, and target announcements in the animated ticker feed",
+      "refresh": "Refresh Data",
+      "createNewCampaign": "New Campaign",
+      "retry": "Retry",
+      "loading": "Loading...",
+      "searchPlaceholder": "Search campaigns by title or content...",
+      "loadingCampaigns": "Loading advertising campaigns...",
+      "stats": {
+        "total": "Total Campaigns",
+        "active": "Active Campaigns",
+        "clicks": "Total Clicks",
+        "draft": "Draft / Paused"
+      },
+      "statuses": {
+        "all": "All Statuses",
+        "active": "Active",
+        "paused": "Paused",
+        "draft": "Draft",
+        "expired": "Expired",
+        "archived": "Archived",
+        "pending_approval": "Pending Approval",
+        "rejected": "Rejected"
+      },
+      "empty": {
+        "title": "No campaigns found",
+        "filterMatchNone": "No campaigns match the selected filters or search criteria.",
+        "description": "No ticker campaigns created yet. Click the button below to start.",
+        "clearFilters": "Clear Filters"
+      },
+      "table": {
+        "campaign": "Campaign",
+        "status": "Status",
+        "priority": "Priority",
+        "schedule": "Schedule",
+        "placements": "Placements & Audience",
+        "clicks": "Clicks",
+        "actions": "Actions",
+        "from": "From",
+        "to": "To",
+        "continuous": "Continuous (No end date)",
+        "noPlacements": "No placements defined"
+      },
+      "actions": {
+        "pause": "Pause",
+        "activate": "Activate",
+        "managePlacements": "Manage Placements",
+        "edit": "Edit Campaign"
+      },
+      "pagination": {
+        "showing": "Showing {from} to {to} of {total} campaigns",
+        "perPage": "Per page"
+      },
+      "notices": {
+        "createdSuccess": "Campaign created successfully",
+        "updatedSuccess": "Campaign updated successfully",
+        "statusUpdated": "Status of \"{title}\" updated to {status}"
+      },
+      "errors": {
+        "fetchFailed": "Failed to load campaigns from server",
+        "fetchPlacementsFailed": "Failed to load placements from server",
+        "duplicatePlacement": "This placement is already added to the campaign",
+        "unknown": "An unexpected error occurred"
+      },
+      "createModal": {
+        "title": "Create New Ticker Campaign",
+        "subtitle": "Configure and publish a new campaign in the animated ticker"
+      },
+      "editModal": {
+        "title": "Edit Ticker Campaign",
+        "subtitle": "Edit campaign #{id}"
+      },
+      "placementsModal": {
+        "title": "Manage Placements & Audience",
+        "subtitle": "Specify display destinations and target audiences for this campaign",
+        "addNewPlacement": "Add New Placement",
+        "addTitle": "Add New Placement",
+        "destination": "Destination",
+        "audience": "Target Audience",
+        "addBtn": "Add Placement",
+        "currentPlacements": "Current Placements",
+        "currentTitle": "Current Placements",
+        "empty": "No placements configured for this campaign yet",
+        "noPlacements": "No placements configured for this campaign yet",
+        "deletePlacementTooltip": "Delete this placement",
+        "deletePlacement": "Delete this placement",
+        "confirmDeleteTitle": "Confirm Placement Removal",
+        "confirmDeletePrompt": "Are you sure you want to remove the placement: {destination} - {audience}?",
+        "confirmDelete": "Are you sure you want to remove this placement?",
+        "confirmDeleteBtn": "Confirm Delete",
+        "addedSuccess": "Placement added successfully",
+        "removedSuccess": "Placement removed successfully"
+      },
+      "form": {
+        "title": "Campaign Title",
+        "titlePlaceholder": "e.g., Special discount on comprehensive checkups",
+        "priority": "Display Priority (Higher shows first)",
+        "content": "Ad Content (Displays in Ticker)",
+        "contentPlaceholder": "Write announcement copy here...",
+        "targetUrl": "Click-through URL (Optional)",
+        "targetUrlPlaceholder": "https://... or /packages",
+        "status": "Initial Status",
+        "bannerImageUrl": "Logo / Icon URL (Optional)",
+        "bannerImageUrlPlaceholder": "https://... or image path",
+        "schedulingTitle": "Scheduling (Optional)",
+        "startsAt": "Start Date & Time",
+        "endsAt": "End Date & Time",
+        "inclusive": "Inclusive",
+        "exclusive": "Exclusive",
+        "placementsTitle": "Placements & Target Audience",
+        "placementsDescription": "Determine where the ad displays and to whom",
+        "minOnePlacementRequired": "At least one placement is required",
+        "addPlacementBtn": "Add Placement",
+        "createSubmitBtn": "Create Campaign",
+        "cancel": "Cancel",
+        "close": "Close",
+        "createCampaignBtn": "Create Campaign",
+        "saveChangesBtn": "Save Changes",
+        "errors": {
+          "titleRequired": "Title is required",
+          "contentRequired": "Content is required",
+          "placementRequired": "At least one placement is required",
+          "endsAfterStarts": "End date must be after start date",
+          "atLeastOnePlacement": "At least one placement is required"
+        }
+      },
+      "destinations": {
+        "ticker": "Public Ticker Feed",
+        "home_banner": "Homepage Banner",
+        "sidebar": "Sidebar",
+        "search_top": "Top of Search Results",
+        "category_sponsor": "Category Sponsor",
+        "modal": "Popup Modal",
+        "banner": "Page Banner"
+      },
+      "audiences": {
+        "public": "Public (Unregistered)",
+        "patient": "Patients",
+        "doctor": "Doctors",
+        "doctor_assistant": "Doctor Assistants",
+        "booking_center": "Booking Center",
+        "lab": "Laboratories",
+        "lab_assistant": "Lab Assistants",
+        "radiology": "Radiology",
+        "rad_assistant": "Radiology Assistants",
+        "all": "All Audiences"
       }
     },
     "subscriptions": {
@@ -1067,6 +1345,12 @@
       "activityLog": "Audit Log",
       "staff": "Clinic Staff & Assistants",
       "clinicStats": "Clinic Doctor Statistics"
+    },
+    "categories": {
+      "clinical": "Live Clinical Practice",
+      "diagnostics": "Diagnostics & Prescriptions",
+      "insights": "Insights & Analytics",
+      "management": "Practice & Clinic Management"
     },
     "badges": {
       "new": "New",
@@ -1195,7 +1479,58 @@
       "incomeValue": "0 DZD",
       "incomeHidden": "•••••••• DZD",
       "incomeToggleTitle": "Show/Hide Income",
-      "welcomeWithName": "Welcome {name}"
+      "welcomeWithName": "Welcome {name}",
+      "defaultDoctorName": "Dr.",
+      "defaultSpecialty": "Practitioner",
+      "defaultClinicName": "Medical Clinic",
+      "guestPatient": "Guest Patient",
+      "generalConsultation": "General Consultation",
+      "practiceActive": "Practice Active",
+      "cockpitSubtitle": "Clinical Practice Cockpit — Queue, Consultations & Diagnostics",
+      "currentConsultationBtn": "Current Consultation",
+      "nextPatientTitle": "Next Patient in Queue",
+      "nextPatientSubtitle": "Priority patient ready for clinical examination",
+      "refreshTooltip": "Refresh",
+      "startConsultationNow": "Start Consultation",
+      "noWaitingPatients": "No patients waiting in queue",
+      "waitingRoomClear": "The waiting room is clear and ready for upcoming arrivals",
+      "patientsUnit": "Patients",
+      "patientsWaitingCall": "Waiting for doctor call",
+      "completedTodayTitle": "Completed Consultations",
+      "totalScheduledUnit": "Total",
+      "totalScheduledFootnote": "{count} scheduled today",
+      "stableStatus": "Stable",
+      "completedFootnote": "{count} completed today",
+      "quickHubTitle": "Quick Clinical Practice Hub:",
+      "quickHubSubtitle": "Direct shortcuts to daily clinical workflows",
+      "railWaitingRoomTitle": "Live Waiting Room",
+      "railWaitingRoomDesc": "Queue management & call patient",
+      "railConsultationTitle": "Active Consultation",
+      "railConsultationDesc": "Clinical exam & diagnosis console",
+      "railPrescriptionsTitle": "E-Prescriptions",
+      "railPrescriptionsDesc": "Issue digital prescription & Rx",
+      "railLabOrdersTitle": "Laboratory Orders",
+      "railLabOrdersDesc": "Order lab panels & compare values",
+      "railRadiologyOrdersTitle": "Radiology & Imaging",
+      "railRadiologyOrdersDesc": "Radiology orders & DICOM viewer",
+      "railVisitsTitle": "Visits History",
+      "railVisitsDesc": "Past visits & clinical records",
+      "railPatientsTitle": "Patients Directory",
+      "railPatientsDesc": "Comprehensive EHR records",
+      "railAnalyticsTitle": "Clinical Analytics",
+      "railAnalyticsDesc": "Diagnosis trends & practice KPIs",
+      "todayScheduleTitle": "Today's Scheduled Appointments",
+      "filterAll": "All",
+      "filterWaiting": "Waiting",
+      "filterCompleted": "Completed",
+      "filterPending": "Pending",
+      "loadingAppointments": "Loading appointments...",
+      "statusCompleted": "Completed",
+      "statusWaiting": "Waiting",
+      "statusPending": "Pending",
+      "examineBtn": "Examine",
+      "noAppointmentsFilter": "No appointments matching this filter",
+      "pickAnotherDate": "You can pick another date using the day bar above"
     },
     "consultation": {
       "title": "Current Patient Consultation Console",
@@ -2583,6 +2918,23 @@
     "commune": "Commune",
     "rememberMe": "Remember me",
     "forgotPassword": "Forgot password?",
+    "forgotPasswordTitle": "Password Recovery",
+    "forgotPasswordDesc": "Enter your registered email address and we will send you a link to reset your password.",
+    "sendRecoveryLink": "Send Recovery Link",
+    "backToLogin": "Back to Login",
+    "uniformRecoveryNotice": "If this email address is associated with an account, a password recovery message will be sent.",
+    "captchaRequiredNotice": "Please verify that you are not a robot (reCAPTCHA) to proceed.",
+    "resetPasswordTitle": "Reset Password",
+    "resetPasswordDesc": "Please enter and confirm your new password.",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "submitResetPassword": "Save New Password",
+    "passwordResetSuccess": "Your password has been changed successfully. Please log in using your new password.",
+    "signInOnWeb": "Sign In on Web",
+    "invalidOrExpiredToken": "The recovery link is invalid or has expired. Please request a new recovery link.",
+    "requestNewLink": "Request New Link",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "passwordMinLength": "Password must be at least 8 characters long",
     "submitLogin": "Secure System Login",
     "submitRegister": "Create New Account",
     "toggleRegister": "Don't have an account? Join us now",
@@ -3440,6 +3792,43 @@
       "platform": "Android 7.0+ (APK)",
       "description": "Manage clinical queues, handle follow-up escalations, consult verified patient EHR, and streamline practice care.",
       "downloadButton": "Download AAFIYA Pro (APK)"
+    }
+  },
+  "ticker": {
+    "badge": "Official Announcement",
+    "openLink": "Open link",
+    "ariaLabel": "Official announcements ticker",
+    "play": "Play animation",
+    "pause": "Pause animation",
+    "previous": "Previous announcement",
+    "next": "Next announcement"
+  },
+  "trust_privacy": {
+    "section_badge": "Trust & Security",
+    "title": "Trust and privacy are fundamental to AAFIYA",
+    "subtitle": "A digital health platform built on rigorous access controls and verified governance policies to protect patient and provider medical records.",
+    "pillar_footer": "Verified operational mechanisms",
+    "pillars": {
+      "rbac": {
+        "title": "Role-Based Access Control",
+        "description": "Strict role-based permissions (RBAC) ensuring clinical data is strictly limited to authorized healthcare personnel.",
+        "badge": "Strict Control"
+      },
+      "protection": {
+        "title": "Account & Data Protection",
+        "description": "Hardened session management and credential protection with complete organizational data isolation.",
+        "badge": "Account Security"
+      },
+      "policy": {
+        "title": "Policy-Driven Information Governance",
+        "description": "Medical record management aligned with professional healthcare governance without unauthorized data sharing.",
+        "badge": "Data Governance"
+      }
+    },
+    "governance_notice": {
+      "title": "Commitment to digital security and clinical confidentiality",
+      "description": "All clinical actions maintain verified audit logs ensuring transparency and professional accountability across all roles.",
+      "cta": "Explore Platform"
     }
   }
 }

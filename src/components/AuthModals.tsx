@@ -38,6 +38,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useAuth } from '../auth/AuthProvider';
 import { AuthResponse } from '../services/authService';
 import { WilayaSelect, CommuneSelect, SpecialtySelect } from './master-data';
+import { RecaptchaCheckbox } from './ui/RecaptchaCheckbox';
+import { api, ApiError } from '../lib/api';
 
 const getDashboardPathForRole = (role: string, loc: string): string => {
   switch (role) {
@@ -87,6 +89,11 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
   const isRtl = locale === 'ar';
   
   const [isRegister, setIsRegister] = useState<boolean>(isRegisterMode);
+  const [isForgotPassword, setIsForgotPassword] = useState<boolean>(false);
+  const [forgotEmail, setForgotEmail] = useState<string>('');
+  const [captchaRequired, setCaptchaRequired] = useState<boolean>(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [recoverySuccessMessage, setRecoverySuccessMessage] = useState<string | null>(null);
   const [selectedRole, setSelectedRole] = useState<RoleType>(initialRole);
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -96,6 +103,11 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
   useEffect(() => {
     if (isOpen) {
       setIsRegister(isRegisterMode);
+      setIsForgotPassword(false);
+      setForgotEmail('');
+      setCaptchaRequired(false);
+      setCaptchaToken(null);
+      setRecoverySuccessMessage(null);
       setSelectedRole(initialRole);
       setError(null);
       setLoading(false);
@@ -178,6 +190,11 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
   const handleReset = () => {
     setSubmitted(false);
     setIsRegister(isRegisterMode);
+    setIsForgotPassword(false);
+    setForgotEmail('');
+    setCaptchaRequired(false);
+    setCaptchaToken(null);
+    setRecoverySuccessMessage(null);
     setSelectedRole(initialRole);
     setError(null);
     setLoading(false);
@@ -371,6 +388,30 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
     }
   };
 
+  const handleForgotPasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    try {
+      const res = await api.publicPost<{ message?: string }>('/auth/forgot-password', {
+        email: forgotEmail.trim().toLowerCase(),
+        recaptcha_token: captchaToken || undefined,
+        locale,
+      });
+      setRecoverySuccessMessage(res?.message || t('uniformRecoveryNotice'));
+    } catch (err: any) {
+      if (err instanceof ApiError && err.status === 422 && err.responseData?.error_code === 'CAPTCHA_REQUIRED') {
+        setCaptchaRequired(true);
+        setError(t('captchaRequiredNotice'));
+      } else {
+        setError(err?.message || err?.responseData?.message || t('uniformRecoveryNotice'));
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const accountTypes = [
     { id: 'patient_registered' as RoleType, label: t('patient'), icon: User, color: 'text-blue-600', bg: 'bg-blue-50' },
     { id: 'doctor' as RoleType, label: t('doctor'), icon: Stethoscope, color: 'text-indigo-600', bg: 'bg-indigo-50' },
@@ -383,12 +424,89 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
-      size={isRegister ? "lg" : "md"}
-      title={isRegister ? t('register') : t('login')}
-      description={isRegister ? t('registerSubtitle') : t('loginSubtitle')}
+      size={isForgotPassword ? "md" : isRegister ? "lg" : "md"}
+      title={isForgotPassword ? t('forgotPasswordTitle') : isRegister ? t('register') : t('login')}
+      description={isForgotPassword ? t('forgotPasswordDesc') : isRegister ? t('registerSubtitle') : t('loginSubtitle')}
     >
       <div className="space-y-6">
-        {submitted ? (
+        {isForgotPassword ? (
+          <div className="space-y-6">
+            {recoverySuccessMessage ? (
+              <div className="space-y-6 py-4 text-center">
+                <div className="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-600 mx-auto flex items-center justify-center border border-emerald-100">
+                  <Mail className="w-8 h-8" />
+                </div>
+                <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-bold rounded-2xl leading-relaxed">
+                  {recoverySuccessMessage}
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  fullWidth
+                  onClick={() => {
+                    setIsForgotPassword(false);
+                    setRecoverySuccessMessage(null);
+                    setError(null);
+                  }}
+                >
+                  {t('backToLogin')}
+                </Button>
+              </div>
+            ) : (
+              <form onSubmit={handleForgotPasswordSubmit} className="space-y-5">
+                {error && (
+                  <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold rounded-xl text-center">
+                    {error}
+                  </div>
+                )}
+
+                <Input
+                  label={t('email')}
+                  type="email"
+                  required
+                  dir="ltr"
+                  value={forgotEmail}
+                  onChange={(e) => setForgotEmail(e.target.value)}
+                  placeholder={t('placeholderEmail')}
+                  icon={<Mail className="w-5 h-5" />}
+                />
+
+                {captchaRequired && (
+                  <div className="space-y-2">
+                    <p className="text-xs text-slate-500 font-bold text-center">
+                      {t('captchaRequiredNotice')}
+                    </p>
+                    <RecaptchaCheckbox
+                      locale={locale}
+                      onVerify={(token) => setCaptchaToken(token)}
+                      onExpire={() => setCaptchaToken(null)}
+                    />
+                  </div>
+                )}
+
+                <div className="space-y-3 pt-2">
+                  <Button type="submit" fullWidth size="lg" loading={loading}>
+                    <Mail className={cn("w-5 h-5", isRtl ? "ml-2" : "mr-2")} />
+                    {t('sendRecoveryLink')}
+                  </Button>
+
+                  <div className="text-center">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsForgotPassword(false);
+                        setError(null);
+                      }}
+                      className="text-xs font-black text-slate-500 hover:text-primary transition-colors"
+                    >
+                      {t('backToLogin')}
+                    </button>
+                  </div>
+                </div>
+              </form>
+            )}
+          </div>
+        ) : submitted ? (
           <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -769,7 +887,16 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
                       />
                       <span className="text-xs text-slate-500 font-bold group-hover:text-slate-700 transition-colors">{t('rememberMe')}</span>
                     </label>
-                    <button type="button" className="text-xs text-primary font-black hover:underline">{t('forgotPassword')}</button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsForgotPassword(true);
+                        setError(null);
+                      }}
+                      className="text-xs text-primary font-black hover:underline"
+                    >
+                      {t('forgotPassword')}
+                    </button>
                   </div>
                 )}
 

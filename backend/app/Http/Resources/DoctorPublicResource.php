@@ -49,6 +49,7 @@ class DoctorPublicResource extends JsonResource
                         'google_maps_link' => $clinic->google_maps_link,
                         'phone' => $clinic->phone,
                         'position' => $clinic->pivot?->position,
+                        'is_working_hours_activated' => (bool) ($clinic->pivot?->is_working_hours_activated ?? false),
                     ]);
             }),
             'created_at' => $this->created_at?->toISOString(),

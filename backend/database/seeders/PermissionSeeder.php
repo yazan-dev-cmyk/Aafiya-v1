@@ -13,335 +13,303 @@ class PermissionSeeder extends Seeder
     public function run(): void
     {
         $permissions = [
-            // Clinic Management
-            [
-                'name' => 'clinic.manage_settings',
-                'display_name' => 'Manage Clinic Settings',
-                'category' => 'clinic',
-                'description' => 'Configure schedules, slots, and facility operational settings.',
-            ],
-            [
-                'name' => 'clinic.view_analytics',
-                'display_name' => 'View Clinic Analytics',
-                'category' => 'clinic',
-                'description' => 'Access administrative, revenue, and attendance analytics.',
-            ],
-            [
-                'name' => 'clinic.create_staff',
-                'display_name' => 'Create Staff Accounts',
-                'category' => 'clinic',
-                'description' => 'Authorize and create assistant and employed doctor profiles.',
-            ],
-
-            // Clinical Practice
-            [
-                'name' => 'clinical.write_rx',
-                'display_name' => 'Write Prescriptions',
-                'category' => 'clinical',
-                'description' => 'Author and sign official medical prescriptions.',
-            ],
-            [
-                'name' => 'clinical.view_ehr',
-                'display_name' => 'View Patient EHR',
-                'category' => 'clinical',
-                'description' => 'Access electronic health records within authorized scope.',
-            ],
-            [
-                'name' => 'clinical.delete_record',
-                'display_name' => 'Delete Clinical Records',
-                'category' => 'clinical',
-                'description' => 'Administrative deletion of clinical records (Restricted).',
-            ],
-
-            // Booking & Queue Management
-            [
-                'name' => 'booking.create',
-                'display_name' => 'Create Appointments',
-                'category' => 'booking',
-                'description' => 'Initiate booking requests and appointments.',
-            ],
-            [
-                'name' => 'booking.manage_queue',
-                'display_name' => 'Manage Waiting Room Queue',
-                'category' => 'booking',
-                'description' => 'Manage clinic waiting room queue and triage statuses.',
-            ],
-            [
-                'name' => 'booking.confirm_attendance',
-                'display_name' => 'Confirm Patient Attendance',
-                'category' => 'booking',
-                'description' => 'Mark patient as arrived and ready for clinical consultation.',
-            ],
-            [
-                'name' => 'booking.confirm_quota',
-                'display_name' => 'Confirm Booking with Quota Deduction',
-                'category' => 'booking',
-                'description' => 'Clinically confirm booking resulting in quota consumption.',
-            ],
-
-            // Patient Identity & Contacts
-            [
-                'name' => 'patient.view_contacts',
-                'display_name' => 'View Patient Contact Information',
-                'category' => 'patient',
-                'description' => 'View basic non-clinical contact details for coordination.',
-            ],
-
-            // Laboratory Diagnostics
-            [
-                'name' => 'lab.manage_orders',
-                'display_name' => 'Manage Laboratory Orders',
-                'category' => 'diagnostics',
-                'description' => 'Receive and track lab test requests and samples.',
-            ],
-            [
-                'name' => 'lab.enter_results',
-                'display_name' => 'Enter Laboratory Results',
-                'category' => 'diagnostics',
-                'description' => 'Input quantitative and qualitative test result values.',
-            ],
-            [
-                'name' => 'lab.finalize_results',
-                'display_name' => 'Finalize & Approve Laboratory Results',
-                'category' => 'diagnostics',
-                'description' => 'Scientifically approve and sign lab test reports.',
-            ],
-
-            // Radiology Diagnostics
-            [
-                'name' => 'radiology.manage_orders',
-                'display_name' => 'Manage Radiology Orders',
-                'category' => 'diagnostics',
-                'description' => 'Receive and track imaging orders and appointments.',
-            ],
-            [
-                'name' => 'radiology.upload_images',
-                'display_name' => 'Upload Radiology Scans',
-                'category' => 'diagnostics',
-                'description' => 'Upload DICOM and radiological image assets.',
-            ],
-            [
-                'name' => 'radiology.finalize_report',
-                'display_name' => 'Finalize & Approve Radiology Report',
-                'category' => 'diagnostics',
-                'description' => 'Author and sign official radiological interpretation report.',
-            ],
-            [
-                'name' => 'diagnostic.approve_result',
-                'display_name' => 'Approve Diagnostic Result',
-                'category' => 'diagnostics',
-                'description' => 'Managerial sign-off on critical diagnostic outcomes.',
-            ],
-
-            // Platform Administration & Audit
-            [
-                'name' => 'platform.manage_users',
-                'display_name' => 'Manage Platform Users',
-                'category' => 'platform',
-                'description' => 'Activate, deactivate, and manage platform user identities.',
-            ],
-            [
-                'name' => 'platform.view_audit_logs',
-                'display_name' => 'View Platform Audit Logs',
-                'category' => 'platform',
-                'description' => 'Inspect immutable security and clinical access logs.',
-            ],
-            [
-                'name' => 'platform.manage_ads',
-                'display_name' => 'Manage Platform Advertisements',
-                'category' => 'platform',
-                'description' => 'Review and manage healthcare sponsored advertisements.',
-            ],
+            // Core System & Dashboard
             [
                 'name' => 'platform.view_dashboard',
-                'display_name' => 'View Platform Dashboard',
-                'category' => 'platform',
-                'description' => 'Access executive overview KPIs.',
+                'display_name' => 'عرض لوحة القيادة',
+                'category' => 'system',
+                'description' => 'الاطلاع على الإحصائيات العامة للمنصة',
             ],
             [
                 'name' => 'platform.view_statistics',
-                'display_name' => 'View Platform Statistics',
-                'category' => 'platform',
-                'description' => 'Access operational and usage analytics.',
+                'display_name' => 'عرض الإحصائيات المتقدمة',
+                'category' => 'system',
+                'description' => 'الاطلاع على الرسوم البيانية ومؤشرات الأداء',
             ],
+
+            // User Management
             [
-                'name' => 'platform.view_tasks',
-                'display_name' => 'View Operational Tasks',
-                'category' => 'platform',
-                'description' => 'Access task queues and pending workflows.',
-            ],
-            [
-                'name' => 'platform.view_requests',
-                'display_name' => 'View Inbound Requests',
-                'category' => 'platform',
-                'description' => 'Access registration and onboarding requests.',
-            ],
-            [
-                'name' => 'platform.review_requests',
-                'display_name' => 'Review Inbound Requests',
-                'category' => 'platform',
-                'description' => 'Triage and review onboarding dossiers.',
-            ],
-            [
-                'name' => 'platform.approve_requests',
-                'display_name' => 'Approve Registration Requests',
-                'category' => 'platform',
-                'description' => 'Grant approval to doctor or facility registrations.',
-            ],
-            [
-                'name' => 'platform.reject_requests',
-                'display_name' => 'Reject Registration Requests',
-                'category' => 'platform',
-                'description' => 'Reject incomplete or non-compliant applications.',
-            ],
-            [
-                'name' => 'platform.request_more_info',
-                'display_name' => 'Request More Information',
-                'category' => 'platform',
-                'description' => 'Solicit additional documentation from applicants.',
-            ],
-            [
-                'name' => 'platform.view_docs',
-                'display_name' => 'View Uploaded Documents',
-                'category' => 'platform',
-                'description' => 'Inspect licenses, permits, and credentials.',
-            ],
-            [
-                'name' => 'platform.review_docs',
-                'display_name' => 'Review Verification Documents',
-                'category' => 'platform',
-                'description' => 'Audit compliance of professional diplomas and certifications.',
-            ],
-            [
-                'name' => 'platform.approve_docs',
-                'display_name' => 'Approve Verification Documents',
-                'category' => 'platform',
-                'description' => 'Verify and authenticate uploaded credentials.',
-            ],
-            [
-                'name' => 'platform.request_info_docs',
-                'display_name' => 'Request Document Clarification',
-                'category' => 'platform',
-                'description' => 'Request re-upload of illegible or expired documents.',
-            ],
-            [
-                'name' => 'platform.view_tickets',
-                'display_name' => 'View Support Tickets',
-                'category' => 'platform',
-                'description' => 'Access customer and practitioner helpdesk inquiries.',
-            ],
-            [
-                'name' => 'platform.reply_tickets',
-                'display_name' => 'Reply to Support Tickets',
-                'category' => 'platform',
-                'description' => 'Communicate with ticket openers and submit resolutions.',
-            ],
-            [
-                'name' => 'platform.close_tickets',
-                'display_name' => 'Close Resolved Tickets',
-                'category' => 'platform',
-                'description' => 'Mark customer issues as closed.',
-            ],
-            [
-                'name' => 'platform.escalate_tickets',
-                'display_name' => 'Escalate Critical Tickets',
-                'category' => 'platform',
-                'description' => 'Route complex issues to senior platform leadership.',
-            ],
-            [
-                'name' => 'platform.view_notifications',
-                'display_name' => 'View Platform Broadcasts',
-                'category' => 'platform',
-                'description' => 'Inspect public bulletins and notification streams.',
-            ],
-            [
-                'name' => 'platform.create_notifications',
-                'display_name' => 'Create Notification Broadcasts',
-                'category' => 'platform',
-                'description' => 'Draft platform-wide alerts and announcements.',
-            ],
-            [
-                'name' => 'platform.edit_notifications',
-                'display_name' => 'Edit Notification Broadcasts',
-                'category' => 'platform',
-                'description' => 'Modify existing bulletins and scheduled notifications.',
-            ],
-            [
-                'name' => 'platform.delete_notifications',
-                'display_name' => 'Delete Notification Broadcasts',
-                'category' => 'platform',
-                'description' => 'Withdraw published bulletins from circulation.',
-            ],
-            [
-                'name' => 'platform.publish_notifications',
-                'display_name' => 'Publish Emergency Alerts',
-                'category' => 'platform',
-                'description' => 'Trigger real-time broadcast pushes across user domains.',
-            ],
-            [
-                'name' => 'platform.view_operational_reports',
-                'display_name' => 'View Operational Reports',
-                'category' => 'platform',
-                'description' => 'Inspect system performance and uptime analytics.',
-            ],
-            [
-                'name' => 'platform.export_reports',
-                'display_name' => 'Export System Reports',
-                'category' => 'platform',
-                'description' => 'Export sanitized statistical tables in CSV/PDF formats.',
-            ],
-            [
-                'name' => 'platform.print_reports',
-                'display_name' => 'Print Summary Reports',
-                'category' => 'platform',
-                'description' => 'Generate formatted print layouts of platform metrics.',
-            ],
-            [
-                'name' => 'platform.view_financial_reports',
-                'display_name' => 'View Platform Financial Reports',
-                'category' => 'platform',
-                'description' => 'Access billing and package transaction summaries.',
+                'name' => 'platform.manage_users',
+                'display_name' => 'إدارة المستخدمين',
+                'category' => 'users',
+                'description' => 'عرض قائمة مستخدمي المنصة بجميع الأدوار',
             ],
             [
                 'name' => 'platform.edit_users',
-                'display_name' => 'Edit User Profiles',
-                'category' => 'platform',
-                'description' => 'Update user contact details and administrative notes.',
+                'display_name' => 'تعديل بيانات المستخدمين',
+                'category' => 'users',
+                'description' => 'تحديث الملفات الشخصية والحسابات',
             ],
             [
                 'name' => 'platform.suspend_users',
-                'display_name' => 'Suspend User Accounts',
-                'category' => 'platform',
-                'description' => 'Temporarily freeze account access pending investigation.',
+                'display_name' => 'تجميد الحسابات',
+                'category' => 'users',
+                'description' => 'إيقاف حسابات المستخدمين مؤقتاً',
             ],
             [
                 'name' => 'platform.delete_users',
-                'display_name' => 'Delete Platform Users',
-                'category' => 'platform',
-                'description' => 'Soft-delete non-compliant or terminated accounts.',
+                'display_name' => 'حذف الحسابات',
+                'category' => 'users',
+                'description' => 'حذف الحسابات نهائياً من المنصة',
+            ],
+
+            // Verification & Onboarding
+            [
+                'name' => 'platform.view_requests',
+                'display_name' => 'عرض طلبات الانضمام',
+                'category' => 'verification',
+                'description' => 'استعراض طلبات الأطباء والمراكز والعيادات',
             ],
             [
-                'name' => 'platform.manage_master_data',
-                'display_name' => 'Manage Master Data',
-                'category' => 'platform',
-                'description' => 'Create, edit, activate, and deactivate Medical Specialties and Wilayas.',
+                'name' => 'platform.review_requests',
+                'display_name' => 'مراجعة الطلبات والوثائق',
+                'category' => 'verification',
+                'description' => 'تدقيق الشهادات والتراخيص المرفقة',
             ],
             [
-                'name' => 'platform.export_backup',
-                'display_name' => 'Export Encrypted Database Backup',
-                'category' => 'platform',
-                'description' => 'Asynchronously export and securely download encrypted database backup artifacts.',
+                'name' => 'platform.approve_requests',
+                'display_name' => 'اعتماد الطلبات',
+                'category' => 'verification',
+                'description' => 'قبول طلبات الانضمام وتفعيل الحسابات',
+            ],
+            [
+                'name' => 'platform.reject_requests',
+                'display_name' => 'رفض الطلبات',
+                'category' => 'verification',
+                'description' => 'رفض طلبات الانضمام غير المستوفية للشروط',
+            ],
+            [
+                'name' => 'platform.request_more_info',
+                'display_name' => 'طلب استكمال الوثائق',
+                'category' => 'verification',
+                'description' => 'مطالبة مقدم الطلب بإرفاق مستندات إضافية',
+            ],
+
+            // Document Audit
+            [
+                'name' => 'platform.view_docs',
+                'display_name' => 'عرض المستندات والملفات',
+                'category' => 'documents',
+                'description' => 'الاطلاع على الأرشيف الرقمي للتراخيص',
+            ],
+            [
+                'name' => 'platform.review_docs',
+                'display_name' => 'فحص صحة المستندات',
+                'category' => 'documents',
+                'description' => 'إجراء المراجعة الفنية للتراخيص الطبية',
+            ],
+            [
+                'name' => 'platform.approve_docs',
+                'display_name' => 'توثيق واعتماد المستند',
+                'category' => 'documents',
+                'description' => 'منح علامة التوثيق الرسمية للوثيقة',
+            ],
+            [
+                'name' => 'platform.request_info_docs',
+                'display_name' => 'طلب إعادة إرسال وثيقة',
+                'category' => 'documents',
+                'description' => 'طلب نسخة أوضح أو أحدث من المستند',
+            ],
+
+            // Ticketing & Support
+            [
+                'name' => 'platform.view_tickets',
+                'display_name' => 'عرض تذاكر الدعم الفني',
+                'category' => 'support',
+                'description' => 'استعراض الشكاوى والاستفسارات الواردة',
+            ],
+            [
+                'name' => 'platform.reply_tickets',
+                'display_name' => 'الرد على التذاكر',
+                'category' => 'support',
+                'description' => 'مراسلة المستخدمين لحل الإشكالات الفنية',
+            ],
+            [
+                'name' => 'platform.close_tickets',
+                'display_name' => 'إغلاق التذاكر',
+                'category' => 'support',
+                'description' => 'إنهاء التذاكر بعد حل الموضوع',
+            ],
+            [
+                'name' => 'platform.escalate_tickets',
+                'display_name' => 'تصعيد التذاكر للإدارة',
+                'category' => 'support',
+                'description' => 'إحالة التذاكر الحرجة للإدارة العليا',
+            ],
+
+            // System Broadcasts & Notifications
+            [
+                'name' => 'platform.view_notifications',
+                'display_name' => 'عرض سجل الإشعارات',
+                'category' => 'notifications',
+                'description' => 'استعراض الإشعارات المرسلة لعموم المنصة',
+            ],
+            [
+                'name' => 'platform.create_notifications',
+                'display_name' => 'إنشاء إشعار عام',
+                'category' => 'notifications',
+                'description' => 'صياغة تنبيهات ورسائل جماعية للمستخدمين',
+            ],
+            [
+                'name' => 'platform.edit_notifications',
+                'display_name' => 'تعديل الإشعار',
+                'category' => 'notifications',
+                'description' => 'تحديث محتوى الإشعارات غير المرسلة',
+            ],
+            [
+                'name' => 'platform.delete_notifications',
+                'display_name' => 'حذف الإشعارات',
+                'category' => 'notifications',
+                'description' => 'إلغاء مسودات الإشعارات',
+            ],
+            [
+                'name' => 'platform.publish_notifications',
+                'display_name' => 'بث ونشر الإشعار',
+                'category' => 'notifications',
+                'description' => 'إرسال الإشعارات فورياً إلى المستهدفين',
+            ],
+
+            // Reporting & Auditing
+            [
+                'name' => 'platform.view_operational_reports',
+                'display_name' => 'عرض التقارير التشغيلية',
+                'category' => 'reports',
+                'description' => 'تقارير المواعيد، الإلغاءات، أداء العيادات',
+            ],
+            [
+                'name' => 'platform.view_financial_reports',
+                'display_name' => 'عرض التقارير المالية',
+                'category' => 'reports',
+                'description' => 'تقارير الإيرادات، الباقات، ومبيعات الحصص',
+            ],
+            [
+                'name' => 'platform.export_reports',
+                'display_name' => 'تصدير التقارير (Excel/PDF)',
+                'category' => 'reports',
+                'description' => 'تنزيل كشوفات البيانات والتقارير الدورية',
+            ],
+            [
+                'name' => 'platform.print_reports',
+                'display_name' => 'طباعة التقارير الرسمية',
+                'category' => 'reports',
+                'description' => 'إرسال التقارير والوثائق لأجهزة الطباعة',
+            ],
+
+            // Task Management
+            [
+                'name' => 'platform.view_tasks',
+                'display_name' => 'عرض المهام الإدارية',
+                'category' => 'tasks',
+                'description' => 'متابعة جدول المهام اليومية لفريق العمل',
+            ],
+
+            // Payout Confirmation (Individual Delegated Authority under DEC-ARP-08 / DEC-07)
+            [
+                'name' => 'platform.confirm_assistant_payout',
+                'display_name' => 'تأكيد تحويل مستحقات المساعدين',
+                'category' => 'financial',
+                'description' => 'صلاحية تفويضية لتأكيد التحويل المصرفي الفعلي لدفعات مستحقات المساعدين وخصمها من الدفتر المالي',
+            ],
+
+            // Assistant Rewards Administration & Governance
+            [
+                'name' => 'platform.rewards.view_overview',
+                'display_name' => 'عرض المؤشرات المالية لمكافآت المساعدين',
+                'category' => 'financial',
+                'description' => 'الاطلاع على الإجماليات، الأرصدة المعلقة، والخسائر التشغيلية للمكافآت',
+            ],
+            [
+                'name' => 'platform.rewards.view_assistants',
+                'display_name' => 'استعراض دليل المساعدين وأرصدتهم',
+                'category' => 'financial',
+                'description' => 'عرض قائمة المساعدين، الأرصدة التراكمية، وحالة الأهلية للصرف',
+            ],
+            [
+                'name' => 'platform.rewards.view_assistant_ledger',
+                'display_name' => 'عرض دفتر أستاذ المساعد الفردي',
+                'category' => 'financial',
+                'description' => 'الاطلاع على المعاملات المالية التاريخية والقيود للمساعد',
+            ],
+            [
+                'name' => 'platform.rewards.view_cheque_document',
+                'display_name' => 'معاينة وثيقة الشيك المشطوب للمساعد',
+                'category' => 'financial',
+                'description' => 'استعراض ملف الشيك المشطوب المرفوع للحساب البريدي',
+            ],
+            [
+                'name' => 'platform.rewards.download_cheque_document',
+                'display_name' => 'تنزيل وثيقة الشيك المشطوب للمساعد',
+                'category' => 'financial',
+                'description' => 'تنزيل ملف الشيك المشطوب بصيغة أصلية للتدقيق الورقي',
+            ],
+            [
+                'name' => 'platform.rewards.view_full_rip',
+                'display_name' => 'كشف الحساب البريدي الكامل (20 رقماً)',
+                'category' => 'financial',
+                'description' => 'إظهار رقم الـ RIP الكامل غير المشفر مع تسجيل قيد تدقيق أمني',
+            ],
+            [
+                'name' => 'platform.rewards.verify_payout_profile',
+                'display_name' => 'اعتماد وتفعيل ملف الحساب البريدي للمساعد',
+                'category' => 'financial',
+                'description' => 'تأكيد صحة الحساب البريدي والموافقة على جاهزيته لصرف المستحقات',
+            ],
+            [
+                'name' => 'platform.rewards.reject_payout_profile',
+                'display_name' => 'رفض ملف الحساب البريدي للمساعد',
+                'category' => 'financial',
+                'description' => 'رفض الحساب البريدي مع إلزامية توثيق سبب الرفض وإعادة الملف للمسودة',
+            ],
+            [
+                'name' => 'platform.rewards.generate_payout_batch',
+                'display_name' => 'تجهيز وتوليد دفعة مستحقات شهرية للمساعدين',
+                'category' => 'financial',
+                'description' => 'تجميع المساعدين المؤهلين وتوليد دفعة الصرف الشهري',
+            ],
+            [
+                'name' => 'platform.rewards.cancel_payout_batch',
+                'display_name' => 'إلغاء دفعة مستحقات شهرية غير مدفوعة',
+                'category' => 'financial',
+                'description' => 'إلغاء دفعة المستحقات وإعادة مبالغ البنود لأرصدة المساعدين المتاحة مع تبرير إلزامي',
+            ],
+            [
+                'name' => 'platform.rewards.view_audit_logs',
+                'display_name' => 'استعراض سجل التدقيق الأمني المالي للمكافآت',
+                'category' => 'financial',
+                'description' => 'الاطلاع على أحداث كشف الـ RIP وتنزيل الشيكات والتعديلات الإدارية الحساسة',
+            ],
+
+            // Dynamic Rate Scheduling & Program Lifecycle Management (DEC-03 & DEC-05)
+            [
+                'name' => 'platform.rewards.view_settings',
+                'display_name' => 'عرض إعدادات وسياسة برنامج المكافآت',
+                'category' => 'financial',
+                'description' => 'الاطلاع على السعر الحالي، السجل التاريخي، والجدولة المستقبلية وحالة دورة حياة البرنامج',
+            ],
+            [
+                'name' => 'platform.rewards.schedule_rate',
+                'display_name' => 'جدولة قيمة جديدة لمكافأة المساعدين',
+                'category' => 'financial',
+                'description' => 'صلاحية حصرية للمدير لجدولة قيمة المكافأة مع تاريخ ووقت السريان المستقبلي',
+            ],
+            [
+                'name' => 'platform.rewards.cancel_scheduled_rate',
+                'display_name' => 'إلغاء جدولة قيمة المكافأة المستقبلية',
+                'category' => 'financial',
+                'description' => 'إلغاء تغيير سعر مجدول قبل حلول تاريخ ووقت سريانه مع إبداء السبب الإلزامي',
+            ],
+            [
+                'name' => 'platform.rewards.manage_lifecycle',
+                'display_name' => 'إدارة دورة حياة برنامج المكافآت',
+                'category' => 'financial',
+                'description' => 'صلاحية حصرية للمدير لتعليق البرنامج أو استئنافه أو إنهائه نهائياً بموجب DEC-05 و DEC-06',
             ],
         ];
 
-        foreach ($permissions as $permissionData) {
-            Permission::updateOrCreate(
-                ['name' => $permissionData['name']],
-                [
-                    'display_name' => $permissionData['display_name'],
-                    'category' => $permissionData['category'],
-                    'description' => $permissionData['description'],
-                ]
+        foreach ($permissions as $permission) {
+            Permission::firstOrCreate(
+                ['name' => $permission['name']],
+                $permission
             );
         }
     }

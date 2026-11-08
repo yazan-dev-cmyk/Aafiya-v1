@@ -24,6 +24,7 @@
       "notifications": "التنبيهات والإشعارات",
       "calendar": "جدول دوام العيادة",
       "reports": "التقارير التشغيلية",
+      "rewards": "المكافآت المالية",
       "profile": "الملف الشخصي للمساعد",
       "settings": "إعدادات الحساب"
     },
@@ -174,6 +175,85 @@
     "common": {
       "cancel": "إلغاء"
     },
+    "rewards": {
+      "title": "المكافآت والتعويضات المالية لمساعد الطبيب",
+      "subtitle": "متابعة الرصيد المستحق، السجل المالي، التحويلات الشهرية وإدارة الحساب البريدي الجاري (RIP / CCP)",
+      "eligibilityBadge": "أهلية صرف المستحقات",
+      "eligible": "مؤهل للصرف المالي",
+      "thresholdNotMet": "لم يبلغ الحد الأدنى للصرف (10,000 دج)",
+      "missingProfile": "يتطلب حساب RIP بريدي مفعل ومعتمد",
+      "kpis": {
+        "currentBalance": "الرصيد المتاح حالياً",
+        "totalEarned": "إجمالي المكافآت المكتسبة",
+        "totalPaid": "إجمالي المبالغ المصروفة",
+        "pendingPayout": "مستحقات قيد المعالجة الشهرية",
+        "totalDeductions": "الخصومات والإلغاءات"
+      },
+      "subtabs": {
+        "overview": "نظرة عامة والسجل المالي",
+        "payouts": "سجل التحويلات والمستحقات",
+        "profile": "بيانات الحساب البريدي (RIP / CCP)"
+      },
+      "ledger": {
+        "title": "دفتر الأستاذ المالي (Double-Entry Ledger)",
+        "description": "سجل محاسبي رقمي غير قابل للتعديل يوثق مكافآت المواعيد المؤكدة، الخصومات الناتجة عن الإلغاء، والتسويات المالية.",
+        "columns": {
+          "date": "التاريخ والوقت",
+          "type": "نوع الحركة",
+          "direction": "الاتجاه",
+          "amount": "المبلغ",
+          "balanceAfter": "الرصيد بعد الحركة",
+          "reference": "المرجع / المصدر"
+        },
+        "types": {
+          "reward_earned": "مكافأة تأكيد موعد",
+          "cancellation_deduction": "خصم لإلغاء الموعد",
+          "payout_settlement": "تسوية وصرف مستحقات",
+          "departure_deficit_relief": "إعفاء عجز عند المغادرة (تحمل المنصة)",
+          "reversal": "تصحيح مالي / تسوية عكسية"
+        },
+        "credit": "إيداع (+)",
+        "debit": "خصم (-)",
+        "empty": "لا توجد معاملات مسجلة بعد."
+      },
+      "payouts": {
+        "title": "سجل الدفعات والتحويلات المالية",
+        "description": "الدفعات الشهرية المصروفة عبر بريد الجزائر (CCP) أو التحويل البنكي.",
+        "batch": "الدفعة",
+        "period": "الفترة",
+        "amount": "المبلغ",
+        "status": "الحالة",
+        "transferRef": "رقم إشعار التحويل",
+        "date": "تاريخ التحويل",
+        "statuses": {
+          "pending": "قيد المعالجة والمصادقة",
+          "paid": "تم الصرف والتحويل",
+          "failed": "تعذر التحويل"
+        },
+        "empty": "لا توجد دفعات مسجلة."
+      },
+      "profile": {
+        "title": "إدارة حساب الصرف (RIP / CCP)",
+        "subtitle": "تقديم رقم الحساب البريدي الجاري (20 رقماً) ونسخة الصك المشطوب لاستلام المستحقات المالية الشهرية.",
+        "activeProfile": "الحساب البريدي النشط والمعتمد",
+        "ripLabel": "رقم الحساب البريدي (RIP)",
+        "version": "الإصدار",
+        "status": "الحالة",
+        "viewCheque": "عرض وثيقة الصك المشطوب",
+        "noActive": "لا يوجد حساب بريدي معتمد حالياً. يرجى تقديم بياناتك البريدية أدناه لتفعيل استلام المستحقات.",
+        "newProfileTitle": "تقديم أو تحديث بيانات الحساب البريدي",
+        "newProfileDesc": "تقديم حساب جديد سيحل محل الإصدارات السابقة فور اعتماده من إدارة المنصة.",
+        "ripInputPlaceholder": "20 رقماً (مثال: 00799999000123456789)",
+        "chequeFileLabel": "صورة الصك المشطوب (JPG, PNG, PDF بحد أقصى 5 ميغابايت)",
+        "submitBtn": "إرسال البيانات للتحقق والاعتماد",
+        "submitting": "جارٍ الإرسال...",
+        "successMsg": "تم إرسال بيانات الحساب بنجاح، وهي قيد المراجعة والاعتماد من قبل الإدارة.",
+        "invalidRip": "رقم الحساب البريدي RIP يجب أن يتكون من 20 رقماً بالضبط.",
+        "missingCheque": "يرجى إرفاق صورة واضحة من الصك المشطوب.",
+        "historyTitle": "سجل طلبات الحسابات السابقة"
+      },
+      "currency": "دج"
+    },
     "logout": "تسجيل الخروج"
   },
   "common": {
@@ -259,7 +339,7 @@
   },
   "features": {
     "section_badge": "الوظائف البنيوية للمنصة",
-    "title": "مزايا منصة عافية الرقمية",
+    "title": "منظومة صحية مترابطة في مكان واحد",
     "subtitle": "تم تصميم كل ميزة بناءً على قواعد العمل المعتمدة، لتخدم كافة الأطراف بأعلى مستويات الشفافية والكفاءة.",
     "official_function": "وظيفة تشغيلية للمنصة",
     "booking_engine": {
@@ -523,7 +603,7 @@
   },
   "directory": {
     "section_badge": "دليل البحث الموحد",
-    "title": "ابحث عن طبيبك أو مركز الخدمة المناسب",
+    "title": "ابحث في شبكة عافية الصحية",
     "description": "استكشف قائمة الأطباء المعتمدين، مراكز الحجز، مخابر التحاليل ومراكز الأشعة في مكان واحد.",
     "search_placeholder": "ابحث بالاسم، التخصص، أو الموقع...",
     "all_provinces": "جميع الولايات",
@@ -804,7 +884,45 @@
     "darkMode": "الوضع الداكن",
     "platform": "المنصة",
     "quickStats": "إحصائية سريعة",
-    "platformStable": "أداء المنصة مستقر 100%"
+    "platformStable": "أداء المنصة مستقر 100%",
+    "header": {
+      "platformName": "منصة عافية",
+      "platformTagline": "بوابتك إلى العافية",
+      "welcome": "مرحباً",
+      "welcomeWithName": "مرحباً، {name}",
+      "welcomeDoctor": "مرحباً د. {name}",
+      "welcomeBack": "مرحباً بعودتك، {name}",
+      "adminSubtitle": "المسؤول الأول عن إدارة منصة عافية",
+      "roles": {
+        "doctor": "طبيب معالج",
+        "doctorDirector": "طبيب / مدير العيادة",
+        "doctorAssistant": "مساعد سريري وإداري",
+        "patient": "الملف الصحي الرقمي",
+        "bookingCenter": "مدير مركز الحجز",
+        "bookingCenterStaff": "وكيل حجز معتمد",
+        "labManager": "مدير مجمع التحاليل",
+        "labAssistant": "فني تحاليل مخبرية",
+        "radManager": "مدير مركز الأشعة",
+        "radAssistant": "فني تصوير طبي",
+        "admin": "الإدارة العامة للمنصة",
+        "platformAdmin": "مدير المنصة",
+        "adminAssistant": "العمليات والدعم الإداري",
+        "superAdmin": "الإدارة العليا للمنصة"
+      },
+      "context": {
+        "clinic": "عيادة نشطة",
+        "laboratory": "مجمع تحاليل",
+        "radiology": "مركز أشعة",
+        "bookingCenter": "مركز حجز",
+        "centralOperations": "المقر العام - منصة عافية",
+        "verifiedAccount": "حساب موثق"
+      },
+      "logout": "تسجيل الخروج",
+      "home": "الرئيسية",
+      "menuToggle": "تبديل القائمة الجانبية",
+      "notifications": "الإشعارات والتنبيهات",
+      "language": "اللغة"
+    }
   },
   "admin": {
     "title": "مركز تحكم إدارة المنصة Platform Administration",
@@ -826,6 +944,7 @@
       "audit_logs": "سجل العمليات",
       "roles_permissions": "الصلاحيات",
       "assistant_permissions": "إدارة المساعدين",
+      "assistant_rewards": "مكافآت مساعدي الأطباء",
       "system_settings": "إعدادات النظام",
       "notifications_center": "مركز التنبيهات"
     },
@@ -1006,7 +1125,166 @@
         "LAB_STAFF": "موظفي المختبر",
         "RAD_STAFF": "موظفي الأشعة",
         "BOOKING_AGENTS": "موظفي الحجز",
-        "ALL": "الكل"
+        "ALL": "الكل",
+        "public": "الجمهور العام",
+        "patient": "المرضى",
+        "doctor": "الأطباء",
+        "doctor_assistant": "مساعدو الأطباء",
+        "booking_center": "مراكز الحجز",
+        "lab": "المخابر الطبية",
+        "lab_assistant": "مساعدو المخابر",
+        "radiology": "مراكز الأشعة",
+        "rad_assistant": "مساعدو الأشعة",
+        "all": "الجميع"
+      }
+    },
+    "adsTicker": {
+      "title": "إدارة شريط الإعلانات والحملات الترويجية",
+      "subtitle": "إدارة ونشر وتوجيه الإعلانات في الشريط المتحرك والمنصات المستهدفة",
+      "refresh": "تحديث البيانات",
+      "createNewCampaign": "إنشاء حملة جديدة",
+      "retry": "إعادة المحاولة",
+      "loading": "جاري التحميل...",
+      "searchPlaceholder": "البحث في الحملات بالاسم أو المحتوى...",
+      "loadingCampaigns": "جاري تحميل الحملات الإعلانية...",
+      "stats": {
+        "total": "إجمالي الحملات",
+        "active": "حملات نشطة",
+        "clicks": "إجمالي النقرات",
+        "draft": "مسودات / متوقفة"
+      },
+      "statuses": {
+        "all": "جميع الحالات",
+        "active": "نشط",
+        "paused": "متوقف مؤقتاً",
+        "draft": "مسودة",
+        "expired": "منتهي الصلاحية",
+        "archived": "مؤرشف",
+        "pending_approval": "قيد المراجعة والاعتماد",
+        "rejected": "مرفوض"
+      },
+      "empty": {
+        "title": "لا توجد حملات إعلانية",
+        "filterMatchNone": "لم يتم العثور على أي حملة تطابق معايير البحث والفلترة المحددة.",
+        "description": "لم يتم إنشاء أي حملات إعلانية للشريط حتى الآن. اضغط على الزر أدناه لبدء أول حملة.",
+        "clearFilters": "إلغاء الفلاتر"
+      },
+      "table": {
+        "campaign": "الحملة",
+        "status": "الحالة",
+        "priority": "الأولوية",
+        "schedule": "الجدولة الزمنية",
+        "placements": "مواضع الظهور والجمهور",
+        "clicks": "النقرات",
+        "actions": "الإجراءات",
+        "from": "من",
+        "to": "إلى",
+        "continuous": "مستمر دون تاريخ انتهاء",
+        "noPlacements": "لا توجد مواضع محددة"
+      },
+      "actions": {
+        "pause": "إيقاف مؤقت",
+        "activate": "تفعيل الحملة",
+        "managePlacements": "إدارة مواضع الظهور",
+        "edit": "تعديل الحملة"
+      },
+      "pagination": {
+        "showing": "عرض {from} إلى {to} من أصل {total} حملة",
+        "perPage": "لكل صفحة"
+      },
+      "notices": {
+        "createdSuccess": "تم إنشاء الحملة الإعلانية بنجاح",
+        "updatedSuccess": "تم تحديث بيانات الحملة الإعلانية بنجاح",
+        "statusUpdated": "تم تغيير حالة الحملة \"{title}\" إلى {status}"
+      },
+      "errors": {
+        "fetchFailed": "فشل تحميل الحملات الإعلانية من الخادم",
+        "fetchPlacementsFailed": "فشل تحميل مواضع الظهور من الخادم",
+        "duplicatePlacement": "هذا الموضع مضاف بالفعل للحملة",
+        "unknown": "حدث خطأ غير متوقع"
+      },
+      "createModal": {
+        "title": "إنشاء حملة شريط إعلاني جديدة",
+        "subtitle": "تكوين ونشر إعلان جديد في الشريط المتحرك التفاعلي"
+      },
+      "editModal": {
+        "title": "تعديل الحملة الإعلانية",
+        "subtitle": "تعديل بيانات الحملة #{id}"
+      },
+      "placementsModal": {
+        "title": "إدارة مواضع الظهور والجمهور",
+        "subtitle": "تحديد منصات العرض والفئات المستهدفة للحملة",
+        "addNewPlacement": "إضافة موضع ظهور جديد",
+        "addTitle": "إضافة موضع ظهور جديد",
+        "destination": "المنصة / الموضع",
+        "audience": "الفئة المستهدفة",
+        "addBtn": "إضافة الموضع",
+        "currentPlacements": "المواضع الحالية للحملة",
+        "currentTitle": "المواضع الحالية للحملة",
+        "empty": "لا توجد مواضع مخصصة حالياً لهذه الحملة",
+        "noPlacements": "لا توجد مواضع مخصصة حالياً لهذه الحملة",
+        "deletePlacementTooltip": "حذف هذا الموضع",
+        "deletePlacement": "حذف هذا الموضع",
+        "confirmDeleteTitle": "تأكيد حذف موضع الظهور",
+        "confirmDeletePrompt": "هل أنت متأكد من رغبتك في إزالة الموضع: {destination} - {audience}؟",
+        "confirmDelete": "هل أنت متأكد من حذف هذا الموضع؟",
+        "confirmDeleteBtn": "تأكيد الحذف",
+        "addedSuccess": "تم إضافة موضع الظهور بنجاح",
+        "removedSuccess": "تم حذف موضع الظهور بنجاح"
+      },
+      "form": {
+        "title": "عنوان الإعلان",
+        "titlePlaceholder": "مثال: خصم خاص على الفحوصات الشاملة",
+        "priority": "أولوية العرض (الأعلى يظهر أولاً)",
+        "content": "نص الإعلان (يظهر في الشريط)",
+        "contentPlaceholder": "اكتب نص الإعلان الترويجي أو التنويه الرسمي هنا...",
+        "targetUrl": "رابط التوجيه عند النقر (اختياري)",
+        "targetUrlPlaceholder": "https://... أو /packages",
+        "status": "الحالة الأولية",
+        "bannerImageUrl": "رابط الشعار أو الصورة الصغيرة (اختياري)",
+        "bannerImageUrlPlaceholder": "https://... أو مسار صورة",
+        "schedulingTitle": "الجدولة الزمنية (اختياري)",
+        "startsAt": "تاريخ ووقت البدء",
+        "endsAt": "تاريخ ووقت الانتهاء",
+        "inclusive": "شامل",
+        "exclusive": "حصري",
+        "placementsTitle": "مواضع الظهور والجمهور المستهدف",
+        "placementsDescription": "حدد أين يظهر الإعلان ولمن يوجه",
+        "minOnePlacementRequired": "يجب إضافة موضع ظهور واحد على الأقل",
+        "addPlacementBtn": "إضافة الموضع",
+        "createSubmitBtn": "إنشاء وحفظ الحملة",
+        "cancel": "إلغاء",
+        "close": "إغلاق",
+        "createCampaignBtn": "إنشاء وحفظ الحملة",
+        "saveChangesBtn": "حفظ التعديلات",
+        "errors": {
+          "titleRequired": "عنوان الإعلان مطلوب",
+          "contentRequired": "محتوى الإعلان مطلوب",
+          "placementRequired": "يجب تحديد موضع ظهور واحد على الأقل",
+          "endsAfterStarts": "تاريخ الانتهاء يجب أن يكون بعد تاريخ البدء",
+          "atLeastOnePlacement": "يجب تحديد موضع ظهور واحد على الأقل"
+        }
+      },
+      "destinations": {
+        "ticker": "الشريط الإعلاني العام (Ticker)",
+        "home_banner": "بانر الصفحة الرئيسية (Home Banner)",
+        "sidebar": "الشريط الجانبي (Sidebar)",
+        "search_top": "أعلى نتائج البحث (Search Top)",
+        "category_sponsor": "راعي التصنيف (Category Sponsor)",
+        "modal": "نافذة منبثقة (Modal)",
+        "banner": "بانر الصفحة (Banner)"
+      },
+      "audiences": {
+        "public": "الجمهور العام (غير المسجلين)",
+        "patient": "المرضى",
+        "doctor": "الأطباء",
+        "doctor_assistant": "مساعدو الأطباء",
+        "booking_center": "مراكز الحجز",
+        "lab": "المخابر الطبية",
+        "lab_assistant": "مساعدو المخابر",
+        "radiology": "مراكز الأشعة",
+        "rad_assistant": "مساعدو الأشعة",
+        "all": "الجميع (كافة الفئات)"
       }
     },
     "subscriptions": {
@@ -1067,6 +1345,12 @@
       "activityLog": "سجل التدقيق Audit Log",
       "staff": "طاقم العيادة والمساعدين",
       "clinicStats": "إحصائيات أطباء العيادة"
+    },
+    "categories": {
+      "clinical": "العيادة والعمل السريري الحي",
+      "diagnostics": "الخدمات التشخيصية والوصفات",
+      "insights": "المؤشرات والتحليلات",
+      "management": "إدارة الممارسة والعيادة"
     },
     "badges": {
       "new": "جديد",
@@ -1195,7 +1479,58 @@
       "incomeValue": "0 د.ج",
       "incomeHidden": "•••••••• د.ج",
       "incomeToggleTitle": "إظهار/إخفاء الإيراد",
-      "welcomeWithName": "مرحباً {name}"
+      "welcomeWithName": "مرحباً {name}",
+      "defaultDoctorName": "د. محمد العربي",
+      "defaultSpecialty": "طبيب ممارس",
+      "defaultClinicName": "عيادة النخبة الطبية",
+      "guestPatient": "مريض زائر",
+      "generalConsultation": "استشارة طبية عامة",
+      "practiceActive": "العيادة نشطة ومتاحة",
+      "cockpitSubtitle": "قمرة القيادة السريرية اليومية — إدارة الطابور الحي، الكشوفات، والوصفات الطبية",
+      "currentConsultationBtn": "الكشف الحالي",
+      "nextPatientTitle": "المريض التالي في قاعة الانتظار",
+      "nextPatientSubtitle": "تسليط الضوء على المريض المستحق للكشف حالياً وفق أسبقية الدور",
+      "refreshTooltip": "تحديث",
+      "startConsultationNow": "بدء الكشف الفوري",
+      "noWaitingPatients": "لا يوجد مرضى بانتظار الدخول حالياً",
+      "waitingRoomClear": "قاعة الانتظار مستقرة وجاهزة لاستقبال الحالات القادمة",
+      "patientsUnit": "مريض",
+      "patientsWaitingCall": "مرضى بانتظار استدعائهم للكشف",
+      "completedTodayTitle": "الكشوفات المكتملة اليوم",
+      "totalScheduledUnit": "إجمالي",
+      "totalScheduledFootnote": "{count} موعد مسجل لهذا اليوم",
+      "stableStatus": "مستقر",
+      "completedFootnote": "{count} كشف منجز اليوم",
+      "quickHubTitle": "محطة العمليات السريرية السريعة:",
+      "quickHubSubtitle": "اختصارات مباشرة للخدمات المتكررة",
+      "railWaitingRoomTitle": "قاعة الانتظار الحية",
+      "railWaitingRoomDesc": "إدارة الطابور ومناداة المرضى",
+      "railConsultationTitle": "الكشف والاستشارة النشطة",
+      "railConsultationDesc": "تسجيل الفحص السريري والتشخيص",
+      "railPrescriptionsTitle": "الوصفات الطبية الإلكترونية",
+      "railPrescriptionsDesc": "تحرير وصفة دوائية جديدة +Rx",
+      "railLabOrdersTitle": "التحاليل والفحوصات المخبرية",
+      "railLabOrdersDesc": "طلب تحاليل ومقارنة النتائج",
+      "railRadiologyOrdersTitle": "الأشعة والتصوير الطبي",
+      "railRadiologyOrdersDesc": "طلب تصوير ومعاينة DICOM",
+      "railVisitsTitle": "سجل المواعيد والزيارات",
+      "railVisitsDesc": "أرشيف الزيارات السريرية السابقة",
+      "railPatientsTitle": "سجل المرضى والملف الطبي EHR",
+      "railPatientsDesc": "السجل الطبي الشامل والتاريخ الصحي",
+      "railAnalyticsTitle": "التقارير والمؤشرات السريرية",
+      "railAnalyticsDesc": "تحليلات الحالات وتوزيع التشخيصات",
+      "todayScheduleTitle": "جدول مواعيد اليوم المجدولة",
+      "filterAll": "الكل",
+      "filterWaiting": "بالانتظار",
+      "filterCompleted": "مكتملة",
+      "filterPending": "بانتظار التأكيد",
+      "loadingAppointments": "جاري تحميل مواعيد اليوم...",
+      "statusCompleted": "مكتمل",
+      "statusWaiting": "في الانتظار",
+      "statusPending": "معلق",
+      "examineBtn": "كشف",
+      "noAppointmentsFilter": "لا توجد مواعيد مسجلة ضمن هذا التصنيف",
+      "pickAnotherDate": "يمكنك اختيار تاريخ آخر من شريط اليوم التشغيلي أعلاه"
     },
     "consultation": {
       "title": "مركز الكشف الطبي المباشر (Current Patient Consultation)",
@@ -2599,6 +2934,23 @@
     "complimentaryNote": "منحة ترحيبية مجانية — رصيد تجريبي معتمد",
     "rememberMe": "تذكرني",
     "forgotPassword": "نسيت كلمة المرور؟",
+    "forgotPasswordTitle": "استعادة كلمة المرور",
+    "forgotPasswordDesc": "أدخل بريدك الإلكتروني المسجل وسنرسل لك رابطاً لإعادة تعيين كلمة المرور.",
+    "sendRecoveryLink": "إرسال رابط الاستعادة",
+    "backToLogin": "العودة لتسجيل الدخول",
+    "uniformRecoveryNotice": "إذا كان هذا البريد مرتبطاً بحساب، فستصلك رسالة استعادة كلمة المرور.",
+    "captchaRequiredNotice": "يرجى تأكيد أنك لست روبوت (reCAPTCHA) لمتابعة الطلب.",
+    "resetPasswordTitle": "إعادة تعيين كلمة المرور",
+    "resetPasswordDesc": "يرجى إدخال كلمة المرور الجديدة وتأكيدها.",
+    "newPassword": "كلمة المرور الجديدة",
+    "confirmNewPassword": "تأكيد كلمة المرور الجديدة",
+    "submitResetPassword": "حفظ كلمة المرور الجديدة",
+    "passwordResetSuccess": "تم تغيير كلمة المرور بنجاح. يرجى تسجيل الدخول باستخدام كلمة المرور الجديدة.",
+    "signInOnWeb": "تسجيل الدخول على الويب",
+    "invalidOrExpiredToken": "رابط استعادة كلمة المرور غير صالح أو انتهت صلاحيته. يرجى طلب رابط جديد.",
+    "requestNewLink": "طلب رابط استعادة جديد",
+    "passwordsDoNotMatch": "كلمتا المرور غير متطابقتين",
+    "passwordMinLength": "يجب أن تتكون كلمة المرور من 8 محارف على الأقل",
     "submitLogin": "دخول آمن للنظام",
     "submitRegister": "إنشاء حساب جديد",
     "toggleRegister": "ليس لديك حساب؟ انضم إلينا الآن",
@@ -3441,6 +3793,43 @@
       "platform": "Android 7.0+ (APK)",
       "description": "إدارة طابور الانتظار، متابعة حالات التصعيد، استعراض الملفات الطبية، والتواصل المهني السريري المعتمد.",
       "downloadButton": "تحميل تطبيق AAFIYA Pro (APK)"
+    }
+  },
+  "ticker": {
+    "badge": "إعلان رسمي",
+    "openLink": "فتح الرابط",
+    "ariaLabel": "شريط الإعلانات والتنويهات الرسمية المتحرك",
+    "play": "تشغيل الحركة التلقائية",
+    "pause": "إيقاف الحركة مؤقتاً",
+    "previous": "الإعلان السابق",
+    "next": "الإعلان التالي"
+  },
+  "trust_privacy": {
+    "section_badge": "الثقة والحماية",
+    "title": "الثقة والخصوصية جزء أساسي من عافية",
+    "subtitle": "منظومة رقمية تعتمد ضوابط وصول دقيقة وسياسات حوكمة صارمة لحماية خصوصية وسجلات المرضى والكوادر الطبية.",
+    "pillar_footer": "آليات معتمدة وموثقة",
+    "pillars": {
+      "rbac": {
+        "title": "صلاحيات وصول مرتبطة بأدوار المستخدمين",
+        "description": "نظام تحكم بالوصول مبني على الأدوار (RBAC) يضمن قصر الإطلاع على البيانات على الكوادر الطبية والمصرح لهم فقط.",
+        "badge": "تحكم مشدد"
+      },
+      "protection": {
+        "title": "حماية الحسابات والبيانات",
+        "description": "تأمين الجلسات وكلمات المرور وفق معايير أمنية متقدمة مع عزل البيانات بين المنشآت وحمايتها من الوصول غير المصرح.",
+        "badge": "أمان الحسابات"
+      },
+      "policy": {
+        "title": "تنظيم التعامل مع المعلومات وفق السياسات المعتمدة",
+        "description": "إدارة السجلات الطبية والتشخيصية وفق السياسات التنظيمية والمهنية للرعاية الصحية ودون مشاركة مع أي طرف غير معني.",
+        "badge": "حوكمة السجلات"
+      }
+    },
+    "governance_notice": {
+      "title": "التزام راسخ بالأمان الرقمي والخصوصية الطبية",
+      "description": "تخضع كافة المعاملات الطبية لسجلات تدقيق رقمية تضمن الشفافية والمساءلة المهنية عبر جميع أدوار المنظومة.",
+      "cta": "تعرف على المنظومة"
     }
   }
 }

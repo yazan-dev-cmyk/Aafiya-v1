@@ -61,6 +61,7 @@ interface DirectoryItem {
   isVerified: boolean;
   latitude?: number | null;
   longitude?: number | null;
+  image?: string | null;
 }
 
 interface DoctorSearchSectionProps {
@@ -104,6 +105,86 @@ const getInitials = (name: string): string => {
     return `${parts[0].charAt(0)}${parts[1].charAt(0)}`;
   }
   return name.slice(0, 2);
+};
+
+// Photographic asset pools extracted from local collection (/imgs)
+const DOCTOR_AVATARS = [
+  '/images/doctors/doctor-1.jpg',
+  '/images/doctors/doctor-2.jpg',
+  '/images/doctors/doctor-3.jpg',
+  '/images/doctors/doctor-4.jpg',
+  '/images/doctors/doctor-5.jpg',
+  '/images/doctors/doctor-6.jpg',
+  '/images/doctors/doctor-7.jpg',
+  '/images/doctors/doctor-8.jpg',
+  '/images/doctors/doctor-9.jpg',
+  '/images/doctors/doctor-10.jpg',
+  '/images/doctors/doctor-11.jpg',
+  '/images/doctors/doctor-12.jpg',
+  '/images/doctors/doctor-13.jpg',
+];
+
+const DOCTOR_COVERS = [
+  '/images/categories/doctor-consultation-card.jpg',
+  '/images/clinics/clinic-2.jpg',
+  '/images/clinics/clinic-3.jpg',
+  '/images/clinics/clinic-4.jpg',
+  '/images/clinics/clinic-5.jpg',
+  '/images/clinics/clinic-6.jpg',
+  '/images/clinics/clinic-7.jpg',
+];
+
+const CLINIC_COVERS = [
+  '/images/clinics/clinic-1.jpg',
+  '/images/clinics/clinic-2.jpg',
+  '/images/clinics/clinic-3.jpg',
+  '/images/clinics/clinic-4.jpg',
+  '/images/clinics/clinic-5.jpg',
+  '/images/clinics/clinic-6.jpg',
+  '/images/clinics/clinic-7.jpg',
+];
+
+const LAB_COVERS = [
+  '/images/labs/lab-1.jpg',
+  '/images/labs/lab-2.jpg',
+  '/images/labs/lab-3.jpg',
+  '/images/labs/lab-4.jpg',
+];
+
+const RADIOLOGY_COVERS = [
+  '/images/radiology/radiology-1.jpg',
+  '/images/radiology/radiology-2.jpg',
+  '/images/radiology/radiology-3.jpg',
+];
+
+const BOOKING_COVERS = [
+  '/images/booking/booking-1.jpg',
+  '/images/booking/booking-2.jpg',
+  '/images/booking/booking-3.jpg',
+];
+
+/**
+ * Deterministically maps an item ID / index to a stable asset in the category pool.
+ * Guarantees distinct visual assignment across providers without random flashing on re-render.
+ */
+const getStableItemIndex = (id: string | number | undefined, poolLength: number, fallbackIdx: number): number => {
+  if (poolLength <= 0) return 0;
+  if (typeof id === 'number' && !Number.isNaN(id)) {
+    return Math.abs(id) % poolLength;
+  }
+  if (typeof id === 'string' && id.trim().length > 0) {
+    const parsed = parseInt(id, 10);
+    if (!Number.isNaN(parsed) && String(parsed) === id.trim()) {
+      return Math.abs(parsed) % poolLength;
+    }
+    let hash = 0;
+    for (let i = 0; i < id.length; i++) {
+      hash = (hash << 5) - hash + id.charCodeAt(i);
+      hash |= 0;
+    }
+    return Math.abs(hash) % poolLength;
+  }
+  return Math.abs(fallbackIdx) % poolLength;
 };
 
 export const DoctorSearchSection: React.FC<DoctorSearchSectionProps> = ({ onOpenAuth }) => {
@@ -214,6 +295,7 @@ export const DoctorSearchSection: React.FC<DoctorSearchSectionProps> = ({ onOpen
       isVerified: Boolean(doc.is_verified ?? true),
       latitude: lat != null ? Number(lat) : null,
       longitude: lng != null ? Number(lng) : null,
+      image: doc.avatar || doc.image || doc.photo || doc.profile_photo_url || null,
     };
   }, [locale, specialtiesMap, t]);
 
@@ -240,6 +322,7 @@ export const DoctorSearchSection: React.FC<DoctorSearchSectionProps> = ({ onOpen
       isVerified: Boolean(clinic.is_active ?? true),
       latitude: lat != null ? Number(lat) : null,
       longitude: lng != null ? Number(lng) : null,
+      image: clinic.logo || clinic.image || clinic.photo || null,
     };
   }, [locale, t]);
 
@@ -260,6 +343,7 @@ export const DoctorSearchSection: React.FC<DoctorSearchSectionProps> = ({ onOpen
       isVerified: bc.verification_status === 'verified',
       latitude: lat != null ? Number(lat) : null,
       longitude: lng != null ? Number(lng) : null,
+      image: bc.logo || bc.image || null,
     };
   }, [t]);
 
@@ -281,6 +365,7 @@ export const DoctorSearchSection: React.FC<DoctorSearchSectionProps> = ({ onOpen
       isVerified: Boolean(dc.is_active ?? true),
       latitude: lat != null ? Number(lat) : null,
       longitude: lng != null ? Number(lng) : null,
+      image: dc.logo || dc.image || null,
     };
   }, [t]);
 
@@ -465,6 +550,18 @@ export const DoctorSearchSection: React.FC<DoctorSearchSectionProps> = ({ onOpen
     fetchDirectory();
   }, [fetchDirectory]);
 
+  useEffect(() => {
+    const handleCategoryEvent = (e: Event) => {
+      const customEvent = e as CustomEvent<{ category: string }>;
+      if (customEvent.detail?.category) {
+        setSelectedRoleCategory(customEvent.detail.category);
+        setCurrentPage(1);
+      }
+    };
+    window.addEventListener('aafiya:select-category', handleCategoryEvent);
+    return () => window.removeEventListener('aafiya:select-category', handleCategoryEvent);
+  }, []);
+
   // Reset to page 1 and clear all filters to return to default showcase
   const handleClearFilters = () => {
     setSearchTerm('');
@@ -497,7 +594,23 @@ export const DoctorSearchSection: React.FC<DoctorSearchSectionProps> = ({ onOpen
   const renderCard = (item: DirectoryItem, idx: number) => {
     const isDoctor = item.type === 'doctor';
     const isClinic = item.type === 'clinic';
-    const initials = getInitials(item.name);
+    const isLab = item.role === 'lab';
+    const isRadiology = item.role === 'radiology';
+    const isBooking = item.role === 'booking_center';
+
+    // Dynamic distinct photographic cover per facility / role from local asset pools
+    const coverImage = isClinic
+      ? CLINIC_COVERS[getStableItemIndex(item.rawId ?? item.id, CLINIC_COVERS.length, idx)]
+      : isDoctor
+      ? DOCTOR_COVERS[getStableItemIndex(item.rawId ?? item.id, DOCTOR_COVERS.length, idx)]
+      : isLab
+      ? LAB_COVERS[getStableItemIndex(item.rawId ?? item.id, LAB_COVERS.length, idx)]
+      : isRadiology
+      ? RADIOLOGY_COVERS[getStableItemIndex(item.rawId ?? item.id, RADIOLOGY_COVERS.length, idx)]
+      : BOOKING_COVERS[getStableItemIndex(item.rawId ?? item.id, BOOKING_COVERS.length, idx)];
+
+    // Dynamic distinct portrait for doctors (uploaded image takes precedence; otherwise distinct portrait from pool)
+    const doctorAvatar = item.image || DOCTOR_AVATARS[getStableItemIndex(item.rawId ?? item.id, DOCTOR_AVATARS.length, idx)];
 
     return (
       <motion.div
@@ -508,16 +621,19 @@ export const DoctorSearchSection: React.FC<DoctorSearchSectionProps> = ({ onOpen
         exit={{ opacity: 0, scale: 0.95 }}
         transition={{ delay: Math.min(idx * 0.04, 0.4) }}
       >
-        <Card variant="elevated" padding="none" className="h-full flex flex-col group hover:shadow-2xl transition-all duration-500 hover:-translate-y-1.5 border-transparent bg-white">
+        <Card variant="elevated" padding="none" className="h-full flex flex-col group hover:shadow-2xl transition-all duration-500 hover:-translate-y-1.5 border-transparent bg-white overflow-hidden">
           
-          {/* Header Banner */}
-          <div className={`h-20 relative overflow-hidden ${
-            isDoctor 
-              ? 'bg-gradient-to-l from-emerald-500/10 via-teal-500/5 to-primary/10' 
-              : isClinic
-              ? 'bg-gradient-to-l from-indigo-500/10 via-sky-500/5 to-primary/10'
-              : 'bg-gradient-to-l from-amber-500/10 via-teal-500/5 to-primary/10'
-          }`}>
+          {/* Header Banner with Distinct Photographic Cover */}
+          <div className="h-28 relative overflow-hidden bg-slate-100">
+            <img
+              src={coverImage}
+              alt={item.roleTitle || item.name}
+              className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 filter brightness-[0.88]"
+              loading="lazy"
+            />
+            {/* Dark gradient overlay to preserve badge and text readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-900/20 to-transparent" />
+
             <div className="absolute top-3 end-3 z-10">
               {item.isVerified && (
                 <Badge variant="success" className="bg-white/95 backdrop-blur-sm border-emerald-100 text-[10px] font-black gap-1 shadow-xs">
@@ -526,34 +642,53 @@ export const DoctorSearchSection: React.FC<DoctorSearchSectionProps> = ({ onOpen
                 </Badge>
               )}
             </div>
+
+            {/* Category label badge in bottom start */}
+            <div className="absolute bottom-2 start-3 z-10">
+              <span className="text-[10px] font-bold text-white/95 bg-slate-900/60 backdrop-blur-xs px-2 py-0.5 rounded-md border border-white/20">
+                {item.roleTitle}
+              </span>
+            </div>
           </div>
 
-          <div className="px-6 -mt-8 flex-1 flex flex-col pb-6">
-            {/* Authentic Local SVG Avatar Badge (Zero external Unsplash requests) */}
+          <div className="px-6 -mt-7 flex-1 flex flex-col pb-6">
+            {/* Distinct Provider Avatar (Doctors receive individual portrait photo; Clinics/Facilities receive uploaded logo or branded badge) */}
             <div className="relative mb-3">
-              <div className={`w-16 h-16 rounded-[22px] flex items-center justify-center font-black text-lg border-4 border-white shadow-xl group-hover:scale-105 transition-transform duration-300 ${
-                isDoctor
-                  ? 'bg-gradient-to-br from-emerald-600 to-teal-700 text-white'
-                  : isClinic
-                  ? 'bg-gradient-to-br from-indigo-600 to-primary text-white'
-                  : item.role === 'booking_center'
-                  ? 'bg-gradient-to-br from-sky-600 to-blue-700 text-white'
-                  : item.role === 'lab'
-                  ? 'bg-gradient-to-br from-teal-600 to-emerald-700 text-white'
-                  : 'bg-gradient-to-br from-purple-600 to-indigo-700 text-white'
-              }`}>
-                {isDoctor ? (
-                  <span className="tracking-tight">{initials}</span>
-                ) : isClinic ? (
-                  <Building2 className="w-7 h-7 text-white" />
-                ) : item.role === 'booking_center' ? (
-                  <CalendarCheck2 className="w-7 h-7 text-white" />
-                ) : item.role === 'lab' ? (
-                  <FlaskConical className="w-7 h-7 text-white" />
-                ) : (
-                  <Activity className="w-7 h-7 text-white" />
-                )}
-              </div>
+              {isDoctor ? (
+                <img
+                  src={doctorAvatar}
+                  alt={item.name}
+                  className="w-14 h-14 rounded-2xl object-cover border-4 border-white shadow-xl group-hover:scale-105 transition-transform duration-300 bg-white"
+                  loading="lazy"
+                />
+              ) : item.image ? (
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="w-14 h-14 rounded-2xl object-cover border-4 border-white shadow-xl group-hover:scale-105 transition-transform duration-300 bg-white"
+                  loading="lazy"
+                />
+              ) : (
+                <div className={`w-14 h-14 rounded-[20px] flex items-center justify-center font-black text-base border-4 border-white shadow-xl group-hover:scale-105 transition-transform duration-300 ${
+                  isClinic
+                    ? 'bg-gradient-to-br from-indigo-600 to-primary text-white'
+                    : isBooking
+                    ? 'bg-gradient-to-br from-sky-600 to-blue-700 text-white'
+                    : isLab
+                    ? 'bg-gradient-to-br from-teal-600 to-emerald-700 text-white'
+                    : 'bg-gradient-to-br from-purple-600 to-indigo-700 text-white'
+                }`}>
+                  {isClinic ? (
+                    <Building2 className="w-6 h-6 text-white" />
+                  ) : isBooking ? (
+                    <CalendarCheck2 className="w-6 h-6 text-white" />
+                  ) : isLab ? (
+                    <FlaskConical className="w-6 h-6 text-white" />
+                  ) : (
+                    <Activity className="w-6 h-6 text-white" />
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="space-y-0.5 mb-3 text-start">
@@ -597,10 +732,16 @@ export const DoctorSearchSection: React.FC<DoctorSearchSectionProps> = ({ onOpen
                 )}
 
                 {item.phone && (
-                  <div className="flex items-center gap-2 text-slate-400">
-                    <Phone className="w-3 h-3 text-slate-400 shrink-0" />
-                    <span dir="ltr">{item.phone}</span>
-                  </div>
+                  <a 
+                    href={`tel:${item.phone}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex items-center gap-2 text-slate-500 hover:text-primary transition-colors group/tel cursor-pointer"
+                    title={item.phone}
+                    aria-label={item.phone}
+                  >
+                    <Phone className="w-3 h-3 text-slate-400 group-hover/tel:text-primary shrink-0 transition-colors" />
+                    <span dir="ltr" className="font-mono text-xs hover:underline">{item.phone}</span>
+                  </a>
                 )}
               </div>
             </div>
@@ -750,29 +891,31 @@ export const DoctorSearchSection: React.FC<DoctorSearchSectionProps> = ({ onOpen
             </div>
           </Card>
 
-          {/* Category Tabs */}
-          <div className="flex items-center justify-center gap-3 overflow-x-auto pb-2 no-scrollbar">
-            {categoryTabs.map((tab) => {
-              const TabIcon = tab.icon;
-              const isActive = selectedRoleCategory === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => {
-                    setSelectedRoleCategory(tab.id);
-                    setCurrentPage(1);
-                  }}
-                  className={`px-6 py-3.5 rounded-[20px] text-xs font-black transition-all flex items-center gap-3 shrink-0 group relative cursor-pointer ${
-                    isActive
-                      ? 'bg-primary text-white shadow-lg shadow-primary/20'
-                      : 'bg-white text-slate-500 border border-slate-100 hover:border-primary/20'
-                  }`}
-                >
-                  <TabIcon className={`w-4 h-4 transition-transform group-hover:scale-110 ${isActive ? 'text-white' : 'text-primary'}`} />
-                  <span>{tab.label}</span>
-                </button>
-              );
-            })}
+          {/* Category Tabs with horizontal scroll indicator */}
+          <div className="relative">
+            <div className="flex items-center justify-start lg:justify-center gap-2.5 overflow-x-auto pb-3 pt-1 px-1 no-scrollbar scroll-smooth">
+              {categoryTabs.map((tab) => {
+                const TabIcon = tab.icon;
+                const isActive = selectedRoleCategory === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => {
+                      setSelectedRoleCategory(tab.id);
+                      setCurrentPage(1);
+                    }}
+                    className={`px-5 py-3 rounded-2xl text-xs font-bold transition-all flex items-center gap-2.5 shrink-0 group relative cursor-pointer ${
+                      isActive
+                        ? 'bg-primary text-white shadow-lg shadow-primary/25 scale-[1.02]'
+                        : 'bg-white text-slate-600 border border-slate-200/80 hover:border-primary/40 hover:text-primary shadow-2xs'
+                    }`}
+                  >
+                    <TabIcon className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${isActive ? 'text-white' : 'text-primary'}`} />
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 

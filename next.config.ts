@@ -35,6 +35,13 @@ const nextConfig: NextConfig = {
       ],
     },
   ],
+  webpack: (config, { dev }) => {
+    if (dev) {
+      config.output = config.output || {};
+      config.output.chunkLoadTimeout = 300000;
+    }
+    return config;
+  },
 };
 
 export default withNextIntl(nextConfig);

@@ -142,20 +142,28 @@ class PatientNotificationController extends Controller
     {
         $query->where(function (Builder $sub) use ($patient, $allPhones) {
             if ($patient) {
-                // Rule 1: Appointment has explicit patient_id matching this patient
+                // Rule 1: Appointment has explicit patient_id matching this patient (including soft-deleted)
                 $sub->whereHas('appointment', function (Builder $apptQ) use ($patient) {
-                    $apptQ->where('patient_id', $patient->id);
+                    $apptQ->withTrashed()->where('patient_id', $patient->id);
                 });
 
-                // Rule 2: Fallback for appointments where patient_id is null or outbox has no appointment
+                // Rule 2: Fallback for notifications matching patient phone
                 if (! empty($allPhones)) {
-                    $sub->orWhere(function (Builder $fallbackQ) use ($allPhones) {
+                    $sub->orWhere(function (Builder $fallbackQ) use ($patient, $allPhones) {
                         $fallbackQ->whereIn('recipient_phone', $allPhones)
-                            ->where(function (Builder $apptCheck) {
+                            ->where(function (Builder $apptCheck) use ($patient) {
                                 $apptCheck->whereNull('appointment_id')
+                                    ->orWhereDoesntHave('appointment')
                                     ->orWhereHas('appointment', function (Builder $q) {
-                                        $q->whereNull('patient_id');
+                                        $q->withTrashed()->whereNull('patient_id');
+                                    })
+                                    ->orWhereHas('appointment', function (Builder $q) use ($patient) {
+                                        $q->withTrashed()->where('patient_id', $patient->id);
                                     });
+                            })
+                            ->where(function (Builder $payloadCheck) use ($patient) {
+                                $payloadCheck->whereNull('payload->patient_id')
+                                    ->orWhere('payload->patient_id', $patient->id);
                             });
                     });
                 }
@@ -164,10 +172,12 @@ class PatientNotificationController extends Controller
                     $sub->whereIn('recipient_phone', $allPhones)
                         ->where(function (Builder $apptCheck) {
                             $apptCheck->whereNull('appointment_id')
+                                ->orWhereDoesntHave('appointment')
                                 ->orWhereHas('appointment', function (Builder $q) {
-                                    $q->whereNull('patient_id');
+                                    $q->withTrashed()->whereNull('patient_id');
                                 });
-                        });
+                        })
+                        ->whereNull('payload->patient_id');
                 } else {
                     $sub->whereRaw('1 = 0');
                 }
@@ -189,26 +199,34 @@ class PatientNotificationController extends Controller
 
         $isOwner = false;
 
-        // Rule 1: Explicit appointment patient_id match
+        // Rule 1: Explicit appointment patient_id match (including soft-deleted)
         if ($patient && $outbox->appointment_id) {
-            $appointment = $outbox->appointment;
+            $appointment = \App\Models\Appointment::withTrashed()->find($outbox->appointment_id);
             if ($appointment && (string) $appointment->patient_id === (string) $patient->id) {
-                $isOwner = true;
+                $payloadPatientId = $outbox->payload['patient_id'] ?? null;
+                if ($payloadPatientId === null || (string) $payloadPatientId === (string) $patient->id) {
+                    $isOwner = true;
+                }
             }
         }
 
-        // Rule 2: Phone match ONLY if appointment has NO patient_id or outbox has no appointment
+        // Rule 2: Phone match if appointment is null, does not exist, belongs to guest, or matches this patient
         if (! $isOwner && ! empty($allPhones)) {
-            $normalizedRecipient = $this->normalizeAlgerianPhone($outbox->recipient_phone);
+            $normalizedRecipient = $this->outboxService->getPhoneVariants($outbox->recipient_phone);
             $phoneMatches = ! empty(array_intersect($normalizedRecipient, $allPhones));
 
             if ($phoneMatches) {
-                if (! $outbox->appointment_id) {
-                    $isOwner = true;
-                } else {
-                    $appointment = $outbox->appointment;
-                    if ($appointment && $appointment->patient_id === null) {
+                $payloadPatientId = $outbox->payload['patient_id'] ?? null;
+                $payloadValid = ($payloadPatientId === null) || ($patient && (string) $payloadPatientId === (string) $patient->id);
+
+                if ($payloadValid) {
+                    if (! $outbox->appointment_id) {
                         $isOwner = true;
+                    } else {
+                        $appointment = \App\Models\Appointment::withTrashed()->find($outbox->appointment_id);
+                        if (! $appointment || $appointment->patient_id === null || ($patient && (string) $appointment->patient_id === (string) $patient->id)) {
+                            $isOwner = true;
+                        }
                     }
                 }
             }
@@ -229,7 +247,7 @@ class PatientNotificationController extends Controller
         $variants = [];
         foreach ($rawPhones as $phone) {
             if ($phone !== null && trim($phone) !== '') {
-                $variants = array_merge($variants, $this->normalizeAlgerianPhone($phone));
+                $variants = array_merge($variants, $this->outboxService->getPhoneVariants($phone));
             }
         }
 
@@ -243,36 +261,6 @@ class PatientNotificationController extends Controller
      */
     protected function normalizeAlgerianPhone(string $phone): array
     {
-        $raw = trim($phone);
-        $clean = preg_replace('/[^\d+]/', '', $raw);
-
-        if (empty($clean)) {
-            return [];
-        }
-
-        $results = [$raw, $clean];
-
-        if (str_starts_with($clean, '00213')) {
-            $clean = '+' . substr($clean, 2);
-        }
-
-        if (str_starts_with($clean, '+213')) {
-            $national = '0' . substr($clean, 4);
-            $results[] = $clean;
-            $results[] = $national;
-        } elseif (str_starts_with($clean, '213') && strlen($clean) === 12) {
-            $national = '0' . substr($clean, 3);
-            $results[] = '+' . $clean;
-            $results[] = $national;
-        } elseif (str_starts_with($clean, '0') && strlen($clean) === 10) {
-            $international = '+213' . substr($clean, 1);
-            $results[] = $clean;
-            $results[] = $international;
-        } elseif (strlen($clean) === 9 && in_array($clean[0], ['5', '6', '7'], true)) {
-            $results[] = '0' . $clean;
-            $results[] = '+213' . $clean;
-        }
-
-        return array_values(array_unique($results));
+        return $this->outboxService->getPhoneVariants($phone);
     }
 }

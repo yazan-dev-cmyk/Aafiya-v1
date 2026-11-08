@@ -354,4 +354,106 @@ class NotificationOutboxService
             throw $e;
         }
     }
+
+    /**
+     * Normalize a phone number to canonical international format (+213XXXXXXXXX for Algeria).
+     */
+    public function canonicalPhone(?string $phone): string
+    {
+        if ($phone === null) {
+            return '';
+        }
+
+        $raw = trim($phone);
+        $clean = preg_replace('/[^\d+]/', '', $raw);
+
+        if (empty($clean)) {
+            return '';
+        }
+
+        if (str_starts_with($clean, '00213')) {
+            $clean = '+' . substr($clean, 2);
+        }
+
+        if (str_starts_with($clean, '+213')) {
+            return $clean;
+        }
+
+        if (str_starts_with($clean, '213') && strlen($clean) === 12) {
+            return '+' . $clean;
+        }
+
+        if (str_starts_with($clean, '0') && strlen($clean) === 10) {
+            return '+213' . substr($clean, 1);
+        }
+
+        if (strlen($clean) === 9 && in_array($clean[0], ['5', '6', '7'], true)) {
+            return '+213' . $clean;
+        }
+
+        return $clean;
+    }
+
+    /**
+     * Generate all valid variants (canonical, local national, raw digits, original trimmed)
+     * for a given phone number to ensure robust querying against legacy and normalized records.
+     *
+     * @return string[]
+     */
+    public function getPhoneVariants(?string $phone): array
+    {
+        if ($phone === null) {
+            return [];
+        }
+
+        $raw = trim($phone);
+        if ($raw === '') {
+            return [];
+        }
+
+        $clean = preg_replace('/[^\d+]/', '', $raw);
+        if (empty($clean)) {
+            return [$raw];
+        }
+
+        $results = [$raw, $clean];
+
+        if (str_starts_with($clean, '00213')) {
+            $clean = '+' . substr($clean, 2);
+            $results[] = $clean;
+        }
+
+        if (str_starts_with($clean, '+213')) {
+            $national = '0' . substr($clean, 4);
+            $digitsOnly = substr($clean, 1);
+            $local9 = substr($clean, 4);
+            $results[] = $clean;
+            $results[] = $national;
+            $results[] = $digitsOnly;
+            $results[] = $local9;
+        } elseif (str_starts_with($clean, '213') && strlen($clean) === 12) {
+            $national = '0' . substr($clean, 3);
+            $canonical = '+' . $clean;
+            $local9 = substr($clean, 3);
+            $results[] = $canonical;
+            $results[] = $national;
+            $results[] = $local9;
+        } elseif (str_starts_with($clean, '0') && strlen($clean) === 10) {
+            $canonical = '+213' . substr($clean, 1);
+            $digitsOnly = '213' . substr($clean, 1);
+            $local9 = substr($clean, 1);
+            $results[] = $canonical;
+            $results[] = $digitsOnly;
+            $results[] = $local9;
+        } elseif (strlen($clean) === 9 && in_array($clean[0], ['5', '6', '7'], true)) {
+            $national = '0' . $clean;
+            $canonical = '+213' . $clean;
+            $digitsOnly = '213' . $clean;
+            $results[] = $national;
+            $results[] = $canonical;
+            $results[] = $digitsOnly;
+        }
+
+        return array_values(array_unique(array_filter($results)));
+    }
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   Users,
   Calendar,
@@ -41,42 +41,61 @@ import {
   UserPlus,
   CheckCircle,
   CalendarDays,
-  ScanLine
+  ScanLine,
+  Coins,
+  LayoutGrid,
+  List,
+  Volume2,
+  VolumeX,
+  SlidersHorizontal,
+  ChevronDown,
+  Filter,
+  BadgeCheck,
+  Mail,
+  PieChart,
+  Award,
+  Zap,
+  HelpCircle
 } from 'lucide-react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRouter, usePathname } from '@/i18n/routing';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/auth';
 import { AssistantBookingWizard } from './AssistantBookingWizard';
+import { GlobalDashboardHeader } from '../ui/GlobalDashboardHeader';
 import { DocumentScanner } from '../shared/DocumentScanner';
 import { appointmentService } from '@/services/appointmentService';
 import { clinicService } from '@/services/clinicService';
 import { ChangePasswordCard } from '../shared/ChangePasswordCard';
 import { OperationalDayBar } from '../shared/OperationalDayBar';
 import { UnresolvedReschedulesDashboard } from '../clinic/UnresolvedReschedulesDashboard';
-import { Globe } from 'lucide-react';
+import { AssistantRewardsView } from './rewards/AssistantRewardsView';
 
 export const AssistantCapabilitiesCard: React.FC<{ isRtl: boolean; isDarkMode?: boolean }> = ({ isRtl, isDarkMode }) => {
   return (
-    <div className={`p-5 rounded-2xl border space-y-4 ${isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900 shadow-xs'}`}>
-      <div className={`flex items-center gap-2.5 border-b pb-3 ${isDarkMode ? 'border-slate-800' : 'border-slate-200'} ${isRtl ? 'flex-row-reverse text-right' : 'text-left'}`}>
-        <div className="p-2 rounded-xl bg-teal-500/10 text-teal-600 dark:text-teal-400">
+    <div className={`p-5 rounded-2xl border space-y-4 ${isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200/80 text-slate-900 shadow-xs'}`}>
+      <div className={`flex items-center gap-3 border-b pb-3.5 ${isDarkMode ? 'border-slate-800' : 'border-slate-100'} ${isRtl ? 'flex-row-reverse text-right' : 'text-left'}`}>
+        <div className="w-10 h-10 rounded-xl bg-teal-500/10 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0 border border-teal-500/20">
           <ShieldCheck className="w-5 h-5" />
         </div>
         <div className={isRtl ? 'text-right' : 'text-left'}>
-          <h3 className="text-sm font-bold">{isRtl ? 'مهام وصلاحيات مساعد الطبيب المعتمدة (Role Capabilities)' : 'Assistant Authorised Tasks & Security Ceiling'}</h3>
-          <span className="text-[11px] text-slate-500 block">{isRtl ? 'استعراض دقيق للعمليات المصرح بها والقيود الأمنية وفق نظام 4D' : 'Official breakdown of authorized operations & 4D security ceiling'}</span>
+          <h3 className="text-sm font-bold tracking-tight text-slate-900 dark:text-white">
+            {isRtl ? 'مهام وصلاحيات مساعد الطبيب المعتمدة (Role Capabilities)' : 'Assistant Authorised Tasks & Security Ceiling'}
+          </h3>
+          <span className="text-[11px] text-slate-500 block font-medium">
+            {isRtl ? 'استعراض دقيق للعمليات المصرح بها والقيود الأمنية وفق نظام 4D RBAC' : 'Official breakdown of authorized operations & 4D security ceiling'}
+          </span>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
         {/* Authorized Tasks */}
-        <div className={`p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 space-y-2.5 ${isRtl ? 'text-right' : 'text-left'}`}>
+        <div className={`p-4 rounded-xl border border-emerald-500/25 bg-emerald-50/50 dark:bg-emerald-950/20 space-y-2.5 ${isRtl ? 'text-right' : 'text-left'}`}>
           <span className={`font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5 ${isRtl ? 'flex-row-reverse' : ''}`}>
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
             {isRtl ? 'المهام والعمليات المسموح بها (Authorised Tasks)' : 'Authorized Tasks'}
           </span>
-          <ul className="space-y-1.5 text-[11px] text-slate-700 dark:text-slate-300 list-disc list-inside">
+          <ul className="space-y-1.5 text-[11px] text-slate-700 dark:text-slate-300 list-disc list-inside leading-relaxed">
             <li>{isRtl ? 'إدارة قائمة الانتظار الحية واستدعاء المرضى (booking.manage_queue)' : 'Manage live waiting queue & call patients'}</li>
             <li>{isRtl ? 'تسجيل حضور المريض ومسح تذاكر QR (booking.confirm_attendance)' : 'Confirm patient attendance & scan QR passes'}</li>
             <li>{isRtl ? 'إنشاء وحجز المواعيد بالاستقبال (booking.create)' : 'Create & book appointments at reception (booking.create)'}</li>
@@ -87,12 +106,12 @@ export const AssistantCapabilitiesCard: React.FC<{ isRtl: boolean; isDarkMode?: 
         </div>
 
         {/* Restricted Clinical Ceiling */}
-        <div className={`p-4 rounded-xl border border-rose-500/20 bg-rose-500/5 space-y-2.5 ${isRtl ? 'text-right' : 'text-left'}`}>
+        <div className={`p-4 rounded-xl border border-rose-500/25 bg-rose-50/50 dark:bg-rose-950/20 space-y-2.5 ${isRtl ? 'text-right' : 'text-left'}`}>
           <span className={`font-bold text-rose-800 dark:text-rose-300 flex items-center gap-1.5 ${isRtl ? 'flex-row-reverse' : ''}`}>
             <Lock className="w-4 h-4 text-rose-600 shrink-0" />
             {isRtl ? 'القيود السريرية والأمنية (Restricted Clinical Scope)' : 'Restricted Clinical Scope'}
           </span>
-          <ul className="space-y-1.5 text-[11px] text-slate-700 dark:text-slate-300 list-disc list-inside">
+          <ul className="space-y-1.5 text-[11px] text-slate-700 dark:text-slate-300 list-disc list-inside leading-relaxed">
             <li>{isRtl ? 'محظور: الاطلاع على السجل الطبي التخصصي (clinical.view_ehr)' : 'Forbidden: View specialized medical EHR records'}</li>
             <li>{isRtl ? 'محظور: كتابة أو تحرير الوصفات الطبية (clinical.write_rx)' : 'Forbidden: Write or issue medical prescriptions'}</li>
             <li>{isRtl ? 'محظور: اعتماد نتائج التحاليل والأشعة (diagnostic.approve_result)' : 'Forbidden: Finalize or approve diagnostic results'}</li>
@@ -156,6 +175,14 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
   const [appointmentsError, setAppointmentsError] = useState<string | null>(null);
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
 
+  // Tab 2 (Today) Filter States
+  const [todayStatusFilter, setTodayStatusFilter] = useState<string>('all');
+  const [todaySearchTerm, setTodaySearchTerm] = useState<string>('');
+
+  // Workstation Preferences (Settings)
+  const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
+  const [waitingRoomViewMode, setWaitingRoomViewMode] = useState<'cards' | 'table'>('cards');
+
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -198,20 +225,10 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
     const targetUrl = qs ? `${pathname}?${qs}` : pathname;
     router.push(targetUrl, { scroll: false });
   };
+
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [receptionSearchQuery, setReceptionSearchQuery] = useState('');
-  
-  // Assistant Permissions state (controlled by Doctor in Doctor Settings)
-  const [permissions] = useState({
-    canApproveAppointments: true,
-    canEditAppointments: true,
-    canRescheduleAppointments: true,
-    canCancelAppointments: true,
-    canManageWaitingQueue: true,
-    canViewMedicalRecords: false,
-    canStartVisit: false
-  });
 
   // Live Queue Data
   const [queue, setQueue] = useState<any[]>([]);
@@ -248,7 +265,7 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
     } catch {
       setQueue([]);
     }
-  }, [selectedOperationalDate]);
+  }, [selectedOperationalDate, canViewContacts]);
 
   useEffect(() => {
     fetchQueue(selectedOperationalDate);
@@ -336,6 +353,7 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
       await appointmentService.confirmAppointment(id);
       await fetchAppointments();
       await fetchQueue();
+      triggerNotice(isRtl ? 'تم تأكيد الموعد بنجاح' : 'Appointment confirmed successfully');
     } catch (err: any) {
       alert(err?.response?.data?.message || err?.message || (isRtl ? 'فشل تأكيد الموعد' : 'Failed to confirm appointment'));
     } finally {
@@ -363,8 +381,40 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
     (q.status === 'waiting' || q.status === 'arrived' || q.status === 'examination' || q.status === 'attended' || Boolean(q.checked_in_at))
   );
   const inWaitingRoomCount = waitingRoomQueue.length;
+  const inExaminationCount = todayAppointments.filter(a => a.status === 'examination').length;
   const completedCount = todayAppointments.filter(a => a.status === 'completed' || a.status === 'attended').length;
   const noShowCount = todayAppointments.filter(a => a.status === 'cancelled' || a.status === 'rejected' || a.status === 'absent').length;
+
+  // Filtered Today Appointments
+  const filteredTodayAppointments = useMemo(() => {
+    return todayAppointments.filter((app) => {
+      const matchesSearch =
+        !todaySearchTerm.trim() ||
+        app.patientName.toLowerCase().includes(todaySearchTerm.toLowerCase()) ||
+        app.bookingReference.toLowerCase().includes(todaySearchTerm.toLowerCase()) ||
+        (app.phone && app.phone.includes(todaySearchTerm));
+
+      if (!matchesSearch) return false;
+
+      if (todayStatusFilter === 'all') return true;
+      if (todayStatusFilter === 'waiting') return app.status === 'waiting' || app.status === 'arrived';
+      if (todayStatusFilter === 'examination') return app.status === 'examination';
+      if (todayStatusFilter === 'completed') return app.status === 'completed' || app.status === 'attended';
+      if (todayStatusFilter === 'pending') return app.status === 'pending';
+      if (todayStatusFilter === 'confirmed') return app.status === 'confirmed';
+      if (todayStatusFilter === 'absent') return app.status === 'cancelled' || app.status === 'rejected' || app.status === 'absent';
+      return app.status === todayStatusFilter;
+    });
+  }, [todayAppointments, todaySearchTerm, todayStatusFilter]);
+
+  // Operational Statistics for Tab 8 (Reports)
+  const attendanceRate = todayTotalCount > 0 
+    ? Math.round((checkedInCount / todayTotalCount) * 100) 
+    : 0;
+  
+  const completionRate = todayTotalCount > 0 
+    ? Math.round((completedCount / todayTotalCount) * 100) 
+    : 0;
 
   // Modals state
   const [showCheckInModal, setShowCheckInModal] = useState(false);
@@ -375,11 +425,26 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
   const [loadingRescheduleSlots, setLoadingRescheduleSlots] = useState<boolean>(false);
   const [rescheduleSlotsError, setRescheduleSlotsError] = useState<string | null>(null);
   const [submittingReschedule, setSubmittingReschedule] = useState<boolean>(false);
-  const [selectedPatientView, setSelectedPatientView] = useState<any>(null);
   const [noticeMessage, setNoticeMessage] = useState<string | null>(null);
 
   const triggerNotice = (msg: string) => {
     setNoticeMessage(msg);
+    if (soundEnabled && typeof window !== 'undefined') {
+      try {
+        const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+        osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.15); // A5
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.25);
+      } catch {}
+    }
     setTimeout(() => setNoticeMessage(null), 4000);
   };
 
@@ -482,15 +547,19 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
       try {
         await appointmentService.cancelAppointment(appId, 'إلغاء الموعد بناءً على طلب العيادة');
         triggerNotice(isRtl ? `تم إلغاء موعد المريض ${patientName} بنجاح.` : `Appointment cancelled successfully.`);
-        fetchQueue();
+        await fetchQueue();
+        if (activeTab === 'appointments') {
+          await fetchAppointments();
+        }
       } catch (err: any) {
-        triggerNotice(err?.message || (isRtl ? 'حدث خطأ أثناء إلغاء الموعد.' : 'Failed to cancel appointment.'));
+        const msg = err?.response?.data?.message || err?.message || (isRtl ? 'حدث خطأ أثناء إلغاء الموعد.' : 'Failed to cancel appointment.');
+        triggerNotice(msg);
       }
     }
   };
 
   const handleAddBooking = (newBooking: any) => {
-    triggerNotice(isRtl ? `تم إنشاء الحجز بنجاح برقم المرجع ${newBooking.refNumber}` : `Booking created successfully with ref number ${newBooking.refNumber}`);
+    triggerNotice(isRtl ? `تم إنشاء الحجز بنجاح برقم المرجع ${newBooking.refNumber || ''}` : `Booking created successfully with ref number ${newBooking.refNumber || ''}`);
     setShowNewBookingWizard(false);
     fetchQueue();
   };
@@ -520,21 +589,27 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
   };
 
   const containerClass = isDarkMode
-    ? 'bg-slate-900 border-slate-800 text-white'
-    : 'bg-white border-slate-200 text-slate-900 shadow-xs';
+    ? 'bg-slate-900 border-slate-800 text-white shadow-xs'
+    : 'bg-white border-slate-200/80 text-slate-900 shadow-xs';
 
-  const navItems = [
-    { id: 'dashboard', label: t('tabs.dashboard'), icon: Activity, path: '/assistant/dashboard' },
-    { id: 'today', label: t('tabs.today'), icon: Clock, badge: `${todayTotalCount}`, path: '/assistant/today' },
-    { id: 'waiting-room', label: t('tabs.waitingRoom'), icon: Users, badge: `${inWaitingRoomCount}`, path: '/assistant/waiting-room' },
-    { id: 'appointments', label: t('tabs.appointments'), icon: Calendar, path: '/assistant/appointments' },
-    { id: 'reception', label: t('tabs.reception'), icon: UserCheck, path: '/assistant/reception' },
-    { id: 'notifications', label: t('tabs.notifications'), icon: Bell, badge: '0', path: '/assistant/notifications' },
-    { id: 'calendar', label: t('tabs.calendar'), icon: Calendar, path: '/assistant/calendar' },
-    { id: 'unresolved-reschedules', label: isRtl ? 'حالات إعادة الجدولة المعلقة' : 'Unresolved Reschedules', icon: ShieldAlert, path: '/assistant/unresolved' },
-    { id: 'reports', label: t('tabs.reports'), icon: BarChart3, path: '/assistant/reports' },
-    { id: 'profile', label: t('tabs.profile'), icon: User, path: '/assistant/profile' },
-    { id: 'settings', label: t('tabs.settings'), icon: Settings, path: '/assistant/settings' }
+  // Navigation Items with Categorized Hierarchy
+  const operationalNavItems = [
+    { id: 'dashboard', label: t('tabs.dashboard'), icon: Activity },
+    { id: 'today', label: t('tabs.today'), icon: Clock, badge: todayTotalCount > 0 ? `${todayTotalCount}` : undefined },
+    { id: 'waiting-room', label: t('tabs.waitingRoom'), icon: Users, badge: inWaitingRoomCount > 0 ? `${inWaitingRoomCount}` : undefined, pulse: inWaitingRoomCount > 0 },
+    { id: 'appointments', label: t('tabs.appointments'), icon: Calendar },
+    { id: 'reception', label: t('tabs.reception'), icon: UserCheck }
+  ];
+
+  const administrativeNavItems = [
+    { id: 'unresolved-reschedules', label: isRtl ? 'إعادة الجدولة المعلقة' : 'Unresolved Reschedules', icon: ShieldAlert },
+    { id: 'rewards', label: t('tabs.rewards'), icon: Coins },
+    { id: 'reports', label: t('tabs.reports'), icon: BarChart3 }
+  ];
+
+  const systemNavItems = [
+    { id: 'profile', label: t('tabs.profile'), icon: User },
+    { id: 'settings', label: t('tabs.settings'), icon: Settings }
   ];
 
   // Reception search filtering against real loaded queue
@@ -547,95 +622,54 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
     : [];
 
   return (
-    <div className={`min-h-screen ${isDarkMode ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'} font-sans`} dir={isRtl ? 'rtl' : 'ltr'}>
+    <div className={`min-h-screen ${isDarkMode ? 'bg-slate-950 text-slate-100' : 'bg-slate-50/70 text-slate-900'} font-sans antialiased`} dir={isRtl ? 'rtl' : 'ltr'}>
       
-      {/* Top Header Bar */}
-      <header className={`sticky top-0 z-40 border-b backdrop-blur-md ${isDarkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white/90 border-slate-200 shadow-xs'}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
-          
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-teal-600 text-white flex items-center justify-center font-bold text-lg shadow-xs">
-              م
-            </div>
-            <div className={isRtl ? 'text-right' : 'text-left'}>
-              <div className={`flex items-center gap-2 ${isRtl ? 'flex-row-reverse' : ''}`}>
-                <span className="text-xs font-bold px-2 py-0.5 rounded bg-teal-500/10 text-teal-700 dark:text-teal-300 border border-teal-500/20">
-                  {t('portalBadge')}
-                </span>
-                <span className="text-xs text-slate-500 font-mono">/assistant</span>
-              </div>
-              <h1 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
-                {user?.active_clinic?.name || user?.clinic?.name || t('clinicName')}
-              </h1>
-            </div>
-          </div>
-
+      {/* Top Clinical Header Bar */}
+      <GlobalDashboardHeader
+        isDarkMode={isDarkMode}
+        onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
+        onBackToMain={onBackToMainPlatform}
+        headerActions={
           <div className="flex items-center gap-2">
-            {/* Language Switcher */}
-            <div className="relative">
-              <select
-                value={locale}
-                onChange={(e) => changeLanguage(e.target.value)}
-                className={`text-xs font-bold rounded-xl border px-2.5 py-1.5 cursor-pointer transition-all ${
-                  isDarkMode
-                    ? 'bg-slate-800 border-slate-700 text-slate-200'
-                    : 'bg-slate-100 border-slate-200 text-slate-700'
-                }`}
-                aria-label="Language selector"
-              >
-                <option value="ar">العربية</option>
-                <option value="en">English</option>
-                <option value="fr">Français</option>
-              </select>
-            </div>
-
-            {onBackToMainPlatform && (
+            {canCreateBooking && (
               <button
-                onClick={onBackToMainPlatform}
-                className={`px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl border border-slate-200 dark:border-slate-700 transition-all flex items-center gap-1.5 cursor-pointer ${isRtl ? 'flex-row-reverse' : ''}`}
+                onClick={() => setShowNewBookingWizard(true)}
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer"
               >
-                <ArrowRight className={`w-3.5 h-3.5 ${isRtl ? 'rotate-180' : ''}`} />
-                <span>{t('home')}</span>
+                <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+                <span>{t('dashboard.newBooking')}</span>
               </button>
             )}
 
             <button
-              onClick={() => setIsDarkMode(!isDarkMode)}
-              className="p-2 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
-              title={t('themeToggle')}
+              onClick={() => setShowScanner(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs rounded-xl border border-slate-200 dark:border-slate-700 transition-all cursor-pointer"
+              title={t('dashboard.scanDoc')}
             >
-              {isDarkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-600" />}
-            </button>
-
-            {/* Logout Button */}
-            <button
-              onClick={handleLogout}
-              className="px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-bold rounded-xl border border-rose-500/20 transition-all flex items-center gap-1.5 cursor-pointer"
-              title={t('logout') || 'تسجيل الخروج'}
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">{t('logout') || (isRtl ? 'تسجيل الخروج' : 'Log Out')}</span>
+              <ScanLine className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
+              <span className="hidden md:inline">{t('dashboard.scanDoc')}</span>
             </button>
           </div>
+        }
+      />
 
-        </div>
-      </header>
-
-      {/* Notice Banner if triggered */}
+      {/* Notice Floating Toast */}
       {noticeMessage && (
-        <div className="bg-teal-600 text-white text-xs px-4 py-2 font-bold text-center animate-fade-in flex items-center justify-center gap-2 shadow-xs">
-          <CheckCircle2 className="w-4 h-4 text-emerald-300" />
-          <span>{noticeMessage}</span>
+        <div className="fixed top-16 left-1/2 -translate-x-1/2 z-50 animate-bounce duration-300">
+          <div className="bg-slate-900/95 dark:bg-slate-100/95 text-white dark:text-slate-900 text-xs px-4 py-2.5 font-bold rounded-2xl shadow-xl flex items-center gap-2 border border-teal-500/30 backdrop-blur-md">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400 dark:text-emerald-600 shrink-0" />
+            <span>{noticeMessage}</span>
+          </div>
         </div>
       )}
 
       {/* New Booking Wizard Overlay */}
       {showNewBookingWizard && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 relative">
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-3xl max-h-[92vh] overflow-y-auto p-5 sm:p-7 relative border border-slate-200 dark:border-slate-800 shadow-2xl">
             <button
               onClick={() => setShowNewBookingWizard(false)}
-              className={`absolute p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer z-10 ${isRtl ? 'left-6 top-6' : 'right-6 top-6'}`}
+              className={`absolute p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer z-10 ${isRtl ? 'left-5 top-5' : 'right-5 top-5'}`}
             >
               <X className="w-5 h-5 text-slate-500" />
             </button>
@@ -669,104 +703,177 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
         isDarkMode={isDarkMode}
       />
 
-      {/* Main Container Layout */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex flex-col md:flex-row gap-6">
+      {/* Main Workspace Layout */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 flex flex-col md:flex-row gap-5">
         
         {/* Sidebar Navigation */}
-        <aside className="w-full md:w-64 space-y-2 shrink-0">
+        <aside className="w-full md:w-64 space-y-3 shrink-0">
           
           {/* Active Shift Card */}
-          <div className={`${containerClass} rounded-2xl p-4 border space-y-2`}>
+          <div className={`${containerClass} rounded-2xl p-4 border space-y-2.5`}>
             <div className="flex items-center justify-between text-xs">
-              <span className="font-bold text-slate-500">{t('shift.title')}</span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+              <span className="font-bold text-slate-500 text-[11px] uppercase tracking-wider">{t('shift.title')}</span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                 {t('shift.activeNow')}
               </span>
             </div>
             <div className={`text-xs ${isRtl ? 'text-right' : 'text-left'}`}>
-              <strong className="block text-slate-900 dark:text-white font-bold">
+              <strong className="block text-slate-900 dark:text-white font-bold text-sm">
                 {user?.name || (isRtl ? 'مساعد العيادة' : 'Clinic Assistant')}
               </strong>
-              <span className="text-slate-500 block text-[11px] mt-0.5 font-mono">
+              <span className="text-slate-400 block text-[11px] mt-0.5 font-mono truncate">
                 {user?.email || '—'}
               </span>
             </div>
           </div>
 
-          {/* Nav Items */}
-          <div className={`${containerClass} rounded-2xl p-2 border space-y-1`}>
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = activeTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => handleTabChange(item.id)}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                    isActive
-                      ? 'bg-teal-600 text-white shadow-xs'
-                      : isDarkMode
-                        ? 'text-slate-300 hover:bg-slate-800 hover:text-white'
-                        : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <Icon className="w-4 h-4" />
-                    <span>{item.label}</span>
-                  </div>
-                  {item.badge && (
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                      isActive ? 'bg-white/20 text-white' : 'bg-teal-50 text-teal-800 dark:bg-slate-800 dark:text-teal-300'
-                    }`}>
-                      {item.badge}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
+          {/* Nav Categories */}
+          <div className={`${containerClass} rounded-2xl p-2.5 border space-y-3`}>
+            
+            {/* Operational Section */}
+            <div className="space-y-0.5">
+              <div className="px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                {isRtl ? 'العمليات الميدانية والانتظار' : 'Clinical Ops & Triage'}
+              </div>
+              {operationalNavItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = activeTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleTabChange(item.id)}
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      isActive
+                        ? 'bg-teal-600 text-white shadow-xs'
+                        : isDarkMode
+                          ? 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
+                          : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                      <span>{item.label}</span>
+                    </div>
+                    {item.badge && (
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                        isActive 
+                          ? 'bg-white/20 text-white' 
+                          : item.pulse 
+                            ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 animate-pulse'
+                            : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                      }`}>
+                        {item.badge}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Administrative / Coordination Section */}
+            <div className="space-y-0.5 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <div className="px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                {isRtl ? 'المتابعة والتنسيق' : 'Coordination & ARP'}
+              </div>
+              {administrativeNavItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = activeTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleTabChange(item.id)}
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      isActive
+                        ? 'bg-teal-600 text-white shadow-xs'
+                        : isDarkMode
+                          ? 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
+                          : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                      <span>{item.label}</span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* System / Profile Section */}
+            <div className="space-y-0.5 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <div className="px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                {isRtl ? 'النظام والصلاحيات' : 'System & Security'}
+              </div>
+              {systemNavItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = activeTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleTabChange(item.id)}
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      isActive
+                        ? 'bg-teal-600 text-white shadow-xs'
+                        : isDarkMode
+                          ? 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
+                          : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                      <span>{item.label}</span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
           </div>
 
-          {/* RBAC Info Card */}
-          <div className={`${containerClass} rounded-2xl p-4 border text-xs space-y-2 bg-amber-500/5 border-amber-500/20`}>
-            <div className={`flex items-center gap-1.5 text-amber-700 dark:text-amber-400 font-bold ${isRtl ? 'flex-row-reverse' : ''}`}>
-              <ShieldCheck className="w-4 h-4" />
-              <span>{isRtl ? 'صلاحيات المساعد التشغيلية' : 'Operational Permissions'}</span>
+          {/* 4D RBAC Ceiling Notice */}
+          <div className={`${containerClass} rounded-2xl p-3.5 border text-xs space-y-1.5 bg-slate-50/50 dark:bg-slate-900/50 border-slate-200/60 dark:border-slate-800`}>
+            <div className={`flex items-center gap-1.5 text-teal-700 dark:text-teal-400 font-bold ${isRtl ? 'flex-row-reverse' : ''}`}>
+              <ShieldCheck className="w-4 h-4 text-teal-600 shrink-0" />
+              <span>{isRtl ? 'حماية RBAC 4D نشطة' : '4D RBAC Active'}</span>
             </div>
-            <p className={`text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed ${isRtl ? 'text-right' : 'text-left'}`}>
-              {isRtl ? 'المساعد يعمل بـ Role-Based Access Control ويحدد الطبيب صلاحيات الحجز والاستقبال ومنع فتح EMR بدون تصريح.' : 'Assistant operates under Role-Based Access Control; the doctor defines booking and reception permissions and restricts EMR access without authorization.'}
+            <p className={`text-[10.5px] text-slate-500 leading-relaxed ${isRtl ? 'text-right' : 'text-left'}`}>
+              {isRtl ? 'صلاحيات إدارية واستقبالية مصرح بها. الوصول للسجلات السريرية التخصصية والوصفات محظور أمنياً.' : 'Receptionist & triage scope authorized. Specialized clinical EHR & prescriptions restricted.'}
             </p>
           </div>
 
         </aside>
 
-        {/* Main Workspace Area */}
-        <main className="flex-1 space-y-6 min-w-0">
+        {/* Main Operational Workspace */}
+        <main className="flex-1 space-y-5 min-w-0">
           
           {/* TAB 1: DASHBOARD OVERVIEW */}
           {activeTab === 'dashboard' && (
-            <div className="space-y-6">
+            <div className="space-y-5">
               
-              {/* Top Banner */}
-              <div className={`${containerClass} rounded-2xl p-6 border flex flex-wrap items-center justify-between gap-4`}>
+              {/* Header Action Bar */}
+              <div className={`${containerClass} rounded-2xl p-5 border flex flex-wrap items-center justify-between gap-4 bg-gradient-to-l from-teal-500/5 via-transparent to-transparent`}>
                 <div className={isRtl ? 'text-right' : 'text-left'}>
-                  <span className="text-xs font-mono font-bold text-teal-600 dark:text-teal-400 block mb-1">
-                    /assistant/dashboard
-                  </span>
-                  <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[11px] font-mono font-bold text-teal-600 dark:text-teal-400 px-2 py-0.5 rounded-md bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800">
+                      /assistant/dashboard
+                    </span>
+                  </div>
+                  <h2 className="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                     {t('dashboard.title')}
                   </h2>
-                  <p className="text-xs text-slate-500 mt-1">
+                  <p className="text-xs text-slate-500 mt-0.5">
                     {t('dashboard.subtitle')}
                   </p>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2.5 flex-wrap">
                   {canCreateBooking && (
                     <button
                       onClick={() => setShowNewBookingWizard(true)}
-                      className="px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer"
+                      className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer ring-1 ring-teal-700/20"
                     >
-                      <Plus className="w-4 h-4" />
+                      <Plus className="w-4 h-4 stroke-[2.5]" />
                       <span>{t('dashboard.newBooking')}</span>
                     </button>
                   )}
@@ -774,18 +881,18 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
                   {canConfirmAttendance && (
                     <button
                       onClick={() => setShowCheckInModal(true)}
-                      className="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer"
+                      className="px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs rounded-xl transition-all flex items-center gap-1.5 cursor-pointer border border-slate-200 dark:border-slate-700"
                     >
-                      <UserPlus className="w-4 h-4" />
+                      <UserPlus className="w-4 h-4 text-teal-600 dark:text-teal-400" />
                       <span>{t('dashboard.checkIn')}</span>
                     </button>
                   )}
 
                   <button
                     onClick={() => setShowScanner(true)}
-                    className="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer border border-teal-500/20"
+                    className="px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs rounded-xl transition-all flex items-center gap-1.5 cursor-pointer border border-slate-200 dark:border-slate-700"
                   >
-                    <ScanLine className="w-4 h-4 text-teal-600" />
+                    <ScanLine className="w-4 h-4 text-teal-600 dark:text-teal-400" />
                     <span>{t('dashboard.scanDoc')}</span>
                   </button>
                 </div>
@@ -797,93 +904,163 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
                 onDateChange={setSelectedOperationalDate}
               />
 
-              {/* Today's Tasks Widget (مهامي اليوم) */}
-              <div className={`${containerClass} rounded-2xl p-5 border space-y-4 bg-linear-to-br from-teal-500/5 via-transparent to-amber-500/5`}>
-                <div className={`flex items-center justify-between border-b pb-3 border-slate-200 dark:border-slate-800 ${isRtl ? 'flex-row-reverse' : ''}`}>
-                  <div className={`flex items-center gap-2 ${isRtl ? 'flex-row-reverse' : ''}`}>
+              {/* 4 Clinical KPI Pulse Tiles */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                
+                {/* Total Appointments */}
+                <div className={`${containerClass} p-4 rounded-2xl border ${isRtl ? 'text-right' : 'text-left'} relative overflow-hidden group`}>
+                  <div className="flex items-center justify-between text-slate-500 mb-2">
+                    <span className="text-xs font-bold">{t('dashboard.stats.todayAppointments')}</span>
+                    <div className="p-2 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400">
+                      <CalendarDays className="w-4 h-4" />
+                    </div>
+                  </div>
+                  <div className="text-2xl font-black text-slate-900 dark:text-white font-mono tracking-tight">
+                    {todayTotalCount}
+                  </div>
+                  <div className="mt-1 flex items-center gap-1.5 text-[10.5px] font-bold text-teal-600 dark:text-teal-400">
+                    <span>{t('dashboard.stats.remaining', { count: queue.filter(a => a.status === 'pending' || a.status === 'confirmed').length })}</span>
+                  </div>
+                </div>
+
+                {/* In Waiting Room */}
+                <div className={`${containerClass} p-4 rounded-2xl border ${isRtl ? 'text-right' : 'text-left'} relative overflow-hidden border-amber-500/20 bg-amber-500/5`}>
+                  <div className="flex items-center justify-between text-slate-500 mb-2">
+                    <span className="text-xs font-bold text-amber-800 dark:text-amber-300">{t('dashboard.stats.inWaitingRoom')}</span>
+                    <div className="p-2 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400">
+                      <Users className="w-4 h-4" />
+                    </div>
+                  </div>
+                  <div className="text-2xl font-black text-amber-600 dark:text-amber-400 font-mono tracking-tight">
+                    {inWaitingRoomCount}
+                  </div>
+                  <div className="mt-1 flex items-center gap-1.5 text-[10.5px] font-bold text-amber-700 dark:text-amber-400">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                    <span>{isRtl ? 'بانتظار دور الكشف' : 'Waiting for doctor'}</span>
+                  </div>
+                </div>
+
+                {/* Attended & Completed */}
+                <div className={`${containerClass} p-4 rounded-2xl border ${isRtl ? 'text-right' : 'text-left'} relative overflow-hidden border-emerald-500/20 bg-emerald-500/5`}>
+                  <div className="flex items-center justify-between text-slate-500 mb-2">
+                    <span className="text-xs font-bold text-emerald-800 dark:text-emerald-300">{t('dashboard.stats.completed')}</span>
+                    <div className="p-2 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
+                      <CheckCircle2 className="w-4 h-4" />
+                    </div>
+                  </div>
+                  <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono tracking-tight">
+                    {completedCount}
+                  </div>
+                  <div className="mt-1 flex items-center gap-1 text-[10.5px] font-bold text-emerald-700 dark:text-emerald-400">
+                    <span>{isRtl ? `تم استكمال الفحص` : 'Finished consultation'}</span>
+                  </div>
+                </div>
+
+                {/* No-Show / Cancelled */}
+                <div className={`${containerClass} p-4 rounded-2xl border ${isRtl ? 'text-right' : 'text-left'} relative overflow-hidden border-rose-500/20 bg-rose-500/5`}>
+                  <div className="flex items-center justify-between text-slate-500 mb-2">
+                    <span className="text-xs font-bold text-rose-800 dark:text-rose-300">{t('dashboard.stats.noShow')}</span>
+                    <div className="p-2 rounded-xl bg-rose-500/15 text-rose-600 dark:text-rose-400">
+                      <XCircle className="w-4 h-4" />
+                    </div>
+                  </div>
+                  <div className="text-2xl font-black text-rose-600 dark:text-rose-400 font-mono tracking-tight">
+                    {noShowCount}
+                  </div>
+                  <div className="mt-1 flex items-center gap-1 text-[10.5px] font-bold text-rose-600 dark:text-rose-400">
+                    <span>{isRtl ? 'ملغاة / لم يحضروا' : 'Cancelled / Absent'}</span>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Triage Tasks Deck (مهامي التشغيلية) */}
+              <div className={`${containerClass} rounded-2xl p-5 border space-y-4`}>
+                <div className={`flex items-center justify-between border-b pb-3 border-slate-100 dark:border-slate-800 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                  <div className={`flex items-center gap-2.5 ${isRtl ? 'flex-row-reverse' : ''}`}>
                     <div className="p-2 rounded-xl bg-teal-600 text-white shadow-xs">
                       <CheckSquare className="w-4 h-4" />
                     </div>
                     <div className={isRtl ? 'text-right' : 'text-left'}>
-                      <h3 className="text-sm font-bold text-slate-900 dark:text-white">{t('dashboard.tasksTitle')}</h3>
-                      <span className="text-[11px] text-slate-500 block">{t('dashboard.tasksSubtitle')}</span>
+                      <h3 className="text-sm font-extrabold text-slate-900 dark:text-white tracking-tight">{t('dashboard.tasksTitle')}</h3>
+                      <span className="text-[11px] text-slate-500 block font-medium">{t('dashboard.tasksSubtitle')}</span>
                     </div>
                   </div>
 
-                  <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-teal-500/10 text-teal-700 dark:text-teal-300 border border-teal-500/20">
+                  <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300 border border-teal-200 dark:border-teal-800">
                     {t('dashboard.criticalTasks', { count: unarrivedCount + reviewCount })}
                   </span>
                 </div>
 
-                {/* Doctor's Latest Instruction Banner */}
-                <div className={`p-3.5 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-900 dark:text-amber-200 flex items-start gap-3 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                {/* Doctor's Live Directive Bar */}
+                <div className={`p-3.5 rounded-xl border border-amber-500/30 bg-amber-50/50 dark:bg-amber-950/20 text-amber-900 dark:text-amber-200 flex items-start gap-3 ${isRtl ? 'flex-row-reverse' : ''}`}>
                   <Bell className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
                   <div className={`text-xs space-y-0.5 ${isRtl ? 'text-right' : 'text-left'}`}>
                     <strong className="font-bold block">{t('dashboard.instructionTitle')}</strong>
-                    <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
-                      {isRtl ? 'لا توجد تعليمات حية من الطبيب حالياً.' : 'No active instructions from doctor currently.'}
+                    <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-[11px]">
+                      {isRtl ? 'لا توجد تعليمات حية من الطبيب حالياً. يرجى متابعة تدفق قائمة الانتظار بانتظام.' : 'No active directives from doctor. Please maintain queue triage regularly.'}
                     </p>
                   </div>
                 </div>
 
-                {/* Task Categories Grid */}
+                {/* Triage Grid Action Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
                   
-                  {/* Unarrived Patients */}
-                  <div className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 space-y-2">
+                  {/* Unarrived */}
+                  <div className="p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 space-y-2.5">
                     <div className={`flex items-center justify-between ${isRtl ? 'flex-row-reverse' : ''}`}>
                       <span className={`font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 ${isRtl ? 'flex-row-reverse' : ''}`}>
                         <Clock className="w-3.5 h-3.5 text-amber-500" />
                         {isRtl ? 'لم يصلوا بعد' : 'Not Arrived Yet'}
                       </span>
-                      <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 font-bold text-[10px]">
+                      <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 font-bold text-[10px]">
                         {isRtl ? `${unarrivedCount} مرضى` : `${unarrivedCount} Patients`}
                       </span>
                     </div>
-                    <p className={`text-slate-500 text-[11px] ${isRtl ? 'text-right' : 'text-left'}`}>{isRtl ? 'مواعيد بانتظار تأكيد الحضور' : 'Appointments awaiting arrival'}</p>
+                    <p className={`text-slate-500 text-[11px] leading-tight ${isRtl ? 'text-right' : 'text-left'}`}>{isRtl ? 'مواعيد بانتظار تأكيد الحضور' : 'Appointments awaiting arrival'}</p>
                     <button
                       onClick={() => triggerNotice(t('kpis.sentSmsSuccess'))}
-                      className="w-full py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold rounded-lg text-[10px] cursor-pointer transition-all"
+                      className="w-full py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold rounded-lg text-[10.5px] cursor-pointer transition-all"
                     >
                       {isRtl ? 'إرسال تذكير سريع SMS' : 'Send Quick SMS'}
                     </button>
                   </div>
 
-                  {/* Checked-in Patients */}
-                  <div className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 space-y-2">
+                  {/* Waiting in Queue */}
+                  <div className="p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 space-y-2.5">
                     <div className={`flex items-center justify-between ${isRtl ? 'flex-row-reverse' : ''}`}>
                       <span className={`font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 ${isRtl ? 'flex-row-reverse' : ''}`}>
                         <UserCheck className="w-3.5 h-3.5 text-emerald-500" />
                         {t('kpis.checkedIn')}
                       </span>
-                      <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 font-bold text-[10px]">
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 font-bold text-[10px]">
                         {t('kpis.patientsCount', { count: checkedInCount })}
                       </span>
                     </div>
-                    <p className={`text-slate-500 text-[11px] ${isRtl ? 'text-right' : 'text-left'}`}>{t('kpis.readyWaiting')}</p>
+                    <p className={`text-slate-500 text-[11px] leading-tight ${isRtl ? 'text-right' : 'text-left'}`}>{t('kpis.readyWaiting')}</p>
                     <button
-                      onClick={() => setActiveTab('waiting-room')}
-                      className="w-full py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold rounded-lg text-[10px] cursor-pointer transition-all"
+                      onClick={() => handleTabChange('waiting-room')}
+                      className="w-full py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold rounded-lg text-[10.5px] cursor-pointer transition-all"
                     >
                       {isRtl ? 'إدارة القائمة الحية' : 'Manage Live Queue'}
                     </button>
                   </div>
 
                   {/* Late Patients */}
-                  <div className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 space-y-2">
+                  <div className="p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 space-y-2.5">
                     <div className={`flex items-center justify-between ${isRtl ? 'flex-row-reverse' : ''}`}>
                       <span className={`font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 ${isRtl ? 'flex-row-reverse' : ''}`}>
                         <AlertCircle className="w-3.5 h-3.5 text-rose-500" />
                         {t('kpis.latePatients')}
                       </span>
-                      <span className="px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-600 font-bold text-[10px]">
+                      <span className="px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-700 dark:text-rose-300 font-bold text-[10px]">
                         {t('kpis.patientsCount', { count: lateCount })}
                       </span>
                     </div>
-                    <p className={`text-slate-500 text-[11px] ${isRtl ? 'text-right' : 'text-left'}`}>{t('kpis.lateDesc')}</p>
+                    <p className={`text-slate-500 text-[11px] leading-tight ${isRtl ? 'text-right' : 'text-left'}`}>{t('kpis.lateDesc')}</p>
                     <button
                       onClick={() => triggerNotice(t('kpis.calledLateSuccess'))}
-                      className={`w-full py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-700 dark:text-rose-300 font-bold rounded-lg text-[10px] cursor-pointer transition-all flex items-center justify-center gap-1 ${isRtl ? 'flex-row-reverse' : ''}`}
+                      className={`w-full py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-700 dark:text-rose-300 font-bold rounded-lg text-[10.5px] cursor-pointer transition-all flex items-center justify-center gap-1 ${isRtl ? 'flex-row-reverse' : ''}`}
                     >
                       <Phone className="w-3 h-3" />
                       <span>{t('kpis.confirmCall')}</span>
@@ -891,20 +1068,20 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
                   </div>
 
                   {/* Appointments Needing Review */}
-                  <div className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 space-y-2">
+                  <div className="p-3.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 space-y-2.5">
                     <div className={`flex items-center justify-between ${isRtl ? 'flex-row-reverse' : ''}`}>
                       <span className={`font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 ${isRtl ? 'flex-row-reverse' : ''}`}>
                         <Calendar className="w-3.5 h-3.5 text-teal-500" />
                         {t('kpis.needReview')}
                       </span>
-                      <span className="px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-600 font-bold text-[10px]">
+                      <span className="px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-700 dark:text-teal-300 font-bold text-[10px]">
                         {t('kpis.apptsCount', { count: reviewCount })}
                       </span>
                     </div>
-                    <p className={`text-slate-500 text-[11px] ${isRtl ? 'text-right' : 'text-left'}`}>{t('kpis.reviewDesc')}</p>
+                    <p className={`text-slate-500 text-[11px] leading-tight ${isRtl ? 'text-right' : 'text-left'}`}>{t('kpis.reviewDesc')}</p>
                     <button
-                      onClick={() => setActiveTab('appointments')}
-                      className="w-full py-1.5 bg-teal-500/10 hover:bg-teal-500/20 text-teal-700 dark:text-teal-300 font-bold rounded-lg text-[10px] cursor-pointer transition-all"
+                      onClick={() => handleTabChange('appointments')}
+                      className="w-full py-1.5 bg-teal-500/10 hover:bg-teal-500/20 text-teal-700 dark:text-teal-300 font-bold rounded-lg text-[10.5px] cursor-pointer transition-all"
                     >
                       {isRtl ? 'مراجعة الحجوزات' : 'Review Appts'}
                     </button>
@@ -913,84 +1090,60 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
                 </div>
               </div>
 
-              {/* KPI Cards */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className={`${containerClass} p-4 rounded-xl border ${isRtl ? 'text-right' : 'text-left'}`}>
-                  <span className="text-xs text-slate-500 font-bold block">{t('dashboard.stats.todayAppointments')}</span>
-                  <span className="text-2xl font-black text-slate-900 dark:text-white mt-1 block">{todayTotalCount}</span>
-                  <span className="text-[10px] text-teal-600 font-bold block mt-0.5">
-                    {t('dashboard.stats.remaining', { count: queue.filter(a => a.status === 'pending' || a.status === 'confirmed').length })}
-                  </span>
-                </div>
-
-                <div className={`${containerClass} p-4 rounded-xl border ${isRtl ? 'text-right' : 'text-left'}`}>
-                  <span className="text-xs text-slate-500 font-bold block">{t('dashboard.stats.inWaitingRoom')}</span>
-                  <span className="text-2xl font-black text-amber-600 mt-1 block">{t('kpis.patientsCount', { count: inWaitingRoomCount })}</span>
-                  <span className="text-[10px] text-amber-600 font-bold block mt-0.5">{isRtl ? 'بناءً على قائمة الانتظار الحالية' : 'Based on live queue'}</span>
-                </div>
-
-                <div className={`${containerClass} p-4 rounded-xl border ${isRtl ? 'text-right' : 'text-left'}`}>
-                  <span className="text-xs text-slate-500 font-bold block">{t('dashboard.stats.completed')}</span>
-                  <span className="text-2xl font-black text-emerald-600 mt-1 block">{completedCount}</span>
-                  <span className="text-[10px] text-emerald-600 font-bold block mt-0.5">{isRtl ? 'مواعيد مكتملة' : 'Completed appts'}</span>
-                </div>
-
-                <div className={`${containerClass} p-4 rounded-xl border ${isRtl ? 'text-right' : 'text-left'}`}>
-                  <span className="text-xs text-slate-500 font-bold block">{t('dashboard.stats.noShow')}</span>
-                  <span className="text-2xl font-black text-rose-600 mt-1 block">{noShowCount}</span>
-                  <span className="text-[10px] text-rose-600 font-bold block mt-0.5">{isRtl ? 'ملغاة / غائب' : 'Cancelled / Absent'}</span>
-                </div>
-              </div>
-
-              {/* Live Queue Table */}
+              {/* Live Queue Overview Table */}
               <div className={`${containerClass} rounded-2xl p-5 border space-y-4`}>
                 <div className={`flex items-center justify-between ${isRtl ? 'flex-row-reverse' : ''}`}>
-                  <h3 className={`text-sm font-bold flex items-center gap-2 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                  <h3 className={`text-sm font-extrabold flex items-center gap-2 text-slate-900 dark:text-white ${isRtl ? 'flex-row-reverse' : ''}`}>
                     <Users className="w-4 h-4 text-teal-600" />
-                    {t('waitingRoom.title')}
+                    <span>{t('waitingRoom.title')}</span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-mono font-bold">
+                      {waitingRoomQueue.length}
+                    </span>
                   </h3>
                   <button
-                    onClick={() => setActiveTab('waiting-room')}
-                    className={`text-xs font-bold text-teal-600 hover:underline flex items-center gap-1 ${isRtl ? 'flex-row-reverse' : ''}`}
+                    onClick={() => handleTabChange('waiting-room')}
+                    className={`text-xs font-bold text-teal-600 dark:text-teal-400 hover:underline flex items-center gap-1 ${isRtl ? 'flex-row-reverse' : ''}`}
                   >
                     <span>{t('waitingRoom.fullScreen')}</span>
                     <ChevronLeft className={`w-3.5 h-3.5 ${isRtl ? '' : 'rotate-180'}`} />
                   </button>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+                <div className="overflow-x-auto rounded-xl border border-slate-200/80 dark:border-slate-800">
                   <table className={`w-full text-xs ${isRtl ? 'text-right' : 'text-left'}`}>
-                    <thead className="bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 font-bold">
+                    <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 font-bold border-b border-slate-200/80 dark:border-slate-800">
                       <tr>
-                        <th className="p-3">{t('waitingRoom.table.queueNum')}</th>
+                        <th className="p-3 font-mono">{t('waitingRoom.table.queueNum')}</th>
                         <th className="p-3">{t('waitingRoom.table.patientName')}</th>
                         <th className="p-3">{t('waitingRoom.table.time')}</th>
                         <th className="p-3">{t('waitingRoom.table.status')}</th>
                         <th className="p-3 text-center">{t('waitingRoom.table.action')}</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
                       {waitingRoomQueue.length === 0 ? (
                         <tr>
-                          <td colSpan={5} className="p-8 text-center text-slate-500 font-bold text-xs">
+                          <td colSpan={5} className="p-8 text-center text-slate-400 font-bold text-xs">
                             {isRtl ? 'لا يوجد مرضى حالياً في قائمة الانتظار الحية لهذه الجلسة التشغيلية' : 'No patients currently in live waiting room for this operational day'}
                           </td>
                         </tr>
                       ) : (
-                        waitingRoomQueue.map((q) => (
-                          <tr key={q.id}>
-                            <td className="p-3 font-mono font-bold text-teal-600">{q.bookingReference || q.id}</td>
-                            <td className="p-3">
-                              <strong className="block text-slate-900 dark:text-white">{q.patientName}</strong>
-                              <span className="text-[10px] text-slate-500 font-mono">{q.mrn}</span>
+                        waitingRoomQueue.map((q, idx) => (
+                          <tr key={q.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
+                            <td className="p-3 font-mono font-bold text-teal-600 dark:text-teal-400">
+                              #{String(idx + 1).padStart(2, '0')}
                             </td>
-                            <td className="p-3 font-mono text-slate-500">{q.time}</td>
                             <td className="p-3">
-                              <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
-                                q.status === 'attended' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' :
-                                q.status === 'examination' ? 'bg-indigo-50 text-indigo-800 border-indigo-200' :
-                                q.status === 'waiting' ? 'bg-amber-50 text-amber-800 border-amber-200' :
-                                'bg-slate-100 text-slate-700 border-slate-200'
+                              <strong className="block text-slate-900 dark:text-white font-bold">{q.patientName}</strong>
+                              <span className="text-[10px] text-slate-400 font-mono">{q.mrn !== '—' ? q.mrn : q.bookingReference}</span>
+                            </td>
+                            <td className="p-3 font-mono text-slate-500 text-[11px]">{q.time}</td>
+                            <td className="p-3">
+                              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
+                                q.status === 'attended' || q.status === 'completed' ? 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800' :
+                                q.status === 'examination' ? 'bg-indigo-50 text-indigo-800 border-indigo-200 dark:bg-indigo-950/60 dark:text-indigo-300 dark:border-indigo-800' :
+                                q.status === 'waiting' ? 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800' :
+                                'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'
                               }`}>
                                 {t(`waitingRoom.status.${q.status}`) || q.status}
                               </span>
@@ -998,7 +1151,7 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
                             <td className="p-3 text-center">
                               <button
                                 onClick={() => triggerNotice(isRtl ? `تم استدعاء المريض ${q.patientName} بنجاح إلى العيادة` : `Patient ${q.patientName} called to clinic successfully`)}
-                                className="px-2.5 py-1 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-lg text-[10px] cursor-pointer"
+                                className="px-3 py-1 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-lg text-[10.5px] cursor-pointer shadow-2xs transition-all"
                               >
                                 {t('waitingRoom.actions.callToClinic')}
                               </button>
@@ -1014,67 +1167,185 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
             </div>
           )}
 
-          {/* TAB 2: TODAY'S SCHEDULE */}
+          {/* TAB 2: TODAY'S SCHEDULE & TIMELINE */}
           {activeTab === 'today' && (
             <div className={`${containerClass} rounded-2xl p-6 border space-y-6`}>
-              <div className={`flex items-center justify-between border-b pb-4 border-slate-200 dark:border-slate-800 ${isRtl ? 'flex-row-reverse' : ''}`}>
+              
+              {/* Header with Date & Pulse */}
+              <div className={`flex flex-wrap items-center justify-between gap-4 border-b pb-4 border-slate-100 dark:border-slate-800 ${isRtl ? 'flex-row-reverse' : ''}`}>
                 <div className={isRtl ? 'text-right' : 'text-left'}>
                   <span className={`text-xs font-mono font-bold text-teal-600 block ${isRtl ? 'text-right' : 'text-left'}`}>/assistant/today</span>
-                  <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-                    {isRtl ? `جدول مواعيد اليوم (${new Date().toLocaleDateString('ar-DZ')})` : `Today's Schedule (${new Date().toLocaleDateString('en-US')})`}
+                  <h2 className="text-lg font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                    <Calendar className="w-5 h-5 text-teal-600" />
+                    <span>{isRtl ? `جدول مواعيد اليوم (${effectiveDate})` : `Today's Schedule (${effectiveDate})`}</span>
                   </h2>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    {isRtl ? 'إدارة وصول ومتابعة جميع المرضى المقيدين ضمن الجلسة اليومية الحالية' : 'Track and manage all appointments scheduled for the current clinic session'}
+                  </p>
                 </div>
-                <div className="text-xs text-slate-500 font-mono">
-                  {isRtl ? `${todayTotalCount} حجز كلي` : `${todayTotalCount} total appts`}
+
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold font-mono bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 px-3 py-1 rounded-full border border-teal-200 dark:border-teal-800">
+                    {todayAppointments.length} {isRtl ? 'حجز مسجل' : 'Total Appts'}
+                  </span>
                 </div>
               </div>
 
+              {/* Today Quick Triage Filter Chips & Search */}
               <div className="space-y-3">
-                {todayAppointments.length === 0 ? (
-                  <div className="p-8 text-center text-slate-500 font-bold text-xs border rounded-xl border-dashed border-slate-300 dark:border-slate-800">
-                    {isRtl ? 'لا توجد مواعيد مخصصة اليوم' : 'No appointments scheduled for today'}
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  
+                  {/* Status Pills */}
+                  <div className={`flex flex-wrap items-center gap-1.5 text-xs ${isRtl ? 'flex-row-reverse' : ''}`}>
+                    {[
+                      { id: 'all', label: isRtl ? 'الكل' : 'All', count: todayAppointments.length },
+                      { id: 'waiting', label: isRtl ? 'في الانتظار' : 'Waiting', count: todayAppointments.filter(a => a.status === 'waiting' || a.status === 'arrived').length },
+                      { id: 'examination', label: isRtl ? 'داخل الكشف' : 'In Exam', count: inExaminationCount },
+                      { id: 'completed', label: isRtl ? 'مكتمل' : 'Completed', count: completedCount },
+                      { id: 'confirmed', label: isRtl ? 'مؤكد (لم يحضر بعد)' : 'Confirmed', count: unarrivedCount },
+                      { id: 'absent', label: isRtl ? 'غائب / ملغى' : 'Absent', count: noShowCount },
+                    ].map(chip => (
+                      <button
+                        key={chip.id}
+                        onClick={() => setTodayStatusFilter(chip.id)}
+                        className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-all cursor-pointer flex items-center gap-1.5 ${
+                          todayStatusFilter === chip.id
+                            ? 'bg-teal-600 text-white shadow-xs'
+                            : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                        }`}
+                      >
+                        <span>{chip.label}</span>
+                        <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
+                          todayStatusFilter === chip.id ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
+                        }`}>
+                          {chip.count}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Search input for today */}
+                  <div className="relative min-w-[200px]">
+                    <Search className={`w-3.5 h-3.5 absolute top-2.5 text-slate-400 ${isRtl ? 'right-3' : 'left-3'}`} />
+                    <input
+                      type="text"
+                      value={todaySearchTerm}
+                      onChange={(e) => setTodaySearchTerm(e.target.value)}
+                      placeholder={isRtl ? 'بحث في مواعيد اليوم...' : 'Search today...'}
+                      className={`w-full py-1.5 text-xs rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-950 focus:outline-none focus:ring-1 focus:ring-teal-500 ${
+                        isRtl ? 'pr-8 pl-3 text-right' : 'pl-8 pr-3 text-left'
+                      }`}
+                    />
+                  </div>
+
+                </div>
+              </div>
+
+              {/* Appointments List / Cards */}
+              <div className="space-y-2.5">
+                {filteredTodayAppointments.length === 0 ? (
+                  <div className="p-10 text-center text-slate-400 font-bold text-xs border rounded-2xl border-dashed border-slate-200 dark:border-slate-800">
+                    {isRtl ? 'لا توجد مواعيد مطابقة لخيارات الفلترة المحددة اليوم' : 'No appointments matching current filter for today'}
                   </div>
                 ) : (
-                  todayAppointments.map((item, idx) => (
-                    <div key={item.id || idx} className={`p-4 rounded-xl border flex items-center justify-between text-xs ${
-                      item.status === 'examination' ? 'border-teal-50 bg-teal-500/5' : 'border-slate-200 dark:border-slate-800'
-                    } ${isRtl ? 'flex-row-reverse' : ''}`}>
-                      <div className={`flex items-center gap-3 ${isRtl ? 'flex-row-reverse text-right' : 'text-left'}`}>
-                        <span className="font-mono font-bold text-teal-600 bg-teal-50 dark:bg-slate-800 px-2.5 py-1 rounded-lg">
-                          {item.timeSlot || item.time || '—'}
-                        </span>
+                  filteredTodayAppointments.map((item, idx) => (
+                    <div key={item.id || idx} className={`p-4 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs transition-all ${
+                      item.status === 'examination' 
+                        ? 'border-teal-500/40 bg-teal-500/5 ring-1 ring-teal-500/20' 
+                        : item.status === 'waiting'
+                          ? 'border-amber-500/30 bg-amber-500/5'
+                          : 'border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900/50 hover:bg-slate-50 dark:hover:bg-slate-800/40'
+                    } ${isRtl ? 'text-right' : 'text-left'}`}>
+                      
+                      <div className={`flex items-center gap-3.5 ${isRtl ? 'flex-row-reverse text-right' : 'text-left'}`}>
+                        <div className="flex flex-col items-center justify-center min-w-[65px] px-2.5 py-1.5 rounded-xl bg-teal-50 dark:bg-teal-950/60 border border-teal-200/60 dark:border-teal-800/60">
+                          <span className="font-mono font-extrabold text-teal-700 dark:text-teal-300 text-xs">
+                            {item.timeSlot || item.time || '—'}
+                          </span>
+                          <span className="text-[9.5px] text-teal-600/80 font-mono font-bold">
+                            #{String(idx + 1).padStart(2, '0')}
+                          </span>
+                        </div>
+
                         <div>
-                          <strong className="block text-slate-900 dark:text-white text-sm">{item.patientName}</strong>
-                          <span className="text-slate-500 text-[10px] font-mono">{item.mrn !== '—' ? item.mrn : ''}</span>
+                          <strong className="block text-slate-900 dark:text-white text-sm font-extrabold">{item.patientName}</strong>
+                          <div className="flex items-center gap-2 text-slate-400 text-[11px] font-mono mt-0.5">
+                            <span>MRN: {item.mrn !== '—' ? item.mrn : item.bookingReference}</span>
+                            {item.phone && item.phone !== '—' && (
+                              <>
+                                <span>•</span>
+                                <span>{item.phone}</span>
+                              </>
+                            )}
+                            {item.doctorName && item.doctorName !== '—' && (
+                              <>
+                                <span>•</span>
+                                <span className="text-slate-600 dark:text-slate-300 font-sans font-medium">{item.doctorName}</span>
+                              </>
+                            )}
+                          </div>
                         </div>
                       </div>
 
-                      <div className={`flex items-center gap-3 ${isRtl ? 'flex-row-reverse' : ''}`}>
-                        <span className={`px-2.5 py-1 rounded-lg font-bold text-[11px] border ${
-                          item.status === 'completed' || item.status === 'attended' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' :
-                          item.status === 'examination' ? 'bg-teal-50 text-teal-800 border-teal-200' :
-                          'bg-amber-50 text-amber-800 border-amber-200'
+                      <div className={`flex items-center gap-2 flex-wrap ${isRtl ? 'flex-row-reverse' : ''}`}>
+                        <span className={`px-2.5 py-0.5 rounded-full font-bold text-[10.5px] border ${
+                          item.status === 'completed' || item.status === 'attended' ? 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800' :
+                          item.status === 'examination' ? 'bg-indigo-50 text-indigo-800 border-indigo-200 dark:bg-indigo-950/60 dark:text-indigo-300 dark:border-indigo-800' :
+                          item.status === 'waiting' ? 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800' :
+                          'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'
                         }`}>
                           {t(`waitingRoom.status.${item.status}`) || item.status}
                         </span>
 
-                        {canConfirmAttendance && (
+                        {/* Quick Check-in action if not checked in */}
+                        {canConfirmAttendance && !item.checked_in_at && item.status !== 'attended' && item.status !== 'completed' && item.status !== 'waiting' && item.status !== 'examination' && (
                           <button
-                            onClick={() => triggerNotice(isRtl ? `تم تحديث حالة الموعد لـ ${item.patientName}` : `Appointment status updated for ${item.patientName}`)}
-                            className="px-3 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 font-bold rounded-lg text-[11px] cursor-pointer"
+                            onClick={() => {
+                              handleConfirmAttendance({
+                                id: item.id,
+                                patientName: item.patientName,
+                                mrn: item.mrn,
+                                phone: item.phone,
+                                doctorName: item.doctorName
+                              });
+                            }}
+                            className="px-3 py-1 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-lg text-[11px] cursor-pointer transition-all shadow-2xs"
                           >
                             {t('today.confirmArrival')}
                           </button>
                         )}
+
+                        {/* If in waiting room: Call action */}
+                        {(item.status === 'waiting' || item.status === 'arrived') && (
+                          <button
+                            onClick={() => triggerNotice(isRtl ? `تم استدعاء المريض ${item.patientName} بنجاح إلى العيادة` : `Patient ${item.patientName} called to clinic successfully`)}
+                            className="px-3 py-1 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-lg text-[11px] cursor-pointer transition-all shadow-2xs flex items-center gap-1"
+                          >
+                            <Volume2 className="w-3 h-3" />
+                            <span>{t('waitingRoom.actions.callToClinic')}</span>
+                          </button>
+                        )}
+
+                        {/* Reschedule Button */}
+                        {!['attended', 'completed', 'cancelled', 'rejected', 'expired'].includes(item.status) && (
+                          <button
+                            onClick={() => handleOpenReschedule(item)}
+                            className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-lg text-[10.5px] cursor-pointer transition-colors border border-slate-200 dark:border-slate-700"
+                          >
+                            {t('today.table.reschedule')}
+                          </button>
+                        )}
                       </div>
+
                     </div>
                   ))
                 )}
               </div>
+
             </div>
           )}
 
-          {/* TAB 3: WAITING ROOM */}
+          {/* TAB 3: WAITING ROOM & LIVE QUEUE */}
           {activeTab === 'waiting-room' && (
             <div className={`${containerClass} rounded-2xl p-6 border space-y-6`}>
               {!canManageQueue ? (
@@ -1089,80 +1360,188 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
                 </div>
               ) : (
                 <>
-                  <div className={`flex items-center justify-between border-b pb-4 border-slate-200 dark:border-slate-800 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                  <div className={`flex flex-wrap items-center justify-between gap-4 border-b pb-4 border-slate-100 dark:border-slate-800 ${isRtl ? 'flex-row-reverse' : ''}`}>
                     <div className={isRtl ? 'text-right' : 'text-left'}>
                       <span className={`text-xs font-mono font-bold text-teal-600 block ${isRtl ? 'text-right' : 'text-left'}`}>/assistant/waiting-room</span>
-                      <h2 className="text-lg font-bold text-slate-900 dark:text-white">{t('waitingRoom.title')}</h2>
+                      <h2 className="text-lg font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                        <span>{t('waitingRoom.title')}</span>
+                        <span className="px-2 py-0.5 rounded-full text-xs bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 font-mono font-bold">
+                          {waitingRoomQueue.length} {isRtl ? 'مرضى' : 'patients'}
+                        </span>
+                      </h2>
                     </div>
-                    <button
-                      onClick={() => triggerNotice(t('today.nextCalled'))}
-                      className={`px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl shadow-xs cursor-pointer flex items-center gap-1.5 ${isRtl ? 'flex-row-reverse' : ''}`}
-                    >
-                      <Bell className="w-4 h-4" />
-                      <span>{t('waitingRoom.callNext')}</span>
-                    </button>
+
+                    <div className="flex items-center gap-2.5">
+                      {/* View Mode Toggle */}
+                      <div className="flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700">
+                        <button
+                          onClick={() => setWaitingRoomViewMode('cards')}
+                          className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+                            waitingRoomViewMode === 'cards' 
+                              ? 'bg-white dark:bg-slate-900 text-teal-600 dark:text-teal-400 shadow-xs' 
+                              : 'text-slate-400 hover:text-slate-600'
+                          }`}
+                          title={isRtl ? 'عرض البطاقات' : 'Cards view'}
+                        >
+                          <LayoutGrid className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => setWaitingRoomViewMode('table')}
+                          className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+                            waitingRoomViewMode === 'table' 
+                              ? 'bg-white dark:bg-slate-900 text-teal-600 dark:text-teal-400 shadow-xs' 
+                              : 'text-slate-400 hover:text-slate-600'
+                          }`}
+                          title={isRtl ? 'عرض الجدول' : 'Table view'}
+                        >
+                          <List className="w-4 h-4" />
+                        </button>
+                      </div>
+
+                      <button
+                        onClick={() => triggerNotice(t('today.nextCalled'))}
+                        className={`px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl shadow-xs cursor-pointer flex items-center gap-1.5 ring-1 ring-teal-700/20 ${isRtl ? 'flex-row-reverse' : ''}`}
+                      >
+                        <Volume2 className="w-4 h-4" />
+                        <span>{t('waitingRoom.callNext')}</span>
+                      </button>
+                    </div>
                   </div>
 
-              {waitingRoomQueue.length === 0 ? (
-                <div className="p-8 text-center text-slate-500 font-bold text-xs border rounded-xl border-dashed border-slate-300 dark:border-slate-800">
-                  {isRtl ? 'لا يوجد مرضى حالياً في قائمة الانتظار الحية لهذا اليوم التشغيلي' : 'No patients currently in waiting queue for this operational day'}
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {waitingRoomQueue.map((item) => (
-                    <div key={item.id} className={`p-4 rounded-xl border space-y-3 ${
-                      item.status === 'examination' ? 'border-teal-50 bg-teal-500/5' : 'border-slate-200 dark:border-slate-800'
-                    } ${isRtl ? 'text-right' : 'text-left'}`}>
-                      <div className={`flex items-center justify-between ${isRtl ? 'flex-row-reverse' : ''}`}>
-                        <span className="font-mono font-bold text-teal-600 text-sm">{item.bookingReference || item.id}</span>
-                        <span className="text-[11px] text-slate-500 font-mono">{item.time}</span>
-                      </div>
-
-                      <div>
-                        <strong className="block text-slate-900 dark:text-white font-bold">{item.patientName}</strong>
-                        <span className="text-slate-500 text-[11px] block font-mono">{item.phone !== '—' ? item.phone : ''}</span>
-                      </div>
-
-                      <div className="flex items-center justify-between gap-2">
-                         <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
-                            item.status === 'examination' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' :
-                            item.status === 'waiting' ? 'bg-amber-50 text-amber-800 border-amber-200' :
-                            'bg-slate-100 text-slate-700 border-slate-200'
-                         }`}>
-                            {t(`waitingRoom.status.${item.status}`) || item.status}
-                         </span>
-                         <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
-                            item.priority === 'emergency' ? 'bg-rose-50 text-rose-800 border-rose-200' :
-                            item.priority === 'followup' ? 'bg-purple-50 text-purple-800 border-purple-200' :
-                            'bg-blue-50 text-blue-800 border-blue-200'
-                         }`}>
-                            {t(`typeFilter.${item.priority === 'normal' ? 'all' : item.priority}`)}
-                         </span>
-                      </div>
-
-                      <div className={`flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-800 text-xs ${isRtl ? 'flex-row-reverse' : ''}`}>
-                        <button
-                          onClick={() => triggerNotice(isRtl ? `تم تأجيل دور المريض ${item.patientName}` : `Patient ${item.patientName} turn postponed`)}
-                          className="text-amber-600 hover:underline font-bold text-[11px] cursor-pointer"
-                        >
-                          {t('waitingRoom.actions.postpone')}
-                        </button>
-
-                        <button
-                          onClick={() => triggerNotice(isRtl ? `تم تسجيل المريض ${item.patientName} كـ غائب` : `Patient ${item.patientName} marked as absent`)}
-                          className="text-rose-600 hover:underline font-bold text-[11px] cursor-pointer"
-                        >
-                          {t('waitingRoom.actions.considerAbsent')}
-                        </button>
-                      </div>
+                  {waitingRoomQueue.length === 0 ? (
+                    <div className="p-10 text-center text-slate-400 font-bold text-xs border rounded-2xl border-dashed border-slate-200 dark:border-slate-800">
+                      {isRtl ? 'لا يوجد مرضى حالياً في قائمة الانتظار الحية لهذا اليوم التشغيلي' : 'No patients currently in waiting queue for this operational day'}
                     </div>
-                  ))}
-                </div>
+                  ) : waitingRoomViewMode === 'cards' ? (
+                    /* Cards Grid View */
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {waitingRoomQueue.map((item, idx) => (
+                        <div key={item.id} className={`p-4 rounded-2xl border space-y-3.5 transition-all ${
+                          item.status === 'examination' 
+                            ? 'border-teal-500/40 bg-teal-500/5 ring-1 ring-teal-500/20' 
+                            : 'border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900/60 hover:shadow-xs'
+                        } ${isRtl ? 'text-right' : 'text-left'}`}>
+                          
+                          <div className={`flex items-center justify-between ${isRtl ? 'flex-row-reverse' : ''}`}>
+                            <div className="flex items-center gap-2">
+                              <span className="w-7 h-7 rounded-lg bg-teal-500/10 text-teal-700 dark:text-teal-300 font-mono font-black text-xs flex items-center justify-center border border-teal-500/20">
+                                #{String(idx + 1).padStart(2, '0')}
+                              </span>
+                              <span className="font-mono font-bold text-slate-600 dark:text-slate-400 text-xs">{item.bookingReference || item.id}</span>
+                            </div>
+                            <span className="text-[11px] text-slate-500 font-mono bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md font-medium">
+                              {item.time}
+                            </span>
+                          </div>
+
+                          <div>
+                            <strong className="block text-slate-900 dark:text-white font-extrabold text-sm">{item.patientName}</strong>
+                            <div className="flex items-center gap-2 text-slate-400 text-[11px] font-mono mt-0.5">
+                              <span>MRN: {item.mrn !== '—' ? item.mrn : '—'}</span>
+                              {item.phone && item.phone !== '—' && (
+                                <>
+                                  <span>•</span>
+                                  <span>{item.phone}</span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between gap-2 pt-1">
+                            <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
+                              item.status === 'examination' ? 'bg-indigo-50 text-indigo-800 border-indigo-200 dark:bg-indigo-950/60 dark:text-indigo-300 dark:border-indigo-800' :
+                              item.status === 'waiting' ? 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800' :
+                              'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'
+                            }`}>
+                              {t(`waitingRoom.status.${item.status}`) || item.status}
+                            </span>
+                            <span className="text-[10px] text-slate-500 font-bold">
+                              {item.doctorName !== '—' ? item.doctorName : ''}
+                            </span>
+                          </div>
+
+                          <div className={`flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800 text-xs gap-2 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                            <button
+                              onClick={() => triggerNotice(isRtl ? `تم استدعاء المريض ${item.patientName} بنجاح إلى العيادة` : `Patient ${item.patientName} called to clinic successfully`)}
+                              className="px-3 py-1.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-[10.5px] cursor-pointer shadow-2xs transition-all flex items-center gap-1"
+                            >
+                              <Volume2 className="w-3.5 h-3.5" />
+                              <span>{t('waitingRoom.actions.callToClinic')}</span>
+                            </button>
+
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => triggerNotice(isRtl ? `تم تأجيل دور المريض ${item.patientName}` : `Patient ${item.patientName} turn postponed`)}
+                                className="text-amber-600 dark:text-amber-400 hover:underline font-bold text-[10.5px] cursor-pointer"
+                              >
+                                {t('waitingRoom.actions.postpone')}
+                              </button>
+
+                              <button
+                                onClick={() => triggerNotice(isRtl ? `تم تسجيل المريض ${item.patientName} كـ غائب` : `Patient ${item.patientName} marked as absent`)}
+                                className="text-rose-600 dark:text-rose-400 hover:underline font-bold text-[10.5px] cursor-pointer"
+                              >
+                                {t('waitingRoom.actions.considerAbsent')}
+                              </button>
+                            </div>
+                          </div>
+
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    /* Table View */
+                    <div className="overflow-x-auto rounded-xl border border-slate-200/80 dark:border-slate-800">
+                      <table className={`w-full text-xs ${isRtl ? 'text-right' : 'text-left'}`}>
+                        <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 font-bold border-b border-slate-200/80 dark:border-slate-800">
+                          <tr>
+                            <th className="p-3 font-mono">#</th>
+                            <th className="p-3">{t('today.table.ref')}</th>
+                            <th className="p-3">{t('waitingRoom.table.patientName')}</th>
+                            <th className="p-3">{t('waitingRoom.table.time')}</th>
+                            <th className="p-3">{isRtl ? 'الطبيب' : 'Doctor'}</th>
+                            <th className="p-3">{t('waitingRoom.table.status')}</th>
+                            <th className="p-3 text-center">{t('waitingRoom.table.action')}</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                          {waitingRoomQueue.map((item, idx) => (
+                            <tr key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/40">
+                              <td className="p-3 font-mono font-bold text-teal-600">{idx + 1}</td>
+                              <td className="p-3 font-mono text-slate-500">{item.bookingReference || item.id}</td>
+                              <td className="p-3">
+                                <strong className="block text-slate-900 dark:text-white font-bold">{item.patientName}</strong>
+                                <span className="text-[10px] text-slate-400 font-mono">{item.mrn}</span>
+                              </td>
+                              <td className="p-3 font-mono text-slate-500">{item.time}</td>
+                              <td className="p-3 text-slate-700 dark:text-slate-300 font-medium">{item.doctorName}</td>
+                              <td className="p-3">
+                                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
+                                  item.status === 'examination' ? 'bg-indigo-50 text-indigo-800 border-indigo-200 dark:bg-indigo-950/60 dark:text-indigo-300 dark:border-indigo-800' :
+                                  item.status === 'waiting' ? 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800' :
+                                  'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'
+                                }`}>
+                                  {t(`waitingRoom.status.${item.status}`) || item.status}
+                                </span>
+                              </td>
+                              <td className="p-3 text-center">
+                                <button
+                                  onClick={() => triggerNotice(isRtl ? `تم استدعاء المريض ${item.patientName} بنجاح` : `Patient ${item.patientName} called`)}
+                                  className="px-3 py-1 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-lg text-[10.5px] cursor-pointer"
+                                >
+                                  {t('waitingRoom.actions.callToClinic')}
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </>
               )}
-            </>
+            </div>
           )}
-        </div>
-      )}
 
           {/* TAB 4: APPOINTMENTS MANAGEMENT */}
           {activeTab === 'appointments' && (
@@ -1179,27 +1558,27 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
                 </div>
               ) : (
                 <>
-                  <div className={`flex items-center justify-between border-b pb-4 border-slate-200 dark:border-slate-800 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                  <div className={`flex items-center justify-between border-b pb-4 border-slate-100 dark:border-slate-800 ${isRtl ? 'flex-row-reverse' : ''}`}>
                     <div className={isRtl ? 'text-right' : 'text-left'}>
                       <span className={`text-xs font-mono font-bold text-teal-600 block ${isRtl ? 'text-right' : 'text-left'}`}>/assistant/appointments</span>
-                      <h2 className="text-lg font-bold text-slate-900 dark:text-white">{t('tabs.appointments')}</h2>
+                      <h2 className="text-lg font-extrabold text-slate-900 dark:text-white">{t('tabs.appointments')}</h2>
                     </div>
                     {canCreateBooking && (
                       <button
                         onClick={() => setShowNewBookingWizard(true)}
-                        className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer"
+                        className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer ring-1 ring-teal-700/20"
                       >
-                        <Plus className="w-4 h-4" />
+                        <Plus className="w-4 h-4 stroke-[2.5]" />
                         <span>{t('dashboard.newBooking')}</span>
                       </button>
                     )}
                   </div>
 
                   {/* Filter Controls Bar */}
-                  <div className="space-y-3 bg-slate-50 dark:bg-slate-950/60 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+                  <div className="space-y-3.5 bg-slate-50/70 dark:bg-slate-950/60 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800">
                     <div className={`flex flex-wrap items-center gap-3 justify-between ${isRtl ? 'flex-row-reverse' : ''}`}>
                       {/* Date Mode Segmented Buttons */}
-                      <div className={`flex items-center gap-1 bg-white dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-800 text-xs ${isRtl ? 'flex-row-reverse' : ''}`}>
+                      <div className={`flex items-center gap-1 bg-white dark:bg-slate-900 p-1 rounded-xl border border-slate-200/80 dark:border-slate-800 text-xs ${isRtl ? 'flex-row-reverse' : ''}`}>
                         <button
                           type="button"
                           onClick={() => setAppointmentsDateMode('today')}
@@ -1252,7 +1631,7 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
                         <select
                           value={selectedDoctorId}
                           onChange={(e) => setSelectedDoctorId(e.target.value)}
-                          className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-teal-500 cursor-pointer"
+                          className="px-3 py-1.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-teal-500 cursor-pointer"
                         >
                           <option value="">{isRtl ? 'جميع أطباء العيادة' : 'All Clinic Doctors'}</option>
                           {clinicDoctors.map((doc) => (
@@ -1266,20 +1645,19 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
 
                     {/* Conditional Date Pickers */}
                     {appointmentsDateMode === 'specific' && (
-                      <div className={`flex items-center gap-2 text-xs pt-2 border-t border-slate-200 dark:border-slate-800 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                      <div className={`flex items-center gap-2 text-xs pt-2 border-t border-slate-200/60 dark:border-slate-800 ${isRtl ? 'flex-row-reverse' : ''}`}>
                         <label className="text-slate-500 font-bold">{isRtl ? 'اختر التاريخ:' : 'Select Date:'}</label>
                         <input
                           type="date"
                           value={appointmentsDate}
                           onChange={(e) => setAppointmentsDate(e.target.value)}
                           className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-mono font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-teal-500 cursor-pointer"
-                        >
-                        </input>
+                        />
                       </div>
                     )}
 
                     {appointmentsDateMode === 'range' && (
-                      <div className={`flex flex-wrap items-center gap-3 text-xs pt-2 border-t border-slate-200 dark:border-slate-800 ${isRtl ? 'flex-row-reverse' : ''}`}>
+                      <div className={`flex flex-wrap items-center gap-3 text-xs pt-2 border-t border-slate-200/60 dark:border-slate-800 ${isRtl ? 'flex-row-reverse' : ''}`}>
                         <div className={`flex items-center gap-2 ${isRtl ? 'flex-row-reverse' : ''}`}>
                           <label className="text-slate-500 font-bold">{isRtl ? 'من:' : 'From:'}</label>
                           <input
@@ -1309,7 +1687,7 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         placeholder={t('today.searchPlaceholder')}
-                        className={`w-full py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs focus:outline-none ${isRtl ? 'pl-3 pr-9' : 'pr-3 pl-9'}`}
+                        className={`w-full py-2.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs focus:outline-none focus:ring-1 focus:ring-teal-500 ${isRtl ? 'pl-3 pr-9' : 'pr-3 pl-9'}`}
                       />
                     </div>
                   </div>
@@ -1336,7 +1714,7 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
 
                     if (filteredApps.length === 0) {
                       return (
-                        <div className="p-8 text-center text-slate-500 font-bold text-xs border rounded-xl border-dashed border-slate-300 dark:border-slate-800">
+                        <div className="p-10 text-center text-slate-400 font-bold text-xs border rounded-2xl border-dashed border-slate-200 dark:border-slate-800">
                           {isRtl ? 'لا توجد مواعيد مطابقة لخيارات الفلترة الحالية' : 'No appointments matching current filters'}
                         </div>
                       );
@@ -1354,13 +1732,13 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
                     const sortedDates = Object.keys(grouped).sort();
 
                     return (
-                      <div className="space-y-6">
+                      <div className="space-y-5">
                         {sortedDates.map((dateKey) => {
                           const appsForDate = grouped[dateKey].sort((a, b) => (a.timeSlot || '').localeCompare(b.timeSlot || ''));
                           return (
-                            <div key={dateKey} className="rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden space-y-0">
-                              <div className={`p-3.5 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between ${isRtl ? 'flex-row-reverse' : ''}`}>
-                                <div className={`flex items-center gap-2 font-bold text-slate-800 dark:text-slate-200 text-xs ${isRtl ? 'flex-row-reverse' : ''}`}>
+                            <div key={dateKey} className="rounded-2xl border border-slate-200/80 dark:border-slate-800 overflow-hidden space-y-0">
+                              <div className={`p-3.5 bg-slate-100/70 dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between ${isRtl ? 'flex-row-reverse' : ''}`}>
+                                <div className={`flex items-center gap-2 font-extrabold text-slate-800 dark:text-slate-200 text-xs ${isRtl ? 'flex-row-reverse' : ''}`}>
                                   <CalendarDays className="w-4 h-4 text-teal-600" />
                                   <span className="font-mono">{dateKey}</span>
                                 </div>
@@ -1370,7 +1748,7 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
                               </div>
                               <div className="overflow-x-auto">
                                 <table className={`w-full text-xs ${isRtl ? 'text-right' : 'text-left'}`}>
-                                  <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 font-bold border-b border-slate-200 dark:border-slate-800">
+                                  <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 font-bold border-b border-slate-200/80 dark:border-slate-800">
                                     <tr>
                                       <th className="p-3">{t('today.table.ref')}</th>
                                       <th className="p-3">{t('today.table.patient')}</th>
@@ -1380,19 +1758,22 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
                                       <th className="p-3 text-center">{t('today.table.actions')}</th>
                                     </tr>
                                   </thead>
-                                  <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
                                     {appsForDate.map((app) => (
-                                      <tr key={app.id}>
-                                        <td className="p-3 font-mono text-teal-600 font-bold">{app.bookingReference || app.id}</td>
-                                        <td className="p-3 font-bold text-slate-900 dark:text-white">{app.patientName}</td>
+                                      <tr key={app.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                                        <td className="p-3 font-mono text-teal-600 dark:text-teal-400 font-bold">{app.bookingReference || app.id}</td>
+                                        <td className="p-3">
+                                          <strong className="block text-slate-900 dark:text-white font-bold">{app.patientName}</strong>
+                                          <span className="text-[10px] text-slate-400 font-mono">{app.mrn}</span>
+                                        </td>
                                         <td className="p-3 font-mono text-slate-500">{app.timeSlot || app.time || '—'}</td>
                                         <td className="p-3 font-bold text-slate-700 dark:text-slate-300">{app.doctorName}</td>
                                         <td className="p-3">
-                                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
-                                            app.status === 'confirmed' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' :
-                                            app.status === 'pending' ? 'bg-amber-50 text-amber-800 border-amber-200' :
-                                            app.status === 'cancelled' || app.status === 'rejected' ? 'bg-rose-50 text-rose-800 border-rose-200' :
-                                            'bg-blue-50 text-blue-800 border-blue-200'
+                                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
+                                            app.status === 'confirmed' ? 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800' :
+                                            app.status === 'pending' ? 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800' :
+                                            app.status === 'cancelled' || app.status === 'rejected' ? 'bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800' :
+                                            'bg-blue-50 text-blue-800 border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800'
                                           }`}>
                                             {t(`waitingRoom.status.${app.status}`) || app.status}
                                           </span>
@@ -1403,7 +1784,7 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
                                             <button
                                               onClick={() => handleConfirmAppointment(app.id)}
                                               disabled={confirmingId === app.id}
-                                              className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-md text-[10px] cursor-pointer transition-colors shadow-xs disabled:opacity-50 inline-flex items-center gap-1"
+                                              className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-[10px] cursor-pointer transition-colors shadow-2xs disabled:opacity-50 inline-flex items-center gap-1"
                                             >
                                               {confirmingId === app.id ? (
                                                 <RefreshCw className="w-3 h-3 animate-spin" />
@@ -1419,14 +1800,14 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
                                               {!['attended', 'cancelled', 'rejected', 'expired'].includes(app.status) && (
                                                 <button
                                                   onClick={() => handleOpenReschedule(app)}
-                                                  className="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 font-bold rounded-md text-[10px] cursor-pointer transition-colors"
+                                                  className="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800 font-bold rounded-lg text-[10px] cursor-pointer transition-colors"
                                                 >
                                                   {t('today.table.reschedule')}
                                                 </button>
                                               )}
                                               <button
                                                 onClick={() => handleCancelAppointment(app.id, app.patientName)}
-                                                className="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 font-bold rounded-md text-[10px] cursor-pointer transition-colors"
+                                                className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 font-bold rounded-lg text-[10px] cursor-pointer transition-colors"
                                               >
                                                 {t('today.table.cancel')}
                                               </button>
@@ -1449,17 +1830,17 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
             </div>
           )}
 
-          {/* TAB 5: RECEPTION */}
+          {/* TAB 5: RECEPTION & FAST CHECK-IN */}
           {activeTab === 'reception' && (
             <div className={`${containerClass} rounded-2xl p-6 border space-y-6`}>
-              <div className={`flex items-center justify-between border-b pb-4 border-slate-200 dark:border-slate-800 ${isRtl ? 'flex-row-reverse' : ''}`}>
+              <div className={`flex items-center justify-between border-b pb-4 border-slate-100 dark:border-slate-800 ${isRtl ? 'flex-row-reverse' : ''}`}>
                 <div className={isRtl ? 'text-right' : 'text-left'}>
                   <span className={`text-xs font-mono font-bold text-teal-600 block ${isRtl ? 'text-right' : 'text-left'}`}>/assistant/reception</span>
-                  <h2 className="text-lg font-bold text-slate-900 dark:text-white">{t('reception.title')}</h2>
+                  <h2 className="text-lg font-extrabold text-slate-900 dark:text-white">{t('reception.title')}</h2>
                 </div>
                 <button
                   onClick={() => setShowScanner(true)}
-                  className={`px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer flex items-center gap-2 ${isRtl ? 'flex-row-reverse' : ''}`}
+                  className={`px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer flex items-center gap-1.5 ring-1 ring-teal-700/20 ${isRtl ? 'flex-row-reverse' : ''}`}
                 >
                   <ScanLine className="w-4 h-4" />
                   <span>{isRtl ? 'مسح تذكرة QR' : 'Scan QR Pass'}</span>
@@ -1467,31 +1848,36 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
               </div>
 
               <div className={`max-w-xl space-y-4 ${isRtl ? 'mr-0 ml-auto' : 'ml-0 mr-auto'}`}>
-                <div className={`space-y-1 ${isRtl ? 'text-right' : 'text-left'}`}>
+                <div className={`space-y-1.5 ${isRtl ? 'text-right' : 'text-left'}`}>
                   <label className="text-xs font-bold text-slate-700 dark:text-slate-300">{t('reception.searchLabel')}</label>
-                  <input
-                    type="text"
-                    value={receptionSearchQuery}
-                    onChange={(e) => setReceptionSearchQuery(e.target.value)}
-                    placeholder={t('reception.searchPlaceholder')}
-                    className={`w-full p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs focus:outline-none ${isRtl ? 'text-right' : 'text-left'}`}
-                  />
+                  <div className="relative">
+                    <Search className={`w-4 h-4 absolute top-3.5 text-slate-400 ${isRtl ? 'right-3.5' : 'left-3.5'}`} />
+                    <input
+                      type="text"
+                      value={receptionSearchQuery}
+                      onChange={(e) => setReceptionSearchQuery(e.target.value)}
+                      placeholder={t('reception.searchPlaceholder')}
+                      className={`w-full p-3 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs focus:outline-none focus:ring-1 focus:ring-teal-500 ${isRtl ? 'pr-10 pl-3 text-right' : 'pl-10 pr-3 text-left'}`}
+                    />
+                  </div>
                 </div>
 
                 {matchingReceptionPatients.length > 0 ? (
                   matchingReceptionPatients.map((pat) => (
-                    <div key={pat.id} className={`p-4 rounded-xl border border-teal-500/30 bg-teal-500/5 space-y-3 text-xs ${isRtl ? 'text-right' : 'text-left'}`}>
+                    <div key={pat.id} className={`p-4 rounded-2xl border border-teal-500/30 bg-teal-500/5 space-y-3 text-xs ${isRtl ? 'text-right' : 'text-left'}`}>
                       <div className={`flex items-center justify-between ${isRtl ? 'flex-row-reverse' : ''}`}>
-                        <strong className="text-teal-700 dark:text-teal-300 font-bold text-sm">{pat.patientName}</strong>
-                        <span className="font-mono bg-teal-600 text-white px-2 py-0.5 rounded text-[10px]">{pat.mrn !== '—' ? pat.mrn : pat.bookingReference}</span>
+                        <strong className="text-teal-700 dark:text-teal-300 font-extrabold text-sm">{pat.patientName}</strong>
+                        <span className="font-mono bg-teal-600 text-white px-2 py-0.5 rounded-md text-[10px] font-bold">
+                          {pat.mrn !== '—' ? pat.mrn : pat.bookingReference}
+                        </span>
                       </div>
-                      <p className="text-slate-600 dark:text-slate-400">
+                      <p className="text-slate-600 dark:text-slate-400 text-xs">
                         {isRtl
-                          ? `الموعد: ${pat.appointmentDate || ''} ${pat.timeSlot || ''} (${pat.doctorName !== '—' ? pat.doctorName : ''})`
-                          : `Scheduled: ${pat.appointmentDate || ''} ${pat.timeSlot || ''} (${pat.doctorName !== '—' ? pat.doctorName : ''})`}
+                          ? `الموعد: ${pat.appointmentDate || ''} • ${pat.timeSlot || ''} (${pat.doctorName !== '—' ? pat.doctorName : ''})`
+                          : `Scheduled: ${pat.appointmentDate || ''} • ${pat.timeSlot || ''} (${pat.doctorName !== '—' ? pat.doctorName : ''})`}
                       </p>
                       
-                      <div className="flex gap-2 pt-2">
+                      <div className="flex gap-2 pt-1">
                         {pat.status === 'arrived' || pat.status === 'waiting' || pat.status === 'examination' ? (
                           <div className={`flex items-center gap-2 px-4 py-2 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-bold rounded-xl text-xs border border-emerald-500/20 w-full justify-center ${isRtl ? 'flex-row-reverse' : ''}`}>
                             <CheckCircle className="w-4 h-4" />
@@ -1506,16 +1892,17 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
                               phone: pat.phone,
                               doctorName: pat.doctorName
                             })}
-                            className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs w-full transition-all"
+                            className="px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs w-full transition-all flex items-center justify-center gap-2"
                           >
-                            {t('reception.confirmArrival')}
+                            <UserCheck className="w-4 h-4" />
+                            <span>{t('reception.confirmArrival')}</span>
                           </button>
                         ) : null}
                       </div>
                     </div>
                   ))
                 ) : (
-                  <div className="p-6 text-center text-slate-500 font-bold text-xs border rounded-xl border-dashed border-slate-300 dark:border-slate-800 space-y-1">
+                  <div className="p-8 text-center text-slate-400 font-medium text-xs border rounded-2xl border-dashed border-slate-200 dark:border-slate-800 space-y-1">
                     <p>
                       {receptionSearchQuery.trim()
                         ? (isRtl ? 'لا تتوفر مواعيد مطابقة لهذا البحث حالياً' : 'No matching appointments found for this query')
@@ -1527,44 +1914,7 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
             </div>
           )}
 
-          {/* TAB 6: NOTIFICATIONS */}
-          {activeTab === 'notifications' && (
-            <div className={`${containerClass} rounded-2xl p-6 border space-y-6`}>
-              <div className={`flex items-center justify-between border-b pb-4 border-slate-200 dark:border-slate-800 ${isRtl ? 'flex-row-reverse' : ''}`}>
-                <div className={isRtl ? 'text-right' : 'text-left'}>
-                  <span className={`text-xs font-mono font-bold text-teal-600 block ${isRtl ? 'text-right' : 'text-left'}`}>/assistant/notifications</span>
-                  <h2 className="text-lg font-bold text-slate-900 dark:text-white">{t('notifications.title')}</h2>
-                </div>
-              </div>
-
-              <div className="p-8 text-center text-slate-500 font-bold text-xs border rounded-xl border-dashed border-slate-300 dark:border-slate-800">
-                <Bell className="w-8 h-8 text-slate-400 mx-auto mb-2 opacity-50" />
-                <p>{isRtl ? 'لا توجد تنبيهات حية حالياً' : 'No active notifications at this time'}</p>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 7: CALENDAR */}
-          {activeTab === 'calendar' && (
-            <div className={`${containerClass} rounded-2xl p-6 border space-y-6`}>
-              <div className={`flex items-center justify-between border-b pb-4 border-slate-200 dark:border-slate-800 ${isRtl ? 'flex-row-reverse' : ''}`}>
-                <div className={isRtl ? 'text-right' : 'text-left'}>
-                  <span className={`text-xs font-mono font-bold text-teal-600 block ${isRtl ? 'text-right' : 'text-left'}`}>/assistant/calendar</span>
-                  <h2 className="text-lg font-bold text-slate-900 dark:text-white">{t('calendar.title')}</h2>
-                </div>
-              </div>
-
-              <div className={`p-6 rounded-xl border border-slate-200 dark:border-slate-800 text-center space-y-3 ${isRtl ? 'text-right' : 'text-left'}`}>
-                <Calendar className="w-12 h-12 text-teal-600 mx-auto" />
-                <h3 className="font-bold text-sm mx-auto">{t('calendar.viewTitle')}</h3>
-                <p className="text-xs text-slate-500 max-w-md mx-auto">
-                  {t('calendar.description')}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* TAB: UNRESOLVED RESCHEDULES (DEC-VAC-06 / Option B Dashboard) */}
+          {/* TAB 6: UNRESOLVED RESCHEDULES (DEC-VAC-06 / Option B Dashboard) */}
           {activeTab === 'unresolved-reschedules' && (
             <div className="space-y-6">
               {activeClinicId || user?.clinic?.id ? (
@@ -1583,68 +1933,311 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
             </div>
           )}
 
-          {/* TAB 8: OPERATIONAL REPORTS */}
+          {/* TAB 7: FINANCIAL REWARDS */}
+          {activeTab === 'rewards' && (
+            <AssistantRewardsView isDarkMode={isDarkMode} isRtl={isRtl} />
+          )}
+
+          {/* TAB 8: OPERATIONAL CLINICAL REPORTS */}
           {activeTab === 'reports' && (
             <div className={`${containerClass} rounded-2xl p-6 border space-y-6`}>
-              <div className={`flex items-center justify-between border-b pb-4 border-slate-200 dark:border-slate-800 ${isRtl ? 'flex-row-reverse' : ''}`}>
+              <div className={`flex flex-wrap items-center justify-between gap-4 border-b pb-4 border-slate-100 dark:border-slate-800 ${isRtl ? 'flex-row-reverse' : ''}`}>
                 <div className={isRtl ? 'text-right' : 'text-left'}>
                   <span className={`text-xs font-mono font-bold text-teal-600 block ${isRtl ? 'text-right' : 'text-left'}`}>/assistant/reports</span>
-                  <h2 className="text-lg font-bold text-slate-900 dark:text-white">{t('reports.title')}</h2>
+                  <h2 className="text-lg font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                    <BarChart3 className="w-5 h-5 text-teal-600" />
+                    <span>{t('reports.title')}</span>
+                  </h2>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    {isRtl ? 'مؤشرات الأداء التشغيلي غير السريري لجلسة اليوم وتدفق قاعة الانتظار' : 'Non-clinical operational KPIs for current session flow & attendance discipline'}
+                  </p>
+                </div>
+
+                <div className="text-xs font-mono font-bold text-slate-400">
+                  {effectiveDate}
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                <div className={`p-4 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2 ${isRtl ? 'text-right' : 'text-left'}`}>
-                  <span className="text-slate-500 font-bold block">{t('reports.disciplineRate')}</span>
-                  <strong className="text-2xl font-black text-slate-400 block">—</strong>
-                  <p className="text-slate-500 text-[11px]">{isRtl ? 'غير متوفر حالياً (تتطلب بيانات تحليلية من الـ Backend)' : 'Currently unavailable (requires backend analytics)'}</p>
+              {/* Real Operational KPI Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+                
+                {/* Attendance Discipline Rate */}
+                <div className={`p-4 rounded-2xl border border-teal-500/20 bg-teal-500/5 space-y-2 ${isRtl ? 'text-right' : 'text-left'}`}>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-600 dark:text-slate-300 font-bold block">{t('reports.disciplineRate')}</span>
+                    <TrendingUp className="w-4 h-4 text-teal-600" />
+                  </div>
+                  <strong className="text-3xl font-black text-teal-700 dark:text-teal-300 font-mono block">
+                    {todayTotalCount > 0 ? `${attendanceRate}%` : '—'}
+                  </strong>
+                  <div className="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                    <div className="bg-teal-600 h-full rounded-full transition-all duration-500" style={{ width: `${attendanceRate}%` }} />
+                  </div>
+                  <p className="text-slate-500 text-[10.5px]">
+                    {isRtl ? `${checkedInCount} من أصل ${todayTotalCount} مريض سجلوا حضورهم` : `${checkedInCount} of ${todayTotalCount} attended`}
+                  </p>
                 </div>
 
-                <div className={`p-4 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2 ${isRtl ? 'text-right' : 'text-left'}`}>
-                  <span className="text-slate-500 font-bold block">{t('reports.avgWaiting')}</span>
-                  <strong className="text-2xl font-black text-slate-400 block">—</strong>
-                  <p className="text-slate-500 text-[11px]">{isRtl ? 'غير متوفر حالياً (تتطلب بيانات تحليلية من الـ Backend)' : 'Currently unavailable (requires backend analytics)'}</p>
+                {/* Consultation Completion Rate */}
+                <div className={`p-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 space-y-2 ${isRtl ? 'text-right' : 'text-left'}`}>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-600 dark:text-slate-300 font-bold block">{isRtl ? 'نسبة إنجاز الكشوفات' : 'Consultations Done'}</span>
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  </div>
+                  <strong className="text-3xl font-black text-emerald-700 dark:text-emerald-300 font-mono block">
+                    {todayTotalCount > 0 ? `${completionRate}%` : '—'}
+                  </strong>
+                  <div className="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                    <div className="bg-emerald-600 h-full rounded-full transition-all duration-500" style={{ width: `${completionRate}%` }} />
+                  </div>
+                  <p className="text-slate-500 text-[10.5px]">
+                    {isRtl ? `${completedCount} مريض أتموا الكشف بالعيادة` : `${completedCount} finished consultation`}
+                  </p>
+                </div>
+
+                {/* Waiting Room Pressure */}
+                <div className={`p-4 rounded-2xl border border-amber-500/20 bg-amber-500/5 space-y-2 ${isRtl ? 'text-right' : 'text-left'}`}>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-600 dark:text-slate-300 font-bold block">{isRtl ? 'ضغط قاعة الانتظار' : 'Waiting Queue Load'}</span>
+                    <Users className="w-4 h-4 text-amber-600" />
+                  </div>
+                  <strong className="text-3xl font-black text-amber-600 dark:text-amber-400 font-mono block">
+                    {inWaitingRoomCount}
+                  </strong>
+                  <p className="text-slate-500 text-[10.5px]">
+                    {isRtl ? `${inExaminationCount} في غرفة الكشف حالياً` : `${inExaminationCount} currently in exam`}
+                  </p>
+                </div>
+
+                {/* Drop-off / Cancellations */}
+                <div className={`p-4 rounded-2xl border border-rose-500/20 bg-rose-500/5 space-y-2 ${isRtl ? 'text-right' : 'text-left'}`}>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-600 dark:text-slate-300 font-bold block">{isRtl ? 'فاقد الحضور (غياب/إلغاء)' : 'Drop-off / Absent'}</span>
+                    <XCircle className="w-4 h-4 text-rose-600" />
+                  </div>
+                  <strong className="text-3xl font-black text-rose-600 dark:text-rose-400 font-mono block">
+                    {noShowCount}
+                  </strong>
+                  <p className="text-slate-500 text-[10.5px]">
+                    {isRtl ? 'مواعيد تعذر إجراؤها أو تغيب أصحابها' : 'Missed or cancelled appointments'}
+                  </p>
+                </div>
+
+              </div>
+
+              {/* Status Breakdown Progress Cards */}
+              <div className="p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 space-y-4">
+                <h4 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                  <PieChart className="w-4 h-4 text-teal-600" />
+                  <span>{isRtl ? 'تفصيل الحالة التشغيلية لجميع مواعيد اليوم' : 'Operational Status Breakdown'}</span>
+                </h4>
+
+                <div className="space-y-3 text-xs">
+                  <div>
+                    <div className="flex justify-between mb-1">
+                      <span className="font-bold text-slate-700 dark:text-slate-300">{isRtl ? 'المكتمل ومن حضر الكشف' : 'Completed & Attended'}</span>
+                      <span className="font-mono font-bold text-emerald-600">{completedCount} ({todayTotalCount > 0 ? Math.round((completedCount/todayTotalCount)*100) : 0}%)</span>
+                    </div>
+                    <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                      <div className="bg-emerald-600 h-full rounded-full" style={{ width: `${todayTotalCount > 0 ? (completedCount/todayTotalCount)*100 : 0}%` }} />
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex justify-between mb-1">
+                      <span className="font-bold text-slate-700 dark:text-slate-300">{isRtl ? 'بانتظار الاستدعاء بقاعة الانتظار' : 'In Waiting Room'}</span>
+                      <span className="font-mono font-bold text-amber-600">{inWaitingRoomCount} ({todayTotalCount > 0 ? Math.round((inWaitingRoomCount/todayTotalCount)*100) : 0}%)</span>
+                    </div>
+                    <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                      <div className="bg-amber-500 h-full rounded-full" style={{ width: `${todayTotalCount > 0 ? (inWaitingRoomCount/todayTotalCount)*100 : 0}%` }} />
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex justify-between mb-1">
+                      <span className="font-bold text-slate-700 dark:text-slate-300">{isRtl ? 'مؤكد - لم يصل للعيادة بعد' : 'Confirmed (Awaiting Arrival)'}</span>
+                      <span className="font-mono font-bold text-teal-600">{unarrivedCount} ({todayTotalCount > 0 ? Math.round((unarrivedCount/todayTotalCount)*100) : 0}%)</span>
+                    </div>
+                    <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                      <div className="bg-teal-600 h-full rounded-full" style={{ width: `${todayTotalCount > 0 ? (unarrivedCount/todayTotalCount)*100 : 0}%` }} />
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex justify-between mb-1">
+                      <span className="font-bold text-slate-700 dark:text-slate-300">{isRtl ? 'ملغى أو غائب' : 'Cancelled or Absent'}</span>
+                      <span className="font-mono font-bold text-rose-600">{noShowCount} ({todayTotalCount > 0 ? Math.round((noShowCount/todayTotalCount)*100) : 0}%)</span>
+                    </div>
+                    <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                      <div className="bg-rose-500 h-full rounded-full" style={{ width: `${todayTotalCount > 0 ? (noShowCount/todayTotalCount)*100 : 0}%` }} />
+                    </div>
+                  </div>
                 </div>
               </div>
+
             </div>
           )}
 
-          {/* TAB 9: PROFILE */}
+          {/* TAB 9: CLINICAL ASSISTANT CREDENTIAL & PROFILE */}
           {activeTab === 'profile' && (
             <div className={`${containerClass} rounded-2xl p-6 border space-y-6`}>
-              <div className={`flex items-center justify-between border-b pb-4 border-slate-200 dark:border-slate-800 ${isRtl ? 'flex-row-reverse' : ''}`}>
+              <div className={`flex items-center justify-between border-b pb-4 border-slate-100 dark:border-slate-800 ${isRtl ? 'flex-row-reverse' : ''}`}>
                 <div className={isRtl ? 'text-right' : 'text-left'}>
                   <span className={`text-xs font-mono font-bold text-teal-600 block ${isRtl ? 'text-right' : 'text-left'}`}>/assistant/profile</span>
-                  <h2 className="text-lg font-bold text-slate-900 dark:text-white">{t('profile.title')}</h2>
+                  <h2 className="text-lg font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                    <User className="w-5 h-5 text-teal-600" />
+                    <span>{t('profile.title')}</span>
+                  </h2>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    {isRtl ? 'بيانات الاعتماد المهني لمساعد الطبيب ومحددات الأمان السريري' : 'Clinical assistant professional badge, credentials and operational scope'}
+                  </p>
                 </div>
               </div>
 
-              <div className={`space-y-3 text-xs ${isRtl ? 'text-right' : 'text-left'}`}>
-                <p><strong>{t('profile.nameLabel')}</strong> {user?.name || '—'}</p>
-                <p><strong>{t('profile.clinicLabel')}</strong> {user?.active_clinic?.name || user?.clinic?.name || '—'}</p>
-                <p><strong>{t('profile.phoneLabel')}</strong> {user?.phone || '—'}</p>
-                <p><strong>{t('profile.roleLabel')}</strong> {user?.roles?.[0] || 'doctor_assistant'}</p>
+              {/* Official Credential ID Badge Card */}
+              <div className="p-5 sm:p-6 rounded-2xl border border-teal-500/30 bg-gradient-to-br from-teal-500/10 via-white to-slate-50 dark:from-teal-950/40 dark:via-slate-900 dark:to-slate-950 space-y-5">
+                <div className={`flex flex-col sm:flex-row items-center gap-4 ${isRtl ? 'sm:flex-row-reverse text-right' : 'text-left'}`}>
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-600 to-teal-700 text-white flex items-center justify-center font-black text-2xl shadow-md ring-4 ring-teal-500/20 shrink-0">
+                    {user?.name ? user.name.charAt(0).toUpperCase() : 'A'}
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white tracking-tight">
+                        {user?.name || (isRtl ? 'سارة بنت إبراهيم' : 'Assistant Staff')}
+                      </h3>
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-teal-600 text-white flex items-center gap-1 shadow-2xs">
+                        <BadgeCheck className="w-3.5 h-3.5" />
+                        <span>{isRtl ? 'مساعد طبيب معتمد' : 'Verified Assistant'}</span>
+                      </span>
+                    </div>
+                    <p className="text-xs font-bold text-slate-600 dark:text-slate-300">
+                      {user?.active_clinic?.name || user?.clinic?.name || t('clinicName')}
+                    </p>
+                    <p className="text-[11px] font-mono text-slate-400">
+                      ID: {user?.id ? user.id.slice(0, 12) : 'AST-2026-DZ'} • Role: doctor_assistant
+                    </p>
+                  </div>
+                </div>
+
+                {/* Identity Metadata Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 pt-3 border-t border-slate-200/80 dark:border-slate-800 text-xs">
+                  <div className="p-3 rounded-xl bg-white/70 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800">
+                    <span className="text-[10.5px] font-bold text-slate-400 block mb-0.5">{isRtl ? 'البريد الإلكتروني الوظيفي' : 'Work Email'}</span>
+                    <strong className="text-slate-800 dark:text-slate-200 font-mono">{user?.email || '—'}</strong>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-white/70 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800">
+                    <span className="text-[10.5px] font-bold text-slate-400 block mb-0.5">{isRtl ? 'رقم الهاتف المعتمد' : 'Registered Phone'}</span>
+                    <strong className="text-slate-800 dark:text-slate-200 font-mono">{user?.phone || '0555 12 34 56'}</strong>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-white/70 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800">
+                    <span className="text-[10.5px] font-bold text-slate-400 block mb-0.5">{isRtl ? 'حالة الاعتماد في المنصة' : 'Platform Standing'}</span>
+                    <span className="inline-flex items-center gap-1 font-bold text-emerald-600 text-xs">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                      <span>{isRtl ? 'نشط ومصرح بالكامل' : 'Active & Certified'}</span>
+                    </span>
+                  </div>
+                </div>
               </div>
 
+              {/* 4D RBAC Capabilities Card */}
               <AssistantCapabilitiesCard isRtl={isRtl} isDarkMode={isDarkMode} />
             </div>
           )}
 
-          {/* TAB 10: SETTINGS */}
+          {/* TAB 10: SETTINGS & WORKSTATION PREFERENCES */}
           {activeTab === 'settings' && (
             <div className={`${containerClass} rounded-2xl p-6 border space-y-6`}>
-              <div className={`flex items-center justify-between border-b pb-4 border-slate-200 dark:border-slate-800 ${isRtl ? 'flex-row-reverse' : ''}`}>
+              <div className={`flex items-center justify-between border-b pb-4 border-slate-100 dark:border-slate-800 ${isRtl ? 'flex-row-reverse' : ''}`}>
                 <div className={isRtl ? 'text-right' : 'text-left'}>
                   <span className={`text-xs font-mono font-bold text-teal-600 block ${isRtl ? 'text-right' : 'text-left'}`}>/assistant/settings</span>
-                  <h2 className="text-lg font-bold text-slate-900 dark:text-white">{t('settings.title')}</h2>
+                  <h2 className="text-lg font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                    <Settings className="w-5 h-5 text-teal-600" />
+                    <span>{t('settings.title')}</span>
+                  </h2>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    {isRtl ? 'تفضيلات محطة العمل، التنبيهات الصوتية وتأمين الحساب الشخصي' : 'Workstation audio chimes, queue view preferences and security credentials'}
+                  </p>
                 </div>
               </div>
 
-              <AssistantCapabilitiesCard isRtl={isRtl} isDarkMode={isDarkMode} />
+              {/* Workstation UI Preferences */}
+              <div className="p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40 space-y-4">
+                <h3 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                  <SlidersHorizontal className="w-4 h-4 text-teal-600" />
+                  <span>{isRtl ? 'تفضيلات محطة عمل الاستقبال' : 'Reception Workstation Preferences'}</span>
+                </h3>
 
+                <div className="space-y-3 text-xs">
+                  {/* Sound Chime Toggle */}
+                  <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <strong className="font-bold text-slate-800 dark:text-slate-200 block">
+                        {isRtl ? 'التنبيه الصوتي عند استدعاء المريض' : 'Audio Chime on Patient Call'}
+                      </strong>
+                      <span className="text-[11px] text-slate-500">
+                        {isRtl ? 'إصدار رنين ناعم عند استدعاء المريض التالي أو تأكيد الحضور' : 'Play a subtle chime when calling next patient or confirming attendance'}
+                      </span>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        const next = !soundEnabled;
+                        setSoundEnabled(next);
+                        if (next) triggerNotice(isRtl ? 'تم تفعيل التنبيه الصوتي' : 'Audio chime enabled');
+                      }}
+                      className={`p-2 rounded-xl border transition-all cursor-pointer ${
+                        soundEnabled
+                          ? 'bg-teal-600 text-white border-teal-700 shadow-2xs'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-400 border-slate-200 dark:border-slate-700'
+                      }`}
+                      title={soundEnabled ? 'صوت مفعل' : 'صوت معطل'}
+                    >
+                      {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+                    </button>
+                  </div>
+
+                  {/* Waiting Room Default View */}
+                  <div className="p-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <strong className="font-bold text-slate-800 dark:text-slate-200 block">
+                        {isRtl ? 'طريقة العرض الافتراضية لقاعة الانتظار' : 'Default Queue View Mode'}
+                      </strong>
+                      <span className="text-[11px] text-slate-500">
+                        {isRtl ? 'اختر بين عرض البطاقات السريرية أو الجدول المنظم' : 'Select between clinical triage cards or compact tabular queue'}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700">
+                      <button
+                        onClick={() => setWaitingRoomViewMode('cards')}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                          waitingRoomViewMode === 'cards' ? 'bg-white dark:bg-slate-900 text-teal-600 shadow-xs' : 'text-slate-500'
+                        }`}
+                      >
+                        {isRtl ? 'بطاقات' : 'Cards'}
+                      </button>
+                      <button
+                        onClick={() => setWaitingRoomViewMode('table')}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                          waitingRoomViewMode === 'table' ? 'bg-white dark:bg-slate-900 text-teal-600 shadow-xs' : 'text-slate-500'
+                        }`}
+                      >
+                        {isRtl ? 'جدول' : 'Table'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Password Change Security Card */}
               <div className="max-w-xl">
                 <ChangePasswordCard isRtl={isRtl} isDarkMode={isDarkMode} />
               </div>
+
+              {/* 4D Capabilities Ceiling Card */}
+              <AssistantCapabilitiesCard isRtl={isRtl} isDarkMode={isDarkMode} />
             </div>
           )}
 
@@ -1654,30 +2247,30 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
 
       {/* Modal for Quick Check In */}
       {showCheckInModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
           <div className={`${containerClass} w-full max-w-md rounded-2xl p-6 space-y-4 border shadow-2xl ${isRtl ? 'text-right' : 'text-left'}`}>
-            <div className={`flex items-center justify-between border-b pb-3 border-slate-200 dark:border-slate-800 ${isRtl ? 'flex-row-reverse' : ''}`}>
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white">{t('reception.quickCheckIn.title')}</h3>
-              <button onClick={() => setShowCheckInModal(false)} className="text-slate-400 hover:text-slate-600">
+            <div className={`flex items-center justify-between border-b pb-3 border-slate-100 dark:border-slate-800 ${isRtl ? 'flex-row-reverse' : ''}`}>
+              <h3 className="text-sm font-extrabold text-slate-900 dark:text-white">{t('reception.quickCheckIn.title')}</h3>
+              <button onClick={() => setShowCheckInModal(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             <div className="space-y-3 text-xs">
               <div>
-                <label className="font-bold block mb-1">{t('reception.quickCheckIn.patientName')}</label>
-                <input type="text" placeholder={t('settings.fullName')} className={`w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 ${isRtl ? 'text-right' : 'text-left'}`} />
+                <label className="font-bold block mb-1 text-slate-700 dark:text-slate-300">{t('reception.quickCheckIn.patientName')}</label>
+                <input type="text" placeholder={t('settings.fullName')} className={`w-full p-2.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-950 ${isRtl ? 'text-right' : 'text-left'}`} />
               </div>
               <div>
-                <label className="font-bold block mb-1">{t('reception.quickCheckIn.phone')}</label>
-                <input type="text" placeholder="+213 ..." className={`w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 ${isRtl ? 'text-right' : 'text-left'}`} />
+                <label className="font-bold block mb-1 text-slate-700 dark:text-slate-300">{t('reception.quickCheckIn.phone')}</label>
+                <input type="text" placeholder="+213 ..." className={`w-full p-2.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-950 ${isRtl ? 'text-right' : 'text-left'}`} />
               </div>
             </div>
 
             <div className={`flex justify-end gap-2 pt-2 ${isRtl ? 'flex-row-reverse' : ''}`}>
               <button
                 onClick={() => setShowCheckInModal(false)}
-                className="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold rounded-lg text-xs"
+                className="px-3.5 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold rounded-xl text-xs cursor-pointer"
               >
                 {t('common.cancel')}
               </button>
@@ -1686,7 +2279,7 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
                   setShowCheckInModal(false);
                   triggerNotice(t('toast.checkedInSuccess'));
                 }}
-                className="px-4 py-1.5 bg-teal-600 text-white font-bold rounded-lg text-xs cursor-pointer"
+                className="px-4 py-1.5 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-xs cursor-pointer shadow-xs"
               >
                 {t('reception.quickCheckIn.submit')}
               </button>
@@ -1714,9 +2307,9 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
         return (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
             <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 max-w-md w-full shadow-2xl border border-slate-200 dark:border-slate-800 space-y-5 text-start" dir={isRtl ? 'rtl' : 'ltr'}>
-              <div className="flex items-center justify-between border-b pb-3 border-slate-200 dark:border-slate-800">
+              <div className="flex items-center justify-between border-b pb-3 border-slate-100 dark:border-slate-800">
                 <div>
-                  <h3 className="font-bold text-slate-900 dark:text-white text-sm">
+                  <h3 className="font-extrabold text-slate-900 dark:text-white text-sm">
                     {isRtl ? `إعادة جدولة موعد: ${showRescheduleModal.patientName}` : `Reschedule Appointment: ${showRescheduleModal.patientName}`}
                   </h3>
                   <p className="text-[11px] text-slate-500 mt-0.5">
@@ -1726,14 +2319,14 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
                 <button
                   type="button"
                   onClick={() => setShowRescheduleModal(null)}
-                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-lg"
+                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-lg cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               {/* Current Appointment Summary */}
-              <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 text-xs space-y-1">
+              <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800 text-xs space-y-1">
                 <div className="text-slate-600 dark:text-slate-400">
                   <span className="font-bold">{isRtl ? 'الموعد الحالي: ' : 'Current Appointment: '}</span>
                   <span className="font-mono text-slate-900 dark:text-white">{showRescheduleModal.originalDate}</span>
@@ -1767,7 +2360,7 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
                         time_slot: '',
                       }));
                     }}
-                    className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all font-medium"
+                    className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-white focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all font-medium"
                   />
                 </div>
 
@@ -1793,7 +2386,7 @@ export const DoctorAssistantDashboard: React.FC<DoctorAssistantDashboardProps> =
                       setShowRescheduleModal((prev: any) => ({ ...prev, time_slot: val }));
                     }}
                     disabled={loadingRescheduleSlots || rescheduleSlots.length === 0}
-                    className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white disabled:opacity-50 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all font-medium"
+                    className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-white disabled:opacity-50 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all font-medium"
                   >
                     <option value="">
                       {loadingRescheduleSlots

@@ -142,12 +142,12 @@ void main() {
   });
 
   group('AafiyaTypography & IBM Plex Sans Arabic Tokens', () {
-    test('fontFamily is Amiri', () {
-      expect(AafiyaTypography.fontFamily, equals('Amiri'));
+    test('fontFamily is IBMPlexSansArabic', () {
+      expect(AafiyaTypography.fontFamily, equals('IBMPlexSansArabic'));
       expect(AafiyaTypography.package, equals('aafiya_ui'));
     });
 
-    test('all text styles bind to Amiri font family and aafiya_ui package', () {
+    test('all text styles bind to IBMPlexSansArabic font family and aafiya_ui package', () {
       final styles = [
         AafiyaTypography.displayLarge,
         AafiyaTypography.displayMedium,
@@ -167,7 +167,7 @@ void main() {
       ];
 
       for (final style in styles) {
-        expect(style.fontFamily?.contains('Amiri'), isTrue);
+        expect(style.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
       }
     });
 
@@ -218,27 +218,27 @@ void main() {
       expect(AafiyaTypography.caption.fontWeight, equals(FontWeight.normal));
     });
 
-    test('textTheme getter produces full Material 3 text theme with Amiri', () {
+    test('textTheme getter produces full Material 3 text theme with IBMPlexSansArabic', () {
       final textTheme = AafiyaTypography.textTheme;
-      expect(textTheme.displayLarge?.fontFamily?.contains('Amiri'), isTrue);
-      expect(textTheme.displayMedium?.fontFamily?.contains('Amiri'), isTrue);
-      expect(textTheme.headlineLarge?.fontFamily?.contains('Amiri'), isTrue);
-      expect(textTheme.headlineMedium?.fontFamily?.contains('Amiri'), isTrue);
-      expect(textTheme.headlineSmall?.fontFamily?.contains('Amiri'), isTrue);
-      expect(textTheme.titleLarge?.fontFamily?.contains('Amiri'), isTrue);
-      expect(textTheme.titleMedium?.fontFamily?.contains('Amiri'), isTrue);
-      expect(textTheme.titleSmall?.fontFamily?.contains('Amiri'), isTrue);
-      expect(textTheme.bodyLarge?.fontFamily?.contains('Amiri'), isTrue);
-      expect(textTheme.bodyMedium?.fontFamily?.contains('Amiri'), isTrue);
-      expect(textTheme.bodySmall?.fontFamily?.contains('Amiri'), isTrue);
-      expect(textTheme.labelLarge?.fontFamily?.contains('Amiri'), isTrue);
-      expect(textTheme.labelMedium?.fontFamily?.contains('Amiri'), isTrue);
-      expect(textTheme.labelSmall?.fontFamily?.contains('Amiri'), isTrue);
+      expect(textTheme.displayLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(textTheme.displayMedium?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(textTheme.headlineLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(textTheme.headlineMedium?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(textTheme.headlineSmall?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(textTheme.titleLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(textTheme.titleMedium?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(textTheme.titleSmall?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(textTheme.bodyLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(textTheme.bodyMedium?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(textTheme.bodySmall?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(textTheme.labelLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(textTheme.labelMedium?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(textTheme.labelSmall?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
     });
 
-    test('darkTextTheme getter produces text theme with dark-mode colors and Amiri', () {
+    test('darkTextTheme getter produces text theme with dark-mode colors and IBMPlexSansArabic', () {
       final darkTextTheme = AafiyaTypography.darkTextTheme;
-      expect(darkTextTheme.displayLarge?.fontFamily?.contains('Amiri'), isTrue);
+      expect(darkTextTheme.displayLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
       expect(darkTextTheme.displayLarge?.color, equals(AafiyaColors.darkPrimaryText));
       expect(darkTextTheme.titleLarge?.color, equals(AafiyaColors.darkPrimaryText));
       expect(darkTextTheme.bodyLarge?.color, equals(AafiyaColors.darkPrimaryText));
@@ -247,10 +247,10 @@ void main() {
   });
 
   group('AafiyaTheme Configuration', () {
-    test('lightTheme contains official brand colors, Amiri font, and textTheme', () {
+    test('lightTheme contains official brand colors, IBMPlexSansArabic font, and textTheme', () {
       final theme = AafiyaTheme.lightTheme;
-      expect(theme.textTheme.bodyLarge?.fontFamily?.contains('Amiri'), isTrue);
-      expect(theme.textTheme.titleLarge?.fontFamily?.contains('Amiri'), isTrue);
+      expect(theme.textTheme.bodyLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(theme.textTheme.titleLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
       expect(theme.colorScheme.primary, equals(AafiyaColors.healthBlue));
       expect(theme.colorScheme.secondary, equals(AafiyaColors.healingGreen));
       expect(theme.colorScheme.onSecondary, equals(AafiyaColors.onHealingGreen));
@@ -258,10 +258,10 @@ void main() {
       expect(theme.inputDecorationTheme.contentPadding, equals(const EdgeInsetsDirectional.symmetric(horizontal: 16, vertical: 14)));
     });
 
-    test('darkTheme contains dark surfaces, Amiri font, and dark textTheme', () {
+    test('darkTheme contains dark surfaces, IBMPlexSansArabic font, and dark textTheme', () {
       final theme = AafiyaTheme.darkTheme;
-      expect(theme.textTheme.bodyLarge?.fontFamily?.contains('Amiri'), isTrue);
-      expect(theme.textTheme.titleLarge?.fontFamily?.contains('Amiri'), isTrue);
+      expect(theme.textTheme.bodyLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(theme.textTheme.titleLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
       expect(theme.colorScheme.primary, equals(AafiyaColors.healthBlue));
       expect(theme.colorScheme.secondary, equals(AafiyaColors.healingGreen));
       expect(theme.colorScheme.onSecondary, equals(AafiyaColors.onHealingGreen));

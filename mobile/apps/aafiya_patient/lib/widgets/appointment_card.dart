@@ -192,8 +192,10 @@ class AppointmentCard extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const Icon(
-                      Icons.chevron_right_rounded,
+                    Icon(
+                      Directionality.of(context) == TextDirection.rtl
+                          ? Icons.chevron_left_rounded
+                          : Icons.chevron_right_rounded,
                       size: 16,
                       color: AafiyaColors.healthBlue,
                     ),

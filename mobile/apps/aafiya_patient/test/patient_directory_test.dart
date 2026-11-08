@@ -606,10 +606,13 @@ void main() {
 
         await tester.pumpAndSettle();
 
+        // Open specialty selector dropdown and select 'أمراض القلب'
+        await tester.tap(find.text('جميع التخصصات'));
+        await tester.pumpAndSettle();
+
         // RAD must NOT be rendered in physician specialty filter
         expect(find.text('الأشعة والتصوير الطبي'), findsNothing);
 
-        // Tap specialty chip 'أمراض القلب'
         await tester.tap(find.text('أمراض القلب'));
         await tester.pumpAndSettle();
 
@@ -672,20 +675,30 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('All Specialties'), findsOneWidget);
+        expect(find.text('All Wilayas'), findsOneWidget);
+
+        // Open Specialty selector dropdown in English
+        await tester.tap(find.text('All Specialties'));
+        await tester.pumpAndSettle();
+
         expect(find.text('Cardiology'), findsOneWidget);
         expect(find.text('Pediatrics'), findsOneWidget);
         expect(find.text('Radiology'), findsNothing);
-        expect(find.text('All Wilayas'), findsOneWidget);
-        expect(find.text('Algiers'), findsOneWidget);
-        expect(find.text('Oran'), findsOneWidget);
 
         // Tap 'Cardiology' in English -> ID invariant: binds to canonical '1'
         await tester.tap(find.text('Cardiology'));
         await tester.pumpAndSettle();
         expect(lastSpecialtyId, '1');
 
+        // Open Wilaya selector dropdown in English
+        await tester.tap(find.text('All Wilayas'));
+        await tester.pumpAndSettle();
+
+        expect(find.textContaining('Algiers'), findsOneWidget);
+        expect(find.textContaining('Oran'), findsOneWidget);
+
         // Tap 'Algiers' in English
-        await tester.tap(find.text('Algiers'));
+        await tester.tap(find.textContaining('Algiers'));
         await tester.pumpAndSettle();
         expect(lastWilaya, 'الجزائر');
       });
@@ -835,8 +848,10 @@ void main() {
 
         expect(find.text('عيادة الشفاء التخصصية'), findsOneWidget);
 
-        // Tap wilaya chip 'الجزائر'
-        await tester.tap(find.text('الجزائر').first);
+        // Open wilaya dropdown selector and select 'الجزائر'
+        await tester.tap(find.text('جميع الولايات'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('16 - الجزائر'));
         await tester.pumpAndSettle();
 
         expect(lastWilaya, 'الجزائر');

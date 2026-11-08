@@ -132,6 +132,32 @@ export const BookingsListTab: React.FC<BookingsListTabProps> = ({
         onChange={setPeriodValue}
       />
 
+      {/* Quick Status Metric Filters */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+        {[
+          { id: 'all', label: isRtl ? 'كافة الحجوزات' : 'All Bookings', count: bookings.length, color: 'text-slate-800 bg-white border-slate-200 hover:border-slate-300' },
+          { id: 'approved', label: isRtl ? 'مؤكدة' : 'Approved', count: bookings.filter(b => b.status === 'approved').length, color: 'text-emerald-700 bg-emerald-50/70 border-emerald-200 hover:border-emerald-300' },
+          { id: 'pending', label: isRtl ? 'بانتظار الاعتماد' : 'Pending', count: bookings.filter(b => b.status === 'pending').length, color: 'text-amber-700 bg-amber-50/70 border-amber-200 hover:border-amber-300' },
+          { id: 'rescheduled', label: isRtl ? 'معدلة' : 'Rescheduled', count: bookings.filter(b => b.status === 'rescheduled').length, color: 'text-indigo-700 bg-indigo-50/70 border-indigo-200 hover:border-indigo-300' },
+          { id: 'rejected', label: isRtl ? 'مرفوضة' : 'Rejected', count: bookings.filter(b => b.status === 'rejected').length, color: 'text-rose-700 bg-rose-50/70 border-rose-200 hover:border-rose-300' },
+          { id: 'cancelled', label: isRtl ? 'ملغاة' : 'Cancelled', count: bookings.filter(b => b.status === 'cancelled').length, color: 'text-slate-600 bg-slate-50 border-slate-200 hover:border-slate-300' },
+        ].map(item => (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => setSelectedStatusFilter(item.id)}
+            className={`p-3 rounded-2xl border text-start transition-all cursor-pointer ${
+              selectedStatusFilter === item.id
+                ? 'ring-2 ring-blue-500 shadow-2xs font-bold border-blue-500'
+                : ''
+            } ${item.color}`}
+          >
+            <span className="text-[11px] block font-medium opacity-80">{item.label}</span>
+            <span className="text-xl font-black font-mono block mt-0.5">{item.count}</span>
+          </button>
+        ))}
+      </div>
+
       {/* Search & Filters Toolbar */}
       <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs flex flex-wrap items-center gap-3">
         {/* Search Field */}
@@ -388,6 +414,16 @@ export const BookingsListTab: React.FC<BookingsListTabProps> = ({
                 <option value="noShow">{t('modals.cancelReasonOptions.noShow')}</option>
                 <option value="other">{t('modals.cancelReasonOptions.other')}</option>
               </select>
+            </div>
+
+            {/* Quota Restored Notice */}
+            <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl p-3 flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <p className="font-semibold leading-relaxed">
+                {isRtl 
+                  ? 'سيتم تحرير واسترجاع حصة الحجز تلقائياً وإضافتها إلى رصيد العمليات المتاح لمركزكم.'
+                  : 'The booking quota unit will be restored to your center balance automatically.'}
+              </p>
             </div>
 
             <div className="flex justify-end gap-2 pt-2">

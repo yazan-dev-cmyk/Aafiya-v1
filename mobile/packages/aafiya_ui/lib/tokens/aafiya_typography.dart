@@ -11,7 +11,7 @@ abstract final class AafiyaTypography {
   static const String package = 'aafiya_ui';
 
   /// The official Arabic typeface for AAFIYA mobile applications.
-  static const String fontFamily = 'Amiri';
+  static const String fontFamily = 'IBMPlexSansArabic';
 
   /// Secondary Latin and digital UI fallback typeface.
   static const String fallbackFontFamily = 'PlusJakartaSans';
@@ -20,9 +20,37 @@ abstract final class AafiyaTypography {
   static const List<String> fontFallbacks = [
     'IBMPlexSansArabic',
     'PlusJakartaSans',
-    'Noto Sans Arabic',
+    'Amiri',
     'sans-serif',
   ];
+
+  /// Resolves the canonical primary font family according to language code.
+  static String fontFamilyFor(String languageCode) {
+    switch (languageCode) {
+      case 'ar':
+        return fontFamily;
+      case 'fr':
+      case 'en':
+      default:
+        return fallbackFontFamily;
+    }
+  }
+
+  /// Resolves the dual-script font fallbacks according to language code.
+  static List<String> fontFallbacksFor(String languageCode) {
+    if (languageCode == 'ar') {
+      return const [
+        'PlusJakartaSans',
+        'Amiri',
+        'sans-serif',
+      ];
+    }
+    return const [
+      'IBMPlexSansArabic',
+      'Amiri',
+      'sans-serif',
+    ];
+  }
 
   /// Base text style builder with local font bundling and disciplined line heights.
   static TextStyle _style({
@@ -31,16 +59,36 @@ abstract final class AafiyaTypography {
     required Color color,
     required double height,
     double? letterSpacing,
+    String? languageCode,
   }) {
     return TextStyle(
-      fontFamily: fontFamily,
+      fontFamily: languageCode != null ? fontFamilyFor(languageCode) : fontFamily,
       package: package,
-      fontFamilyFallback: fontFallbacks,
+      fontFamilyFallback: languageCode != null ? fontFallbacksFor(languageCode) : fontFallbacks,
       fontSize: fontSize,
       fontWeight: fontWeight,
       color: color,
       height: height,
       letterSpacing: letterSpacing,
+    );
+  }
+
+  /// Public text style builder for locale-aware styling.
+  static TextStyle styleFor({
+    required double fontSize,
+    required FontWeight fontWeight,
+    required Color color,
+    required double height,
+    double? letterSpacing,
+    String languageCode = 'ar',
+  }) {
+    return _style(
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      color: color,
+      height: height,
+      letterSpacing: letterSpacing,
+      languageCode: languageCode,
     );
   }
 
@@ -231,39 +279,48 @@ abstract final class AafiyaTypography {
     height: 1.2,
   );
 
-  /// Material 3 TextTheme mapped with light palette colors and local IBM Plex typography.
-  static TextTheme get textTheme => TextTheme(
-    displayLarge: displayLarge,
-    displayMedium: displayMedium,
-    headlineLarge: headlineLarge,
-    headlineMedium: headlineMedium,
-    headlineSmall: headlineSmall,
-    titleLarge: titleLarge,
-    titleMedium: titleMedium,
-    titleSmall: titleSmall,
-    bodyLarge: bodyLarge,
-    bodyMedium: bodyMedium,
-    bodySmall: bodySmall,
-    labelLarge: labelLarge,
-    labelMedium: labelMedium,
-    labelSmall: labelSmall,
+  /// Returns light TextTheme tailored for the specified [languageCode].
+  static TextTheme textThemeFor(String languageCode) => TextTheme(
+    displayLarge: styleFor(fontSize: 28, fontWeight: FontWeight.bold, letterSpacing: -0.5, color: AafiyaColors.primaryText, height: 1.25, languageCode: languageCode),
+    displayMedium: styleFor(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: -0.3, color: AafiyaColors.primaryText, height: 1.25, languageCode: languageCode),
+    headlineLarge: styleFor(fontSize: 24, fontWeight: FontWeight.w700, color: AafiyaColors.primaryText, height: 1.3, languageCode: languageCode),
+    headlineMedium: styleFor(fontSize: 22, fontWeight: FontWeight.w700, color: AafiyaColors.primaryText, height: 1.3, languageCode: languageCode),
+    headlineSmall: styleFor(fontSize: 20, fontWeight: FontWeight.w700, color: AafiyaColors.primaryText, height: 1.3, languageCode: languageCode),
+    titleLarge: styleFor(fontSize: 18, fontWeight: FontWeight.w600, color: AafiyaColors.primaryText, height: 1.35, languageCode: languageCode),
+    titleMedium: styleFor(fontSize: 16, fontWeight: FontWeight.w600, color: AafiyaColors.primaryText, height: 1.35, languageCode: languageCode),
+    titleSmall: styleFor(fontSize: 14, fontWeight: FontWeight.w600, color: AafiyaColors.primaryText, height: 1.35, languageCode: languageCode),
+    bodyLarge: styleFor(fontSize: 15, fontWeight: FontWeight.normal, color: AafiyaColors.primaryText, height: 1.45, languageCode: languageCode),
+    bodyMedium: styleFor(fontSize: 13, fontWeight: FontWeight.normal, color: AafiyaColors.secondaryText, height: 1.45, languageCode: languageCode),
+    bodySmall: styleFor(fontSize: 12, fontWeight: FontWeight.normal, color: AafiyaColors.secondaryText, height: 1.45, languageCode: languageCode),
+    labelLarge: styleFor(fontSize: 14, fontWeight: FontWeight.w600, letterSpacing: 0.1, color: AafiyaColors.pureWhite, height: 1.2, languageCode: languageCode),
+    labelMedium: styleFor(fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: 0.1, color: AafiyaColors.primaryText, height: 1.2, languageCode: languageCode),
+    labelSmall: styleFor(fontSize: 11, fontWeight: FontWeight.w500, letterSpacing: 0.1, color: AafiyaColors.secondaryText, height: 1.2, languageCode: languageCode),
   );
 
-  /// Material 3 TextTheme mapped with dark palette colors and local IBM Plex typography.
-  static TextTheme get darkTextTheme => TextTheme(
-    displayLarge: displayLarge.copyWith(color: AafiyaColors.darkPrimaryText),
-    displayMedium: displayMedium.copyWith(color: AafiyaColors.darkPrimaryText),
-    headlineLarge: headlineLarge.copyWith(color: AafiyaColors.darkPrimaryText),
-    headlineMedium: headlineMedium.copyWith(color: AafiyaColors.darkPrimaryText),
-    headlineSmall: headlineSmall.copyWith(color: AafiyaColors.darkPrimaryText),
-    titleLarge: titleLarge.copyWith(color: AafiyaColors.darkPrimaryText),
-    titleMedium: titleMedium.copyWith(color: AafiyaColors.darkPrimaryText),
-    titleSmall: titleSmall.copyWith(color: AafiyaColors.darkPrimaryText),
-    bodyLarge: bodyLarge.copyWith(color: AafiyaColors.darkPrimaryText),
-    bodyMedium: bodyMedium.copyWith(color: AafiyaColors.darkSecondaryText),
-    bodySmall: bodySmall.copyWith(color: AafiyaColors.darkSecondaryText),
-    labelLarge: labelLarge,
-    labelMedium: labelMedium.copyWith(color: AafiyaColors.darkPrimaryText),
-    labelSmall: labelSmall.copyWith(color: AafiyaColors.darkSecondaryText),
-  );
+  /// Returns dark TextTheme tailored for the specified [languageCode].
+  static TextTheme darkTextThemeFor(String languageCode) {
+    final light = textThemeFor(languageCode);
+    return TextTheme(
+      displayLarge: light.displayLarge?.copyWith(color: AafiyaColors.darkPrimaryText),
+      displayMedium: light.displayMedium?.copyWith(color: AafiyaColors.darkPrimaryText),
+      headlineLarge: light.headlineLarge?.copyWith(color: AafiyaColors.darkPrimaryText),
+      headlineMedium: light.headlineMedium?.copyWith(color: AafiyaColors.darkPrimaryText),
+      headlineSmall: light.headlineSmall?.copyWith(color: AafiyaColors.darkPrimaryText),
+      titleLarge: light.titleLarge?.copyWith(color: AafiyaColors.darkPrimaryText),
+      titleMedium: light.titleMedium?.copyWith(color: AafiyaColors.darkPrimaryText),
+      titleSmall: light.titleSmall?.copyWith(color: AafiyaColors.darkPrimaryText),
+      bodyLarge: light.bodyLarge?.copyWith(color: AafiyaColors.darkPrimaryText),
+      bodyMedium: light.bodyMedium?.copyWith(color: AafiyaColors.darkSecondaryText),
+      bodySmall: light.bodySmall?.copyWith(color: AafiyaColors.darkSecondaryText),
+      labelLarge: light.labelLarge,
+      labelMedium: light.labelMedium?.copyWith(color: AafiyaColors.darkPrimaryText),
+      labelSmall: light.labelSmall?.copyWith(color: AafiyaColors.darkSecondaryText),
+    );
+  }
+
+  /// Material 3 TextTheme mapped with light palette colors and local IBM Plex typography (Arabic default).
+  static TextTheme get textTheme => textThemeFor('ar');
+
+  /// Material 3 TextTheme mapped with dark palette colors and local IBM Plex typography (Arabic default).
+  static TextTheme get darkTextTheme => darkTextThemeFor('ar');
 }

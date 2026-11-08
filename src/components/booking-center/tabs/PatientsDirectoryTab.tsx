@@ -17,7 +17,7 @@ import {
 
 interface PatientsDirectoryTabProps {
   patients: PatientRecord[];
-  onOpenNewBooking: () => void;
+  onOpenNewBooking: (patient?: PatientRecord) => void;
 }
 
 export const PatientsDirectoryTab: React.FC<PatientsDirectoryTabProps> = ({
@@ -148,42 +148,69 @@ export const PatientsDirectoryTab: React.FC<PatientsDirectoryTabProps> = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {paginatedList.map((p) => (
-                  <tr key={p.id} className="hover:bg-slate-50/80 transition-colors">
-                    {activeTab === 'registered' && (
-                      <td className="px-5 py-3.5 font-mono text-xs font-bold text-slate-700">
-                        {p.uuid || '—'}
+                {paginatedList.map((p) => {
+                  const initials = p.fullName
+                    .split(' ')
+                    .map((n) => n[0])
+                    .filter(Boolean)
+                    .slice(0, 2)
+                    .join('');
+
+                  return (
+                    <tr key={p.id} className="hover:bg-slate-50/80 transition-colors">
+                      {activeTab === 'registered' && (
+                        <td className="px-5 py-3.5 font-mono text-xs font-bold text-blue-600">
+                          {p.uuid || '—'}
+                        </td>
+                      )}
+                      <td className="px-5 py-3.5">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-xs flex items-center justify-center shrink-0">
+                            {initials || 'م'}
+                          </div>
+                          <div>
+                            <strong className="block text-slate-900 font-bold">{p.fullName}</strong>
+                            <span className="text-[10.5px] text-slate-400">
+                              {activeTab === 'registered' ? 'مريض معتمد بالمنصة' : 'مريض زائر عابر'}
+                            </span>
+                          </div>
+                        </div>
                       </td>
-                    )}
-                    <td className="px-5 py-3.5 font-bold text-slate-900">
-                      {p.fullName}
-                    </td>
-                    <td className="px-5 py-3.5 text-xs text-slate-600 dir-ltr text-right font-medium">
-                      {p.phone}
-                    </td>
-                    <td className="px-5 py-3.5 text-xs text-slate-500">
-                      {p.wilaya}
-                    </td>
-                    <td className="px-5 py-3.5 text-xs text-slate-500 dir-ltr text-right">
-                      {p.lastVisitDate || 'لا يوجد'}
-                    </td>
-                    <td className="px-5 py-3.5 text-xs font-medium text-blue-600">
-                      {p.lastDoctorBooked || '—'}
-                    </td>
-                    <td className="px-5 py-3.5 text-center font-bold text-slate-900">
-                      {p.totalBookings}
-                    </td>
-                    <td className="px-5 py-3.5 text-center">
-                      <button
-                        onClick={onOpenNewBooking}
-                        className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs transition-colors cursor-pointer inline-flex items-center gap-1"
-                      >
-                        <Plus className="w-3.5 h-3.5" />
-                        <span>حجز موعد</span>
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                      <td className="px-5 py-3.5 text-xs font-mono font-bold text-slate-700 dir-ltr text-right">
+                        <a
+                          href={`tel:${p.phone}`}
+                          className="hover:text-blue-600 transition-colors"
+                          title="اتصال مباشر"
+                        >
+                          {p.phone}
+                        </a>
+                      </td>
+                      <td className="px-5 py-3.5 text-xs text-slate-600 font-medium">
+                        {p.wilaya}
+                      </td>
+                      <td className="px-5 py-3.5 text-xs text-slate-500 font-mono dir-ltr text-right">
+                        {p.lastVisitDate || '—'}
+                      </td>
+                      <td className="px-5 py-3.5 text-xs font-bold text-blue-600">
+                        {p.lastDoctorBooked || '—'}
+                      </td>
+                      <td className="px-5 py-3.5 text-center">
+                        <span className="inline-flex px-2 py-0.5 rounded-full font-mono font-bold text-xs bg-slate-100 text-slate-800">
+                          {p.totalBookings}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3.5 text-center">
+                        <button
+                          onClick={() => onOpenNewBooking(p)}
+                          className="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-all shadow-2xs hover:shadow-xs active:scale-95 cursor-pointer inline-flex items-center gap-1.5"
+                        >
+                          <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+                          <span>حجز موعد</span>
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
 

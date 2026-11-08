@@ -60,3 +60,7 @@ export 'models/clinic_escalation.dart';
 export 'models/clinic_escalations_response.dart';
 export 'services/patient_notification_service.dart';
 export 'services/clinic_notification_service.dart';
+export 'models/assistant_rewards_models.dart';
+export 'services/assistant_rewards_service.dart';
+export 'models/ads_ticker_item.dart';
+export 'services/ads_ticker_service.dart';

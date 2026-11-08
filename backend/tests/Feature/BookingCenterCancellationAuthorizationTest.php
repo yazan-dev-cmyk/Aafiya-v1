@@ -238,7 +238,6 @@ class BookingCenterCancellationAuthorizationTest extends TestCase
         $this->assertEquals(9, $this->centerA->fresh()->quota_balance);
         $this->assertNotEquals($this->bcUserA->id, $appointment->created_by_id, 'Testing actor must differ from created_by_id');
 
-        // bcUserA cancels the appointment
         $response = $this->actingAs($this->bcUserA, 'sanctum')->postJson("/api/v1/appointments/{$appointment->id}/cancel", [
             'reason' => 'إلغاء الموعد بناءً على طلب المريض لمركز الحجز',
         ]);

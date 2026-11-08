@@ -64,6 +64,8 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
 
   bool _isLoading = true;
   bool _isSavingDraft = false;
+  bool _clinicIdMissing = false;
+  bool _doctorIdMissing = false;
   String? _errorMessage;
   String? _successMessage;
 
@@ -92,7 +94,7 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
     if (_clinicId.isEmpty) {
       setState(() {
         _isLoading = false;
-        _errorMessage = 'معرف العيادة غير متوفر. يرجى اختيار عيادة أولاً.';
+        _clinicIdMissing = true;
       });
       return;
     }
@@ -101,14 +103,15 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
     if (doctorId == null) {
       setState(() {
         _isLoading = false;
-        _errorMessage =
-            'معرف الطبيب غير متوفر في ملف الحساب. يرجى تسجيل الدخول بحساب طبيب معتمد.';
+        _doctorIdMissing = true;
       });
       return;
     }
 
     setState(() {
       _isLoading = true;
+      _clinicIdMissing = false;
+      _doctorIdMissing = false;
       _errorMessage = null;
     });
 
@@ -327,6 +330,11 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
   @override
   Widget build(BuildContext context) {
     final strings = LocalizedStrings.of(context);
+    final effectiveError = _clinicIdMissing
+        ? strings.clinicIdMissingError
+        : _doctorIdMissing
+            ? strings.doctorIdMissingError
+            : _errorMessage;
 
     return Scaffold(
       appBar: AafiyaAppBar(
@@ -342,20 +350,24 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
       ),
       body: _isLoading
           ? AafiyaLoadingView(message: strings.loading)
-          : _errorMessage != null && _scheduleData == null
+          : effectiveError != null && _scheduleData == null
               ? AafiyaErrorView(
-                  message: _errorMessage!,
+                  message: effectiveError,
                   retryLabel: strings.retry,
                   onRetry: _loadSchedule,
                 )
-              : _buildScheduleBody(context, strings),
+              : _buildScheduleBody(context, strings, effectiveError),
       bottomNavigationBar: (!_isLoading && !_isLocked)
           ? _buildBottomActionBar(context, strings)
           : null,
     );
   }
 
-  Widget _buildScheduleBody(BuildContext context, LocalizedStrings strings) {
+  Widget _buildScheduleBody(
+    BuildContext context,
+    LocalizedStrings strings,
+    String? effectiveError,
+  ) {
     return ListView(
       padding: AafiyaSpacing.insetScreen,
       children: [
@@ -363,7 +375,7 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
         _buildStatusBanner(context, strings),
         const SizedBox(height: AafiyaSpacing.md),
 
-        if (_errorMessage != null) ...[
+        if (effectiveError != null) ...[
           Container(
             padding: AafiyaSpacing.insetAllSm,
             margin: const EdgeInsets.only(bottom: AafiyaSpacing.md),
@@ -380,7 +392,7 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
                 const SizedBox(width: AafiyaSpacing.sm),
                 Expanded(
                   child: Text(
-                    _errorMessage!,
+                    effectiveError,
                     style: AafiyaTypography.caption
                         .copyWith(color: AafiyaColors.error),
                   ),

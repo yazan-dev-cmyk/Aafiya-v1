@@ -5,12 +5,18 @@ use App\Http\Controllers\Api\V1\ClinicController;
 use App\Http\Controllers\Api\V1\DoctorController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Middleware\EnforcePlatformHeader;
+use App\Http\Middleware\EnsureActiveClinicContext;
+
 
 // Auth Routes
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:auth.register');
     Route::post('/register-doctor', [\App\Http\Controllers\Api\V1\DoctorOnboardingController::class, 'registerDoctor'])->middleware('throttle:auth.register');
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:auth.login');
+    Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+    Route::post('/verify-reset-token', [AuthController::class, 'verifyResetToken']);
+    Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
@@ -127,12 +133,12 @@ Route::middleware(['auth:sanctum', 'throttle:api.general', 'active.clinic'])->gr
     Route::post('/appointments', [\App\Http\Controllers\Api\V1\AppointmentController::class, 'store']);
     Route::post('/appointments/check-in', [\App\Http\Controllers\Api\V1\AppointmentController::class, 'checkIn']);
     Route::get('/appointments/{appointment}', [\App\Http\Controllers\Api\V1\AppointmentController::class, 'show']);
-    Route::post('/appointments/{appointment}/confirm', [\App\Http\Controllers\Api\V1\AppointmentController::class, 'confirm']);
-    Route::post('/appointments/{appointment}/attend', [\App\Http\Controllers\Api\V1\AppointmentController::class, 'attend']);
-    Route::post('/appointments/{appointment}/no-show', [\App\Http\Controllers\Api\V1\AppointmentController::class, 'noShow']);
-    Route::post('/appointments/{appointment}/cancel', [\App\Http\Controllers\Api\V1\AppointmentController::class, 'cancel']);
-    Route::post('/appointments/{appointment}/reject', [\App\Http\Controllers\Api\V1\AppointmentController::class, 'reject']);
-    Route::post('/appointments/{appointment}/reschedule', [\App\Http\Controllers\Api\V1\AppointmentController::class, 'reschedule']);
+    Route::match(['post', 'put'], '/appointments/{appointment}/confirm', [\App\Http\Controllers\Api\V1\AppointmentController::class, 'confirm']);
+    Route::match(['post', 'put'], '/appointments/{appointment}/attend', [\App\Http\Controllers\Api\V1\AppointmentController::class, 'attend']);
+    Route::match(['post', 'put'], '/appointments/{appointment}/no-show', [\App\Http\Controllers\Api\V1\AppointmentController::class, 'noShow']);
+    Route::match(['post', 'put'], '/appointments/{appointment}/cancel', [\App\Http\Controllers\Api\V1\AppointmentController::class, 'cancel']);
+    Route::match(['post', 'put'], '/appointments/{appointment}/reject', [\App\Http\Controllers\Api\V1\AppointmentController::class, 'reject']);
+    Route::match(['post', 'put'], '/appointments/{appointment}/reschedule', [\App\Http\Controllers\Api\V1\AppointmentController::class, 'reschedule']);
 
     // EHR & Patients
     Route::get('/patients', [\App\Http\Controllers\Api\V1\PatientController::class, 'index']);
@@ -281,11 +287,103 @@ Route::middleware(['auth:sanctum', 'throttle:api.general', 'active.clinic'])->gr
         Route::get('/exports/{id}/status', [\App\Http\Controllers\Api\V1\BackupExportController::class, 'showExport'])->whereUuid('id');
         Route::get('/exports/{id}/download', [\App\Http\Controllers\Api\V1\BackupExportController::class, 'downloadExport'])->whereUuid('id');
     });
+    // Assistant Rewards (Doctor Assistant Self-Service)
+    Route::prefix('assistant/rewards')->group(function () {
+        Route::get('/summary', [\App\Http\Controllers\Api\V1\AssistantRewardsController::class, 'summary']);
+        Route::get('/transactions', [\App\Http\Controllers\Api\V1\AssistantRewardsController::class, 'transactions']);
+        Route::get('/payouts', [\App\Http\Controllers\Api\V1\AssistantRewardsController::class, 'payouts']);
+        Route::get('/profiles', [\App\Http\Controllers\Api\V1\AssistantRewardsController::class, 'profiles']);
+        Route::post('/profiles', [\App\Http\Controllers\Api\V1\AssistantRewardsController::class, 'submitProfile']);
+        Route::get('/profiles/{profileId}/cheque', [\App\Http\Controllers\Api\V1\AssistantRewardsController::class, 'streamCheque'])->whereUuid('profileId');
+    });
+
+    // Platform Admin Assistant Rewards Management (Admin & Authorized Assistant)
+    Route::prefix('admin/rewards')->group(function () {
+        // Configuration, Rate Scheduling & Lifecycle Endpoints
+        Route::get('/settings', [\App\Http\Controllers\Api\V1\AdminAssistantRewardsController::class, 'settings']);
+        Route::get('/rates', [\App\Http\Controllers\Api\V1\AdminAssistantRewardsController::class, 'rates']);
+        Route::post('/rates/schedule', [\App\Http\Controllers\Api\V1\AdminAssistantRewardsController::class, 'scheduleRate']);
+        Route::post('/rates/schedules/{id}/cancel', [\App\Http\Controllers\Api\V1\AdminAssistantRewardsController::class, 'cancelScheduledRate'])->whereUuid('id');
+        Route::get('/lifecycle/history', [\App\Http\Controllers\Api\V1\AdminAssistantRewardsController::class, 'lifecycleHistory']);
+        Route::post('/lifecycle/transition', [\App\Http\Controllers\Api\V1\AdminAssistantRewardsController::class, 'transitionLifecycle']);
+
+        // Existing Rewards Management Endpoints
+        Route::get('/overview', [\App\Http\Controllers\Api\V1\AdminAssistantRewardsController::class, 'overview']);
+        Route::get('/assistants', [\App\Http\Controllers\Api\V1\AdminAssistantRewardsController::class, 'assistants']);
+        Route::get('/assistants/{id}/ledger', [\App\Http\Controllers\Api\V1\AdminAssistantRewardsController::class, 'assistantLedger'])->whereUuid('id');
+        Route::get('/batches', [\App\Http\Controllers\Api\V1\AdminAssistantRewardsController::class, 'batches']);
+        Route::get('/batches/preview', [\App\Http\Controllers\Api\V1\AdminAssistantRewardsController::class, 'batchPreview']);
+        Route::get('/batches/{id}', [\App\Http\Controllers\Api\V1\AdminAssistantRewardsController::class, 'batchDetails'])->whereUuid('id');
+        Route::post('/batches/generate', [\App\Http\Controllers\Api\V1\AdminAssistantRewardsController::class, 'generateBatch']);
+        Route::post('/batches/{id}/cancel', [\App\Http\Controllers\Api\V1\AdminAssistantRewardsController::class, 'cancelBatch'])->whereUuid('id');
+        Route::post('/batches/{batchId}/items/{itemId}/confirm', [\App\Http\Controllers\Api\V1\AdminAssistantRewardsController::class, 'confirmBatchItem'])
+            ->whereUuid('batchId')
+            ->whereUuid('itemId');
+        Route::post('/batches/{batchId}/items/{itemId}/fail', [\App\Http\Controllers\Api\V1\AdminAssistantRewardsController::class, 'failBatchItem'])
+            ->whereUuid('batchId')
+            ->whereUuid('itemId');
+        Route::post('/batches/{batchId}/items/{itemId}/defer', [\App\Http\Controllers\Api\V1\AdminAssistantRewardsController::class, 'deferBatchItem'])
+            ->whereUuid('batchId')
+            ->whereUuid('itemId');
+        Route::post('/batches/{batchId}/items/{itemId}/return', [\App\Http\Controllers\Api\V1\AdminAssistantRewardsController::class, 'returnBatchItem'])
+            ->whereUuid('batchId')
+            ->whereUuid('itemId');
+        Route::get('/profiles', [\App\Http\Controllers\Api\V1\AdminAssistantRewardsController::class, 'profiles']);
+        Route::get('/profiles/pending', [\App\Http\Controllers\Api\V1\AdminAssistantRewardsController::class, 'pendingProfiles']);
+        Route::put('/profiles/{profileId}/verify', [\App\Http\Controllers\Api\V1\AdminAssistantRewardsController::class, 'verifyProfile'])->whereUuid('profileId');
+        Route::post('/profiles/{profileId}/reveal-rip', [\App\Http\Controllers\Api\V1\AdminAssistantRewardsController::class, 'revealFullRip'])->whereUuid('profileId');
+        Route::get('/profiles/{profileId}/cheque', [\App\Http\Controllers\Api\V1\AdminAssistantRewardsController::class, 'streamCheque'])->whereUuid('profileId');
+        Route::get('/profiles/{profileId}/cheque/download', [\App\Http\Controllers\Api\V1\AdminAssistantRewardsController::class, 'downloadCheque'])->whereUuid('profileId');
+        Route::get('/losses', [\App\Http\Controllers\Api\V1\AdminAssistantRewardsController::class, 'losses']);
+        Route::get('/audit-logs', [\App\Http\Controllers\Api\V1\AdminAssistantRewardsController::class, 'auditLogs']);
+    });
+
+    // Admin Advertising Ticker Management (Admin & Admin Assistant)
+    Route::prefix('admin/ads/ticker')
+        ->middleware(\App\Http\Middleware\EnsureAdminOrAssistant::class)
+        ->group(function () {
+            Route::get('/', [\App\Http\Controllers\Api\V1\AdminAdsTickerController::class, 'index']);
+            Route::post('/', [\App\Http\Controllers\Api\V1\AdminAdsTickerController::class, 'store']);
+            Route::get('/settings', [\App\Http\Controllers\Api\V1\AdminAdsTickerController::class, 'getSettings']);
+            Route::put('/settings', [\App\Http\Controllers\Api\V1\AdminAdsTickerController::class, 'updateSettings']);
+            Route::get('/analytics', [\App\Http\Controllers\Api\V1\AdminAdsTickerController::class, 'analytics']);
+            Route::get('/{advertisement}', [\App\Http\Controllers\Api\V1\AdminAdsTickerController::class, 'show'])->whereUuid('advertisement');
+            Route::put('/{advertisement}', [\App\Http\Controllers\Api\V1\AdminAdsTickerController::class, 'update'])->whereUuid('advertisement');
+            Route::delete('/{advertisement}', [\App\Http\Controllers\Api\V1\AdminAdsTickerController::class, 'destroy'])->whereUuid('advertisement');
+            Route::patch('/{advertisement}/toggle-status', [\App\Http\Controllers\Api\V1\AdminAdsTickerController::class, 'toggleStatus'])->whereUuid('advertisement');
+
+            // Placements Management
+            Route::get('/{advertisement}/placements', [\App\Http\Controllers\Api\V1\AdminAdsTickerController::class, 'listPlacements'])->whereUuid('advertisement');
+            Route::post('/{advertisement}/placements', [\App\Http\Controllers\Api\V1\AdminAdsTickerController::class, 'addPlacement'])->whereUuid('advertisement');
+            Route::delete('/{advertisement}/placements/{placement}', [\App\Http\Controllers\Api\V1\AdminAdsTickerController::class, 'removePlacement'])
+                ->whereUuid('advertisement')
+                ->whereUuid('placement');
+        });
+
 });
 
 // Public Routes
 Route::get('/v/{token}', [\App\Http\Controllers\Api\V1\PrescriptionController::class, 'verify'])->middleware('throttle:qr.verify');
 Route::get('/diagnostics/verify/{token}', [\App\Http\Controllers\Api\V1\DiagnosticOrderController::class, 'verify'])->middleware('throttle:qr.verify');
+Route::get('/appointments/pass/{token}', [\App\Http\Controllers\Api\V1\AppointmentController::class, 'publicPass'])->middleware('throttle:qr.verify');
 Route::get('/advertisements', [\App\Http\Controllers\Api\V1\AdvertisementController::class, 'index']);
 Route::post('/advertisements/{advertisement}/click', [\App\Http\Controllers\Api\V1\AdvertisementController::class, 'recordClick'])->middleware('throttle:ads.click');
 
+// Advertising Ticker Public/Authenticated Stream Routes
+Route::prefix('ads/ticker')
+    ->middleware([EnforcePlatformHeader::class, \App\Http\Middleware\OptionalSanctumAuth::class])
+    ->group(function () {
+        Route::get('/', [\App\Http\Controllers\Api\V1\AdsTickerController::class, 'index']);
+        Route::post('/{advertisement}/click', [\App\Http\Controllers\Api\V1\AdsTickerController::class, 'recordClick'])->whereUuid('advertisement');
+    });
+
+// Public Reference & Lookup Routes
+Route::prefix('reference')->group(function () {
+    Route::get('/wilayas', [\App\Http\Controllers\Api\V1\MasterDataController::class, 'wilayas']);
+    Route::get('/wilayas/{id}/communes', [\App\Http\Controllers\Api\V1\MasterDataController::class, 'communes']);
+    Route::get('/specialties', [\App\Http\Controllers\Api\V1\MasterDataController::class, 'specialties']);
+});
+
+// Patient Public Share Token Resolvers
+Route::get('/share-tokens/{token}', [\App\Http\Controllers\Api\V1\PatientShareTokenController::class, 'resolveToken']);
+Route::post('/share-tokens/{token}/access', [\App\Http\Controllers\Api\V1\PatientShareTokenController::class, 'accessRecords']);

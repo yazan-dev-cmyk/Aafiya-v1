@@ -135,6 +135,18 @@ trait Has4DAuthorization
                 'platform.delete_users',
                 'platform.manage_master_data',
                 'platform.export_backup',
+                'platform.confirm_assistant_payout',
+                'platform.rewards.view_overview',
+                'platform.rewards.view_assistants',
+                'platform.rewards.view_assistant_ledger',
+                'platform.rewards.view_cheque_document',
+                'platform.rewards.download_cheque_document',
+                'platform.rewards.view_full_rip',
+                'platform.rewards.verify_payout_profile',
+                'platform.rewards.reject_payout_profile',
+                'platform.rewards.generate_payout_batch',
+                'platform.rewards.cancel_payout_batch',
+                'platform.rewards.view_audit_logs',
             ];
 
             return in_array($permission, $allowedDelegations, true);

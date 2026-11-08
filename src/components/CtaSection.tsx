@@ -46,7 +46,7 @@ export const CtaSection: React.FC<CtaSectionProps> = ({ onOpenAuth }) => {
           transition={{ delay: 0.1 }}
           className="text-4xl sm:text-5xl md:text-7xl font-black text-white tracking-tight max-w-4xl mx-auto leading-[1.1]"
         >
-          {t('title_prefix')} <span className="text-primary font-satisfy">Aafiya</span> {t('title_suffix')}
+          {t('title_prefix')} <span className="text-primary font-black">Aafiya</span> {t('title_suffix')}
         </motion.h2>
 
         <motion.p 

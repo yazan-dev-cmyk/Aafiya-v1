@@ -11,7 +11,7 @@ abstract final class AafiyaRadius {
   // Prototype Specific Radii
   static const double brandMark = 13.0;
   static const double button = 14.0;
-  static const double card = 18.0;
+  static const double card = 16.0;
   static const double ticket = 22.0;
   static const double sheet = 26.0;
   static const double shortcutCircle = 58.0;

@@ -48,7 +48,7 @@ export const AppDownloadSection: React.FC = () => {
             transition={{ delay: 0.1 }}
             className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight"
           >
-            {t('title')} <span className="text-primary font-satisfy">{t('titleAccent')}</span>
+            {t('title')} <span className="text-primary font-black">{t('titleAccent')}</span>
           </motion.h2>
 
           <motion.p 

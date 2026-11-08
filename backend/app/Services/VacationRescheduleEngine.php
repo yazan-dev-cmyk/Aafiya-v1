@@ -28,8 +28,11 @@ class VacationRescheduleEngine
         protected ClinicOperatingHoursService $clinicOperatingHoursService,
         protected DoctorVacationService $doctorVacationService,
         protected DoctorTimeReservationService $timeReservationService,
-        protected QuotaService $quotaService
-    ) {}
+        protected QuotaService $quotaService,
+        protected ?NotificationOutboxService $notificationOutboxService = null
+    ) {
+        $this->notificationOutboxService = $notificationOutboxService ?? app(NotificationOutboxService::class);
+    }
 
     /**
      * Process automated vacation rescheduling under DEC-VAC-02, DEC-VAC-03, DEC-VAC-05, DEC-VAC-06, and DEC-GAP-03.
@@ -243,7 +246,7 @@ class VacationRescheduleEngine
                 $rawPhone = $appointment->patient_phone
                     ?? $appointment->patient?->phone
                     ?? $appointment->patient?->user?->phone;
-                $recipientPhone = $rawPhone !== null ? trim((string) $rawPhone) : '';
+                $recipientPhone = $this->notificationOutboxService->canonicalPhone($rawPhone);
 
                 if ($recipientPhone !== '') {
                     $idempotencyKey = sprintf(

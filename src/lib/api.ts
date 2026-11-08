@@ -78,12 +78,13 @@ export const setActiveClinicId = (clinicId: string | null): void => {
 export interface RequestOptions extends Omit<RequestInit, 'headers'> {
   headers?: HeadersInit;
   requiresAuth?: boolean;
+  optionalAuth?: boolean;
   includeClinicContext?: boolean;
 }
 
 function normalizeOptions(options?: RequestOptions | Record<string, string>): RequestOptions {
   if (!options) return {};
-  if ('headers' in options || 'requiresAuth' in options || 'includeClinicContext' in options || 'signal' in options || 'cache' in options) {
+  if ('headers' in options || 'requiresAuth' in options || 'optionalAuth' in options || 'includeClinicContext' in options || 'signal' in options || 'cache' in options) {
     return options as RequestOptions;
   }
   return { headers: options as HeadersInit };
@@ -95,6 +96,7 @@ export async function apiClient<T = any>(
 ): Promise<ApiResponse<T>> {
   const {
     requiresAuth = true,
+    optionalAuth = false,
     includeClinicContext = true,
     headers: customHeaders,
     ...fetchInit
@@ -116,7 +118,11 @@ export async function apiClient<T = any>(
     headers.set('Content-Type', 'application/json');
   }
 
-  if (!requiresAuth) {
+  if (optionalAuth) {
+    if (token && !headers.has('Authorization')) {
+      headers.set('Authorization', `Bearer ${token}`);
+    }
+  } else if (!requiresAuth) {
     headers.delete('Authorization');
   } else if (token && !headers.has('Authorization')) {
     headers.set('Authorization', `Bearer ${token}`);
@@ -139,7 +145,7 @@ export async function apiClient<T = any>(
 
     if (!response.ok) {
       const isAuthHandshake = cleanEndpoint.startsWith('/auth/login') || cleanEndpoint.startsWith('/auth/register');
-      if (response.status === 401 && requiresAuth && token && !isAuthHandshake) {
+      if (response.status === 401 && (requiresAuth || optionalAuth) && token && !isAuthHandshake) {
         setStoredToken(null);
       }
 
@@ -174,6 +180,13 @@ export const api = {
       body: body instanceof FormData ? body : (body !== undefined ? JSON.stringify(body) : undefined),
     }),
 
+  patch: <T = any>(endpoint: string, body?: any, options?: RequestOptions | Record<string, string>) =>
+    apiClient<T>(endpoint, {
+      ...normalizeOptions(options),
+      method: 'PATCH',
+      body: body instanceof FormData ? body : (body !== undefined ? JSON.stringify(body) : undefined),
+    }),
+
   delete: <T = any>(endpoint: string, options?: RequestOptions | Record<string, string>) =>
     apiClient<T>(endpoint, { ...normalizeOptions(options), method: 'DELETE' }),
 
@@ -192,5 +205,24 @@ export const api = {
       body: body instanceof FormData ? body : (body !== undefined ? JSON.stringify(body) : undefined),
       requiresAuth: false,
       includeClinicContext: false,
+    }),
+
+  optionalGet: <T = any>(endpoint: string, options?: RequestOptions | Record<string, string>) =>
+    apiClient<T>(endpoint, {
+      ...normalizeOptions(options),
+      method: 'GET',
+      requiresAuth: false,
+      optionalAuth: true,
+      includeClinicContext: true,
+    }),
+
+  optionalPost: <T = any>(endpoint: string, body?: any, options?: RequestOptions | Record<string, string>) =>
+    apiClient<T>(endpoint, {
+      ...normalizeOptions(options),
+      method: 'POST',
+      body: body instanceof FormData ? body : (body !== undefined ? JSON.stringify(body) : undefined),
+      requiresAuth: false,
+      optionalAuth: true,
+      includeClinicContext: true,
     }),
 };

@@ -102,6 +102,91 @@ class LocalizedStrings {
       : isFrench
           ? 'Masquer le mot de passe'
           : 'Hide password';
+
+  // Change Password
+  String get changePassword => isArabic
+      ? 'تغيير كلمة المرور'
+      : isFrench
+          ? 'Changer le mot de passe'
+          : 'Change Password';
+  String get currentPasswordLabel => isArabic
+      ? 'كلمة المرور الحالية'
+      : isFrench
+          ? 'Mot de passe actuel'
+          : 'Current Password';
+  String get newPasswordLabel => isArabic
+      ? 'كلمة المرور الجديدة'
+      : isFrench
+          ? 'Nouveau mot de passe'
+          : 'New Password';
+  String get confirmNewPasswordLabel => isArabic
+      ? 'تأكيد كلمة المرور الجديدة'
+      : isFrench
+          ? 'Confirmer le nouveau mot de passe'
+          : 'Confirm New Password';
+  String get passwordChangedSuccess => isArabic
+      ? 'تم تغيير كلمة المرور بنجاح'
+      : isFrench
+          ? 'Mot de passe modifié avec succès'
+          : 'Password changed successfully';
+  String get otherSessionsRevoked => isArabic
+      ? 'تم إبطال تسجيل الدخول من الأجهزة الأخرى'
+      : isFrench
+          ? 'Autres sessions déconnectées'
+          : 'Other sessions have been logged out';
+  String get changePasswordSubmit => isArabic
+      ? 'حفظ كلمة المرور الجديدة'
+      : isFrench
+          ? 'Enregistrer le nouveau mot de passe'
+          : 'Save New Password';
+  String get changePasswordCancel => isArabic
+      ? 'إلغاء'
+      : isFrench
+          ? 'Annuler'
+          : 'Cancel';
+  String get currentPasswordRequired => isArabic
+      ? 'يرجى إدخال كلمة المرور الحالية'
+      : isFrench
+          ? 'Veuillez saisir le mot de passe actuel'
+          : 'Please enter current password';
+  String get newPasswordRequired => isArabic
+      ? 'يرجى إدخال كلمة المرور الجديدة'
+      : isFrench
+          ? 'Veuillez saisir le nouveau mot de passe'
+          : 'Please enter new password';
+
+  // Password Recovery
+  String get forgotPassword => isArabic
+      ? 'نسيت كلمة المرور؟'
+      : isFrench
+          ? 'Mot de passe oublié ?'
+          : 'Forgot Password?';
+  String get forgotPasswordTitle => isArabic
+      ? 'استعادة كلمة المرور'
+      : isFrench
+          ? 'Récupération de mot de passe'
+          : 'Password Recovery';
+  String get forgotPasswordDesc => isArabic
+      ? 'أدخل بريدك الإلكتروني المسجل وسنرسل لك رابطاً لإعادة تعيين كلمة المرور.'
+      : isFrench
+          ? 'Entrez votre adresse e-mail enregistrée pour recevoir un lien de réinitialisation.'
+          : 'Enter your registered email address to receive a password reset link.';
+  String get sendRecoveryLink => isArabic
+      ? 'إرسال رابط الاستعادة'
+      : isFrench
+          ? 'Envoyer le lien de récupération'
+          : 'Send Recovery Link';
+  String get uniformRecoveryNotice => isArabic
+      ? 'إذا كان هذا البريد مرتبطاً بحساب، فستصلك رسالة استعادة كلمة المرور.'
+      : isFrench
+          ? 'Si cette adresse e-mail est associée à un compte, un message de récupération vous sera envoyé.'
+          : 'If this email address is associated with an account, a password recovery message will be sent.';
+  String get recoveryEmailSent => isArabic
+      ? 'تم إرسال الطلب بنجاح'
+      : isFrench
+          ? 'Demande envoyée avec succès'
+          : 'Request Sent Successfully';
+
   String get alreadyHaveAccount => isArabic
       ? 'لديك حساب بالفعل؟ تسجيل الدخول'
       : isFrench
@@ -4085,6 +4170,11 @@ class LocalizedStrings {
       : isFrench
           ? 'Votre rendez-vous a été reprogrammé en raison du congé du médecin.'
           : 'Your appointment was rescheduled due to doctor vacation.';
+  String get prescriptionIssuedNotification => isArabic
+      ? 'تم إصدار وصفة طبية إلكترونية جديدة. يمكنك الاطلاع عليها وتحميلها الآن.'
+      : isFrench
+          ? 'Une nouvelle ordonnance électronique a été émise. Vous pouvez la consulter et la télécharger dès maintenant.'
+          : 'A new electronic prescription has been issued. You can view and download it now.';
   String get clinicEscalationsTitle => isArabic
       ? 'تصعيدات المتابعة'
       : isFrench
@@ -4150,6 +4240,313 @@ class LocalizedStrings {
       : isFrench
           ? 'Impossible d’acquitter l’escalade.'
           : 'Failed to acknowledge escalation. Please try again.';
+
+  // Assistant Rewards (TASK-ASSISTANT-REWARDS-P1-UI)
+  String get assistantRewardsTitle => isArabic
+      ? 'المكافآت المالية لمساعد الطبيب'
+      : isFrench
+          ? 'Récompenses financières'
+          : 'Assistant Financial Rewards';
+  String get assistantRewardsSubtitle => isArabic
+      ? 'متابعة الرصيد المستحق، السجل المالي، وحساب CCP'
+      : isFrench
+          ? 'Suivi du solde, grand livre et compte CCP'
+          : 'Track balance, financial ledger, and CCP details';
+  String get assistantRewardsEligible => isArabic
+      ? 'مؤهل للصرف المالي'
+      : isFrench
+          ? 'Éligible au virement'
+          : 'Eligible for Payout';
+  String get assistantRewardsThresholdNotMet => isArabic
+      ? 'لم يبلغ الحد الأدنى للصرف (10,000 دج)'
+      : isFrench
+          ? 'Seuil minimum (10 000 DZD) non atteint'
+          : 'Threshold (10,000 DZD) not yet reached';
+  String get assistantRewardsMissingProfile => isArabic
+      ? 'يتطلب حساب RIP مفعل ومعتمد'
+      : isFrench
+          ? 'Profil RIP vérifié requis'
+          : 'Verified RIP Profile Required';
+  String get assistantRewardsCurrentBalance => isArabic
+      ? 'الرصيد المتاح'
+      : isFrench
+          ? 'Solde disponible'
+          : 'Available Balance';
+  String get assistantRewardsTotalEarned => isArabic
+      ? 'إجمالي المكتسب'
+      : isFrench
+          ? 'Total acquis'
+          : 'Total Earned';
+  String get assistantRewardsTotalPaid => isArabic
+      ? 'إجمالي المصروف'
+      : isFrench
+          ? 'Total versé'
+          : 'Total Paid Out';
+  String get assistantRewardsPendingPayout => isArabic
+      ? 'قيد التحويل'
+      : isFrench
+          ? 'Virement en cours'
+          : 'Pending Payout';
+  String get assistantRewardsDeductions => isArabic
+      ? 'الخصومات والإلغاءات'
+      : isFrench
+          ? 'Déductions & Annulations'
+          : 'Deductions & Reversals';
+  String get assistantRewardsTabOverview => isArabic
+      ? 'السجل المالي'
+      : isFrench
+          ? 'Grand livre'
+          : 'Ledger';
+  String get assistantRewardsTabPayouts => isArabic
+      ? 'سجل التحويلات'
+      : isFrench
+          ? 'Virements'
+          : 'Payouts';
+  String get assistantRewardsTabProfile => isArabic
+      ? 'حساب الصرف (RIP)'
+      : isFrench
+          ? 'Profil RIP'
+          : 'RIP Profile';
+  String get assistantRewardsLedgerTitle => isArabic
+      ? 'دفتر الحركات المالية'
+      : isFrench
+          ? 'Mouvements comptables'
+          : 'Financial Transactions';
+  String get assistantRewardsNoTransactions => isArabic
+      ? 'لا توجد حركات مالية مسجلة حتى الآن.'
+      : isFrench
+          ? 'Aucune transaction enregistrée.'
+          : 'No transactions recorded yet.';
+  String get assistantRewardsPayoutsTitle => isArabic
+      ? 'سجل التحويلات الشهرية'
+      : isFrench
+          ? 'Historique des virements'
+          : 'Payout History';
+  String get assistantRewardsNoPayouts => isArabic
+      ? 'لا توجد تحويلات سابقة مسجلة.'
+      : isFrench
+          ? 'Aucun virement enregistré.'
+          : 'No payout records found.';
+  String get assistantRewardsActiveProfile => isArabic
+      ? 'الحساب البريدي المعتمد'
+      : isFrench
+          ? 'Profil RIP actif'
+          : 'Active RIP Profile';
+  String get assistantRewardsRipNumber => isArabic
+      ? 'رقم الحساب البريدي RIP'
+      : isFrench
+          ? 'Numéro RIP CCP'
+          : 'CCP RIP Number';
+  String get assistantRewardsSubmitNewProfile => isArabic
+      ? 'تقديم أو تحديث بيانات RIP'
+      : isFrench
+          ? 'Soumettre / Mettre à jour RIP'
+          : 'Submit / Update RIP Profile';
+  String get assistantRewardsRipHint => isArabic
+      ? '20 رقماً (مثال: 00799999000123456789)'
+      : isFrench
+          ? '20 chiffres (ex: 00799999000123456789)'
+          : '20 numeric digits';
+  String get assistantRewardsChequeDocLabel => isArabic
+      ? 'نسخة الصك المشطوب'
+      : isFrench
+          ? 'Scan du chèque barré'
+          : 'Crossed Cheque Document';
+  String get assistantRewardsSubmitButton => isArabic
+      ? 'إرسال للاعتماد'
+      : isFrench
+          ? 'Soumettre pour validation'
+          : 'Submit Profile';
+  String get assistantRewardsSubmitting => isArabic
+      ? 'جاري الإرسال...'
+      : isFrench
+          ? 'Envoi en cours...'
+          : 'Submitting...';
+  String get assistantRewardsSuccessSubmitted => isArabic
+      ? 'تم إرسال الملف بنجاح وهو قيد المراجعة الإدارية.'
+      : isFrench
+          ? 'Profil soumis avec succès, en attente de validation.'
+          : 'Profile submitted successfully and is pending admin verification.';
+  String get assistantRewardsInvalidRip => isArabic
+      ? 'رقم RIP يجب أن يتكون من 20 رقماً.'
+      : isFrench
+          ? 'Le numéro RIP doit comporter 20 chiffres.'
+          : 'RIP must be exactly 20 digits.';
+  String get assistantRewardsSelectCheque => isArabic
+      ? 'يرجى إرفاق الصك المشطوب'
+      : isFrench
+          ? 'Veuillez joindre le chèque barré'
+          : 'Please attach crossed cheque';
+
+  String get assistantRewardsHistoryTitle => isArabic
+      ? 'سجل إصدارات الحساب (RIP)'
+      : isFrench
+          ? 'Historique des versions RIP'
+          : 'RIP Profile Version History';
+
+  String get assistantRewardsNoHistory => isArabic
+      ? 'لا توجد إصدارات مسجلة سابقاً.'
+      : isFrench
+          ? 'Aucun historique de profil trouvé.'
+          : 'No profile history found.';
+
+  String get assistantRewardsVersion => isArabic
+      ? 'الإصدار'
+      : isFrench
+          ? 'Version'
+          : 'Version';
+
+  String get assistantRewardsStatusActive => isArabic
+      ? 'معتمد'
+      : isFrench
+          ? 'Actif'
+          : 'Active';
+
+  String get assistantRewardsStatusPending => isArabic
+      ? 'قيد المراجعة'
+      : isFrench
+          ? 'En attente'
+          : 'Pending Review';
+
+  String get assistantRewardsStatusRejected => isArabic
+      ? 'مرفوض'
+      : isFrench
+          ? 'مرفوض'
+          : 'Rejected';
+
+  String get assistantRewardsStatusSuperseded => isArabic
+      ? 'مستبدل'
+      : isFrench
+          ? 'Remplacé'
+          : 'Superseded';
+
+  String get assistantRewardsRejectionAlertTitle => isArabic
+      ? 'تنبيه: تم رفض بيانات الدفع'
+      : isFrench
+          ? 'Attention: profil de paiement rejeté'
+          : 'Notice: Payment Profile Rejected';
+
+  String get assistantRewardsRejectionReasonLabel => isArabic
+      ? 'سبب الرفض الإداري:'
+      : isFrench
+          ? 'Motif du refus administratif:'
+          : 'Administrative rejection reason:';
+
+  String get assistantRewardsRejectionActionHint => isArabic
+      ? 'يرجى تصحيح البيانات أدناه وإرفاق صك بريدي واضح لإعادة المراجعة.'
+      : isFrench
+          ? 'Veuillez corriger vos informations et joindre un chèque lisible.'
+          : 'Please correct the information below and attach a clear cheque for review.';
+
+  String get assistantRewardsPayoutSuspendedPending => isArabic
+      ? 'أهلية الصرف معلقة: يوجد إصدار قيد المراجعة الإدارية.'
+      : isFrench
+          ? 'Paiement suspendu: un profil est en cours de validation.'
+          : 'Payout suspended: a profile version is pending administrative review.';
+
+  String get assistantRewardsPayoutSuspendedRejected => isArabic
+      ? 'أهلية الصرف معلقة: تم رفض بيانات الدفع الأخيرة.'
+      : isFrench
+          ? 'Paiement suspendu: le dernier profil a été rejeté.'
+          : 'Payout suspended: the latest payment profile was rejected.';
+
+  String get assistantRewardsEligibleForPayout => isArabic
+      ? 'مؤهل للصرف الدوري'
+      : isFrench
+          ? 'Éligible au virement'
+          : 'Eligible for Payout';
+
+  String get assistantRewardsIneligibleForPayout => isArabic
+      ? 'غير مؤهل للصرف حالياً'
+      : isFrench
+          ? 'Non éligible au virement actuellement'
+          : 'Currently Ineligible for Payout';
+
+  String get assistantRewardsFileTooLarge => isArabic
+      ? 'حجم الملف يتجاوز الحد الأقصى المسموح (5 ميغابايت).'
+      : isFrench
+          ? 'Le fichier dépasse la taille maximale autorisée (5 Mo).'
+          : 'File size exceeds maximum allowed limit (5 MB).';
+
+  String get assistantRewardsFileInvalidType => isArabic
+      ? 'نوع الملف غير مدعوم. الصيغ المقبولة: JPG, PNG, PDF.'
+      : isFrench
+          ? 'Format non supporté. Formats acceptés: JPG, PNG, PDF.'
+          : 'Unsupported file type. Accepted formats: JPG, PNG, PDF.';
+
+  String get assistantRewardsSelectedFile => isArabic
+      ? 'الملف المختار:'
+      : isFrench
+          ? 'Fichier sélectionné:'
+          : 'Selected file:';
+
+  String get assistantRewardsReplaceFile => isArabic
+      ? 'تغيير الملف'
+      : isFrench
+          ? 'Changer'
+          : 'Change';
+
+  // Ads Ticker (TASK-MOBILE-ADS-TICKER-INTEGRATION)
+  String get adsTickerSponsored => isArabic
+      ? 'إعلان'
+      : isFrench
+          ? 'Sponsorisé'
+          : 'Sponsored';
+
+  String get adsTickerLearnMore => isArabic
+      ? 'التفاصيل'
+      : isFrench
+          ? 'En savoir plus'
+          : 'Learn more';
+
+  String get adsTickerNext => isArabic
+      ? 'التالي'
+      : isFrench
+          ? 'Suivant'
+          : 'Next';
+
+  String get adsTickerPrevious => isArabic
+      ? 'السابق'
+      : isFrench
+          ? 'Précédent'
+          : 'Previous';
+
+  String get adsTickerPause => isArabic
+      ? 'إيقاف مؤقت'
+      : isFrench
+          ? 'Pause'
+          : 'Pause';
+
+  String get adsTickerPlay => isArabic
+      ? 'تشغيل'
+      : isFrench
+          ? 'Lecture'
+          : 'Play';
+
+  // Missing Identifiers & Clinical Guardrail Strings
+  String get clinicIdMissingError => isArabic
+      ? 'معرف العيادة غير متوفر. يرجى اختيار عيادة أولاً.'
+      : isFrench
+          ? 'Identifiant de la clinique non disponible. Veuillez d\'abord sélectionner une clinique.'
+          : 'Clinic identifier unavailable. Please select a clinic first.';
+
+  String get doctorIdMissingError => isArabic
+      ? 'معرف الطبيب غير متوفر في ملف الحساب. يرجى تسجيل الدخول بحساب طبيب معتمد.'
+      : isFrench
+          ? 'Identifiant du médecin non disponible dans le profil. Veuillez vous connecter avec un compte médecin agréé.'
+          : 'Doctor identifier unavailable in profile. Please sign in with an authorized doctor account.';
+
+  String get neutralMedicalRecordsEmptyState => isArabic
+      ? 'لا توجد بيانات طبية معروضة حالياً. إدخال البيانات الطبية وعرضها غير متاحين في هذه المرحلة.'
+      : isFrench
+          ? 'Aucune donnée médicale affichée actuellement. La saisie et l\'affichage des données médicales ne sont pas disponibles à ce stade.'
+          : 'No medical data currently displayed. Entering and viewing medical records are not available at this stage.';
+
+  String get moreOptions => isArabic
+      ? 'المزيد من الخيارات'
+      : isFrench
+          ? 'Plus d\'options'
+          : 'More options';
 }
 
 /// Minimal LocalizationsDelegate for LocalizedStrings.

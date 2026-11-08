@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Stethoscope,
   Calendar as CalendarIcon,
@@ -31,6 +31,7 @@ interface SlotItem {
   occupied: number;
   available: number;
   is_available: boolean;
+  already_booked_by_patient?: boolean;
 }
 
 interface AssistantBookingWizardProps {
@@ -47,8 +48,8 @@ export const AssistantBookingWizard: React.FC<AssistantBookingWizardProps> = ({
   const locale = useLocale();
   const isRtl = locale === 'ar';
 
-  // Step management (1: Doctor & Date & Slot, 2: Patient Info)
-  const [step, setStep] = useState<1 | 2>(1);
+  // Step management: 1: Patient, 2: Doctor, 3: Date & Slot, 4: Review & Confirm
+  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
 
   // Clinic doctors state
   const [clinicName, setClinicName] = useState<string>('');
@@ -58,6 +59,8 @@ export const AssistantBookingWizard: React.FC<AssistantBookingWizardProps> = ({
 
   // Form selections
   const [selectedDoctorId, setSelectedDoctorId] = useState<string>('');
+  const [doctorSelectionError, setDoctorSelectionError] = useState<string | null>(null);
+
   const [selectedDate, setSelectedDate] = useState<string>(() => {
     return new Date().toISOString().split('T')[0];
   });
@@ -67,6 +70,9 @@ export const AssistantBookingWizard: React.FC<AssistantBookingWizardProps> = ({
   const [slots, setSlots] = useState<SlotItem[]>([]);
   const [loadingSlots, setLoadingSlots] = useState<boolean>(false);
   const [slotsError, setSlotsError] = useState<string | null>(null);
+  const activeSlotsRequestIdRef = useRef<number>(0);
+  const prevDoctorIdRef = useRef<string>(selectedDoctorId);
+  const prevDateRef = useRef<string>(selectedDate);
 
   // Patient mode: 'registered' (search platform-wide) vs 'walkin' (unregistered walk-in)
   const [patientMode, setPatientMode] = useState<'registered' | 'walkin'>('registered');
@@ -88,6 +94,15 @@ export const AssistantBookingWizard: React.FC<AssistantBookingWizardProps> = ({
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
+  // Check if given date string is Friday (Weekly Holiday)
+  const isFridayDate = (dateStr: string): boolean => {
+    if (!dateStr) return false;
+    const parts = dateStr.split('-');
+    if (parts.length !== 3) return false;
+    const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+    return d.getDay() === 5; // 5 = Friday
+  };
+
   // 1. Fetch clinic doctors on mount or clinicId change
   useEffect(() => {
     if (!clinicId) return;
@@ -108,8 +123,19 @@ export const AssistantBookingWizard: React.FC<AssistantBookingWizardProps> = ({
         );
         setDoctors(activeDocs);
 
+        // Pre-select first doctor if active working hours
         if (activeDocs.length > 0 && !selectedDoctorId) {
-          setSelectedDoctorId(activeDocs[0].id);
+          const firstWithSchedule = activeDocs.find((d) => d.is_working_hours_activated === true) || activeDocs[0];
+          setSelectedDoctorId(firstWithSchedule.id);
+          if (firstWithSchedule.is_working_hours_activated !== true) {
+            setDoctorSelectionError(
+              isRtl
+                ? `لا يمكن المواصلة مع د. ${firstWithSchedule.name}: ساعات العمل الأسبوعية للطبيب غير مفعّلة في العيادة. يرجى تفعيل ساعات العمل أو اختيار طبيب آخر.`
+                : `Doctor ${firstWithSchedule.name} does not have active working hours.`
+            );
+          } else {
+            setDoctorSelectionError(null);
+          }
         }
       } catch (err: any) {
         if (!isMounted) return;
@@ -131,50 +157,115 @@ export const AssistantBookingWizard: React.FC<AssistantBookingWizardProps> = ({
     };
   }, [clinicId, isRtl]);
 
-  // 2. Fetch authoritative slots whenever doctor or date changes
+  // 2. Fetch authoritative slots whenever doctor, date, or patient changes (strictly when step is 3)
   const fetchSlots = useCallback(async () => {
     if (!clinicId || !selectedDoctorId || !selectedDate) {
       setSlots([]);
+      setSlotsError(null);
       return;
     }
 
-    setLoadingSlots(true);
     setSlotsError(null);
+
+    // 1. Friday check
+    if (isFridayDate(selectedDate)) {
+      setSlots([]);
+      setSelectedTimeSlot('');
+      setSlotsError(
+        isRtl
+          ? 'يوم الجمعة عطلة أسبوعية رسمية، ولا تتوفر مواعيد عمل في هذا اليوم.'
+          : 'Friday is an official weekly holiday. No appointments available.'
+      );
+      return;
+    }
+
+    const currentReqId = ++activeSlotsRequestIdRef.current;
+    setLoadingSlots(true);
+
+    const currentPatientPhone = patientMode === 'registered' ? selectedPatient?.phone : patientPhone;
+    const currentPatientId = patientMode === 'registered' ? selectedPatient?.id : undefined;
+
     try {
       const response = await appointmentService.getSlots(
         clinicId,
         selectedDoctorId,
-        selectedDate
+        selectedDate,
+        currentPatientPhone,
+        currentPatientId
       );
-      const slotData = response.data?.slots || [];
-      setSlots(slotData);
 
-      // If previously selected slot is no longer available, clear selection
-      if (selectedTimeSlot) {
-        const current = slotData.find(
-          (s: SlotItem) => s.time_slot === selectedTimeSlot
-        );
-        if (!current || !current.is_available) {
-          setSelectedTimeSlot('');
+      // Stale response guard: discard if doctor, date, or patient changed in the meantime
+      if (currentReqId !== activeSlotsRequestIdRef.current) return;
+
+      const respData = response.data?.data || response.data || {};
+      const slotData: SlotItem[] = respData.slots || [];
+      const reasonMsg = respData.reason_message;
+      const isAvail = respData.is_available !== false;
+
+      if (Array.isArray(slotData) && slotData.length > 0) {
+        setSlots(slotData);
+
+        // Preserve selectedTimeSlot if it still exists and is genuinely available; otherwise reset it
+        setSelectedTimeSlot((currentSelected) => {
+          if (!currentSelected) return '';
+          const matchingSlot = slotData.find((s) => s.time_slot === currentSelected);
+          if (matchingSlot && matchingSlot.is_available && matchingSlot.available > 0 && !matchingSlot.already_booked_by_patient) {
+            return currentSelected; // Keep selection intact!
+          }
+          return ''; // Reset if slot became unavailable, booked up, or was booked by this patient
+        });
+
+        if (!isAvail || reasonMsg) {
+          setSlotsError(reasonMsg || (isRtl ? 'لا توجد فترات حجز متاحة في هذا اليوم.' : 'No available slots on this day.'));
+        } else {
+          setSlotsError(null);
         }
+      } else {
+        setSlots([]);
+        setSelectedTimeSlot('');
+        setSlotsError(
+          reasonMsg ||
+            (isRtl
+              ? 'لا تتوفر فترات حجز متاحة لهذا الطبيب في هذا التاريخ.'
+              : 'No booking slots available for this doctor on this date.')
+        );
       }
     } catch (err: any) {
-      console.error('Failed to fetch slots:', err);
+      if (currentReqId !== activeSlotsRequestIdRef.current) return;
+      console.warn('Failed to fetch slots:', err);
       setSlotsError(
-        err?.message ||
+        err?.data?.message ||
+          err?.response?.data?.message ||
+          err?.message ||
           (isRtl
             ? 'تعذر تحميل المواعيد المتاحة لهذا اليوم.'
             : 'Failed to load available slots for this date.')
       );
       setSlots([]);
+      setSelectedTimeSlot('');
     } finally {
-      setLoadingSlots(false);
+      if (currentReqId === activeSlotsRequestIdRef.current) {
+        setLoadingSlots(false);
+      }
     }
-  }, [clinicId, selectedDoctorId, selectedDate, selectedTimeSlot, isRtl]);
+  }, [clinicId, selectedDoctorId, selectedDate, selectedPatient?.phone, selectedPatient?.id, patientPhone, patientMode, isRtl]);
 
+  // Trigger fetchSlots strictly when user is on Step 3 (Date & Slot selection)
   useEffect(() => {
-    fetchSlots();
-  }, [clinicId, selectedDoctorId, selectedDate]);
+    if (step === 3) {
+      // Check if doctor or date actually changed from previous fetch
+      const docChanged = prevDoctorIdRef.current !== selectedDoctorId;
+      const dateChanged = prevDateRef.current !== selectedDate;
+
+      if (docChanged || dateChanged) {
+        setSelectedTimeSlot('');
+        prevDoctorIdRef.current = selectedDoctorId;
+        prevDateRef.current = selectedDate;
+      }
+
+      fetchSlots();
+    }
+  }, [clinicId, selectedDoctorId, selectedDate, step, fetchSlots]);
 
   // 3. Debounced platform-wide patient search for registered patients
   useEffect(() => {
@@ -260,57 +351,92 @@ export const AssistantBookingWizard: React.FC<AssistantBookingWizardProps> = ({
     }
   };
 
-  // Validation before moving to Step 2
-  const handleProceedToPatientInfo = () => {
-    if (!selectedDoctorId) {
-      setSlotsError(
-        isRtl ? 'يرجى اختيار الطبيب المعالج.' : 'Please select a doctor.'
-      );
+  // Step 1 -> Step 2 validation
+  const handleProceedToDoctor = () => {
+    if (patientMode === 'registered' && !selectedPatient) {
+      alert(isRtl ? 'يرجى اختيار مريض مسجل من القائمة أولاً' : 'Please select a registered patient first');
       return;
     }
-    if (!selectedDate) {
-      setSlotsError(
-        isRtl ? 'يرجى اختيار تاريخ الحجز.' : 'Please select a date.'
-      );
-      return;
+    if (patientMode === 'walkin') {
+      if (!patientName.trim() || !patientPhone.trim()) {
+        alert(isRtl ? 'يرجى كتابة اسم ورقم هاتف المريض الزائر' : 'Please enter patient name and phone number');
+        return;
+      }
     }
-    if (!selectedTimeSlot) {
-      setSlotsError(
-        isRtl
-          ? 'يرجى اختيار الفترة الزمنية المطلوبة.'
-          : 'Please select a time slot.'
-      );
-      return;
-    }
-    setSlotsError(null);
     setStep(2);
   };
 
-  // Submit appointment creation
+  // Step 2: Doctor selection handler with working hours guard
+  const handleSelectDoctor = (doctor: ClinicDoctorStaff) => {
+    setSelectedDoctorId(doctor.id);
+    setSelectedTimeSlot('');
+
+    if (doctor.is_working_hours_activated !== true) {
+      setDoctorSelectionError(
+        isRtl
+          ? `لا يمكن المواصلة مع د. ${doctor.name}: ساعات العمل الأسبوعية للطبيب غير مفعّلة في العيادة. يرجى تفعيل ساعات العمل أو اختيار طبيب آخر.`
+          : `Cannot proceed with Dr. ${doctor.name}: working hours are not activated in this clinic.`
+      );
+    } else {
+      setDoctorSelectionError(null);
+    }
+  };
+
+  // Step 2 -> Step 3 validation
+  const handleProceedToDateAndSlot = () => {
+    const doc = doctors.find((d) => d.id === selectedDoctorId);
+    if (!doc) {
+      alert(isRtl ? 'يرجى اختيار الطبيب المعالج' : 'Please select a doctor');
+      return;
+    }
+    if (doc.is_working_hours_activated !== true) {
+      setDoctorSelectionError(
+        isRtl
+          ? `لا يمكن المواصلة مع د. ${doc.name}: ساعات العمل الأسبوعية للطبيب غير مفعّلة في العيادة. يرجى تفعيل ساعات العمل أو اختيار طبيب آخر.`
+          : `Doctor ${doc.name} does not have active working hours.`
+      );
+      return;
+    }
+    setDoctorSelectionError(null);
+    setStep(3);
+  };
+
+  // Step 3 -> Step 4 validation: verify slot exists and is available
+  const handleProceedToReview = () => {
+    if (!selectedTimeSlot) {
+      alert(isRtl ? 'يرجى اختيار الفترة الزمنية المطلوبة' : 'Please select a time slot');
+      return;
+    }
+
+    const chosenSlot = slots.find((s) => s.time_slot === selectedTimeSlot);
+    if (!chosenSlot || !chosenSlot.is_available || (chosenSlot.available ?? 0) <= 0 || chosenSlot.already_booked_by_patient) {
+      alert(
+        isRtl
+          ? 'الفترة الزمنية المختارة لم تعد متاحة حالياً. يرجى اختيار فترة زمنية أخرى.'
+          : 'Selected time slot is no longer available. Please select another slot.'
+      );
+      setSelectedTimeSlot('');
+      return;
+    }
+
+    if (slotsError) {
+      alert(slotsError);
+      return;
+    }
+    setStep(4);
+  };
+
+  // Step 4: Final Submit with robust validation and error handling
   const handleConfirmBooking = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (patientMode === 'registered' && !selectedPatient) {
-      setSubmitError(
-        isRtl
-          ? 'يرجى البحث واختيار مريض مسجل أو التحويل إلى وضع مريض مباشر (Walk-in).'
-          : 'Please search and select a registered patient or switch to walk-in.'
-      );
+    if (!selectedDoctorId || !selectedDate || !selectedTimeSlot) {
+      setSubmitError(isRtl ? 'بيانات الموعد غير مكتملة' : 'Appointment details incomplete');
       return;
     }
 
-    if (!patientName.trim()) {
-      setSubmitError(
-        isRtl ? 'يرجى إدخال اسم المريض كاملاً.' : 'Please enter patient name.'
-      );
-      return;
-    }
-    if (!patientPhone.trim()) {
-      setSubmitError(
-        isRtl
-          ? 'يرجى إدخال رقم هاتف المريض.'
-          : 'Please enter patient phone number.'
-      );
+    if (!clinicId) {
+      setSubmitError(isRtl ? 'تعذر تحديد معرف العيادة. يرجى تحديث الصفحة والمحاولة مجدداً.' : 'Clinic identifier missing.');
       return;
     }
 
@@ -333,17 +459,17 @@ export const AssistantBookingWizard: React.FC<AssistantBookingWizardProps> = ({
       const res = await appointmentService.createAppointment(payload);
       onSuccess(res.data);
     } catch (err: any) {
-      console.error('Failed to create appointment:', err);
+      console.warn('Failed to create appointment in assistant wizard:', err);
       const errMsg =
+        err?.data?.message ||
+        (err?.data?.errors ? Object.values(err.data.errors).flat().join(' ') : null) ||
         err?.response?.data?.message ||
+        (err?.response?.data?.errors ? Object.values(err.response.data.errors).flat().join(' ') : null) ||
         err?.message ||
         (isRtl
           ? 'تعذر إنشاء الحجز. يرجى التحقق من توفر السعة.'
           : 'Failed to create booking. Please check capacity.');
       setSubmitError(errMsg);
-
-      // Refresh slots in case slot became fully booked
-      fetchSlots();
     } finally {
       setSubmitting(false);
     }
@@ -372,238 +498,51 @@ export const AssistantBookingWizard: React.FC<AssistantBookingWizardProps> = ({
           </p>
         </div>
 
-        {/* Steps indicator */}
-        <div className="flex items-center gap-2">
-          <span
-            className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-              step === 1
-                ? 'bg-teal-600 text-white shadow-md shadow-teal-500/20'
-                : 'bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300'
-            }`}
-          >
-            1
-          </span>
-          <span className="w-6 h-0.5 bg-slate-200 dark:bg-slate-700" />
-          <span
-            className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-              step === 2
-                ? 'bg-teal-600 text-white shadow-md shadow-teal-500/20'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
-            }`}
-          >
-            2
-          </span>
+        {/* 4-Steps Indicator */}
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          {[
+            { num: 1, label: isRtl ? 'المريض' : 'Patient' },
+            { num: 2, label: isRtl ? 'الطبيب' : 'Doctor' },
+            { num: 3, label: isRtl ? 'الموعد' : 'Date' },
+            { num: 4, label: isRtl ? 'التأكيد' : 'Confirm' },
+          ].map((s, idx) => (
+            <React.Fragment key={s.num}>
+              {idx > 0 && (
+                <span
+                  className={`w-3 sm:w-6 h-0.5 ${
+                    step >= s.num ? 'bg-teal-600' : 'bg-slate-200 dark:bg-slate-700'
+                  }`}
+                />
+              )}
+              <div className="flex flex-col items-center">
+                <span
+                  className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                    step === s.num
+                      ? 'bg-teal-600 text-white shadow-md shadow-teal-500/20 ring-2 ring-teal-600/30'
+                      : step > s.num
+                      ? 'bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
+                  }`}
+                >
+                  {step > s.num ? '✓' : s.num}
+                </span>
+                <span className="hidden sm:block text-[10px] font-semibold text-slate-500 mt-1">
+                  {s.label}
+                </span>
+              </div>
+            </React.Fragment>
+          ))}
         </div>
       </div>
 
-      {/* Content */}
-      {step === 1 ? (
+      {/* STEP 1: Patient Selection */}
+      {step === 1 && (
         <div className="space-y-6">
-          {/* Doctor Selection */}
-          <div>
-            <label className="block text-sm font-bold text-slate-700 dark:text-slate-200 mb-2">
-              {isRtl ? '1. اختر الطبيب المعالج من العيادة' : '1. Select In-Clinic Doctor'}
-            </label>
-
-            {loadingDoctors ? (
-              <div className="p-6 text-center text-slate-400 flex items-center justify-center gap-2">
-                <Loader2 className="w-5 h-5 animate-spin text-teal-600" />
-                <span>{isRtl ? 'جاري تحميل أطباء العيادة...' : 'Loading clinic doctors...'}</span>
-              </div>
-            ) : doctorsError ? (
-              <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 text-sm flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                <span>{doctorsError}</span>
-              </div>
-            ) : doctors.length === 0 ? (
-              <div className="p-6 text-center text-slate-500 bg-slate-50 dark:bg-slate-800/50 rounded-2xl">
-                {isRtl ? 'لا يوجد أطباء نشطون مسجلون في هذه العيادة حالياً.' : 'No active doctors registered in this clinic.'}
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {doctors.map((doctor) => {
-                  const isSelected = selectedDoctorId === doctor.id;
-                  return (
-                    <button
-                      type="button"
-                      key={doctor.id}
-                      onClick={() => {
-                        setSelectedDoctorId(doctor.id);
-                        setSelectedTimeSlot('');
-                      }}
-                      className={`p-4 rounded-2xl border text-right transition-all flex items-start gap-3 cursor-pointer ${
-                        isSelected
-                          ? 'border-teal-600 bg-teal-50/50 dark:bg-teal-900/20 shadow-sm ring-1 ring-teal-600'
-                          : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900'
-                      }`}
-                    >
-                      <div
-                        className={`p-2.5 rounded-xl ${
-                          isSelected
-                            ? 'bg-teal-600 text-white'
-                            : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
-                        }`}
-                      >
-                        <Stethoscope className="w-5 h-5" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-bold text-slate-900 dark:text-white truncate">
-                          {doctor.name}
-                        </div>
-                        <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                          {doctor.specialty || (isRtl ? 'طبيب ممارس' : 'General Practitioner')}
-                        </div>
-                        {doctor.position === 'director' && (
-                          <span className="inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
-                            {isRtl ? 'مدير العيادة' : 'Clinic Director'}
-                          </span>
-                        )}
-                      </div>
-                      {isSelected && (
-                        <CheckCircle2 className="w-5 h-5 text-teal-600 dark:text-teal-400 flex-shrink-0" />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
+          <div className="flex items-center justify-between">
+            <h3 className="font-bold text-slate-900 dark:text-white text-base">
+              {isRtl ? '1. حدد بيانات المريض:' : '1. Select Patient Information:'}
+            </h3>
           </div>
-
-          {/* Date Picker */}
-          <div>
-            <label className="block text-sm font-bold text-slate-700 dark:text-slate-200 mb-2">
-              {isRtl ? '2. تاريخ الحجز' : '2. Appointment Date'}
-            </label>
-            <div className="relative">
-              <input
-                type="date"
-                min={minDate}
-                value={selectedDate}
-                onChange={(e) => {
-                  setSelectedDate(e.target.value);
-                  setSelectedTimeSlot('');
-                }}
-                className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all"
-              />
-            </div>
-          </div>
-
-          {/* Hourly Slot Selector */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="block text-sm font-bold text-slate-700 dark:text-slate-200">
-                {isRtl ? '3. الفترة الزمنية (نظام الساعة الواحدة P3)' : '3. Hourly Time Slot (P3 Rule)'}
-              </label>
-              {loadingSlots && (
-                <span className="text-xs text-slate-400 flex items-center gap-1">
-                  <Loader2 className="w-3.5 h-3.5 animate-spin text-teal-600" />
-                  {isRtl ? 'تحديث السعة...' : 'Checking capacity...'}
-                </span>
-              )}
-            </div>
-
-            {slotsError ? (
-              <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 text-sm flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                <span>{slotsError}</span>
-              </div>
-            ) : slots.length === 0 && !loadingSlots ? (
-              <div className="p-4 text-center text-sm text-slate-500 bg-slate-50 dark:bg-slate-800/50 rounded-2xl">
-                {isRtl ? 'يرجى تحديد الطبيب والتاريخ لعرض الفترات الزمنية المتاحة.' : 'Select a doctor and date to view time slots.'}
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
-                {slots.map((slot) => {
-                  const isSelected = selectedTimeSlot === slot.time_slot;
-                  const isAvailable = slot.is_available;
-
-                  return (
-                    <button
-                      type="button"
-                      key={slot.time_slot}
-                      disabled={!isAvailable}
-                      onClick={() => setSelectedTimeSlot(slot.time_slot)}
-                      className={`p-3 rounded-2xl border text-center transition-all cursor-pointer ${
-                        !isAvailable
-                          ? 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/30 text-slate-400 cursor-not-allowed opacity-60'
-                          : isSelected
-                          ? 'border-teal-600 bg-teal-600 text-white shadow-md shadow-teal-600/20'
-                          : 'border-slate-200 dark:border-slate-800 hover:border-teal-500/50 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200'
-                      }`}
-                    >
-                      <div className="font-bold text-sm tracking-wider flex items-center justify-center gap-1">
-                        <Clock className="w-3.5 h-3.5" />
-                        <span>{slot.time_slot}</span>
-                      </div>
-                      <div
-                        className={`text-[11px] mt-1 ${
-                          isSelected
-                            ? 'text-teal-100'
-                            : isAvailable
-                            ? 'text-teal-600 dark:text-teal-400 font-semibold'
-                            : 'text-rose-500 dark:text-rose-400 font-semibold'
-                        }`}
-                      >
-                        {isAvailable
-                          ? (isRtl ? `متاح (${slot.available}/${slot.max_capacity})` : `${slot.available} free`)
-                          : (isRtl ? 'مكتمل' : 'Full')}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex items-center justify-between pt-6 border-t border-slate-100 dark:border-slate-800">
-            <button
-              type="button"
-              onClick={onCancel}
-              className="px-6 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all cursor-pointer"
-            >
-              {isRtl ? 'إلغاء' : 'Cancel'}
-            </button>
-
-            <button
-              type="button"
-              disabled={!selectedDoctorId || !selectedDate || !selectedTimeSlot || loadingSlots}
-              onClick={handleProceedToPatientInfo}
-              className="px-6 py-2.5 rounded-xl bg-teal-600 text-white font-bold hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-teal-600/20 flex items-center gap-2 cursor-pointer"
-            >
-              <span>{isRtl ? 'متابعة لبيانات المريض' : 'Continue to Patient Info'}</span>
-              {isRtl ? <ArrowLeft className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
-            </button>
-          </div>
-        </div>
-      ) : (
-        /* Step 2: Patient Info */
-        <form onSubmit={handleConfirmBooking} className="space-y-5">
-          {/* Booking Summary Card */}
-          <div className="p-4 rounded-2xl bg-teal-50/50 dark:bg-teal-900/20 border border-teal-100 dark:border-teal-800/40 flex items-center justify-between">
-            <div>
-              <div className="text-xs text-slate-500 dark:text-slate-400">
-                {isRtl ? 'تفاصيل الموعد المحدد' : 'Selected Appointment'}
-              </div>
-              <div className="font-bold text-slate-900 dark:text-white text-sm mt-0.5">
-                {selectedDoctor?.name} — {selectedDate} ({selectedTimeSlot})
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => setStep(1)}
-              className="text-xs font-bold text-teal-600 dark:text-teal-400 hover:underline cursor-pointer"
-            >
-              {isRtl ? 'تعديل الموعد' : 'Change Slot'}
-            </button>
-          </div>
-
-          {submitError && (
-            <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 text-sm flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              <span>{submitError}</span>
-            </div>
-          )}
 
           {/* Mode Selector: Registered Patient vs Walk-in */}
           <div className="grid grid-cols-2 gap-2 p-1 bg-slate-100 dark:bg-slate-800/60 rounded-2xl">
@@ -617,7 +556,7 @@ export const AssistantBookingWizard: React.FC<AssistantBookingWizardProps> = ({
               }`}
             >
               <UserCheck className="w-4 h-4" />
-              <span>{isRtl ? 'مريض مسجل في المنصة' : 'Registered Patient'}</span>
+              <span>{isRtl ? 'مريض مسجل بالمنصة' : 'Registered Patient'}</span>
             </button>
 
             <button
@@ -630,12 +569,11 @@ export const AssistantBookingWizard: React.FC<AssistantBookingWizardProps> = ({
               }`}
             >
               <UserPlus className="w-4 h-4" />
-              <span>{isRtl ? 'مريض غير مسجل / مباشر (Walk-in)' : 'Walk-in (Unregistered)'}</span>
+              <span>{isRtl ? 'مريض مباشر (Walk-in)' : 'Walk-in (Unregistered)'}</span>
             </button>
           </div>
 
           {patientMode === 'registered' ? (
-            /* Registered Patient Search Flow */
             <div className="space-y-4">
               {selectedPatient ? (
                 /* Selected Registered Patient Card */
@@ -673,8 +611,8 @@ export const AssistantBookingWizard: React.FC<AssistantBookingWizardProps> = ({
 
                       <p className="text-[11px] text-slate-500 dark:text-slate-400 pt-1">
                         {isRtl
-                          ? 'تم تحديد هذا المريض المسجل لربط الحجز بملفه التعريفي.'
-                          : 'This registered patient will be linked to the booking identity.'}
+                          ? 'تم تحديد هذا المريض المسجل بنجاح لربط الموعد بملفه الطبي.'
+                          : 'This registered patient will be linked to the booking.'}
                       </p>
                     </div>
 
@@ -690,33 +628,27 @@ export const AssistantBookingWizard: React.FC<AssistantBookingWizardProps> = ({
               ) : (
                 /* Patient Search Input & Results */
                 <div className="space-y-3">
-                  <div>
-                    <label className="block text-sm font-bold text-slate-700 dark:text-slate-200 mb-1.5">
-                      {isRtl ? 'البحث عن مريض مسجل في المنصة *' : 'Search Registered Patient *'}
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder={
-                          isRtl
-                            ? 'ابحث بالاسم، رقم الملف (MRN)، أو رقم الهاتف...'
-                            : 'Search by name, MRN, or phone number...'
-                        }
-                        className={`w-full py-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all ${
-                          isRtl ? 'pr-11 pl-4' : 'pl-11 pr-4'
-                        }`}
-                      />
-                      <Search
-                        className={`absolute top-3.5 w-5 h-5 text-slate-400 ${
-                          isRtl ? 'right-4' : 'left-4'
-                        }`}
-                      />
-                    </div>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder={
+                        isRtl
+                          ? 'ابحث بالاسم، رقم الملف (MRN)، أو رقم الهاتف...'
+                          : 'Search by name, MRN, or phone number...'
+                      }
+                      className={`w-full py-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all ${
+                        isRtl ? 'pr-11 pl-4' : 'pl-11 pr-4'
+                      }`}
+                    />
+                    <Search
+                      className={`absolute top-3.5 w-5 h-5 text-slate-400 ${
+                        isRtl ? 'right-4' : 'left-4'
+                      }`}
+                    />
                   </div>
 
-                  {/* Searching loader */}
                   {searching && (
                     <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center gap-2 text-sm text-slate-500 dark:text-slate-400">
                       <Loader2 className="w-4 h-4 animate-spin text-teal-600" />
@@ -724,14 +656,12 @@ export const AssistantBookingWizard: React.FC<AssistantBookingWizardProps> = ({
                     </div>
                   )}
 
-                  {/* Search error */}
                   {searchError && (
                     <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 text-xs">
                       {searchError}
                     </div>
                   )}
 
-                  {/* Search results */}
                   {!searching && searchResults.length > 0 && (
                     <div className="border border-slate-200 dark:border-slate-800 rounded-2xl divide-y divide-slate-100 dark:divide-slate-800 max-h-56 overflow-y-auto bg-white dark:bg-slate-900">
                       {searchResults.map((p) => {
@@ -763,7 +693,7 @@ export const AssistantBookingWizard: React.FC<AssistantBookingWizardProps> = ({
                               onClick={() => handleSelectPatient(p)}
                               className="px-3 py-1.5 rounded-xl bg-teal-50 dark:bg-teal-900/30 hover:bg-teal-100 dark:hover:bg-teal-900/50 text-teal-700 dark:text-teal-300 font-bold text-xs transition-colors cursor-pointer flex-shrink-0"
                             >
-                              {isRtl ? 'اختيار' : 'Select'}
+                              {isRtl ? 'اختيار المريض' : 'Select'}
                             </button>
                           </div>
                         );
@@ -771,155 +701,535 @@ export const AssistantBookingWizard: React.FC<AssistantBookingWizardProps> = ({
                     </div>
                   )}
 
-                  {/* No results found */}
-                  {!searching &&
-                    searchQuery.trim().length >= 2 &&
-                    searchResults.length === 0 && (
-                      <div className="p-4 text-center rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-dashed border-slate-200 dark:border-slate-800 space-y-2">
-                        <p className="text-xs text-slate-500 dark:text-slate-400">
-                          {isRtl
-                            ? 'لم يتم العثور على أي مريض مسجل مطابق لبحثك.'
-                            : 'No matching registered patient found.'}
-                        </p>
-                        <button
-                          type="button"
-                          onClick={() => handleSwitchMode('walkin')}
-                          className="text-xs font-bold text-teal-600 dark:text-teal-400 hover:underline cursor-pointer"
-                        >
-                          {isRtl
-                            ? 'التحويل إلى حجز مباشر (Walk-in)'
-                            : 'Switch to Walk-in Booking'}
-                        </button>
-                      </div>
-                    )}
+                  {!searching && searchQuery.trim().length >= 2 && searchResults.length === 0 && (
+                    <div className="p-4 text-center rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-dashed border-slate-200 dark:border-slate-800 space-y-2">
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        {isRtl
+                          ? 'لم يتم العثور على أي مريض مسجل مطابق لبحثك.'
+                          : 'No matching registered patient found.'}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => handleSwitchMode('walkin')}
+                        className="text-xs font-bold text-teal-600 dark:text-teal-400 hover:underline cursor-pointer"
+                      >
+                        {isRtl ? 'التحويل إلى تسجيل مريض مباشر (Walk-in)' : 'Switch to Walk-in'}
+                      </button>
+                    </div>
+                  )}
 
-                  {/* Helper text when idle */}
                   {!searching && searchQuery.trim().length < 2 && (
                     <p className="text-xs text-slate-400 dark:text-slate-500 px-1">
                       {isRtl
                         ? 'أدخل حرفين على الأقل للبحث عن المريض بالاسم أو رقم MRN أو رقم الهاتف.'
-                        : 'Enter at least 2 characters to search by name, MRN, or phone number.'}
+                        : 'Enter at least 2 characters to search by name, MRN, or phone.'}
                     </p>
                   )}
                 </div>
               )}
             </div>
           ) : (
-            /* Walk-in (Unregistered) Patient Flow */
+            /* Walk-in Form */
             <div className="space-y-4">
               <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 text-amber-800 dark:text-amber-300 text-xs">
                 {isRtl
-                  ? 'حجز مباشر لمريض غير مسجل في المنصة. لن يتم إنشاء حساب مستخدم أو ملف طبي إلكتروني تلقائيًا.'
-                  : 'Direct booking for an unregistered patient. No platform account or EHR is created automatically.'}
+                  ? 'حجز مباشر لمريض غير مسجل في المنصة. سيتم تسجيل بيانات المريض الأساسية لإنشاء التذكرة فورياً.'
+                  : 'Direct walk-in booking for an unregistered patient.'}
               </div>
 
-              {/* Patient Name */}
-              <div>
-                <label className="block text-sm font-bold text-slate-700 dark:text-slate-200 mb-1.5">
-                  {isRtl ? 'اسم المريض كاملاً *' : 'Patient Full Name *'}
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    required
-                    value={patientName}
-                    onChange={(e) => setPatientName(e.target.value)}
-                    placeholder={isRtl ? 'مثال: محمد العمري' : 'e.g., Mohamed El-Amri'}
-                    className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all"
-                  />
-                  <User
-                    className={`absolute top-3.5 w-5 h-5 text-slate-400 ${
-                      isRtl ? 'left-4' : 'right-4'
-                    }`}
-                  />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-1">
+                    {isRtl ? 'اسم المريض كاملاً *' : 'Patient Full Name *'}
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      required
+                      value={patientName}
+                      onChange={(e) => setPatientName(e.target.value)}
+                      placeholder={isRtl ? 'مثال: محمد العمري' : 'e.g., Mohamed El-Amri'}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-teal-500 outline-none"
+                    />
+                  </div>
                 </div>
-              </div>
 
-              {/* Patient Phone */}
-              <div>
-                <label className="block text-sm font-bold text-slate-700 dark:text-slate-200 mb-1.5">
-                  {isRtl ? 'رقم الهاتف *' : 'Phone Number *'}
-                </label>
-                <div className="relative">
-                  <input
-                    type="tel"
-                    required
-                    dir="ltr"
-                    value={patientPhone}
-                    onChange={(e) => setPatientPhone(e.target.value)}
-                    placeholder="+213..."
-                    className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all text-left"
-                  />
-                  <Phone
-                    className={`absolute top-3.5 w-5 h-5 text-slate-400 ${
-                      isRtl ? 'left-4' : 'right-4'
-                    }`}
-                  />
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-1">
+                    {isRtl ? 'رقم الهاتف للتواصل *' : 'Phone Number *'}
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="tel"
+                      required
+                      dir="ltr"
+                      value={patientPhone}
+                      onChange={(e) => setPatientPhone(e.target.value)}
+                      placeholder="0550112233"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-teal-500 outline-none text-right"
+                    />
+                  </div>
                 </div>
-              </div>
 
-              {/* MRN / Patient Number (Optional) */}
-              <div>
-                <label className="block text-sm font-bold text-slate-700 dark:text-slate-200 mb-1.5">
-                  {isRtl
-                    ? 'رقم الملف الطبي بالعيادة (اختياري)'
-                    : 'Clinic Medical Record Number (Optional)'}
-                </label>
-                <div className="relative">
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-1">
+                    {isRtl ? 'رقم الملف الطبي بالعيادة MRN (اختياري)' : 'Clinic MRN (Optional)'}
+                  </label>
                   <input
                     type="text"
                     value={patientMrn}
                     onChange={(e) => setPatientMrn(e.target.value)}
                     placeholder="MRN-..."
-                    className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all"
-                  />
-                  <FileText
-                    className={`absolute top-3.5 w-5 h-5 text-slate-400 ${
-                      isRtl ? 'left-4' : 'right-4'
-                    }`}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-teal-500 outline-none"
                   />
                 </div>
               </div>
             </div>
           )}
 
-          {/* Notes */}
+          {/* Step 1 Footer */}
+          <div className="flex items-center justify-between pt-6 border-t border-slate-100 dark:border-slate-800">
+            <button
+              type="button"
+              onClick={onCancel}
+              className="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 text-xs transition-all cursor-pointer"
+            >
+              {isRtl ? 'إلغاء' : 'Cancel'}
+            </button>
+
+            <button
+              type="button"
+              onClick={handleProceedToDoctor}
+              disabled={
+                (patientMode === 'registered' && !selectedPatient) ||
+                (patientMode === 'walkin' && (!patientName.trim() || !patientPhone.trim()))
+              }
+              className="px-6 py-2.5 rounded-xl bg-teal-600 text-white font-bold hover:bg-teal-700 disabled:opacity-40 disabled:cursor-not-allowed text-xs transition-all shadow-md shadow-teal-600/20 flex items-center gap-2 cursor-pointer"
+            >
+              <span>{isRtl ? 'متابعة إلى اختيار الطبيب ←' : 'Continue to Doctor Selection →'}</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* STEP 2: Doctor Selection with Working Hours Guard */}
+      {step === 2 && (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+            <div>
+              <h3 className="font-bold text-slate-900 dark:text-white text-base">
+                {isRtl ? '2. اختر الطبيب المعالج:' : '2. Select Attending Doctor:'}
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                {isRtl
+                  ? `المريض المحدد: ${patientName || selectedPatient?.full_name}`
+                  : `Selected Patient: ${patientName || selectedPatient?.full_name}`}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setStep(1)}
+              className="text-xs text-teal-600 dark:text-teal-400 hover:underline cursor-pointer"
+            >
+              {isRtl ? 'تعديل بيانات المريض' : 'Edit Patient'}
+            </button>
+          </div>
+
+          {/* Doctor Selection Error Alert */}
+          {doctorSelectionError && (
+            <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs font-semibold flex items-center gap-3">
+              <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
+              <div className="flex-1 leading-relaxed">
+                <p>{doctorSelectionError}</p>
+                <p className="text-[11px] text-rose-600 dark:text-rose-400 font-normal mt-0.5">
+                  {isRtl
+                    ? 'يجب تفعيل جدول ساعات العمل الأسبوعية للطبيب في العيادة أولاً لتتمكن من إنشاء الحجوزات.'
+                    : 'Doctor schedule must be activated to accept bookings.'}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {loadingDoctors ? (
+            <div className="p-8 text-center text-slate-400 flex items-center justify-center gap-2">
+              <Loader2 className="w-5 h-5 animate-spin text-teal-600" />
+              <span>{isRtl ? 'جاري تحميل أطباء العيادة...' : 'Loading doctors...'}</span>
+            </div>
+          ) : doctorsError ? (
+            <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-xs flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{doctorsError}</span>
+            </div>
+          ) : doctors.length === 0 ? (
+            <div className="p-6 text-center text-slate-500 bg-slate-50 rounded-2xl text-xs">
+              {isRtl ? 'لا يوجد أطباء مسجلون في هذه العيادة حالياً.' : 'No doctors in this clinic.'}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {doctors.map((doctor) => {
+                const isSelected = selectedDoctorId === doctor.id;
+                const isScheduleActive = doctor.is_working_hours_activated === true;
+
+                return (
+                  <div
+                    key={doctor.id}
+                    onClick={() => handleSelectDoctor(doctor)}
+                    className={`p-4 rounded-2xl border text-right transition-all flex flex-col justify-between cursor-pointer ${
+                      isSelected
+                        ? isScheduleActive
+                          ? 'border-teal-600 bg-teal-50/50 dark:bg-teal-900/20 shadow-sm ring-2 ring-teal-500/20'
+                          : 'border-rose-400 bg-rose-50/40 dark:bg-rose-900/20 ring-2 ring-rose-400/20'
+                        : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900'
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-center gap-2.5">
+                          <div
+                            className={`p-2 rounded-xl ${
+                              isSelected
+                                ? isScheduleActive ? 'bg-teal-600 text-white' : 'bg-rose-600 text-white'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+                            }`}
+                          >
+                            <Stethoscope className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <div className="font-bold text-slate-900 dark:text-white text-sm">
+                              {doctor.name}
+                            </div>
+                            <div className="text-xs text-teal-600 dark:text-teal-400 font-semibold mt-0.5">
+                              {doctor.specialty || (isRtl ? 'طب عام' : 'General')}
+                            </div>
+                          </div>
+                        </div>
+
+                        {isSelected && (
+                          <div className={`p-1 rounded-full text-white ${isScheduleActive ? 'bg-teal-600' : 'bg-rose-600'}`}>
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="mt-3 flex items-center justify-between text-[11px] text-slate-500">
+                        <span>{doctor.license_number ? `ترخيص: ${doctor.license_number}` : ''}</span>
+                        <span>{doctor.position === 'director' ? (isRtl ? 'مدير العيادة' : 'Director') : ''}</span>
+                      </div>
+                    </div>
+
+                    <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800">
+                      {isScheduleActive ? (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-[11px] font-bold border border-emerald-200 dark:border-emerald-800">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                          <span>{isRtl ? 'ساعات العمل: مفعّلة ✓' : 'Working hours: Active ✓'}</span>
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 text-[11px] font-bold border border-rose-200 dark:border-rose-800">
+                          <AlertCircle className="w-3 h-3 text-rose-600" />
+                          <span>{isRtl ? 'ساعات العمل: غير مفعّلة ✕' : 'Working hours: Inactive ✕'}</span>
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Step 2 Footer */}
+          <div className="flex items-center justify-between pt-6 border-t border-slate-100 dark:border-slate-800">
+            <button
+              type="button"
+              onClick={() => setStep(1)}
+              className="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 text-xs transition-all cursor-pointer flex items-center gap-1.5"
+            >
+              {isRtl ? <ArrowRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />}
+              <span>{isRtl ? 'السابق (بيانات المريض)' : 'Back to Patient'}</span>
+            </button>
+
+            <button
+              type="button"
+              disabled={!selectedDoctorId || selectedDoctor?.is_working_hours_activated !== true}
+              onClick={handleProceedToDateAndSlot}
+              className="px-6 py-2.5 rounded-xl bg-teal-600 text-white font-bold hover:bg-teal-700 disabled:opacity-40 disabled:cursor-not-allowed text-xs transition-all shadow-md shadow-teal-600/20 flex items-center gap-2 cursor-pointer"
+            >
+              <span>{isRtl ? 'متابعة إلى تحديد الموعد ←' : 'Continue to Date & Slot →'}</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* STEP 3: Date & Slot Selection with Friday / Vacation / Schedule Guards */}
+      {step === 3 && (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+            <div>
+              <h3 className="font-bold text-slate-900 dark:text-white text-base">
+                {isRtl ? '3. حدد التاريخ والفترة الزمنية المتاحة:' : '3. Select Date and Available Slot:'}
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                {isRtl
+                  ? `الطبيب: ${selectedDoctor?.name} (${selectedDoctor?.specialty || 'طب عام'})`
+                  : `Doctor: ${selectedDoctor?.name}`}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setStep(2)}
+              className="text-xs text-teal-600 dark:text-teal-400 hover:underline cursor-pointer"
+            >
+              {isRtl ? 'تغيير الطبيب' : 'Change Doctor'}
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {/* Date Input */}
+            <div>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-2">
+                {isRtl ? 'تاريخ الحجز المطلوب:' : 'Appointment Date:'}
+              </label>
+              <input
+                type="date"
+                min={minDate}
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-teal-500 outline-none"
+              />
+              <p className="text-[11px] text-slate-400 mt-1.5">
+                {isRtl
+                  ? 'ملاحظة: أيام الجمعة عطلة أسبوعية رسمية.'
+                  : 'Note: Fridays are official weekly holidays.'}
+              </p>
+            </div>
+
+            {/* Time Slot Picker */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-200">
+                  {isRtl ? 'الفترات الزمنية المتاحة:' : 'Available Time Slots:'}
+                </label>
+                {loadingSlots && (
+                  <span className="text-[10px] text-teal-600 animate-pulse font-medium">
+                    {isRtl ? 'جارٍ التحقق...' : 'Checking...'}
+                  </span>
+                )}
+              </div>
+
+              {loadingSlots ? (
+                <div className="py-8 text-center text-slate-400 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 text-xs">
+                  <Loader2 className="w-5 h-5 animate-spin text-teal-600 mx-auto mb-2" />
+                  <p>{isRtl ? 'جارٍ فحص المواعيد المتاحة والسعة...' : 'Checking capacity...'}</p>
+                </div>
+              ) : slotsError ? (
+                <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-xs space-y-2">
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                    <span className="font-bold">{isRtl ? 'لا يمكن حجز موعد في هذا التاريخ' : 'Unavailable Date'}</span>
+                  </div>
+                  <p className="leading-relaxed font-medium pr-6">{slotsError}</p>
+                  <div className="pr-6 pt-1">
+                    <span className="text-[11px] text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/50 px-2 py-0.5 rounded-lg font-semibold inline-block">
+                      💡 {isRtl ? 'يرجى اختيار تاريخ آخر للمتابعة.' : 'Please select another date.'}
+                    </span>
+                  </div>
+                </div>
+              ) : slots.length === 0 ? (
+                <div className="py-8 text-center text-slate-400 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 text-xs">
+                  <Clock className="w-6 h-6 text-slate-300 mx-auto mb-2" />
+                  <p>{isRtl ? 'لا توجد فترات عمل متاحة لهذا اليوم' : 'No available slots on this day'}</p>
+                  <p className="text-[11px] text-slate-400 mt-1">{isRtl ? 'اختر تاريخاً آخر' : 'Choose another date'}</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {/* Warning banner if patient has an active booking on this date */}
+                  {(() => {
+                    const existingBookedSlot = slots.find((s) => s.already_booked_by_patient);
+                    if (!existingBookedSlot) return null;
+                    return (
+                      <div className="p-3.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl text-xs text-amber-900 dark:text-amber-200 flex items-start gap-2.5">
+                        <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
+                        <div>
+                          <strong className="block font-bold text-amber-950 dark:text-amber-100">
+                            {isRtl ? 'تنبيه: المريض لديه حجز نشط بالفعل في هذا اليوم' : 'Notice: Patient already has an active booking on this date'}
+                          </strong>
+                          <p className="mt-0.5 text-amber-800 dark:text-amber-300 leading-relaxed">
+                            {isRtl
+                              ? `يوجد موعد معتمد للمريض في تمام الساعة (${existingBookedSlot.time_slot}) مع هذا الطبيب. تم تعطيل تلك الفترة تلقائياً لمنع التكرار، يرجى اختيار فترة زمنية أخرى.`
+                              : `Patient is already booked at ${existingBookedSlot.time_slot} with this doctor. This slot has been disabled to prevent duplicate bookings.`}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  <div className="grid grid-cols-2 gap-2 max-h-56 overflow-y-auto pr-1">
+                    {slots.map((slot) => {
+                      const isSelected = selectedTimeSlot === slot.time_slot;
+                      const isAlreadyBooked = Boolean(slot.already_booked_by_patient);
+                      const isAvailable = slot.is_available && slot.available > 0 && !isAlreadyBooked;
+
+                      return (
+                        <button
+                          type="button"
+                          key={slot.time_slot}
+                          disabled={!isAvailable}
+                          onClick={() => setSelectedTimeSlot(slot.time_slot)}
+                          className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-0.5 ${
+                            isAlreadyBooked
+                              ? 'border-rose-200 dark:border-rose-800 bg-rose-50/70 dark:bg-rose-950/30 text-rose-500 cursor-not-allowed opacity-90'
+                              : !isAvailable
+                              ? 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/30 text-slate-400 cursor-not-allowed opacity-60'
+                              : isSelected
+                              ? 'border-teal-600 bg-teal-600 text-white shadow-sm'
+                              : 'border-slate-200 dark:border-slate-800 hover:border-teal-400 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100'
+                          }`}
+                        >
+                          <span className="font-bold text-xs">{slot.time_slot}</span>
+                          <span
+                            className={`text-[9px] font-medium px-1.5 py-0.2 rounded-full ${
+                              isAlreadyBooked
+                                ? 'bg-rose-100 dark:bg-rose-900/60 text-rose-800 dark:text-rose-200 font-bold border border-rose-200'
+                                : isSelected
+                                ? 'bg-teal-500 text-white'
+                                : isAvailable
+                                ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
+                                : 'bg-slate-200 dark:bg-slate-700 text-slate-500'
+                            }`}
+                          >
+                            {isAlreadyBooked
+                              ? (isRtl ? '🚫 محجوز للمريض' : 'Already booked')
+                              : isAvailable
+                              ? (isRtl ? `متاح (${slot.available}/${slot.max_capacity})` : `${slot.available} free`)
+                              : (isRtl ? 'مكتمل' : 'Full')}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Step 3 Footer */}
+          <div className="flex items-center justify-between pt-6 border-t border-slate-100 dark:border-slate-800">
+            <button
+              type="button"
+              onClick={() => setStep(2)}
+              className="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 text-xs transition-all cursor-pointer flex items-center gap-1.5"
+            >
+              {isRtl ? <ArrowRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />}
+              <span>{isRtl ? 'السابق (اختيار الطبيب)' : 'Back to Doctor'}</span>
+            </button>
+
+            <button
+              type="button"
+              disabled={!selectedTimeSlot || !!slotsError || slots.length === 0}
+              onClick={handleProceedToReview}
+              className="px-6 py-2.5 rounded-xl bg-teal-600 text-white font-bold hover:bg-teal-700 disabled:opacity-40 disabled:cursor-not-allowed text-xs transition-all shadow-md shadow-teal-600/20 flex items-center gap-2 cursor-pointer"
+            >
+              <span>{isRtl ? 'متابعة إلى مراجعة وتأكيد الحجز ←' : 'Continue to Review →'}</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* STEP 4: Review & Final Confirmation */}
+      {step === 4 && (
+        <form onSubmit={handleConfirmBooking} className="space-y-6">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+            <h3 className="font-bold text-slate-900 dark:text-white text-base">
+              {isRtl ? '4. مراجعة وتأكيد الحجز النهائي:' : '4. Review & Confirm Booking:'}
+            </h3>
+            <button
+              type="button"
+              onClick={() => setStep(3)}
+              className="text-xs text-teal-600 dark:text-teal-400 hover:underline cursor-pointer"
+            >
+              {isRtl ? 'تعديل الموعد' : 'Change Date/Slot'}
+            </button>
+          </div>
+
+          {submitError && (
+            <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 text-xs font-semibold flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                <span>{submitError}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setStep(3)}
+                className="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-rose-300 dark:border-rose-700 text-rose-700 dark:text-rose-300 font-bold text-xs hover:bg-rose-100 transition-all shrink-0 cursor-pointer shadow-2xs"
+              >
+                {isRtl ? 'تعديل التوقيت أو اليوم ←' : 'Change Slot/Date →'}
+              </button>
+            </div>
+          )}
+
+          {/* Structured Summary Card */}
+          <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+              <div>
+                <span className="text-slate-400 block mb-1">{isRtl ? 'المريض:' : 'Patient:'}</span>
+                <p className="font-bold text-slate-900 dark:text-white text-sm">{patientName}</p>
+                <p className="text-slate-500 font-mono mt-0.5">{patientPhone}</p>
+                <span className="inline-block mt-1 px-2 py-0.5 rounded bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 font-bold text-[10px]">
+                  {patientMode === 'registered' ? (isRtl ? 'مريض مسجل بالمنصة' : 'Registered') : (isRtl ? 'مريض مباشر (Walk-in)' : 'Walk-in')}
+                </span>
+              </div>
+
+              <div>
+                <span className="text-slate-400 block mb-1">{isRtl ? 'الطبيب والعيادة:' : 'Doctor & Clinic:'}</span>
+                <p className="font-bold text-slate-900 dark:text-white text-sm">{selectedDoctor?.name}</p>
+                <p className="text-teal-600 dark:text-teal-400 font-semibold mt-0.5">{selectedDoctor?.specialty || (isRtl ? 'طب عام' : 'General')}</p>
+                <p className="text-slate-500 mt-1">{clinicName}</p>
+              </div>
+
+              <div className="sm:col-span-2 pt-3 border-t border-slate-200 dark:border-slate-700/60 flex items-center justify-between">
+                <div>
+                  <span className="text-slate-400 block mb-1">{isRtl ? 'تاريخ وتوقيت الموعد:' : 'Date & Time Slot:'}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="px-3 py-1 rounded-xl bg-teal-600 text-white font-bold font-mono text-sm">
+                      {selectedTimeSlot}
+                    </span>
+                    <span className="font-bold text-slate-800 dark:text-slate-200 text-sm">
+                      {selectedDate}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Optional Notes */}
           <div>
-            <label className="block text-sm font-bold text-slate-700 dark:text-slate-200 mb-1.5">
-              {isRtl ? 'ملاحظات الحجز (اختياري)' : 'Notes / Reason for Visit (Optional)'}
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-1.5">
+              {isRtl ? 'ملاحظات إضافية أو سبب الزيارة (اختياري):' : 'Notes / Reason for Visit (Optional):'}
             </label>
             <textarea
               rows={2}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder={
-                isRtl
-                  ? 'ملاحظات خاصة، سبب الزيارة، أو إحالة...'
-                  : 'Notes or reason for visit...'
-              }
-              className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all resize-none"
+              placeholder={isRtl ? 'ملاحظات خاصة، استشارة أولى، متابعة علاج...' : 'Additional visit notes...'}
+              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-teal-500 outline-none resize-none"
             />
           </div>
 
-          {/* Action Buttons */}
+          {/* Step 4 Footer */}
           <div className="flex items-center justify-between pt-6 border-t border-slate-100 dark:border-slate-800">
             <button
               type="button"
-              onClick={() => setStep(1)}
-              className="px-6 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center gap-2 cursor-pointer"
+              onClick={() => setStep(3)}
+              className="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 text-xs transition-all cursor-pointer flex items-center gap-1.5"
             >
               {isRtl ? <ArrowRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />}
-              <span>{isRtl ? 'السابق' : 'Back'}</span>
+              <span>{isRtl ? 'السابق (تعديل الموعد)' : 'Back to Date'}</span>
             </button>
 
             <button
               type="submit"
-              disabled={
-                submitting ||
-                (patientMode === 'registered' && !selectedPatient) ||
-                (patientMode === 'walkin' && (!patientName.trim() || !patientPhone.trim()))
-              }
-              className="px-8 py-2.5 rounded-xl bg-teal-600 text-white font-bold hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-teal-600/20 flex items-center gap-2 cursor-pointer"
+              disabled={submitting}
+              className="px-8 py-2.5 rounded-xl bg-teal-600 text-white font-bold hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed text-xs transition-all shadow-lg shadow-teal-600/20 flex items-center gap-2 cursor-pointer"
             >
               {submitting ? (
                 <>
@@ -929,7 +1239,7 @@ export const AssistantBookingWizard: React.FC<AssistantBookingWizardProps> = ({
               ) : (
                 <>
                   <CheckCircle2 className="w-4 h-4" />
-                  <span>{isRtl ? 'تأكيد الحجز الحضوري' : 'Confirm In-Clinic Booking'}</span>
+                  <span>{isRtl ? 'تأكيد وإنشاء الحجز الحضوري' : 'Confirm In-Clinic Booking'}</span>
                 </>
               )}
             </button>

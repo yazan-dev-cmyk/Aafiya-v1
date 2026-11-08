@@ -72,7 +72,6 @@ export const ProfileSettingsTab: React.FC = () => {
   }, [user]);
 
   const [enableSmsAlerts, setEnableSmsAlerts] = useState(true);
-  const [enableWhatsappAlerts, setEnableWhatsappAlerts] = useState(true);
 
   const handleSaveSettings = async () => {
     setFeedback(null);
@@ -288,27 +287,23 @@ export const ProfileSettingsTab: React.FC = () => {
       <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-4">
         <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
           <Bell className="w-5 h-5 text-emerald-600" />
-          <h3 className="font-bold text-slate-900 text-base">قنوات إرسال التذاكر وتنبيهات WhatsApp & SMS</h3>
+          <h3 className="font-bold text-slate-900 text-base">قنوات إرسال التذاكر وتنبيهات الرسائل</h3>
         </div>
 
         <div className="space-y-3">
-          <div className="p-4 rounded-2xl border border-slate-200 flex items-center justify-between">
+          <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2.5 bg-emerald-100 text-emerald-700 rounded-xl">
                 <MessageSquare className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="font-bold text-slate-900 text-sm">إرسال التذكرة تلقائياً عبر WhatsApp API</h4>
-                <p className="text-xs text-slate-500">إرسال رسالة توثيق تحتوي على رابط التذكرة والتوقيت فور إنشاء الحجز</p>
+                <h4 className="font-bold text-emerald-950 text-sm">مشاركة التذاكر عبر WhatsApp اليدوي</h4>
+                <p className="text-xs text-emerald-800">تتيح المنصة تنزيل بطاقة الموعد الرسمية بصيغة PNG ومشاركة رسالة التأكيد عبر WhatsApp يدوياً لكل حجز معتمد أو معلّق.</p>
               </div>
             </div>
-
-            <input
-              type="checkbox"
-              checked={enableWhatsappAlerts}
-              onChange={(e) => setEnableWhatsappAlerts(e.target.checked)}
-              className="w-5 h-5 text-blue-600 rounded cursor-pointer"
-            />
+            <span className="text-[11px] font-bold text-emerald-800 bg-white px-3 py-1 rounded-full border border-emerald-300">
+              مفعل يدوياً
+            </span>
           </div>
 
           <div className="p-4 rounded-2xl border border-slate-200 flex items-center justify-between">

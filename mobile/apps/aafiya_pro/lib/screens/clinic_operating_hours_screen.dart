@@ -59,6 +59,7 @@ class _ClinicOperatingHoursScreenState
   bool _isConfigured = false;
   bool _isLoading = true;
   bool _isSaving = false;
+  bool _clinicIdMissing = false;
   String? _errorMessage;
   String? _successMessage;
 
@@ -96,13 +97,14 @@ class _ClinicOperatingHoursScreenState
     if (_activeClinicId.isEmpty) {
       setState(() {
         _isLoading = false;
-        _errorMessage = 'معرف العيادة غير متوفر. يرجى اختيار عيادة أولاً.';
+        _clinicIdMissing = true;
       });
       return;
     }
 
     setState(() {
       _isLoading = true;
+      _clinicIdMissing = false;
       _errorMessage = null;
       _successMessage = null;
     });
@@ -352,6 +354,8 @@ class _ClinicOperatingHoursScreenState
     final strings = LocalizedStrings.of(context);
     final activeClinic = widget.sessionManager.activeClinic;
     final isDirector = activeClinic?.isMedicalDirector == true;
+    final effectiveError =
+        _clinicIdMissing ? strings.clinicIdMissingError : _errorMessage;
 
     return Scaffold(
       appBar: AafiyaAppBar(
@@ -367,7 +371,7 @@ class _ClinicOperatingHoursScreenState
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : _errorMessage != null && _days.every((d) => d.periods.isEmpty)
+          : effectiveError != null && _days.every((d) => d.periods.isEmpty)
               ? Center(
                   child: Padding(
                     padding: AafiyaSpacing.insetScreen,
@@ -381,7 +385,7 @@ class _ClinicOperatingHoursScreenState
                         ),
                         const SizedBox(height: AafiyaSpacing.md),
                         Text(
-                          _errorMessage!,
+                          effectiveError,
                           style: AafiyaTypography.bodyMedium,
                           textAlign: TextAlign.center,
                         ),

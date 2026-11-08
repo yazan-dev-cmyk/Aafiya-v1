@@ -22,4 +22,5 @@ export interface BookingRecord {
   rescheduledTime?: string;
   createdAt: string;
   createdBy: string;
+  secureToken?: string;
 }

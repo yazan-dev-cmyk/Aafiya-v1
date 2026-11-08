@@ -3,6 +3,7 @@ import 'package:aafiya_core/aafiya_core.dart';
 import 'package:aafiya_ui/aafiya_ui.dart';
 
 import '../screens/assistant_queue_screen.dart';
+import '../screens/assistant_rewards_screen.dart';
 import '../screens/clinic_escalations_screen.dart';
 import '../screens/unresolved_reschedules_screen.dart';
 
@@ -15,7 +16,7 @@ import '../screens/unresolved_reschedules_screen.dart';
 /// 4. QR Token single-use Check-In (`POST /api/v1/appointments/check-in`).
 /// 5. Clinic-scoped Patient Directory Lookup (`GET /api/v1/patients`).
 /// 6. Urgent Unresolved Reschedules Dashboard (`GET /api/v1/clinic/reschedule-dashboard/unresolved`).
-class AssistantShell extends StatelessWidget {
+class AssistantShell extends StatefulWidget {
   const AssistantShell({
     super.key,
     required this.user,
@@ -23,6 +24,7 @@ class AssistantShell extends StatelessWidget {
     required this.onSignOut,
     this.apiClient,
     this.queueService,
+    this.adsTickerService,
   });
 
   final User user;
@@ -30,17 +32,67 @@ class AssistantShell extends StatelessWidget {
   final VoidCallback onSignOut;
   final ApiClient? apiClient;
   final AssistantQueueService? queueService;
+  final AdsTickerService? adsTickerService;
+
+  @override
+  State<AssistantShell> createState() => _AssistantShellState();
+}
+
+class _AssistantShellState extends State<AssistantShell> {
+  late final AdsTickerService _adsTickerService;
+  List<AdsTickerItem> _tickerAds = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _adsTickerService = widget.adsTickerService ??
+        AdsTickerService(
+          apiClient: widget.apiClient ?? widget.sessionManager.apiClient,
+        );
+    _fetchTickerAds();
+  }
+
+  @override
+  void didUpdateWidget(covariant AssistantShell oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.adsTickerService != oldWidget.adsTickerService) {
+      _adsTickerService = widget.adsTickerService ??
+          AdsTickerService(
+            apiClient: widget.apiClient ?? widget.sessionManager.apiClient,
+          );
+      _fetchTickerAds();
+    }
+  }
+
+  Future<void> _fetchTickerAds() async {
+    final result =
+        await _adsTickerService.getEligibleAds(destination: 'ticker');
+    if (!mounted) return;
+    switch (result) {
+      case ApiSuccess(:final data):
+        setState(() => _tickerAds = data);
+      case ApiFailure():
+        setState(() => _tickerAds = []);
+    }
+  }
+
+  Future<void> _handleAdClick(AdsTickerItem ad) async {
+    await _adsTickerService.recordClick(ad.id, destination: 'ticker');
+    final urlValidation = AafiyaAdsTicker.validateTargetUrl(ad.targetUrl);
+    if (!urlValidation.isSafe || !mounted) return;
+  }
 
   @override
   Widget build(BuildContext context) {
     final strings = LocalizedStrings.of(context);
-    final effectiveClient = apiClient ?? sessionManager.apiClient;
-    final canManageQueue = sessionManager.activeClinicId != null &&
-        user.hasPermission('booking.manage_queue');
+    final effectiveClient =
+        widget.apiClient ?? widget.sessionManager.apiClient;
+    final canManageQueue = widget.sessionManager.activeClinicId != null &&
+        widget.user.hasPermission('booking.manage_queue');
 
     return Scaffold(
       appBar: AafiyaAppBar(
-        title: '${strings.assistantRoleTitle}: ${user.name}',
+        title: '${strings.assistantRoleTitle}: ${widget.user.name}',
         showBrandMark: true,
         actions: [
           if (canManageQueue)
@@ -50,8 +102,8 @@ class AssistantShell extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).push(
                   ClinicEscalationsScreen.route(
-                    sessionManager: sessionManager,
-                    user: user,
+                    sessionManager: widget.sessionManager,
+                    user: widget.user,
                     apiClient: effectiveClient,
                   ),
                 );
@@ -63,8 +115,21 @@ class AssistantShell extends StatelessWidget {
             onPressed: () {
               Navigator.of(context).push(
                 UnresolvedReschedulesScreen.route(
-                  sessionManager: sessionManager,
-                  user: user,
+                  sessionManager: widget.sessionManager,
+                  user: widget.user,
+                  apiClient: effectiveClient,
+                ),
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.account_balance_wallet_outlined),
+            tooltip: strings.assistantRewardsTitle,
+            onPressed: () {
+              Navigator.of(context).push(
+                AssistantRewardsScreen.route(
+                  sessionManager: widget.sessionManager,
+                  user: widget.user,
                   apiClient: effectiveClient,
                 ),
               );
@@ -82,18 +147,125 @@ class AssistantShell extends StatelessWidget {
                 confirmLabel: strings.signOut,
               );
               if (confirmed == true) {
-                await sessionManager.logout();
-                onSignOut();
+                _adsTickerService.clearCache();
+                await widget.sessionManager.logout();
+                widget.onSignOut();
               }
             },
           ),
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert_rounded),
+            tooltip: strings.moreOptions,
+            onSelected: (value) async {
+              if (value == 'assistant_rewards') {
+                Navigator.of(context).push(
+                  AssistantRewardsScreen.route(
+                    sessionManager: widget.sessionManager,
+                    user: widget.user,
+                    apiClient: effectiveClient,
+                  ),
+                );
+              } else if (value == 'change_password') {
+                await AafiyaChangePasswordCard.show(
+                  context,
+                  apiClient: effectiveClient,
+                );
+              } else if (value == 'sign_out') {
+                final confirmed = await AafiyaSignOutDialog.show(
+                  context,
+                  title: strings.signOutConfirmTitle,
+                  message: strings.signOutConfirmMessage,
+                  cancelLabel: strings.cancel,
+                  confirmLabel: strings.signOut,
+                );
+                if (confirmed == true) {
+                  _adsTickerService.clearCache();
+                  await widget.sessionManager.logout();
+                  widget.onSignOut();
+                }
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem<String>(
+                value: 'assistant_rewards',
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.account_balance_wallet_outlined,
+                      color: AafiyaColors.primaryBlue,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        strings.assistantRewardsTitle,
+                        style: AafiyaTypography.bodyMedium,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: 'change_password',
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.lock_reset_rounded,
+                      color: AafiyaColors.healingGreen,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        strings.changePassword,
+                        style: AafiyaTypography.bodyMedium,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const PopupMenuDivider(),
+              PopupMenuItem<String>(
+                value: 'sign_out',
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.logout_rounded,
+                      color: AafiyaColors.error,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        strings.signOut,
+                        style: AafiyaTypography.bodyMedium.copyWith(
+                          color: AafiyaColors.error,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ],
       ),
-      body: AssistantQueueScreen(
-        sessionManager: sessionManager,
-        user: user,
-        apiClient: effectiveClient,
-        queueService: queueService,
+      body: Column(
+        children: [
+          AafiyaAdsTicker(
+            ads: _tickerAds,
+            onAdClick: _handleAdClick,
+            margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          ),
+          Expanded(
+            child: AssistantQueueScreen(
+              sessionManager: widget.sessionManager,
+              user: widget.user,
+              apiClient: effectiveClient,
+              queueService: widget.queueService,
+            ),
+          ),
+        ],
       ),
     );
   }

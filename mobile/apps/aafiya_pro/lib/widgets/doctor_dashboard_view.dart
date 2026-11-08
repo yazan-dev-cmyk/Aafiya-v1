@@ -29,6 +29,7 @@ class DoctorDashboardView extends StatefulWidget {
     this.dashboardService,
     this.clinicOperatingHoursService,
     this.doctorWorkingHoursService,
+    this.adsTickerService,
     this.apiClient,
   });
 
@@ -37,6 +38,7 @@ class DoctorDashboardView extends StatefulWidget {
   final DoctorDashboardService? dashboardService;
   final ClinicOperatingHoursService? clinicOperatingHoursService;
   final DoctorWorkingHoursService? doctorWorkingHoursService;
+  final AdsTickerService? adsTickerService;
   final ApiClient? apiClient;
 
   @override
@@ -47,10 +49,12 @@ class _DoctorDashboardViewState extends State<DoctorDashboardView> {
   late final DoctorDashboardService _service;
   late final ClinicOperatingHoursService _clinicHoursService;
   late final DoctorWorkingHoursService _doctorWorkingHoursService;
+  late final AdsTickerService _adsTickerService;
   final ScrollController _scrollController = ScrollController();
 
   DoctorStats? _stats;
   List<Appointment> _appointments = [];
+  List<AdsTickerItem> _tickerAds = [];
   bool _isLoading = true;
   bool _isLoadingMore = false;
   String? _errorMessage;
@@ -83,11 +87,16 @@ class _DoctorDashboardViewState extends State<DoctorDashboardView> {
         DoctorWorkingHoursService(
           apiClient: widget.apiClient ?? widget.sessionManager.apiClient,
         );
+    _adsTickerService = widget.adsTickerService ??
+        AdsTickerService(
+          apiClient: widget.apiClient ?? widget.sessionManager.apiClient,
+        );
 
     widget.sessionManager.addListener(_onClinicContextChanged);
     _scrollController.addListener(_onScroll);
     _loadDashboardData();
     _checkOnboardingStatus();
+    _fetchTickerAds();
   }
 
   @override
@@ -213,6 +222,24 @@ class _DoctorDashboardViewState extends State<DoctorDashboardView> {
       _selectedStatus = status;
     });
     _loadDashboardData();
+  }
+
+  Future<void> _fetchTickerAds() async {
+    final result =
+        await _adsTickerService.getEligibleAds(destination: 'ticker');
+    if (!mounted) return;
+    switch (result) {
+      case ApiSuccess(:final data):
+        setState(() => _tickerAds = data);
+      case ApiFailure():
+        setState(() => _tickerAds = []);
+    }
+  }
+
+  Future<void> _handleAdClick(AdsTickerItem ad) async {
+    await _adsTickerService.recordClick(ad.id, destination: 'ticker');
+    final urlValidation = AafiyaAdsTicker.validateTargetUrl(ad.targetUrl);
+    if (!urlValidation.isSafe || !mounted) return;
   }
 
   Future<void> _checkOnboardingStatus({bool showModalIfEligible = true}) async {
@@ -397,6 +424,7 @@ class _DoctorDashboardViewState extends State<DoctorDashboardView> {
         await Future.wait([
           _loadDashboardData(),
           _checkOnboardingStatus(showModalIfEligible: false),
+          _fetchTickerAds(),
         ]);
       },
       child: CustomScrollView(
@@ -426,6 +454,13 @@ class _DoctorDashboardViewState extends State<DoctorDashboardView> {
                     onConfigureDoctorSchedule: _navigateToDoctorWorkingHours,
                     onRefresh: () =>
                         _checkOnboardingStatus(showModalIfEligible: false),
+                  ),
+
+                  // 2b. Advertising Ticker (TASK-MOBILE-ADS-TICKER-INTEGRATION)
+                  AafiyaAdsTicker(
+                    ads: _tickerAds,
+                    onAdClick: _handleAdClick,
+                    margin: const EdgeInsets.only(bottom: AafiyaSpacing.md),
                   ),
 
                   // 3. Operational KPI Statistics Cards

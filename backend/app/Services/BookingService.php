@@ -35,13 +35,17 @@ class BookingService
         protected ?ClinicOperatingHoursService $clinicOperatingHoursService = null,
         protected ?DoctorTimeReservationService $timeReservationService = null,
         protected ?DoctorVacationService $vacationService = null,
-        protected ?NotificationOutboxService $notificationOutboxService = null
+        protected ?NotificationOutboxService $notificationOutboxService = null,
+        protected ?AssistantRewardQualificationService $assistantQualificationService = null,
+        protected ?AssistantRewardReversalService $assistantReversalService = null
     ) {
         $this->clinicOperatingHoursService = $clinicOperatingHoursService ?? app(ClinicOperatingHoursService::class);
         $this->doctorWorkingHoursService = $doctorWorkingHoursService ?? app(DoctorWorkingHoursService::class);
         $this->timeReservationService = $timeReservationService ?? app(DoctorTimeReservationService::class);
         $this->vacationService = $vacationService ?? app(DoctorVacationService::class);
         $this->notificationOutboxService = $notificationOutboxService ?? app(NotificationOutboxService::class);
+        $this->assistantQualificationService = $assistantQualificationService ?? app(AssistantRewardQualificationService::class);
+        $this->assistantReversalService = $assistantReversalService ?? app(AssistantRewardReversalService::class);
     }
 
     /**
@@ -248,18 +252,28 @@ class BookingService
                 ]);
             }
 
-            // 3. Duplicate active booking check for the same patient phone in this slot
+            // 3. Duplicate active booking check for the same patient in this slot
             $duplicate = Appointment::where('clinic_id', $clinic->id)
                 ->where('doctor_id', $doctor->id)
                 ->where('appointment_date', $date)
                 ->where('time_slot', $timeSlot)
-                ->where('patient_phone', $data['patient_phone'])
                 ->whereIn('status', Appointment::OCCUPYING_STATUSES)
+                ->where(function ($q) use ($data) {
+                    $q->where('patient_phone', $data['patient_phone']);
+                    $digits = preg_replace('/\D/', '', $data['patient_phone']);
+                    if (strlen($digits) >= 9) {
+                        $local9 = substr($digits, -9);
+                        $q->orWhere('patient_phone', 'like', "%{$local9}%");
+                    }
+                    if (! empty($data['patient_id'])) {
+                        $q->orWhere('patient_id', $data['patient_id']);
+                    }
+                })
                 ->exists();
 
             if ($duplicate) {
                 throw ValidationException::withMessages([
-                    'patient_phone' => ['المريض لديه حجز نشط بالفعل في نفس الفترة الزمنية مع هذا الطبيب.'],
+                    'patient_phone' => ['المريض لديه حجز نشط بالفعل في نفس الفترة الزمنية مع هذا الطبيب. يرجى اختيار فترة زمنية أخرى.'],
                 ]);
             }
 
@@ -420,6 +434,7 @@ class BookingService
     {
         return DB::transaction(function () use ($token, $actor) {
             $appointment = Appointment::where('secure_token', $token)
+                ->orWhere('booking_reference', $token)
                 ->lockForUpdate()
                 ->first();
 
@@ -584,6 +599,9 @@ class BookingService
                 $this->quotaService->deductForAppointment($center, $lockedAppointment, $user);
             }
 
+            // Qualify doctor assistant reward for genuine booking-center appointment
+            $this->assistantQualificationService->qualifyAppointment($lockedAppointment, $user);
+
             $fromStatus = $lockedAppointment->status;
             $lockedAppointment->update([
                 'status' => 'confirmed',
@@ -685,10 +703,14 @@ class BookingService
 
             $fromStatus = $lockedAppointment->status;
 
-            // If it was confirmed and has a booking center, issue a quota refund (P3 / P10)
-            if ($fromStatus === 'confirmed' && $lockedAppointment->booking_center_id) {
-                $center = BookingCenter::findOrFail($lockedAppointment->booking_center_id);
-                $this->quotaService->refundForAppointment($center, $lockedAppointment, $user, $reason);
+            // If it was confirmed, handle quota refund (if BC) and assistant reward reversal / deduction / loss absorption
+            if ($fromStatus === 'confirmed') {
+                if ($lockedAppointment->booking_center_id) {
+                    $center = BookingCenter::findOrFail($lockedAppointment->booking_center_id);
+                    $this->quotaService->refundForAppointment($center, $lockedAppointment, $user, $reason);
+                }
+
+                $this->assistantReversalService->handleCancellation($lockedAppointment, $user, $reason);
             }
 
             $lockedAppointment->update(['status' => $targetStatus]);
@@ -741,7 +763,8 @@ class BookingService
             ]);
 
             // Record transactional notification in outbox for patient in-app delivery (DEC-NOT-01 / DEC-GAP-04)
-            $recipientPhone = $lockedAppointment->patient_phone ?: ($lockedAppointment->patient?->phone ?? 'UNKNOWN_PHONE');
+            $rawRecipientPhone = $lockedAppointment->patient_phone ?: ($lockedAppointment->patient?->phone ?? $lockedAppointment->patient?->user?->phone ?? '');
+            $recipientPhone = $this->notificationOutboxService->canonicalPhone($rawRecipientPhone);
             $idempotencyKey = sprintf('appointment_%s_%s', $targetStatus, $lockedAppointment->id);
 
             if (! NotificationOutbox::where('idempotency_key', $idempotencyKey)->exists()) {
@@ -1270,7 +1293,7 @@ class BookingService
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getAvailableSlots(Doctor $doctor, Clinic $clinic, string $date): array
+    public function getAvailableSlots(Doctor $doctor, Clinic $clinic, string $date, ?string $patientPhone = null, ?string $patientId = null): array
     {
         // 1. If clinic operating hours are not configured or doctor schedule is not activated, return empty list (pure read-only)
         if (! $this->clinicOperatingHoursService->isClinicConfigured($clinic->id)) {
@@ -1305,6 +1328,29 @@ class BookingService
             ->pluck('count', 'time_slot')
             ->toArray();
 
+        $patientBookedSlots = [];
+        if (! empty($patientPhone) || ! empty($patientId)) {
+            $patientBookedSlots = Appointment::where('clinic_id', $clinic->id)
+                ->where('doctor_id', $doctor->id)
+                ->where('appointment_date', $date)
+                ->whereIn('status', Appointment::OCCUPYING_STATUSES)
+                ->where(function ($q) use ($patientPhone, $patientId) {
+                    if (! empty($patientPhone)) {
+                        $q->where('patient_phone', $patientPhone);
+                        $digits = preg_replace('/\D/', '', $patientPhone);
+                        if (strlen($digits) >= 9) {
+                            $local9 = substr($digits, -9);
+                            $q->orWhere('patient_phone', 'like', "%{$local9}%");
+                        }
+                    }
+                    if (! empty($patientId)) {
+                        $q->orWhere('patient_id', $patientId);
+                    }
+                })
+                ->pluck('time_slot')
+                ->toArray();
+        }
+
         $configuredCapacity = $this->resolveSlotCapacity($clinic, $doctor);
 
         $slots = [];
@@ -1330,16 +1376,94 @@ class BookingService
             $occupied = $slotRow ? max((int) $slotRow->booked_count, $activeCount) : $activeCount;
             $available = max(0, $capacity - $occupied);
 
+            $isAlreadyBooked = in_array($slotTime, $patientBookedSlots);
+
             $slots[] = [
-                'time_slot'    => $slotTime,
-                'max_capacity' => $capacity,
-                'occupied'     => $occupied,
-                'available'    => $available,
-                'is_available' => $available > 0,
+                'time_slot'                 => $slotTime,
+                'max_capacity'              => $capacity,
+                'occupied'                  => $occupied,
+                'available'                 => $available,
+                'is_available'              => $available > 0 && ! $isAlreadyBooked,
+                'already_booked_by_patient' => $isAlreadyBooked,
             ];
         }
 
         return $slots;
+    }
+
+    /**
+     * Retrieve available slots along with exhaustive diagnostic availability status and Arabic reason.
+     */
+    public function getSlotAvailabilityDetails(Doctor $doctor, Clinic $clinic, string $date, ?string $patientPhone = null, ?string $patientId = null): array
+    {
+        $carbonDate = Carbon::parse($date);
+        $isFriday = $carbonDate->isFriday();
+        $isClinicConfigured = $this->clinicOperatingHoursService->isClinicConfigured($clinic->id);
+        $isDoctorScheduleActivated = $this->doctorWorkingHoursService->isScheduleActivated($clinic->id, $doctor->id);
+        $isDoctorOnVacation = $this->vacationService->isDoctorOnVacation($doctor->id, $clinic->id, $date);
+
+        if (! $isClinicConfigured) {
+            return [
+                'is_available' => false,
+                'reason_code' => 'CLINIC_SCHEDULE_NOT_CONFIGURED',
+                'reason_message' => 'ساعات تشغيل العيادة غير مهيأة بعد.',
+                'slots' => [],
+            ];
+        }
+
+        if (! $isDoctorScheduleActivated) {
+            return [
+                'is_available' => false,
+                'reason_code' => 'DOCTOR_SCHEDULE_NOT_ACTIVATED',
+                'reason_message' => 'ساعات عمل الطبيب غير مفعّلة في هذه العيادة. يرجى تفعيل جدول العمل الأسبوعي للطبيب أولاً.',
+                'slots' => [],
+            ];
+        }
+
+        if ($isDoctorOnVacation) {
+            return [
+                'is_available' => false,
+                'reason_code' => 'DOCTOR_ON_VACATION',
+                'reason_message' => 'الطبيب في عطلة / إجازة رسمية معتمدة في هذا التاريخ، ولا يستقبل حجوزات.',
+                'slots' => [],
+            ];
+        }
+
+        if ($isFriday) {
+            return [
+                'is_available' => false,
+                'reason_code' => 'WEEKLY_HOLIDAY_FRIDAY',
+                'reason_message' => 'يوم الجمعة عطلة أسبوعية رسمية، ولا تتوفر مواعيد عمل في هذا اليوم.',
+                'slots' => [],
+            ];
+        }
+
+        $slots = $this->getAvailableSlots($doctor, $clinic, $date, $patientPhone, $patientId);
+        if (empty($slots)) {
+            return [
+                'is_available' => false,
+                'reason_code' => 'DOCTOR_DAY_OFF',
+                'reason_message' => 'الطبيب لا يستقبل مواعيد في هذا اليوم من الأسبوع وفق جدول عمله المعتمد.',
+                'slots' => [],
+            ];
+        }
+
+        $hasAvailableSlot = collect($slots)->contains(fn ($s) => (bool) ($s['is_available'] ?? false));
+        if (! $hasAvailableSlot) {
+            return [
+                'is_available' => false,
+                'reason_code' => 'ALL_SLOTS_BOOKED',
+                'reason_message' => 'جميع الفترات الزمنية المتاحة لهذا اليوم محجوزة بالكامل.',
+                'slots' => $slots,
+            ];
+        }
+
+        return [
+            'is_available' => true,
+            'reason_code' => null,
+            'reason_message' => null,
+            'slots' => $slots,
+        ];
     }
 
     /**
@@ -1725,10 +1849,10 @@ class BookingService
             return null;
         }
 
-        $recipientPhone = $appointment->patient_phone
+        $rawRecipientPhone = $appointment->patient_phone
             ?? $appointment->patient?->phone
             ?? $appointment->patient?->user?->phone;
-        $recipientPhone = $recipientPhone !== null ? trim((string) $recipientPhone) : '';
+        $recipientPhone = $this->notificationOutboxService->canonicalPhone($rawRecipientPhone);
 
         $outbox = NotificationOutbox::create([
             'id'              => (string) Str::uuid(),

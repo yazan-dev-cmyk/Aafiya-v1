@@ -17,6 +17,8 @@ class PatientNotification {
     this.clinicName,
     this.bookingReference,
     this.appointmentId,
+    this.prescriptionId,
+    this.prescriptionReference,
   });
 
   /// Unique notification identifier (UUID).
@@ -55,6 +57,12 @@ class PatientNotification {
   /// Optional associated appointment ID.
   final String? appointmentId;
 
+  /// Optional associated prescription ID.
+  final String? prescriptionId;
+
+  /// Optional associated prescription reference string.
+  final String? prescriptionReference;
+
   /// Whether this notification has already been acknowledged by the patient.
   bool get isAcknowledged => acknowledgedAt != null;
 
@@ -71,6 +79,7 @@ class PatientNotification {
         'appointment_rejected' => strings.appointmentRejectedNotification,
         'appointment_rescheduled' => strings.appointmentRescheduledNotification,
         'vacation_reschedule_success' => strings.vacationRescheduleNotification,
+        'prescription_issued' => strings.prescriptionIssuedNotification,
         _ => message,
       };
     } else if (strings.isEnglish) {
@@ -84,6 +93,7 @@ class PatientNotification {
         'appointment_rejected' => strings.appointmentRejectedNotification,
         'appointment_rescheduled' => strings.appointmentRescheduledNotification,
         'vacation_reschedule_success' => strings.vacationRescheduleNotification,
+        'prescription_issued' => strings.prescriptionIssuedNotification,
         _ => message,
       };
     }
@@ -105,6 +115,8 @@ class PatientNotification {
     String? clinicName,
     String? bookingReference,
     String? appointmentId,
+    String? prescriptionId,
+    String? prescriptionReference,
   }) {
     return PatientNotification(
       id: id ?? this.id,
@@ -120,6 +132,9 @@ class PatientNotification {
       clinicName: clinicName ?? this.clinicName,
       bookingReference: bookingReference ?? this.bookingReference,
       appointmentId: appointmentId ?? this.appointmentId,
+      prescriptionId: prescriptionId ?? this.prescriptionId,
+      prescriptionReference:
+          prescriptionReference ?? this.prescriptionReference,
     );
   }
 
@@ -167,6 +182,7 @@ class PatientNotification {
           'تمت إعادة جدولة موعدكم الطبي نظراً لإجازة الطبيب.',
         'appointment_cancelled' => 'تم إلغاء الموعد الطبي.',
         'appointment_rejected' => 'تم رفض طلب الموعد الطبي.',
+        'prescription_issued' => 'تم إصدار وصفة طبية إلكترونية جديدة.',
         _ => 'إشعار طبي جديد.',
       };
     }
@@ -179,6 +195,8 @@ class PatientNotification {
     final bookingRef = payload['booking_reference']?.toString();
     final apptId = json['appointment_id']?.toString() ??
         payload['appointment_id']?.toString();
+    final prescriptionId = payload['prescription_id']?.toString();
+    final prescriptionRef = payload['prescription_reference']?.toString();
 
     return PatientNotification(
       id: id,
@@ -193,6 +211,8 @@ class PatientNotification {
       clinicName: clinicName,
       bookingReference: bookingRef,
       appointmentId: apptId,
+      prescriptionId: prescriptionId,
+      prescriptionReference: prescriptionRef,
     );
   }
 
@@ -209,5 +229,8 @@ class PatientNotification {
         if (clinicName != null) 'clinic_name': clinicName,
         if (bookingReference != null) 'booking_reference': bookingReference,
         if (appointmentId != null) 'appointment_id': appointmentId,
+        if (prescriptionId != null) 'prescription_id': prescriptionId,
+        if (prescriptionReference != null)
+          'prescription_reference': prescriptionReference,
       };
 }

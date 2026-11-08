@@ -11,6 +11,7 @@ export interface ClinicDoctorStaff {
   is_primary?: boolean;
   is_verified?: boolean;
   is_active?: boolean;
+  is_working_hours_activated?: boolean;
   joined_at?: string;
 }
 

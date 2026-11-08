@@ -67,6 +67,7 @@ class ApiClient {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
       'Accept-Language': _currentLocale,
+      'X-Platform': 'mobile',
     };
 
     if (requiresAuth) {

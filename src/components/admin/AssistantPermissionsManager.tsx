@@ -499,6 +499,23 @@ export function AssistantPermissionsManager() {
                     <span>الاعتماد النهائي للطلب (approveRequests) ⚠️</span>
                   </label>
                 </div>
+
+                {/* 3. Financial & Rewards Confirmation */}
+                <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-2">
+                  <h4 className="font-bold text-slate-900 border-b border-slate-200 pb-1 flex items-center gap-1.5">
+                    <BarChart2 className="w-4 h-4 text-teal-600" />
+                    المكافآت المالية والتحويلات
+                  </h4>
+                  <label className="flex items-center gap-2 cursor-pointer text-indigo-900 font-bold">
+                    <input
+                      type="checkbox"
+                      checked={selectedAssistant.permissions.confirmAssistantPayout}
+                      onChange={() => handleTogglePermission('confirmAssistantPayout')}
+                      className="rounded text-teal-600 accent-teal-600"
+                    />
+                    <span>تأكيد تحويلات مكافآت المساعدين (confirmAssistantPayout) 💳</span>
+                  </label>
+                </div>
               </div>
 
               {/* Action Buttons */}

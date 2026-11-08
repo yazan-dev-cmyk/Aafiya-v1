@@ -24,6 +24,7 @@
       "notifications": "Alertes & Notifications",
       "calendar": "Planning du Cabinet",
       "reports": "Rapports Opérationnels",
+      "rewards": "Récompenses financières",
       "profile": "Profil de l'Assistant",
       "settings": "Paramètres du Compte"
     },
@@ -174,6 +175,85 @@
     "common": {
       "cancel": "Annuler"
     },
+    "rewards": {
+      "title": "Récompenses financières de l'assistant médical",
+      "subtitle": "Suivez vos récompenses acquises, votre grand livre de transactions, vos virements et votre compte RIP / CCP",
+      "eligibilityBadge": "Éligibilité au virement",
+      "eligible": "Éligible au virement",
+      "thresholdNotMet": "Seuil minimum (10 000 DZD) non atteint",
+      "missingProfile": "Profil RIP vérifié requis",
+      "kpis": {
+        "currentBalance": "Solde disponible actuel",
+        "totalEarned": "Total des récompenses acquises",
+        "totalPaid": "Total versé",
+        "pendingPayout": "Paiement mensuel en cours",
+        "totalDeductions": "Déductions & Annulations"
+      },
+      "subtabs": {
+        "overview": "Aperçu & Grand livre",
+        "payouts": "Historique des virements",
+        "profile": "Profil bancaire CCP / RIP"
+      },
+      "ledger": {
+        "title": "Grand livre financier (Partie double)",
+        "description": "Historique comptable immuable des récompenses de rendez-vous confirmés, déductions et règlements.",
+        "columns": {
+          "date": "Date & Heure",
+          "type": "Type d'opération",
+          "direction": "Sens",
+          "amount": "Montant",
+          "balanceAfter": "Solde après opération",
+          "reference": "Référence / Origine"
+        },
+        "types": {
+          "reward_earned": "Récompense acquise",
+          "cancellation_deduction": "Déduction pour annulation",
+          "payout_settlement": "Règlement de virement",
+          "departure_deficit_relief": "Prise en charge du déficit (Plateforme)",
+          "reversal": "Régularisation"
+        },
+        "credit": "Crédit (+)",
+        "debit": "Débit (-)",
+        "empty": "Aucune transaction enregistrée."
+      },
+      "payouts": {
+        "title": "Historique des règlements",
+        "description": "Cycles de virements mensuels traités par Algérie Poste CCP ou virement bancaire.",
+        "batch": "Lot",
+        "period": "Période",
+        "amount": "Montant",
+        "status": "Statut",
+        "transferRef": "Référence de virement",
+        "date": "Date de transfert",
+        "statuses": {
+          "pending": "En attente de traitement",
+          "paid": "Transféré & Payé",
+          "failed": "Échec du transfert"
+        },
+        "empty": "Aucun virement trouvé."
+      },
+      "profile": {
+        "title": "Gestion du profil CCP / RIP",
+        "subtitle": "Soumettez votre RIP CCP algérien à 20 chiffres et le scan de votre chèque barré pour les virements mensuels.",
+        "activeProfile": "Profil RIP actif et vérifié",
+        "ripLabel": "Numéro RIP CCP",
+        "version": "Version",
+        "status": "Statut",
+        "viewCheque": "Voir le chèque barré",
+        "noActive": "Aucun profil actif. Veuillez soumettre vos coordonnées RIP ci-dessous pour recevoir vos virements.",
+        "newProfileTitle": "Soumettre / Mettre à jour le profil RIP",
+        "newProfileDesc": "La soumission d'un nouveau profil remplacera les versions précédentes dès sa validation par l'administration.",
+        "ripInputPlaceholder": "20 chiffres (ex: 00799999000123456789)",
+        "chequeFileLabel": "Scan du chèque barré (JPG, PNG, PDF max 5 Mo)",
+        "submitBtn": "Soumettre pour vérification",
+        "submitting": "Soumission en cours...",
+        "successMsg": "Profil soumis avec succès ! Il est en cours de vérification par l'administration.",
+        "invalidRip": "Le numéro RIP doit comporter exactement 20 chiffres.",
+        "missingCheque": "Veuillez joindre une copie lisible de votre chèque barré.",
+        "historyTitle": "Historique des soumissions"
+      },
+      "currency": "DZD"
+    },
     "logout": "Déconnexion"
   },
   "common": {
@@ -259,7 +339,7 @@
   },
   "features": {
     "section_badge": "Fonctions Structurelles de la Plateforme",
-    "title": "Fonctionnalités de la Plateforme Numérique Aafiya",
+    "title": "Un écosystème de santé interconnecté",
     "subtitle": "Chaque fonctionnalité est conçue selon des règles de gestion approuvées, au service de toutes les parties avec les plus hauts niveaux de transparence et d'efficacité.",
     "official_function": "Fonction Opérationnelle de la Plateforme",
     "booking_engine": {
@@ -523,7 +603,7 @@
   },
   "directory": {
     "section_badge": "Annuaire de Recherche Unifié",
-    "title": "Recherchez votre médecin ou le centre de service approprié",
+    "title": "Rechercher dans le réseau de santé AAFIYA",
     "description": "Explorez la liste des médecins certifiés, centres de réservation, laboratoires d'analyses et centres de radiologie en un seul endroit.",
     "search_placeholder": "Rechercher par nom, spécialité ou lieu...",
     "all_provinces": "Toutes les Wilayas",
@@ -804,7 +884,45 @@
     "darkMode": "Mode Sombre",
     "platform": "Plateforme",
     "quickStats": "Stats Rapides",
-    "platformStable": "Performance stable à 100%"
+    "platformStable": "Performance stable à 100%",
+    "header": {
+      "platformName": "AAFIYA",
+      "platformTagline": "Votre Passerelle Santé",
+      "welcome": "Bienvenue",
+      "welcomeWithName": "Bienvenue, {name}",
+      "welcomeDoctor": "Bienvenue, Dr {name}",
+      "welcomeBack": "Heureux de vous retrouver, {name}",
+      "adminSubtitle": "Responsable de la gestion de la plateforme AAFIYA",
+      "roles": {
+        "doctor": "Médecin Traitant",
+        "doctorDirector": "Médecin & Directeur de Cabinet",
+        "doctorAssistant": "Assistant Médical & Administratif",
+        "patient": "Dossier Santé Numérique",
+        "bookingCenter": "Directeur Centre de Réservation",
+        "bookingCenterStaff": "Agent de Réservation Certifié",
+        "labManager": "Directeur de Laboratoire",
+        "labAssistant": "Technicien de Laboratoire",
+        "radManager": "Directeur Centre d'Imagerie",
+        "radAssistant": "Manipulateur en Radiologie",
+        "admin": "Administration Générale",
+        "platformAdmin": "Administrateur de la plateforme",
+        "adminAssistant": "Assistant d'Exploitation",
+        "superAdmin": "Super Administration"
+      },
+      "context": {
+        "clinic": "Cabinet Actif",
+        "laboratory": "Laboratoire d'Analyses",
+        "radiology": "Centre d'Imagerie",
+        "bookingCenter": "Centre de Réservation",
+        "centralOperations": "Opérations Centrales - AAFIYA",
+        "verifiedAccount": "Compte Vérifié"
+      },
+      "logout": "Déconnexion",
+      "home": "Accueil",
+      "menuToggle": "Basculer la barre latérale",
+      "notifications": "Notifications et Alertes",
+      "language": "Langue"
+    }
   },
   "admin": {
     "title": "Centre de Contrôle d'Administration de la Plateforme",
@@ -826,6 +944,7 @@
       "audit_logs": "Journaux d'Audit",
       "roles_permissions": "Permissions",
       "assistant_permissions": "Gestion des Assistants",
+      "assistant_rewards": "Récompenses Assistants Médecins",
       "system_settings": "Paramètres Système",
       "notifications_center": "Centre de Notifications"
     },
@@ -1006,7 +1125,166 @@
         "LAB_STAFF": "Staff Labo",
         "RAD_STAFF": "Staff Radio",
         "BOOKING_AGENTS": "Agents de Réservation",
-        "ALL": "Tous"
+        "ALL": "Tous",
+        "public": "Public",
+        "patient": "Patients",
+        "doctor": "Médecins",
+        "doctor_assistant": "Assistants Médicaux",
+        "booking_center": "Centre de Réservation",
+        "lab": "Laboratoires",
+        "lab_assistant": "Assistants de Laboratoire",
+        "radiology": "Radiologie",
+        "rad_assistant": "Assistants de Radiologie",
+        "all": "Tous les Publics"
+      }
+    },
+    "adsTicker": {
+      "title": "Gestion du Ruban d'Annonces & Campagnes",
+      "subtitle": "Gérer, publier et cibler les annonces sur le bandeau défilant animé",
+      "refresh": "Actualiser les Données",
+      "createNewCampaign": "Nouvelle Campagne",
+      "retry": "Réessayer",
+      "loading": "Chargement en cours...",
+      "searchPlaceholder": "Rechercher par titre ou contenu...",
+      "loadingCampaigns": "Chargement des campagnes en cours...",
+      "stats": {
+        "total": "Total Campagnes",
+        "active": "Campagnes Actives",
+        "clicks": "Total Clics",
+        "draft": "Brouillons / En Pause"
+      },
+      "statuses": {
+        "all": "Tous les Statuts",
+        "active": "Actif",
+        "paused": "En Pause",
+        "draft": "Brouillon",
+        "expired": "Expiré",
+        "archived": "Archivé",
+        "pending_approval": "En attente d'approbation",
+        "rejected": "Rejeté"
+      },
+      "empty": {
+        "title": "Aucune campagne trouvée",
+        "filterMatchNone": "Aucune campagne ne correspond aux critères de recherche.",
+        "description": "Aucune campagne créée pour le ruban. Cliquez sur le bouton ci-dessous pour démarrer.",
+        "clearFilters": "Effacer les Filtres"
+      },
+      "table": {
+        "campaign": "Campagne",
+        "status": "Statut",
+        "priority": "Priorité",
+        "schedule": "Calendrier",
+        "placements": "Emplacements & Audience",
+        "clicks": "Clics",
+        "actions": "Actions",
+        "from": "Du",
+        "to": "Au",
+        "continuous": "Continu (Sans date de fin)",
+        "noPlacements": "Aucun emplacement défini"
+      },
+      "actions": {
+        "pause": "Mettre en Pause",
+        "activate": "Activer",
+        "managePlacements": "Gérer les Emplacements",
+        "edit": "Modifier la Campagne"
+      },
+      "pagination": {
+        "showing": "Affichage de {from} à {to} sur {total} campagnes",
+        "perPage": "Par page"
+      },
+      "notices": {
+        "createdSuccess": "Campagne créée avec succès",
+        "updatedSuccess": "Campagne mise à jour avec succès",
+        "statusUpdated": "Le statut de \"{title}\" a été modifié en {status}"
+      },
+      "errors": {
+        "fetchFailed": "Échec du chargement des campagnes depuis le serveur",
+        "fetchPlacementsFailed": "Échec du chargement des emplacements depuis le serveur",
+        "duplicatePlacement": "Cet emplacement est déjà ajouté à la campagne",
+        "unknown": "Une erreur inattendue s'est produite"
+      },
+      "createModal": {
+        "title": "Créer une Nouvelle Campagne",
+        "subtitle": "Configurer et publier une annonce sur le ruban animé"
+      },
+      "editModal": {
+        "title": "Modifier la Campagne",
+        "subtitle": "Modifier la campagne #{id}"
+      },
+      "placementsModal": {
+        "title": "Gérer les Emplacements et l'Audience",
+        "subtitle": "Spécifier les destinations d'affichage et les publics cibles",
+        "addNewPlacement": "Ajouter un Nouvel Emplacement",
+        "addTitle": "Ajouter un Nouvel Emplacement",
+        "destination": "Destination",
+        "audience": "Audience Cible",
+        "addBtn": "Ajouter l'Emplacement",
+        "currentPlacements": "Emplacements Actuels",
+        "currentTitle": "Emplacements Actuels",
+        "empty": "Aucun emplacement configuré pour cette campagne",
+        "noPlacements": "Aucun emplacement configuré pour cette campagne",
+        "deletePlacementTooltip": "Supprimer cet emplacement",
+        "deletePlacement": "Supprimer cet emplacement",
+        "confirmDeleteTitle": "Confirmer la suppression de l'emplacement",
+        "confirmDeletePrompt": "Êtes-vous sûr de vouloir supprimer l'emplacement : {destination} - {audience} ?",
+        "confirmDelete": "Êtes-vous sûr de vouloir supprimer cet emplacement ?",
+        "confirmDeleteBtn": "Confirmer la Suppression",
+        "addedSuccess": "Emplacement ajouté avec succès",
+        "removedSuccess": "Emplacement supprimé avec succès"
+      },
+      "form": {
+        "title": "Titre de la Campagne",
+        "titlePlaceholder": "ex: Remise spéciale sur les bilans de santé",
+        "priority": "Priorité d'affichage (Plus élevé s'affiche en premier)",
+        "content": "Texte de l'Annonce (S'affiche dans le Ruban)",
+        "contentPlaceholder": "Rédigez le texte de l'annonce ici...",
+        "targetUrl": "URL de Redirection (Optionnel)",
+        "targetUrlPlaceholder": "https://... ou /packages",
+        "status": "Statut Initial",
+        "bannerImageUrl": "URL du Logo / Icône (Optionnel)",
+        "bannerImageUrlPlaceholder": "https://... ou chemin de l'image",
+        "schedulingTitle": "Planification (Optionnel)",
+        "startsAt": "Date et Heure de Début",
+        "endsAt": "Date et Heure de Fin",
+        "inclusive": "Inclusif",
+        "exclusive": "Exclusif",
+        "placementsTitle": "Emplacements et Audience Cible",
+        "placementsDescription": "Déterminez où l'annonce s'affiche et pour qui",
+        "minOnePlacementRequired": "Au moins un emplacement est requis",
+        "addPlacementBtn": "Ajouter l'Emplacement",
+        "createSubmitBtn": "Créer la Campagne",
+        "cancel": "Annuler",
+        "close": "Fermer",
+        "createCampaignBtn": "Créer la Campagne",
+        "saveChangesBtn": "Enregistrer les Modifications",
+        "errors": {
+          "titleRequired": "Le titre est obligatoire",
+          "contentRequired": "Le contenu est obligatoire",
+          "placementRequired": "Au moins un emplacement est requis",
+          "endsAfterStarts": "La date de fin doit être postérieure à la date de début",
+          "atLeastOnePlacement": "Au moins un emplacement est requis"
+        }
+      },
+      "destinations": {
+        "ticker": "Ruban Défilant Public (Ticker)",
+        "home_banner": "Bannière d'accueil (Home Banner)",
+        "sidebar": "Barre latérale (Sidebar)",
+        "search_top": "Haut des résultats de recherche (Search Top)",
+        "category_sponsor": "Sponsor de catégorie (Category Sponsor)",
+        "modal": "Fenêtre Pop-up (Modal)",
+        "banner": "Bannière de Page (Banner)"
+      },
+      "audiences": {
+        "public": "Public Général (Non inscrit)",
+        "patient": "Patients",
+        "doctor": "Médecins",
+        "doctor_assistant": "Assistants Médicaux",
+        "booking_center": "Centre de Réservation",
+        "lab": "Laboratoires",
+        "lab_assistant": "Assistants de Laboratoire",
+        "radiology": "Radiologie",
+        "rad_assistant": "Assistants de Radiologie",
+        "all": "Tous les Publics"
       }
     },
     "subscriptions": {
@@ -1067,6 +1345,12 @@
       "activityLog": "Journal d'Audit",
       "staff": "Personnel & Assistants",
       "clinicStats": "Statistiques des Médecins"
+    },
+    "categories": {
+      "clinical": "Pratique Clinique en Direct",
+      "diagnostics": "Diagnostics & Prescriptions",
+      "insights": "Rapports & Analyses",
+      "management": "Gestion du Cabinet"
     },
     "badges": {
       "new": "Nouveau",
@@ -1195,7 +1479,58 @@
       "incomeValue": "0 DZD",
       "incomeHidden": "•••••••• DZD",
       "incomeToggleTitle": "Afficher/Masquer les revenus",
-      "welcomeWithName": "Bienvenue {name}"
+      "welcomeWithName": "Bienvenue {name}",
+      "defaultDoctorName": "Dr.",
+      "defaultSpecialty": "Praticien",
+      "defaultClinicName": "Clinique Médicale",
+      "guestPatient": "Patient invité",
+      "generalConsultation": "Consultation médicale générale",
+      "practiceActive": "Cabinet actif et disponible",
+      "cockpitSubtitle": "Poste de pilotage clinique quotidien — File d'attente, consultations et ordonnances",
+      "currentConsultationBtn": "Consultation en cours",
+      "nextPatientTitle": "Prochain patient en salle d'attente",
+      "nextPatientSubtitle": "Patient prioritaire prêt pour l'examen clinique",
+      "refreshTooltip": "Actualiser",
+      "startConsultationNow": "Démarrer la consultation",
+      "noWaitingPatients": "Aucun patient en attente actuellement",
+      "waitingRoomClear": "La salle d'attente est prête pour les prochaines arrivées",
+      "patientsUnit": "Patients",
+      "patientsWaitingCall": "Patients en attente d'appel",
+      "completedTodayTitle": "Consultations terminées aujourd'hui",
+      "totalScheduledUnit": "Total",
+      "totalScheduledFootnote": "{count} rendez-vous programmés aujourd'hui",
+      "stableStatus": "Stable",
+      "completedFootnote": "{count} consultations effectuées aujourd'hui",
+      "quickHubTitle": "Opérations cliniques rapides :",
+      "quickHubSubtitle": "Raccourcis directs vers les flux cliniques quotidiens",
+      "railWaitingRoomTitle": "Salle d'attente en direct",
+      "railWaitingRoomDesc": "Gestion de la file d'attente et appel des patients",
+      "railConsultationTitle": "Consultation active",
+      "railConsultationDesc": "Examen clinique et console de diagnostic",
+      "railPrescriptionsTitle": "Ordonnances électroniques",
+      "railPrescriptionsDesc": "Délivrer une ordonnance numérique (+Rx)",
+      "railLabOrdersTitle": "Analyses et examens de laboratoire",
+      "railLabOrdersDesc": "Demander des bilans et comparer les résultats",
+      "railRadiologyOrdersTitle": "Radiologie et imagerie médicale",
+      "railRadiologyOrdersDesc": "Demandes d'imagerie et visualiseur DICOM",
+      "railVisitsTitle": "Historique des visites",
+      "railVisitsDesc": "Archives des consultations antérieures",
+      "railPatientsTitle": "Dossiers patients et DME",
+      "railPatientsDesc": "Dossier médical complet et historique de santé",
+      "railAnalyticsTitle": "Analyses et indicateurs cliniques",
+      "railAnalyticsDesc": "Tendances diagnostiques et indicateurs d'activité",
+      "todayScheduleTitle": "Planning des rendez-vous du jour",
+      "filterAll": "Tous",
+      "filterWaiting": "En attente",
+      "filterCompleted": "Terminées",
+      "filterPending": "En attente de confirmation",
+      "loadingAppointments": "Chargement des rendez-vous du jour...",
+      "statusCompleted": "Terminé",
+      "statusWaiting": "En attente",
+      "statusPending": "En attente",
+      "examineBtn": "Examiner",
+      "noAppointmentsFilter": "Aucun rendez-vous dans cette catégorie",
+      "pickAnotherDate": "Vous pouvez sélectionner une autre date ci-dessus"
     },
     "consultation": {
       "title": "Console de Consultation Patient Actuelle",
@@ -2583,6 +2918,23 @@
     "commune": "Commune",
     "rememberMe": "Se souvenir de moi",
     "forgotPassword": "Mot de passe oublié ?",
+    "forgotPasswordTitle": "Récupération de mot de passe",
+    "forgotPasswordDesc": "Entrez votre adresse e-mail enregistrée pour recevoir un lien de réinitialisation de votre mot de passe.",
+    "sendRecoveryLink": "Envoyer le lien de récupération",
+    "backToLogin": "Retour à la connexion",
+    "uniformRecoveryNotice": "Si cette adresse e-mail est associée à un compte, un message de récupération vous sera envoyé.",
+    "captchaRequiredNotice": "Veuillez confirmer que vous n'êtes pas un robot (reCAPTCHA) pour continuer.",
+    "resetPasswordTitle": "Réinitialiser le mot de passe",
+    "resetPasswordDesc": "Veuillez saisir et confirmer votre nouveau mot de passe.",
+    "newPassword": "Nouveau mot de passe",
+    "confirmNewPassword": "Confirmer le nouveau mot de passe",
+    "submitResetPassword": "Enregistrer le nouveau mot de passe",
+    "passwordResetSuccess": "Votre mot de passe a été modifié avec succès. Veuillez vous connecter avec votre nouveau mot de passe.",
+    "signInOnWeb": "Se connecter sur le Web",
+    "invalidOrExpiredToken": "Le lien de récupération est invalide ou a expiré. Veuillez demander un nouveau lien.",
+    "requestNewLink": "Demander un nouveau lien",
+    "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
+    "passwordMinLength": "Le mot de passe doit comporter au moins 8 caractères",
     "submitLogin": "Connexion système sécurisée",
     "submitRegister": "Créer un nouveau compte",
     "toggleRegister": "Vous n'avez pas de compte ? Rejoignez-nous",
@@ -3440,6 +3792,43 @@
       "platform": "Android 7.0+ (APK)",
       "description": "Gérez la file d’attente du cabinet, traitez les escalades de suivi, consultez le dossier patient et optimisez vos soins.",
       "downloadButton": "Télécharger AAFIYA Pro (APK)"
+    }
+  },
+  "ticker": {
+    "badge": "Annonce officielle",
+    "openLink": "Ouvrir le lien",
+    "ariaLabel": "Bandeau d'annonces officielles",
+    "play": "Démarrer l'animation",
+    "pause": "Mettre en pause l'animation",
+    "previous": "Annonce précédente",
+    "next": "Annonce suivante"
+  },
+  "trust_privacy": {
+    "section_badge": "Confiance et protection",
+    "title": "La confiance et la confidentialité au cœur d'Aafiya",
+    "subtitle": "Un système numérique reposant sur des contrôles d'accès stricts et des politiques de gouvernance rigoureuses pour protéger les dossiers médicaux.",
+    "pillar_footer": "Mécanismes certifiés et documentés",
+    "pillars": {
+      "rbac": {
+        "title": "Droits d'accès liés aux rôles des utilisateurs",
+        "description": "Contrôle d'accès basé sur les rôles (RBAC) garantissant que seules les équipes médicales autorisées accèdent aux données pertinentes.",
+        "badge": "Contrôle strict"
+      },
+      "protection": {
+        "title": "Protection des comptes et des données",
+        "description": "Sécurisation des sessions et des identifiants selon les standards modernes avec isolation stricte des données entre établissements.",
+        "badge": "Sécurité des comptes"
+      },
+      "policy": {
+        "title": "Gestion de l'information conforme aux politiques établies",
+        "description": "Traitement des dossiers médicaux selon les normes déontologiques et réglementaires de la santé, sans partage non autorisé.",
+        "badge": "Gouvernance des données"
+      }
+    },
+    "governance_notice": {
+      "title": "Engagement ferme pour la sécurité numérique et la confidentialité médicale",
+      "description": "Toutes les opérations font l'objet de journaux d'audit garantissant transparence et traçabilité pour tous les rôles.",
+      "cta": "Découvrir la plateforme"
     }
   }
 }

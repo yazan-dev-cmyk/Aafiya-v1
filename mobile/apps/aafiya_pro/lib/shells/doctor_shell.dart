@@ -29,6 +29,7 @@ class DoctorShell extends StatefulWidget {
     this.dashboardService,
     this.clinicStaffService,
     this.statsService,
+    this.adsTickerService,
     this.apiClient,
   });
 
@@ -39,6 +40,7 @@ class DoctorShell extends StatefulWidget {
   final DoctorDashboardService? dashboardService;
   final ClinicStaffService? clinicStaffService;
   final ClinicDoctorStatsService? statsService;
+  final AdsTickerService? adsTickerService;
   final ApiClient? apiClient;
 
   @override
@@ -170,50 +172,11 @@ class _DoctorShellState extends State<DoctorShell> {
             onPressed: _isLoading ? null : _loadClinics,
           ),
           IconButton(
-            icon: const Icon(Icons.schedule_rounded),
-            tooltip: strings.doctorWorkingHoursTitle,
-            onPressed: () {
-              Navigator.of(context).push(
-                DoctorWorkingHoursScreen.route(
-                  sessionManager: widget.sessionManager,
-                  user: widget.user,
-                  apiClient: widget.apiClient,
-                ),
-              );
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.event_busy_outlined),
-            tooltip: strings.doctorVacationsTitle,
-            onPressed: () {
-              Navigator.of(context).push(
-                DoctorVacationsScreen.route(
-                  sessionManager: widget.sessionManager,
-                  user: widget.user,
-                  apiClient: widget.apiClient,
-                ),
-              );
-            },
-          ),
-          IconButton(
             icon: const Icon(Icons.notification_important_outlined),
             tooltip: strings.clinicEscalationsTitle,
             onPressed: () {
               Navigator.of(context).push(
                 ClinicEscalationsScreen.route(
-                  sessionManager: widget.sessionManager,
-                  user: widget.user,
-                  apiClient: widget.apiClient,
-                ),
-              );
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.assignment_late_outlined),
-            tooltip: strings.unresolvedReschedulesTitle,
-            onPressed: () {
-              Navigator.of(context).push(
-                UnresolvedReschedulesScreen.route(
                   sessionManager: widget.sessionManager,
                   user: widget.user,
                   apiClient: widget.apiClient,
@@ -253,6 +216,30 @@ class _DoctorShellState extends State<DoctorShell> {
                     apiClient: widget.apiClient,
                   ),
                 );
+              } else if (value == 'unresolved_reschedules') {
+                Navigator.of(context).push(
+                  UnresolvedReschedulesScreen.route(
+                    sessionManager: widget.sessionManager,
+                    user: widget.user,
+                    apiClient: widget.apiClient,
+                  ),
+                );
+              } else if (value == 'change_password') {
+                final client =
+                    widget.apiClient ?? widget.sessionManager.apiClient;
+                await AafiyaChangePasswordCard.show(context, apiClient: client);
+              } else if (value == 'logout') {
+                final confirmed = await AafiyaSignOutDialog.show(
+                  context,
+                  title: strings.signOutConfirmTitle,
+                  message: strings.signOutConfirmMessage,
+                  cancelLabel: strings.cancel,
+                  confirmLabel: strings.signOut,
+                );
+                if (confirmed == true) {
+                  await widget.sessionManager.logout();
+                  widget.onSignOut();
+                }
               }
             },
             itemBuilder: (context) => [
@@ -315,6 +302,25 @@ class _DoctorShellState extends State<DoctorShell> {
                 ),
               ),
               PopupMenuItem<String>(
+                value: 'unresolved_reschedules',
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.assignment_late_outlined,
+                      color: AafiyaColors.warning,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        strings.unresolvedReschedulesTitle,
+                        style: AafiyaTypography.bodyMedium,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
                 value: 'shared_record',
                 child: Row(
                   children: [
@@ -333,24 +339,48 @@ class _DoctorShellState extends State<DoctorShell> {
                   ],
                 ),
               ),
+              PopupMenuItem<String>(
+                value: 'change_password',
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.lock_reset_rounded,
+                      color: AafiyaColors.healingGreen,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        strings.changePassword,
+                        style: AafiyaTypography.bodyMedium,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const PopupMenuDivider(),
+              PopupMenuItem<String>(
+                value: 'logout',
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.logout_rounded,
+                      color: AafiyaColors.error,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        strings.signOut,
+                        style: AafiyaTypography.bodyMedium.copyWith(
+                          color: AafiyaColors.error,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout_rounded),
-            tooltip: strings.signOut,
-            onPressed: () async {
-              final confirmed = await AafiyaSignOutDialog.show(
-                context,
-                title: strings.signOutConfirmTitle,
-                message: strings.signOutConfirmMessage,
-                cancelLabel: strings.cancel,
-                confirmLabel: strings.signOut,
-              );
-              if (confirmed == true) {
-                await widget.sessionManager.logout();
-                widget.onSignOut();
-              }
-            },
           ),
         ],
       ),
@@ -474,6 +504,7 @@ class _DoctorShellState extends State<DoctorShell> {
       sessionManager: widget.sessionManager,
       user: widget.user,
       dashboardService: widget.dashboardService,
+      adsTickerService: widget.adsTickerService,
       apiClient: widget.apiClient,
     );
   }

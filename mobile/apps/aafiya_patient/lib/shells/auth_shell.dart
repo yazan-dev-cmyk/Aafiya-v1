@@ -570,6 +570,33 @@ class _PatientAuthShellState extends State<PatientAuthShell> {
                       ),
                     ),
 
+                    if (_mode == AuthMode.login) ...[
+                      const SizedBox(height: 8),
+                      Align(
+                        alignment: AlignmentDirectional.centerEnd,
+                        child: TextButton(
+                          onPressed: _isLoading
+                              ? null
+                              : () => AafiyaForgotPasswordSheet.show(
+                                    context,
+                                    apiClient: widget.apiClient,
+                                  ),
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: Text(
+                            strings.forgotPassword,
+                            style: AafiyaTypography.bodySmall.copyWith(
+                              color: AafiyaColors.healthBlue,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+
                     // Registration confirmation password
                     if (_mode == AuthMode.register) ...[
                       const SizedBox(height: 16),

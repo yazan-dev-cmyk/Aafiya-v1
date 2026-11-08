@@ -39,14 +39,59 @@ export interface AppointmentItem {
   notes?: string;
 }
 
+export interface AppointmentPublicPassData {
+  booking_reference: string;
+  status: string;
+  status_label: {
+    ar: string;
+    en: string;
+    fr: string;
+  };
+  is_active_pass: boolean;
+  appointment_date: string;
+  time_slot: string;
+  patient_name: string;
+  doctor: {
+    name?: string;
+    specialty?: string;
+  };
+  clinic: {
+    name?: string;
+    wilaya?: string;
+    phone?: string;
+  };
+  booking_center?: {
+    name?: string;
+  } | null;
+  qr_pass_url: string;
+  instructions: {
+    ar: string;
+    fr: string;
+    en: string;
+  };
+}
+
 export const appointmentService = {
+  getPublicPass: async (token: string): Promise<ApiResponse<AppointmentPublicPassData>> => {
+    return api.get<AppointmentPublicPassData>(`/appointments/pass/${encodeURIComponent(token)}`);
+  },
+
   getAppointments: async (params?: Record<string, any>): Promise<ApiResponse<AppointmentItem[]>> => {
     const query = new URLSearchParams(params).toString();
     return api.get<AppointmentItem[]>(`/appointments${query ? `?${query}` : ''}`);
   },
 
-  getSlots: async (clinicId: string, doctorId: string, date: string): Promise<ApiResponse<any>> => {
-    return api.get(`/appointments/slots?clinic_id=${clinicId}&doctor_id=${doctorId}&date=${date}`);
+  getSlots: async (
+    clinicId: string,
+    doctorId: string,
+    date: string,
+    patientPhone?: string,
+    patientId?: string
+  ): Promise<ApiResponse<any>> => {
+    let url = `/appointments/slots?clinic_id=${clinicId}&doctor_id=${doctorId}&date=${date}`;
+    if (patientPhone) url += `&patient_phone=${encodeURIComponent(patientPhone)}`;
+    if (patientId) url += `&patient_id=${encodeURIComponent(patientId)}`;
+    return api.get(url);
   },
 
   createAppointment: async (data: {

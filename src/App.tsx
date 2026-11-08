@@ -3,16 +3,14 @@
 import React, { useState } from 'react';
 import { useLocale } from 'next-intl';
 import { ViewMode, RoleType } from './types';
-import { TopBar } from './components/TopBar';
 import { Header } from './components/Header';
+import { PublicAdsTicker } from './components/ticker/PublicAdsTicker';
 import { Hero } from './components/Hero';
 import { DoctorSearchSection } from './components/DoctorSearchSection';
-import { WhyUsSection } from './components/WhyUsSection';
-import { StatsSection } from './components/StatsSection';
 import { FeaturesSection } from './components/FeaturesSection';
 import { StakeholderBenefits } from './components/StakeholderBenefits';
 import { WorkflowStepper } from './components/WorkflowStepper';
-import { MedicalFileSection } from './components/MedicalFileSection';
+import { TrustPrivacySection } from './components/TrustPrivacySection';
 import { PackageCalculator } from './components/PackageCalculator';
 import { FaqSection } from './components/FaqSection';
 import { AppDownloadSection } from './components/AppDownloadSection';
@@ -58,16 +56,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans selection:bg-teal-500 selection:text-white" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
-      
-      {/* Top Announcement Bar (Gated for internal preview only) */}
-      {process.env.NEXT_PUBLIC_SHOW_DEV_BAR === 'true' && (
-        <TopBar
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
-          onOpenCalculator={scrollToCalculator}
-        />
-      )}
-
       {viewMode === 'doctor_dashboard' ? (
         /* Doctor Interactive Enterprise Dashboard */
         <DoctorDashboard
@@ -130,7 +118,7 @@ export default function App() {
       ) : (
         /* Interactive Landing Page Preview */
         <main>
-          {/* Header */}
+          {/* Section 1: Navigation Header */}
           <Header
             viewMode={viewMode}
             onViewModeChange={setViewMode}
@@ -138,59 +126,54 @@ export default function App() {
             onOpenAuth={handleOpenAuth}
           />
 
-          {/* Hero Section */}
+          {/* Public Advertising Ticker */}
+          <PublicAdsTicker />
+
+          {/* Section 2: Hero Section */}
           <Hero
             onOpenAuth={handleOpenAuth}
           />
 
-          {/* Unified Doctor & Healthcare Center Search Directory */}
-          <DoctorSearchSection
-            onOpenAuth={handleOpenAuth}
-          />
-
-          {/* Why Aafiya (Pain Points vs Solution) */}
-          <WhyUsSection
-            onOpenAuth={handleOpenAuth}
-          />
-
-          {/* Interactive 5-Step Workflow (كيف تعمل المنصة؟) */}
-          <WorkflowStepper />
-
-          {/* Live Metric Statistics */}
-          <StatsSection />
-
-          {/* Platform Core Features */}
+          {/* Section 3: Healthcare Services */}
           <FeaturesSection
             onOpenAuth={handleOpenAuth}
           />
 
-          {/* Stakeholder Benefits Grid */}
+          {/* Section 4: Interactive 5-Step Workflow (كيف تعمل عافية؟) */}
+          <WorkflowStepper />
+
+          {/* Section 5: Unified Healthcare Directory (ابحث في شبكة عافية) */}
+          <DoctorSearchSection
+            onOpenAuth={handleOpenAuth}
+          />
+
+          {/* Section 6: Mobile Applications (عافية معك أينما كنت) */}
+          <AppDownloadSection />
+
+          {/* Section 7: Stakeholder Benefits (عافية لكل طرف) */}
           <StakeholderBenefits
             onOpenAuth={handleOpenAuth}
           />
 
-          {/* EMR & UUID Showcase */}
-          <MedicalFileSection
+          {/* Section 8: Trust & Privacy (الثقة والخصوصية) */}
+          <TrustPrivacySection
             onOpenAuth={handleOpenAuth}
           />
 
-          {/* Operational Packages */}
+          {/* Section 9: Operational Packages (باقات مراكز الحجز والعمليات) */}
           <PackageCalculator
             onOpenAuth={handleOpenAuth}
           />
 
-          {/* FAQs */}
+          {/* Section 10: FAQs (الأسئلة الشائعة) */}
           <FaqSection />
 
-          {/* App Download */}
-          <AppDownloadSection />
-
-          {/* Final Call to Action Banner */}
+          {/* Section 11: Final Call to Action (كن جزءاً من شبكة عافية الصحية) */}
           <CtaSection
             onOpenAuth={handleOpenAuth}
           />
 
-          {/* Footer */}
+          {/* Section 12: Footer */}
           <Footer
             viewMode={viewMode}
             onViewModeChange={setViewMode}

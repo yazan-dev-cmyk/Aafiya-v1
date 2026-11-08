@@ -42,7 +42,7 @@ class SystemSetting extends Model
     public static function setValue(string $key, mixed $value, string $type = 'string', string $group = 'general'): self
     {
         $stringValue = match ($type) {
-            'boolean', 'bool' => $value ? '1' : '0',
+            'boolean', 'bool' => filter_var($value, FILTER_VALIDATE_BOOLEAN) ? '1' : '0',
             'json' => is_string($value) ? $value : json_encode($value),
             default => (string) $value,
         };
