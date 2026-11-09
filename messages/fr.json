@@ -603,7 +603,7 @@
   },
   "directory": {
     "section_badge": "Annuaire de Recherche Unifié",
-    "title": "Rechercher dans le réseau de santé AAFIYA",
+    "title": "Rechercher dans le réseau de santé Aafiya",
     "description": "Explorez la liste des médecins certifiés, centres de réservation, laboratoires d'analyses et centres de radiologie en un seul endroit.",
     "search_placeholder": "Rechercher par nom, spécialité ou lieu...",
     "all_provinces": "Toutes les Wilayas",
@@ -886,13 +886,13 @@
     "quickStats": "Stats Rapides",
     "platformStable": "Performance stable à 100%",
     "header": {
-      "platformName": "AAFIYA",
+      "platformName": "Aafiya",
       "platformTagline": "Votre Passerelle Santé",
       "welcome": "Bienvenue",
       "welcomeWithName": "Bienvenue, {name}",
       "welcomeDoctor": "Bienvenue, Dr {name}",
       "welcomeBack": "Heureux de vous retrouver, {name}",
-      "adminSubtitle": "Responsable de la gestion de la plateforme AAFIYA",
+      "adminSubtitle": "Responsable de la gestion de la plateforme Aafiya",
       "roles": {
         "doctor": "Médecin Traitant",
         "doctorDirector": "Médecin & Directeur de Cabinet",
@@ -914,7 +914,7 @@
         "laboratory": "Laboratoire d'Analyses",
         "radiology": "Centre d'Imagerie",
         "bookingCenter": "Centre de Réservation",
-        "centralOperations": "Opérations Centrales - AAFIYA",
+        "centralOperations": "Opérations Centrales - Aafiya",
         "verifiedAccount": "Compte Vérifié"
       },
       "logout": "Déconnexion",
@@ -3771,7 +3771,7 @@
   },
   "appDownload": {
     "sectionBadge": "Applications Mobiles",
-    "title": "Téléchargez les applications AAFIYA",
+    "title": "Téléchargez les applications Aafiya",
     "titleAccent": "sur votre téléphone",
     "subtitle": "Accès rapide et sécurisé à vos rendez-vous médicaux, dossier de santé et suivi clinique à tout moment.",
     "desktopScanNotice": "Scannez le code QR avec l’appareil photo de votre téléphone pour télécharger directement",
@@ -3781,17 +3781,17 @@
     "officialBuild": "Package Android (APK)",
     "patient": {
       "badge": "Application Patients",
-      "name": "AAFIYA",
+      "name": "Aafiya",
       "platform": "Android 7.0+ (APK)",
       "description": "Consultez vos rendez-vous, accédez à votre dossier médical partagé, vérifiez vos ordonnances et recevez vos alertes.",
       "downloadButton": "Télécharger l’application Patients (APK)"
     },
     "pro": {
       "badge": "Application Clinique & Professionnels",
-      "name": "AAFIYA Pro",
+      "name": "Aafiya Pro",
       "platform": "Android 7.0+ (APK)",
       "description": "Gérez la file d’attente du cabinet, traitez les escalades de suivi, consultez le dossier patient et optimisez vos soins.",
-      "downloadButton": "Télécharger AAFIYA Pro (APK)"
+      "downloadButton": "Télécharger Aafiya Pro (APK)"
     }
   },
   "ticker": {

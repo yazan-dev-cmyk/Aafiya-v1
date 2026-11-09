@@ -89,7 +89,7 @@ export default function PublicAppointmentPassPage() {
             {isRtl ? 'جاري التحقق من تذكرة الموعد...' : 'Verifying appointment ticket...'}
           </h2>
           <p className="text-xs text-slate-500">
-            {isRtl ? 'يتم استرجاع بيانات التذكرة الرقمية الآمنة من منصة عافية' : 'Retrieving secure digital ticket from AAFIYA'}
+            {isRtl ? 'يتم استرجاع بيانات التذكرة الرقمية الآمنة من منصة عافية' : 'Retrieving secure digital ticket from Aafiya'}
           </p>
         </div>
       </div>
@@ -134,7 +134,7 @@ export default function PublicAppointmentPassPage() {
           <div className="relative w-44 h-16 mb-2">
             <Image
               src="/logo/Aafiya_Logo_Full.png"
-              alt="AAFIYA"
+              alt="Aafiya"
               fill
               className="object-contain"
               priority
@@ -257,7 +257,7 @@ export default function PublicAppointmentPassPage() {
                   {isRtl ? 'العيادة / المركز الطبي' : 'Clinic / Medical Center'}
                 </span>
                 <p className="text-xs font-black text-slate-900 truncate">
-                  {data.clinic?.name || 'AAFIYA Clinic'}
+                  {data.clinic?.name || 'Aafiya Clinic'}
                 </p>
                 {data.clinic?.wilaya && (
                   <p className="text-[11px] font-medium text-slate-500">
@@ -356,7 +356,7 @@ export default function PublicAppointmentPassPage() {
             {isRtl ? 'نتمنى لكم دوام الصحة والعافية' : 'Wishing you good health and wellness'}
           </p>
           <span className="text-[9px] text-slate-400 block mt-0.5">
-            {isRtl ? 'وثيقة رقمية معتمدة صادرة عبر منصة عافية الطبية' : 'Official Digital Pass by AAFIYA Platform'}
+            {isRtl ? 'وثيقة رقمية معتمدة صادرة عبر منصة عافية الطبية' : 'Official Digital Pass by Aafiya Platform'}
           </span>
         </div>
 

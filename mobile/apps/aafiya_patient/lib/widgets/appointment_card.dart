@@ -18,10 +18,6 @@ class AppointmentCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final strings = LocalizedStrings.of(context);
-    final statusColor = _resolveStatusColor(appointment.status);
-    final statusBgColor = statusColor.withValues(alpha: 0.12);
-    final statusBorderColor = statusColor.withValues(alpha: 0.35);
-
     final clinicText = _formatClinicText(appointment.clinic);
 
     return AafiyaCard(
@@ -73,21 +69,10 @@ class AppointmentCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                // Status Chip
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: statusBgColor,
-                    borderRadius: BorderRadius.circular(AafiyaRadius.sm),
-                    border: Border.all(color: statusBorderColor),
-                  ),
-                  child: Text(
-                    strings.statusLabel(appointment.status),
-                    style: AafiyaTypography.caption.copyWith(
-                      color: statusColor,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                // Status Chip (WCAG AA Compliant)
+                AafiyaStatusChip(
+                  label: strings.statusLabel(appointment.status),
+                  type: _resolveStatusType(appointment.status),
                 ),
               ],
             ),
@@ -207,6 +192,23 @@ class AppointmentCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  AafiyaStatusType _resolveStatusType(AppointmentStatus status) {
+    return switch (status) {
+      AppointmentStatus.confirmed => AafiyaStatusType.confirmed,
+      AppointmentStatus.pending => AafiyaStatusType.pending,
+      AppointmentStatus.attended ||
+      AppointmentStatus.expired =>
+        AafiyaStatusType.concluded,
+      AppointmentStatus.cancelled ||
+      AppointmentStatus.rejected ||
+      AppointmentStatus.noShow =>
+        AafiyaStatusType.urgent,
+      AppointmentStatus.rescheduled ||
+      AppointmentStatus.unknown =>
+        AafiyaStatusType.custom,
+    };
   }
 
   Color _resolveStatusColor(AppointmentStatus status) {

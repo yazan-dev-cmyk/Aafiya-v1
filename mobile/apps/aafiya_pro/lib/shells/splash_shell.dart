@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:aafiya_core/aafiya_core.dart';
 import 'package:aafiya_ui/aafiya_ui.dart';
 
-/// Splash screen foundation for AAFIYA Pro.
+/// Splash screen foundation for Aafiya Pro.
 class ProSplashShell extends StatefulWidget {
   const ProSplashShell({
     super.key,
@@ -70,8 +70,8 @@ class _ProSplashShellState extends State<ProSplashShell> {
                     style: SegmentedButton.styleFrom(
                       textStyle: AafiyaTypography.caption
                           .copyWith(fontWeight: FontWeight.w600),
-                      visualDensity: VisualDensity.compact,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      visualDensity: VisualDensity.standard,
+                      tapTargetSize: MaterialTapTargetSize.padded,
                     ),
                     onSelectionChanged: (selected) {
                       if (selected.isNotEmpty) {
@@ -92,7 +92,7 @@ class _ProSplashShellState extends State<ProSplashShell> {
                       package: 'aafiya_ui',
                       width: 280,
                       fit: BoxFit.contain,
-                      semanticLabel: 'AAFIYA — Your Gateway To Aafiya',
+                      semanticLabel: 'Aafiya — Your Gateway To Aafiya',
                     ),
                     const SizedBox(height: 32),
                     const AafiyaLoadingView(),

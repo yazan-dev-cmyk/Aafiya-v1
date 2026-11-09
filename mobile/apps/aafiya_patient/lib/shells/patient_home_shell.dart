@@ -212,6 +212,7 @@ class _PatientHomeShellState extends State<PatientHomeShell>
             builder: (context, _) {
               final count = _countManager.unreadCount;
               return IconButton(
+                constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
                 icon: Badge(
                   isLabelVisible: count > 0,
                   label: Text(
@@ -239,6 +240,7 @@ class _PatientHomeShellState extends State<PatientHomeShell>
             },
           ),
           IconButton(
+            constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
             icon: const Icon(Icons.health_and_safety_rounded,
                 color: AafiyaColors.error),
             tooltip: strings.emergencyProfileTitle,
@@ -246,6 +248,7 @@ class _PatientHomeShellState extends State<PatientHomeShell>
                 apiClient: widget.apiClient),
           ),
           IconButton(
+            constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
             icon: const Icon(Icons.logout_rounded),
             tooltip: strings.signOut,
             onPressed: () async {
@@ -275,32 +278,46 @@ class _PatientHomeShellState extends State<PatientHomeShell>
           _buildProfileTab(context, strings, user),
         ],
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _selectedTabIndex,
-        onDestinationSelected: (index) =>
-            setState(() => _selectedTabIndex = index),
-        destinations: [
-          NavigationDestination(
-            icon: const Icon(Icons.home_outlined),
-            selectedIcon: const Icon(Icons.home),
-            label: strings.patientHomeTitle,
+      bottomNavigationBar: Container(
+        decoration: const BoxDecoration(
+          color: AafiyaColors.pureWhite,
+          border: Border(
+            top: BorderSide(
+              color: AafiyaColors.lineDivider,
+              width: 1.0,
+            ),
           ),
-          NavigationDestination(
-            icon: const Icon(Icons.calendar_month_outlined),
-            selectedIcon: const Icon(Icons.calendar_month),
-            label: strings.patientAppointmentsTitle,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.folder_shared_outlined),
-            selectedIcon: const Icon(Icons.folder_shared),
-            label: strings.patientRecordsTitle,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.person_outline),
-            selectedIcon: const Icon(Icons.person),
-            label: strings.patientProfileTitle,
-          ),
-        ],
+        ),
+        child: NavigationBar(
+          height: 64.0,
+          backgroundColor: AafiyaColors.pureWhite,
+          elevation: 0,
+          selectedIndex: _selectedTabIndex,
+          onDestinationSelected: (index) =>
+              setState(() => _selectedTabIndex = index),
+          destinations: [
+            NavigationDestination(
+              icon: const Icon(Icons.home_outlined),
+              selectedIcon: const Icon(Icons.home),
+              label: strings.patientHomeTitle,
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.calendar_month_outlined),
+              selectedIcon: const Icon(Icons.calendar_month),
+              label: strings.patientAppointmentsTitle,
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.folder_shared_outlined),
+              selectedIcon: const Icon(Icons.folder_shared),
+              label: strings.patientRecordsTitle,
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.person_outline),
+              selectedIcon: const Icon(Icons.person),
+              label: strings.patientProfileTitle,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -511,22 +528,29 @@ class _PatientHomeShellState extends State<PatientHomeShell>
             const SizedBox(height: 16.0),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: AafiyaCard(
-                borderColor: AafiyaColors.info.withValues(alpha: 0.3),
-                backgroundColor: AafiyaColors.info.withValues(alpha: 0.05),
-                padding: AafiyaSpacing.insetAllMd,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF0FDF4),
+                  borderRadius: BorderRadius.circular(16.0),
+                  border: Border.all(color: const Color(0xFFBBF7D0), width: 1.0),
+                ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.info_outline_rounded,
-                        color: AafiyaColors.info, size: 24),
+                    const Icon(
+                      Icons.shield_outlined,
+                      color: AafiyaColors.actionGreen,
+                      size: 22,
+                    ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         strings.patientNoticeDirectBookingNotice,
                         style: AafiyaTypography.bodyMedium.copyWith(
-                          color: AafiyaColors.primaryText,
-                          height: 1.4,
+                          color: const Color(0xFF14532D),
+                          fontWeight: FontWeight.w500,
+                          height: 1.45,
                         ),
                       ),
                     ),
@@ -829,6 +853,7 @@ class _PatientHomeShellState extends State<PatientHomeShell>
                             : 'Visit Pass',
                     icon: const Icon(Icons.qr_code_2_rounded),
                     variant: AafiyaButtonVariant.primary,
+                    height: 52.0,
                     onPressed: () =>
                         PatientQrDialog.show(context, appointment: appointment),
                   ),
@@ -841,6 +866,7 @@ class _PatientHomeShellState extends State<PatientHomeShell>
                   child: AafiyaButton(
                     label: strings.appointmentDetails,
                     variant: AafiyaButtonVariant.outline,
+                    height: 52.0,
                     onPressed: () => AppointmentDetailScreen.show(
                       context,
                       appointment,
@@ -858,6 +884,7 @@ class _PatientHomeShellState extends State<PatientHomeShell>
                   child: AafiyaButton(
                     label: strings.appointmentDetails,
                     variant: AafiyaButtonVariant.outline,
+                    height: 52.0,
                     onPressed: () => AppointmentDetailScreen.show(
                       context,
                       appointment,
@@ -1147,13 +1174,17 @@ class _PatientHomeShellState extends State<PatientHomeShell>
               subtitle: Text(strings.shareMedicalRecordSubtitle,
                   style: AafiyaTypography.caption),
               trailing: forwardIcon,
-              onTap: () => PatientSharedRecordsScreen.show(context,
-                  apiClient: widget.apiClient),
+              onTap: () {
+                PatientSharedRecordsScreen.show(
+                  context,
+                  apiClient: widget.apiClient,
+                );
+              },
             ),
           ),
           const SizedBox(height: 12),
 
-          // View Shared Record (Recipient Viewer - Manual Ingress)
+          // View Shared Record (Recipient Viewer)
           AafiyaCard(
             child: ListTile(
               leading: CircleAvatar(
@@ -1166,8 +1197,12 @@ class _PatientHomeShellState extends State<PatientHomeShell>
               subtitle: Text(strings.viewSharedRecordHubSubtitle,
                   style: AafiyaTypography.caption),
               trailing: forwardIcon,
-              onTap: () => SharedRecordViewerSheet.show(context,
-                  apiClient: widget.apiClient),
+              onTap: () {
+                SharedRecordViewerSheet.show(
+                  context,
+                  apiClient: widget.apiClient,
+                );
+              },
             ),
           ),
         ],

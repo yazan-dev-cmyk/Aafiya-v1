@@ -65,7 +65,7 @@ export const AppDownloadSection: React.FC = () => {
         {/* 2-Card App Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
           
-          {/* CARD 1: AAFIYA Patient */}
+          {/* CARD 1: Aafiya Patient */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -110,7 +110,7 @@ export const AppDownloadSection: React.FC = () => {
                   <div className="p-3 bg-white rounded-2xl border border-slate-200/80 shadow-md">
                     <Image 
                       src="/qr/qr-patient-apk.png" 
-                      alt="AAFIYA Patient QR Code" 
+                      alt="Aafiya Patient QR Code" 
                       width={160}
                       height={160}
                       className="w-40 h-40 object-contain rounded-lg"
@@ -150,7 +150,7 @@ export const AppDownloadSection: React.FC = () => {
             </Card>
           </motion.div>
 
-          {/* CARD 2: AAFIYA Pro */}
+          {/* CARD 2: Aafiya Pro */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -195,7 +195,7 @@ export const AppDownloadSection: React.FC = () => {
                   <div className="p-3 bg-white rounded-2xl border border-slate-200/80 shadow-md">
                     <Image 
                       src="/qr/qr-pro-apk.png" 
-                      alt="AAFIYA Pro QR Code" 
+                      alt="Aafiya Pro QR Code" 
                       width={160}
                       height={160}
                       className="w-40 h-40 object-contain rounded-lg"

@@ -69,8 +69,8 @@ class _PatientSplashShellState extends State<PatientSplashShell> {
                     showSelectedIcon: false,
                     style: SegmentedButton.styleFrom(
                       textStyle: AafiyaTypography.caption.copyWith(fontWeight: FontWeight.w600),
-                      visualDensity: VisualDensity.compact,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      visualDensity: VisualDensity.standard,
+                      tapTargetSize: MaterialTapTargetSize.padded,
                     ),
                     onSelectionChanged: (selected) {
                       if (selected.isNotEmpty) {
@@ -91,7 +91,7 @@ class _PatientSplashShellState extends State<PatientSplashShell> {
                       package: 'aafiya_ui',
                       width: 280,
                       fit: BoxFit.contain,
-                      semanticLabel: 'AAFIYA — Your Gateway To Aafiya',
+                      semanticLabel: 'Aafiya — Your Gateway To Aafiya',
                     ),
                     const SizedBox(height: 32),
                     const AafiyaLoadingView(),

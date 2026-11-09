@@ -166,6 +166,8 @@ class _QrScannerSheetState extends State<QrScannerSheet>
                 IconButton(
                   key: const Key('qr_scanner_close_button'),
                   icon: const Icon(Icons.close_rounded, color: Colors.white),
+                  constraints:
+                      const BoxConstraints(minWidth: 48, minHeight: 48),
                   onPressed: () => Navigator.of(context).pop(),
                   tooltip: strings.cancel,
                 ),
@@ -192,6 +194,8 @@ class _QrScannerSheetState extends State<QrScannerSheet>
                             : Icons.flash_off_rounded,
                         color: isTorchOn ? Colors.amber : Colors.white,
                       ),
+                      constraints:
+                          const BoxConstraints(minWidth: 48, minHeight: 48),
                       onPressed: () => _controller.toggleTorch(),
                       tooltip: strings.scannerTorchToggle,
                     );

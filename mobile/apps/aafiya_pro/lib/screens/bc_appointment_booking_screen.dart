@@ -1272,7 +1272,7 @@ class _BcAppointmentBookingScreenState
                 key: const Key('wizard_back_button'),
                 onPressed: _isSubmitting ? null : _previousStep,
                 style: OutlinedButton.styleFrom(
-                  minimumSize: Size.zero,
+                  minimumSize: const Size(0, 52),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
                   shape: RoundedRectangleBorder(
@@ -1296,6 +1296,7 @@ class _BcAppointmentBookingScreenState
                       ? AafiyaColors.healingGreen
                       : AafiyaColors.healthBlue,
                   foregroundColor: AafiyaColors.pureWhite,
+                  minimumSize: const Size(0, 52),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),

@@ -53,12 +53,12 @@ export default function TestAppsClient({ locale }: TestAppsClientProps) {
           <div className="flex items-center gap-3">
             <img 
               src="/logo/Aafiya_Logo_No_Tagline.png" 
-              alt="AAFIYA Logo" 
+              alt="Aafiya Logo" 
               className="h-10 w-auto object-contain" 
             />
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-black text-lg text-white tracking-tight">AAFIYA</span>
+                <span className="font-black text-lg text-white tracking-tight">Aafiya</span>
                 <span className="bg-amber-500/20 text-amber-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-amber-500/30">
                   {isRtl ? 'إصدار تجريبي سريري' : 'TEST / STAGING / PILOT'}
                 </span>
@@ -118,12 +118,12 @@ export default function TestAppsClient({ locale }: TestAppsClientProps) {
                 </span>
               </div>
               <h1 className="text-xl sm:text-2xl font-black text-white">
-                {isRtl ? 'حزم تطبيقات AAFIYA المعتمدة — مرحلة الاختبار التجريبي' : 'AAFIYA Android Mobile Test Artifacts'}
+                {isRtl ? 'حزم تطبيقات Aafiya المعتمدة — مرحلة الاختبار التجريبي' : 'Aafiya Android Mobile Test Artifacts'}
               </h1>
               <p className="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-3xl">
                 {isRtl 
                   ? 'هذه الصفحة مخصصة حصرياً لفريق العمل والأطباء والمختبرين المعتمدين ضمن المرحلة التجريبية (Pilot Testing). هذه التطبيقات متصلة بالواجهة البرمجية السحابية الموثقة (https://api.aafiya.site/api/v1) وليست نسخاً عامة منشورة على متجر Google Play.'
-                  : 'This page is designated strictly for authorized clinical staff, engineers, and verified pilot testers. These artifacts connect directly to the verified AAFIYA cloud infrastructure (https://api.aafiya.site/api/v1) and are not public Google Play releases.'}
+                  : 'This page is designated strictly for authorized clinical staff, engineers, and verified pilot testers. These artifacts connect directly to the verified Aafiya cloud infrastructure (https://api.aafiya.site/api/v1) and are not public Google Play releases.'}
               </p>
             </div>
           </div>
@@ -144,13 +144,13 @@ export default function TestAppsClient({ locale }: TestAppsClientProps) {
                     <span className="text-[10px] font-mono text-teal-400 uppercase tracking-widest font-bold">
                       {isRtl ? 'تطبيق المرضى' : 'Patient Application'}
                     </span>
-                    <h2 className="text-2xl font-black text-white">AAFIYA</h2>
+                    <h2 className="text-2xl font-black text-white">Aafiya</h2>
                     <p className="text-xs text-slate-400 font-mono">com.aafiya.aafiya_patient</p>
                   </div>
                 </div>
 
                 <span className="bg-teal-900/40 text-teal-300 text-[11px] font-bold px-3 py-1 rounded-full border border-teal-500/30 shrink-0">
-                  v0.1.1 (Code 10)
+                  v0.1.2 (Code 11)
                 </span>
               </div>
 
@@ -158,7 +158,7 @@ export default function TestAppsClient({ locale }: TestAppsClientProps) {
               <div className="bg-slate-900/90 rounded-2xl p-4 border border-slate-800/80 space-y-2.5 text-xs">
                 <div className="flex justify-between items-center text-slate-400">
                   <span>{isRtl ? 'حجم الملف:' : 'File Size:'}</span>
-                  <span className="text-white font-mono font-bold">57.9 MB (60,734,223 bytes)</span>
+                  <span className="text-white font-mono font-bold">58.2 MB (61,013,579 bytes)</span>
                 </div>
                 <div className="flex justify-between items-center text-slate-400">
                   <span>{isRtl ? 'النظام المدعوم:' : 'Target OS:'}</span>
@@ -176,7 +176,7 @@ export default function TestAppsClient({ locale }: TestAppsClientProps) {
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider font-bold">SHA-256 Checksum:</span>
                     <button
-                      onClick={() => copyToClipboard('15f3168812ea5ff4ca60ac59faae74d0fa68d3871cd60aa8a14d940e72749dc8', 'patient-hash')}
+                      onClick={() => copyToClipboard('58f6f1709476fe3719ac3b6ea1bbcb9f33d7821abd36835b9a02cc262feca8ab', 'patient-hash')}
                       className="text-[10px] text-teal-400 hover:text-teal-300 flex items-center gap-1 transition-colors cursor-pointer"
                     >
                       {copiedKey === 'patient-hash' ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
@@ -184,7 +184,7 @@ export default function TestAppsClient({ locale }: TestAppsClientProps) {
                     </button>
                   </div>
                   <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800/80 font-mono text-[10px] text-slate-300 break-all select-all">
-                    15f3168812ea5ff4ca60ac59faae74d0fa68d3871cd60aa8a14d940e72749dc8
+                    58f6f1709476fe3719ac3b6ea1bbcb9f33d7821abd36835b9a02cc262feca8ab
                   </div>
                 </div>
               </div>
@@ -209,11 +209,11 @@ export default function TestAppsClient({ locale }: TestAppsClientProps) {
             <div className="space-y-2 pt-4">
               <a
                 href="/downloads/aafiya-patient.apk"
-                download="aafiya-patient-v0.1.1.apk"
+                download="aafiya-patient-v0.1.2.apk"
                 className="w-full py-3.5 px-6 rounded-2xl bg-teal-600 hover:bg-teal-500 text-white font-bold flex items-center justify-center gap-2.5 shadow-lg shadow-teal-900/30 transition-all cursor-pointer"
               >
                 <Download className="w-5 h-5" />
-                <span>{isRtl ? 'تحميل تطبيق المرضى (APK)' : 'Download AAFIYA Patient (APK)'}</span>
+                <span>{isRtl ? 'تحميل تطبيق المرضى (APK)' : 'Download Aafiya Patient (APK)'}</span>
               </a>
 
               <button
@@ -240,13 +240,13 @@ export default function TestAppsClient({ locale }: TestAppsClientProps) {
                     <span className="text-[10px] font-mono text-emerald-400 uppercase tracking-widest font-bold">
                       {isRtl ? 'تطبيق الأطباء والعيادات' : 'Clinical & Professional App'}
                     </span>
-                    <h2 className="text-2xl font-black text-white">AAFIYA Pro</h2>
+                    <h2 className="text-2xl font-black text-white">Aafiya Pro</h2>
                     <p className="text-xs text-slate-400 font-mono">com.aafiya.aafiya_pro</p>
                   </div>
                 </div>
 
                 <span className="bg-emerald-900/40 text-emerald-300 text-[11px] font-bold px-3 py-1 rounded-full border border-emerald-500/30 shrink-0">
-                  v0.1.1 (Code 10)
+                  v0.1.2 (Code 11)
                 </span>
               </div>
 
@@ -254,7 +254,7 @@ export default function TestAppsClient({ locale }: TestAppsClientProps) {
               <div className="bg-slate-900/90 rounded-2xl p-4 border border-slate-800/80 space-y-2.5 text-xs">
                 <div className="flex justify-between items-center text-slate-400">
                   <span>{isRtl ? 'حجم الملف:' : 'File Size:'}</span>
-                  <span className="text-white font-mono font-bold">77.7 MB (81,472,109 bytes)</span>
+                  <span className="text-white font-mono font-bold">78.5 MB (82,342,029 bytes)</span>
                 </div>
                 <div className="flex justify-between items-center text-slate-400">
                   <span>{isRtl ? 'النظام المدعوم:' : 'Target OS:'}</span>
@@ -272,7 +272,7 @@ export default function TestAppsClient({ locale }: TestAppsClientProps) {
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider font-bold">SHA-256 Checksum:</span>
                     <button
-                      onClick={() => copyToClipboard('50e8f14f1e72c2a609217959719e3e061057232878871d90b1f0373213a8bb07', 'pro-hash')}
+                      onClick={() => copyToClipboard('caaa9b89e856f7379dea47c29d8b2c8cb2dd0bf02c371a3d8a99d892e5078db2', 'pro-hash')}
                       className="text-[10px] text-emerald-400 hover:text-emerald-300 flex items-center gap-1 transition-colors cursor-pointer"
                     >
                       {copiedKey === 'pro-hash' ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
@@ -280,7 +280,7 @@ export default function TestAppsClient({ locale }: TestAppsClientProps) {
                     </button>
                   </div>
                   <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800/80 font-mono text-[10px] text-slate-300 break-all select-all">
-                    50e8f14f1e72c2a609217959719e3e061057232878871d90b1f0373213a8bb07
+                    caaa9b89e856f7379dea47c29d8b2c8cb2dd0bf02c371a3d8a99d892e5078db2
                   </div>
                 </div>
               </div>
@@ -305,11 +305,11 @@ export default function TestAppsClient({ locale }: TestAppsClientProps) {
             <div className="space-y-2 pt-4">
               <a
                 href="/downloads/aafiya-pro.apk"
-                download="aafiya-pro-v0.1.1.apk"
+                download="aafiya-pro-v0.1.2.apk"
                 className="w-full py-3.5 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold flex items-center justify-center gap-2.5 shadow-lg shadow-emerald-900/30 transition-all cursor-pointer"
               >
                 <Download className="w-5 h-5" />
-                <span>{isRtl ? 'تحميل تطبيق الأطباء (APK)' : 'Download AAFIYA Pro (APK)'}</span>
+                <span>{isRtl ? 'تحميل تطبيق الأطباء (APK)' : 'Download Aafiya Pro (APK)'}</span>
               </a>
 
               <button

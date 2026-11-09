@@ -298,7 +298,7 @@ class QueuePatientTile extends StatelessWidget {
                           backgroundColor: AafiyaColors.actionGreen,
                           foregroundColor: AafiyaColors.pureWhite,
                           elevation: 0,
-                          minimumSize: const Size(0, 48),
+                          minimumSize: const Size(0, 52),
                           padding: const EdgeInsets.symmetric(
                             horizontal: AafiyaSpacing.sm,
                             vertical: 12,
@@ -325,7 +325,7 @@ class QueuePatientTile extends StatelessWidget {
                           foregroundColor: AafiyaColors.error,
                           side: const BorderSide(color: AafiyaColors.error),
                           elevation: 0,
-                          minimumSize: const Size(0, 48),
+                          minimumSize: const Size(0, 52),
                           padding: const EdgeInsets.symmetric(
                             horizontal: AafiyaSpacing.sm,
                             vertical: 12,
@@ -366,7 +366,7 @@ class QueuePatientTile extends StatelessWidget {
                         backgroundColor: AafiyaColors.actionGreen,
                         foregroundColor: AafiyaColors.pureWhite,
                         elevation: 0,
-                        minimumSize: const Size(0, 48),
+                        minimumSize: const Size(0, 52),
                         padding: const EdgeInsets.symmetric(
                           horizontal: AafiyaSpacing.sm,
                           vertical: 12,

@@ -16,6 +16,7 @@ class AafiyaButton extends StatelessWidget {
     this.isLoading = false,
     this.isLocked = false,
     this.icon,
+    this.height = 48.0,
   });
 
   final String label;
@@ -24,6 +25,7 @@ class AafiyaButton extends StatelessWidget {
   final bool isLoading;
   final bool isLocked;
   final Widget? icon;
+  final double height;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +38,7 @@ class AafiyaButton extends StatelessWidget {
           );
 
       return SizedBox(
-        height: 48,
+        height: height,
         child: ElevatedButton.icon(
           onPressed: () => AafiyaLockedNotice.showNotice(context),
           style: ElevatedButton.styleFrom(
@@ -62,7 +64,7 @@ class AafiyaButton extends StatelessWidget {
       };
 
       return SizedBox(
-        height: 48,
+        height: height,
         child: ElevatedButton(
           onPressed: null,
           style: _buttonStyle,
@@ -80,7 +82,7 @@ class AafiyaButton extends StatelessWidget {
 
     if (icon != null) {
       return SizedBox(
-        height: 48,
+        height: height,
         child: ElevatedButton.icon(
           onPressed: onPressed,
           style: _buttonStyle,
@@ -91,7 +93,7 @@ class AafiyaButton extends StatelessWidget {
     }
 
     return SizedBox(
-      height: 48,
+      height: height,
       child: ElevatedButton(
         onPressed: onPressed,
         style: _buttonStyle,

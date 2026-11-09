@@ -371,7 +371,7 @@ class AafiyaPatientAppState extends State<AafiyaPatientApp>
   Widget build(BuildContext context) {
     return MaterialApp(
       navigatorKey: _navigatorKey,
-      title: 'AAFIYA Patient',
+      title: 'Aafiya Patient',
       debugShowCheckedModeBanner: false,
       theme: AafiyaTheme.lightTheme,
       darkTheme: AafiyaTheme.darkTheme,

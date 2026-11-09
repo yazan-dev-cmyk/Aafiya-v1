@@ -683,6 +683,7 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
                 ),
                 onPressed: _isSavingDraft ? null : _handleSaveDraft,
                 style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(0, 52),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   foregroundColor: AafiyaColors.primaryBlue,
                   side: const BorderSide(color: AafiyaColors.primaryBlue),
@@ -700,6 +701,7 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
                 label: Text(strings.activateSchedule),
                 onPressed: _isSavingDraft ? null : _handleOpenActivationDialog,
                 style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(0, 52),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   backgroundColor: AafiyaColors.healthBlue,
                   foregroundColor: AafiyaColors.pureWhite,

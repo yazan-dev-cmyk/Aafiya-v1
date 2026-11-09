@@ -17,38 +17,8 @@ class PrescriptionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final strings = LocalizedStrings.of(context);
 
-    Color statusColor;
-    Color statusBgColor;
-    String statusLabel;
-
-    switch (prescription.status.toLowerCase()) {
-      case 'active':
-        if (prescription.isValid) {
-          statusColor = AafiyaColors.success;
-          statusBgColor = AafiyaColors.success.withValues(alpha: 0.1);
-          statusLabel = strings.statusActive;
-        } else {
-          statusColor = AafiyaColors.warning;
-          statusBgColor = AafiyaColors.warning.withValues(alpha: 0.1);
-          statusLabel = strings.filterStatusExpired;
-        }
-      case 'completed':
-        statusColor = AafiyaColors.healthBlue;
-        statusBgColor = AafiyaColors.healthBlue.withValues(alpha: 0.1);
-        statusLabel = strings.filterStatusCompleted;
-      case 'voided':
-        statusColor = AafiyaColors.error;
-        statusBgColor = AafiyaColors.error.withValues(alpha: 0.1);
-        statusLabel = strings.statusVoided;
-      case 'expired':
-        statusColor = AafiyaColors.warning;
-        statusBgColor = AafiyaColors.warning.withValues(alpha: 0.1);
-        statusLabel = strings.filterStatusExpired;
-      default:
-        statusColor = AafiyaColors.secondaryText;
-        statusBgColor = AafiyaColors.border;
-        statusLabel = prescription.status;
-    }
+    final statusLabel = _resolveStatusLabel(strings, prescription);
+    final statusType = _resolveStatusType(prescription);
 
     return AafiyaCard(
       onTap: onTap,
@@ -94,20 +64,9 @@ class PrescriptionCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: statusBgColor,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  statusLabel,
-                  style: AafiyaTypography.caption.copyWith(
-                    color: statusColor,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+              AafiyaStatusChip(
+                label: statusLabel,
+                type: statusType,
               ),
             ],
           ),
@@ -216,5 +175,39 @@ class PrescriptionCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  static String _resolveStatusLabel(LocalizedStrings strings, Prescription prescription) {
+    switch (prescription.status.toLowerCase()) {
+      case 'active':
+        return prescription.isValid
+            ? strings.statusActive
+            : strings.filterStatusExpired;
+      case 'completed':
+        return strings.filterStatusCompleted;
+      case 'voided':
+        return strings.statusVoided;
+      case 'expired':
+        return strings.filterStatusExpired;
+      default:
+        return prescription.status;
+    }
+  }
+
+  static AafiyaStatusType _resolveStatusType(Prescription prescription) {
+    switch (prescription.status.toLowerCase()) {
+      case 'active':
+        return prescription.isValid
+            ? AafiyaStatusType.confirmed
+            : AafiyaStatusType.pending;
+      case 'completed':
+        return AafiyaStatusType.concluded;
+      case 'voided':
+        return AafiyaStatusType.urgent;
+      case 'expired':
+        return AafiyaStatusType.pending;
+      default:
+        return AafiyaStatusType.concluded;
+    }
   }
 }

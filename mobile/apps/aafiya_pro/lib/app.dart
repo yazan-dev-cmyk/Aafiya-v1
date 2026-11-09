@@ -139,7 +139,7 @@ class _AafiyaProAppState extends State<AafiyaProApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       navigatorKey: _navigatorKey,
-      title: 'AAFIYA Pro',
+      title: 'Aafiya Pro',
       debugShowCheckedModeBanner: false,
       theme: AafiyaTheme.lightTheme,
       darkTheme: AafiyaTheme.darkTheme,

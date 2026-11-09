@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AAFIYA Mobile Redesign — Visual Previews & Audit Index</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'IBM Plex Sans Arabic', sans-serif; background-color: #F8FAFC; }
+    .font-latin { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .badge-revised { background-color: #E3F6EA; color: #166534; border: 1px solid #BBF7D0; }
+    .badge-designed { background-color: #E0F2FE; color: #0369A1; border: 1px solid #BAE6FD; }
+    .badge-pending { background-color: #F1F5F9; color: #475569; border: 1px solid #E2E8F0; }
+    .badge-confirm { background-color: #FEF1DC; color: #92400E; border: 1px solid #FDE68A; }
+  </style>
+</head>
+<body class="text-slate-900 antialiased p-6 md:p-10 max-w-7xl mx-auto space-y-10">
+
+  <!-- Header -->
+  <header class="border-b border-slate-200 pb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+    <div>
+      <div class="inline-flex items-center gap-2 px-3 py-1 bg-teal-50 border border-teal-200 rounded-full text-xs font-semibold text-teal-800 mb-2">
+        <span>المعاينة المرئية — الجولة الثانية المنقحة</span> • <span class="font-latin">Revision Round 2</span>
+      </div>
+      <h1 class="text-2xl md:text-3xl font-black text-slate-900">معرض التصاميم والتدقيق الفني — تطبيقي عافية (Patient & Pro)</h1>
+      <p class="text-xs md:text-sm text-slate-600 mt-1">التوجه الجمالي المعتمد: Premium Editorial Medical مع الامتثال الصارم لسياسات الإغلاق الطبي</p>
+    </div>
+    <div class="flex flex-wrap items-center gap-3">
+      <a href="../design_system/design_system.html" class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 hover:border-teal-500 rounded-xl text-xs font-bold text-slate-700 shadow-sm transition-all">
+        <span>🎨 نظام التصميم المعتمد</span>
+      </a>
+      <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 border border-amber-200 rounded-xl text-xs font-bold text-amber-800">
+        <span>🔒 Zero Source Mutation</span>
+      </span>
+    </div>
+  </header>
+
+  <!-- Governance & Compliance Banner -->
+  <div class="p-4 bg-teal-900 text-white rounded-2xl shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+    <div class="space-y-1">
+      <div class="flex items-center gap-2 text-xs font-bold text-teal-300">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span>بوابة المراجعة البصرية الإلزامية (Visual Review Gate)</span>
+      </div>
+      <p class="text-sm font-medium text-teal-50">
+        جميع الشاشات المعروضة أدناه هي تصاميم بصرية ونماذج توضيحية. لم يتم تعديل أي سطر برمجي في التطبيق بانتظار الاعتماد النهائي الصريح.
+      </p>
+    </div>
+    <div class="flex items-center gap-2 text-xs text-teal-200 bg-teal-800/80 px-3 py-1.5 rounded-lg border border-teal-700 whitespace-nowrap">
+      <span>تاريخ السياسة: 29 أكتوبر 2026</span>
+    </div>
+  </div>
+
+  <!-- Audit Documents Quick Bar -->
+  <section class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-3">
+    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">تقارير التدقيق الفني المعتمدة (Technical Audit Reports)</h3>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 text-xs font-semibold">
+      <a href="../audit/PAGE_INVENTORY.md" class="p-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl flex items-center justify-between transition-colors">
+        <span>📑 حصر الشاشات</span>
+        <span class="text-slate-400 font-mono">54 وحدة</span>
+      </a>
+      <a href="../audit/POLICY_COMPLIANCE_REPORT.md" class="p-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl flex items-center justify-between transition-colors">
+        <span>⚖️ تقرير السياسات</span>
+        <span class="text-emerald-600">مطابق</span>
+      </a>
+      <a href="../audit/COLOR_CONTRAST_AUDIT.md" class="p-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl flex items-center justify-between transition-colors">
+        <span>👁️ تباين الألوان</span>
+        <span class="text-teal-600 font-latin">WCAG AA</span>
+      </a>
+      <a href="../audit/TOUCH_TARGET_AUDIT.md" class="p-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl flex items-center justify-between transition-colors">
+        <span>👆 مساحات اللمس</span>
+        <span class="text-blue-600 font-latin">&ge; 48dp</span>
+      </a>
+      <a href="../audit/VISUAL_REVISION_REPORT.md" class="p-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl flex items-center justify-between transition-colors">
+        <span>📝 تقرير المراجعة R2</span>
+        <span class="text-purple-600">محدث</span>
+      </a>
+      <a href="../audit/PENDING_ITEMS.md" class="p-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl flex items-center justify-between transition-colors">
+        <span>⏳ القرارات المعلقة</span>
+        <span class="text-amber-600">4 بنود</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Section 1: Aafiya Patient -->
+  <section class="space-y-6">
+    <div class="flex items-center justify-between">
+      <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+        <span class="w-3 h-3 rounded-full bg-teal-500"></span>
+        تطبيق المرضى (Aafiya Patient)
+      </h2>
+      <div class="flex items-center gap-2">
+        <span class="badge-revised text-xs px-2.5 py-0.5 rounded-full font-bold">5 REVISED</span>
+        <span class="badge-designed text-xs px-2.5 py-0.5 rounded-full font-bold">1 DESIGNED</span>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Screen 1: Home -->
+      <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
+        <div class="bg-slate-100 p-2 border-b border-slate-200 flex justify-center">
+          <img src="../patient/proposed/patient_home_proposed.jpg" alt="Patient Home" class="rounded-xl max-h-96 object-contain shadow-sm">
+        </div>
+        <div class="p-4 space-y-3 flex-1 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-xs mb-1">
+              <span class="font-bold text-slate-500">الشاشة الرئيسية</span>
+              <span class="badge-revised text-[10px] px-2 py-0.5 rounded-full font-bold">REVISED</span>
+            </div>
+            <h3 class="font-bold text-base text-slate-900">الرئيسية وبطاقة الموعد القادم</h3>
+            <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+              استبدال الهيدر الكحلي ببطاقة موعد قادم مضيئة ذات تباين ناعم، شبكة خدمات سريعة بأيقونات طبية متناسقة، وقائمة تذكيرات محلية.
+            </p>
+          </div>
+          <div class="pt-2 border-t border-slate-100 text-[11px] text-slate-500 space-y-1">
+            <div><strong>تصحيحات الامتثال:</strong> تطهير الأرقام الوهمية، تمييز الموعد كنموذج تجريبي توضيحي.</div>
+            <div class="text-teal-700 font-mono text-[10px]">التباين: 17.85:1 | مساحة اللمس: 52dp</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen 2: Appointments -->
+      <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
+        <div class="bg-slate-100 p-2 border-b border-slate-200 flex justify-center">
+          <img src="../patient/proposed/patient_appointments_proposed.jpg" alt="Appointments List" class="rounded-xl max-h-96 object-contain shadow-sm">
+        </div>
+        <div class="p-4 space-y-3 flex-1 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-xs mb-1">
+              <span class="font-bold text-slate-500">قائمة المواعيد</span>
+              <span class="badge-revised text-[10px] px-2 py-0.5 rounded-full font-bold">REVISED</span>
+            </div>
+            <h3 class="font-bold text-base text-slate-900">جدول المواعيد والبطاقات السريرية</h3>
+            <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+              أزرار تبويب كبسولية عصرية، بطاقات بيضاء متباعدة ذات هوامش مدروسة، شارات حالة هادئة (مؤكد: 6.33:1 / معلق: 6.36:1).
+            </p>
+          </div>
+          <div class="pt-2 border-t border-slate-100 text-[11px] text-slate-500 space-y-1">
+            <div><strong>تصحيحات الامتثال:</strong> توحيد شارات الحالة الطبية دون استهلاك مساحات مفرطة.</div>
+            <div class="text-teal-700 font-mono text-[10px]">التباين: 6.33:1 (Pass AA) | زر التصريح: 48dp</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen 3: Ticket / Pass -->
+      <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
+        <div class="bg-slate-100 p-2 border-b border-slate-200 flex justify-center">
+          <img src="../patient/proposed/patient_ticket_proposed.jpg" alt="Medical Pass Ticket" class="rounded-xl max-h-96 object-contain shadow-sm">
+        </div>
+        <div class="p-4 space-y-3 flex-1 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-xs mb-1">
+              <span class="font-bold text-slate-500">تصريح الزيارة (Boarding Pass)</span>
+              <span class="badge-revised text-[10px] px-2 py-0.5 rounded-full font-bold">REVISED</span>
+            </div>
+            <h3 class="font-bold text-base text-slate-900">تذكرة الدخول الرقمية التحريرية</h3>
+            <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+              بطاقة صعود طبية بيضاء بنمط التذاكر العالمية مع خط فاصل تخريمي ناعم، ورمز QR تجريبي غير سريري يحافظ على بروتوكول AAFIYA-APPT.
+            </p>
+          </div>
+          <div class="pt-2 border-t border-slate-100 text-[11px] text-slate-500 space-y-1">
+            <div><strong>تصحيحات الامتثال:</strong> حفظ بنية بروتوكول AAFIYA-APPT:v1 المشفر، تنبيه النموذج التوضيحي.</div>
+            <div class="text-teal-700 font-mono text-[10px]">البروتوكول: AAFIYA-APPT:v1:... (Non-mutated)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen 4: Doctor Discovery -->
+      <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
+        <div class="bg-slate-100 p-2 border-b border-slate-200 flex justify-center">
+          <img src="../patient/proposed/patient_doctors_proposed.jpg" alt="Doctors Directory" class="rounded-xl max-h-96 object-contain shadow-sm">
+        </div>
+        <div class="p-4 space-y-3 flex-1 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-xs mb-1">
+              <span class="font-bold text-slate-500">دليل الأطباء والبحث</span>
+              <span class="badge-designed text-[10px] px-2 py-0.5 rounded-full font-bold">DESIGNED</span>
+            </div>
+            <h3 class="font-bold text-base text-slate-900">البحث والتصفية حسب التخصص والولاية</h3>
+            <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+              شريط بحث عالي الوضوح، رقاقات تخصص طبية بأهداف لمس 48dp، وبطاقات أطباء تعرض التخصص، سنوات الخبرة، وأقرب موعد متاح.
+            </p>
+          </div>
+          <div class="pt-2 border-t border-slate-100 text-[11px] text-slate-500 space-y-1">
+            <div><strong>تصحيحات الامتثال:</strong> حقول إدخال 52dp وأهداف لمس الرقاقات الموسعة 48dp.</div>
+            <div class="text-teal-700 font-mono text-[10px]">حقل البحث: 52dp | تباين التخصص: 5.47:1</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen 5: Prescriptions -->
+      <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
+        <div class="bg-slate-100 p-2 border-b border-slate-200 flex justify-center">
+          <img src="../patient/proposed/patient_rx_proposed.jpg" alt="Prescriptions & Schedule" class="rounded-xl max-h-96 object-contain shadow-sm">
+        </div>
+        <div class="p-4 space-y-3 flex-1 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-xs mb-1">
+              <span class="font-bold text-slate-500">الوصفات والمواعيد الدوائية</span>
+              <span class="badge-revised text-[10px] px-2 py-0.5 rounded-full font-bold">REVISED</span>
+            </div>
+            <h3 class="font-bold text-base text-slate-900">جدول تناول الأدوية والتذكير اليومي</h3>
+            <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+              بطاقات جرعات يومية مع خانة تأكيد التناول، متوافقة تماماً مع قفل السجلات السريرية V1 (تذكيرات محلية بدون مزامنة طبية محظورة).
+            </p>
+          </div>
+          <div class="pt-2 border-t border-slate-100 text-[11px] text-slate-500 space-y-1">
+            <div><strong>تصحيحات الامتثال:</strong> شطب كود التشغيلة الوهمي BATCH-2026-10 ورقم الوصفة RX-DZ.</div>
+            <div class="text-teal-700 font-mono text-[10px]">قفل السجلات: مغلق إدارياً V1</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen 6: Emergency -->
+      <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
+        <div class="bg-slate-100 p-2 border-b border-slate-200 flex justify-center">
+          <img src="../patient/proposed/patient_emergency_proposed.jpg" alt="Emergency Assistance" class="rounded-xl max-h-96 object-contain shadow-sm">
+        </div>
+        <div class="p-4 space-y-3 flex-1 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-xs mb-1">
+              <span class="font-bold text-slate-500">شاشة الطوارئ والمساعدة</span>
+              <span class="badge-revised text-[10px] px-2 py-0.5 rounded-full font-bold">REVISED</span>
+            </div>
+            <h3 class="font-bold text-base text-slate-900">أرقام الطوارئ والتوجيه السريع</h3>
+            <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+              بطاقات اتصال مباشر للحماية المدنية (14) والشرطة (17) والدرك (1055) مع تنبيه سريري وإرشادات الإسعاف الأولي.
+            </p>
+          </div>
+          <div class="pt-2 border-t border-slate-100 text-[11px] text-slate-500 space-y-1">
+            <div><strong>تصحيحات الامتثال:</strong> إزالة زمرة الدم O+ والحساسيات المحظورة بموجب قرار 2026-10-29.</div>
+            <div class="text-teal-700 font-mono text-[10px]">أرقام الطوارئ: رسمية وطنية | السجلات: محيدة</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 2: Aafiya Pro -->
+  <section class="space-y-6 pt-6 border-t border-slate-200">
+    <div class="flex items-center justify-between">
+      <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+        <span class="w-3 h-3 rounded-full bg-blue-600"></span>
+        تطبيق الممارسين والعيادات (Aafiya Pro)
+      </h2>
+      <div class="flex items-center gap-2">
+        <span class="badge-revised text-xs px-2.5 py-0.5 rounded-full font-bold">5 REVISED</span>
+        <span class="badge-designed text-xs px-2.5 py-0.5 rounded-full font-bold">2 DESIGNED</span>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Screen 7: Pro Auth -->
+      <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
+        <div class="bg-slate-100 p-2 border-b border-slate-200 flex justify-center">
+          <img src="../pro/proposed/pro_auth_proposed.jpg" alt="Pro Authentication" class="rounded-xl max-h-96 object-contain shadow-sm">
+        </div>
+        <div class="p-4 space-y-3 flex-1 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-xs mb-1">
+              <span class="font-bold text-slate-500">المصادقة وتسجيل الدخول</span>
+              <span class="badge-designed text-[10px] px-2 py-0.5 rounded-full font-bold">DESIGNED</span>
+            </div>
+            <h3 class="font-bold text-base text-slate-900">دخول المهنيين والتحقق الثنائي</h3>
+            <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+              تصميم نخبوي يعكس الرصانة الطبية مع حقول إدخال واضحة، محدد اللغة (عربي / فرنسي / إنجليزي)، وزر دخول 52dp.
+            </p>
+          </div>
+          <div class="pt-2 border-t border-slate-100 text-[11px] text-slate-500 space-y-1">
+            <div><strong>المعايير المعتمدة:</strong> التحقق من الدور الوظيفي، أهداف لمس قياسية.</div>
+            <div class="text-teal-700 font-mono text-[10px]">التباين: 17.85:1 | زر الدخول: 52dp</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen 8: Doctor Queue -->
+      <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
+        <div class="bg-slate-100 p-2 border-b border-slate-200 flex justify-center">
+          <img src="../pro/proposed/pro_doctor_queue_proposed.jpg" alt="Doctor Queue Management" class="rounded-xl max-h-96 object-contain shadow-sm">
+        </div>
+        <div class="p-4 space-y-3 flex-1 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-xs mb-1">
+              <span class="font-bold text-slate-500">طابور الفحص والعيادة</span>
+              <span class="badge-revised text-[10px] px-2 py-0.5 rounded-full font-bold">REVISED</span>
+            </div>
+            <h3 class="font-bold text-base text-slate-900">إدارة طابور المرضى الحي</h3>
+            <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+              عرض المريض الحالي في الفحص مع توقيت الزيارة، وقائمة الانتظار مرتبة تسلسلياً مع إجراءات النداء السريع والإتمام.
+            </p>
+          </div>
+          <div class="pt-2 border-t border-slate-100 text-[11px] text-slate-500 space-y-1">
+            <div><strong>تصحيحات الامتثال:</strong> شطب متوسط الانتظار الثابت 16 دقيقة، استبداله بمؤقت حي.</div>
+            <div class="text-teal-700 font-mono text-[10px]">بطاقات المرضى: أهداف لمس &ge; 72dp</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen 9: Pro Dashboard -->
+      <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
+        <div class="bg-slate-100 p-2 border-b border-slate-200 flex justify-center">
+          <img src="../pro/proposed/pro_dashboard_proposed.jpg" alt="Pro Analytics Dashboard" class="rounded-xl max-h-96 object-contain shadow-sm">
+        </div>
+        <div class="p-4 space-y-3 flex-1 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-xs mb-1">
+              <span class="font-bold text-slate-500">لوحة التحكم والمؤشرات</span>
+              <span class="badge-revised text-[10px] px-2 py-0.5 rounded-full font-bold">REVISED</span>
+            </div>
+            <h3 class="font-bold text-base text-slate-900">لوحة الإحصائيات والأداء اليومي</h3>
+            <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+              بطاقات ملخص ديناميكية للمواعيد، حضور العيادة، ومؤشرات الأداء السريري مع رسم بياني تدفقي هادئ.
+            </p>
+          </div>
+          <div class="pt-2 border-t border-slate-100 text-[11px] text-slate-500 space-y-1">
+            <div><strong>تصحيحات الامتثال:</strong> تطهير النسب الوهمية (12%، 94% إشغال، 18 كشف).</div>
+            <div class="text-teal-700 font-mono text-[10px]">القيم: ديناميكية من الخادم الحقيقي</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen 10: Pro Booking -->
+      <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
+        <div class="bg-slate-100 p-2 border-b border-slate-200 flex justify-center">
+          <img src="../pro/proposed/pro_booking_proposed.jpg" alt="Pro Appointment Booking" class="rounded-xl max-h-96 object-contain shadow-sm">
+        </div>
+        <div class="p-4 space-y-3 flex-1 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-xs mb-1">
+              <span class="font-bold text-slate-500">حجز موعد للمريض</span>
+              <span class="badge-designed text-[10px] px-2 py-0.5 rounded-full font-bold">DESIGNED</span>
+            </div>
+            <h3 class="font-bold text-base text-slate-900">نافذة الحجز السريع لمساعد الطبيب</h3>
+            <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+              إدخال الاسم ورقم الهاتف، اختيار فترة الموعد وتأكيد الحجز الفوري مع خيار طباعة أو إرسال تذكرة الزيارة.
+            </p>
+          </div>
+          <div class="pt-2 border-t border-slate-100 text-[11px] text-slate-500 space-y-1">
+            <div><strong>المعايير المعتمدة:</strong> تدفق سريع بحد أدنى من الحقول وأزرار تأكيد 52dp.</div>
+            <div class="text-teal-700 font-mono text-[10px]">مساحة اللمس: 52dp | المدخلات: واضحة</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen 11: Assistant Rewards -->
+      <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
+        <div class="bg-slate-100 p-2 border-b border-slate-200 flex justify-center">
+          <img src="../pro/proposed/pro_rewards_proposed.jpg" alt="Assistant Rewards Ledger" class="rounded-xl max-h-96 object-contain shadow-sm">
+        </div>
+        <div class="p-4 space-y-3 flex-1 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-xs mb-1">
+              <span class="font-bold text-slate-500">سجل مكافآت المساعد</span>
+              <span class="badge-revised text-[10px] px-2 py-0.5 rounded-full font-bold">REVISED</span>
+            </div>
+            <h3 class="font-bold text-base text-slate-900">دفتر الحسابات ومستحقات المساعدين</h3>
+            <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+              عرض الرصيد المستحق وسجل الدفعات بنظام FIFO، مع تمييز استحقاقات الحصص والديون المرحلة وفق منطق النظام المالي الحقيقي.
+            </p>
+          </div>
+          <div class="pt-2 border-t border-slate-100 text-[11px] text-slate-500 space-y-1">
+            <div><strong>تصحيحات الامتثال:</strong> شطب رقم 42,500 دج وسقف 50,000 دج، ربط بالسقف الديناميكي.</div>
+            <div class="text-teal-700 font-mono text-[10px]">المنطق المالي: FIFO مع ترحيل الديون</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen 12: Doctor Schedule -->
+      <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
+        <div class="bg-slate-100 p-2 border-b border-slate-200 flex justify-center">
+          <img src="../pro/proposed/pro_schedule_proposed.jpg" alt="Doctor Schedule & Lock" class="rounded-xl max-h-96 object-contain shadow-sm">
+        </div>
+        <div class="p-4 space-y-3 flex-1 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-xs mb-1">
+              <span class="font-bold text-slate-500">جدول الدوام وقفل المواعيد</span>
+              <span class="badge-revised text-[10px] px-2 py-0.5 rounded-full font-bold">REVISED</span>
+            </div>
+            <h3 class="font-bold text-base text-slate-900">جدولة أوقات العمل وبطاقة القفل النهائي</h3>
+            <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+              تحديد فترات الاستقبال، وأزرار تفعيل الأيام، مع بطاقة تحذيرية صريحة توضح أن اعتماد الدوام يترتب عليه قفل نهائي غير قابل للرجوع في V1.
+            </p>
+          </div>
+          <div class="pt-2 border-t border-slate-100 text-[11px] text-slate-500 space-y-1">
+            <div><strong>تصحيحات الامتثال:</strong> بطاقة قفل تنظيمي نهائي غير قابل للإلغاء من التطبيق.</div>
+            <div class="text-teal-700 font-mono text-[10px]">القفل: دائم تنظيمي V1 مع تأكيد مضاعف</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen 13: QR Scanner -->
+      <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
+        <div class="bg-slate-100 p-2 border-b border-slate-200 flex justify-center">
+          <img src="../pro/proposed/pro_scanner_proposed.jpg" alt="QR Ticket Scanner" class="rounded-xl max-h-96 object-contain shadow-sm">
+        </div>
+        <div class="p-4 space-y-3 flex-1 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between text-xs mb-1">
+              <span class="font-bold text-slate-500">ماسح تصاريح المواعيد</span>
+              <span class="badge-revised text-[10px] px-2 py-0.5 rounded-full font-bold">REVISED</span>
+            </div>
+            <h3 class="font-bold text-base text-slate-900">ماسح الكاميرا السريع لبروتوكول عافية</h3>
+            <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+              إطار تصويب الكاميرا مع شبكة محاذاة دقيقة، وزر تشغيل الفلاش، وتنبيه فوري لفك تشفير بروتوكول AAFIYA-APPT المشفر.
+            </p>
+          </div>
+          <div class="pt-2 border-t border-slate-100 text-[11px] text-slate-500 space-y-1">
+            <div><strong>تصحيحات الامتثال:</strong> الالتزام بالبروتوكول المشفر دون أي تعديل في صيغة التحقق.</div>
+            <div class="text-teal-700 font-mono text-[10px]">البروتوكول: AAFIYA-APPT:v1:... (Cryptographic)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-200 pt-8 pb-12 flex flex-col md:flex-row items-center justify-between text-xs text-slate-500 gap-4">
+    <div>
+      <span>مشروع عافية الطبي (AAFIYA) • وثيقة المراجعة البصرية وتدقيق الامتثال للسياسات</span>
+    </div>
+    <div class="flex items-center gap-4">
+      <span class="font-mono">Status: Awaiting Final User Approval</span>
+      <span class="font-mono">Track: Zero Mutation Mode</span>
+    </div>
+  </footer>
+
+</body>
+</html>

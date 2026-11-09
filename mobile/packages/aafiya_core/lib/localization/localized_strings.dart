@@ -18,7 +18,7 @@ class LocalizedStrings {
   bool get isEnglish => locale.languageCode == 'en';
 
   // Brand Identifiers
-  String get appBrandName => isArabic ? 'عافية' : 'AAFIYA';
+  String get appBrandName => isArabic ? 'عافية' : 'Aafiya';
   String get brandGatewaySlogan => isArabic
       ? 'بوابتك إلى العافية'
       : isFrench
@@ -26,8 +26,8 @@ class LocalizedStrings {
           : 'Your Gateway To Aafiya';
 
   // App Titles
-  String get patientAppTitle => isArabic ? 'عافية للمرضى' : 'AAFIYA Patient';
-  String get proAppTitle => isArabic ? 'عافية للمهنيين' : 'AAFIYA Pro';
+  String get patientAppTitle => isArabic ? 'عافية للمرضى' : 'Aafiya Patient';
+  String get proAppTitle => isArabic ? 'عافية للمهنيين' : 'Aafiya Pro';
 
   // Administrative / Feature Lock Notice (AAFIYA-UI-FEATURE-LOCK-01 / AAFIYA-MOBILE-UI-FEATURE-LOCK-01)
   String get featureLockedNotice => isArabic
@@ -661,10 +661,10 @@ class LocalizedStrings {
           : 'This account is not authorized to access this application.';
 
   String get proAccountGuidance => isArabic
-      ? 'هذا الحساب مخصص للكوادر الطبية والإدارية. يرجى استخدام تطبيق عافية للمهنيين (AAFIYA Pro).'
+      ? 'هذا الحساب مخصص للكوادر الطبية والإدارية. يرجى استخدام تطبيق عافية للمهنيين (Aafiya Pro).'
       : isFrench
-          ? 'Ce compte est réservé aux professionnels. Veuillez utiliser AAFIYA Pro.'
-          : 'This account is designated for medical staff. Please use AAFIYA Pro.';
+          ? 'Ce compte est réservé aux professionnels. Veuillez utiliser Aafiya Pro.'
+          : 'This account is designated for medical staff. Please use Aafiya Pro.';
 
   String get webOnlyRoleMessage => isArabic
       ? 'الوظائف الإدارية والتشخيصية مخصصة للاستخدام عبر بوابة الويب حصرياً.'

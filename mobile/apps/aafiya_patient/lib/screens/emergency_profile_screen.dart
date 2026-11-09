@@ -81,6 +81,7 @@ class _EmergencyProfileScreenState extends State<EmergencyProfileScreen> {
           IconButton(
             icon: const Icon(Icons.share_rounded),
             tooltip: strings.shareMedicalRecordTitle,
+            constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
             onPressed: () => PatientShareRecordDialog.show(context, apiClient: widget.apiClient),
           ),
         ],
@@ -573,6 +574,7 @@ class _EmergencyProfileScreenState extends State<EmergencyProfileScreen> {
           IconButton(
             icon: const Icon(Icons.phone_in_talk, color: AafiyaColors.healthBlue),
             tooltip: strings.call,
+            constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(

@@ -603,7 +603,7 @@
   },
   "directory": {
     "section_badge": "Unified Search Directory",
-    "title": "Search the AAFIYA Healthcare Network",
+    "title": "Search the Aafiya Healthcare Network",
     "description": "Explore the list of certified doctors, booking centers, test labs, and radiology centers in one place.",
     "search_placeholder": "Search by name, specialty, or location...",
     "all_provinces": "All Provinces",
@@ -886,13 +886,13 @@
     "quickStats": "Quick Stats",
     "platformStable": "Platform performance is 100% stable",
     "header": {
-      "platformName": "AAFIYA",
+      "platformName": "Aafiya",
       "platformTagline": "Your Gateway To Health",
       "welcome": "Welcome",
       "welcomeWithName": "Welcome, {name}",
       "welcomeDoctor": "Welcome, Dr. {name}",
       "welcomeBack": "Welcome back, {name}",
-      "adminSubtitle": "Responsible for overseeing the AAFIYA platform",
+      "adminSubtitle": "Responsible for overseeing the Aafiya platform",
       "roles": {
         "doctor": "Attending Physician",
         "doctorDirector": "Physician & Clinic Director",
@@ -914,7 +914,7 @@
         "laboratory": "Diagnostic Lab",
         "radiology": "Imaging Center",
         "bookingCenter": "Booking Center",
-        "centralOperations": "Central Operations - AAFIYA",
+        "centralOperations": "Central Operations - Aafiya",
         "verifiedAccount": "Verified Account"
       },
       "logout": "Logout",
@@ -3771,7 +3771,7 @@
   },
   "appDownload": {
     "sectionBadge": "Mobile Applications",
-    "title": "Download AAFIYA Apps",
+    "title": "Download Aafiya Apps",
     "titleAccent": "on Your Phone",
     "subtitle": "Fast and secure access to your medical appointments, health records, and clinical care anytime, anywhere.",
     "desktopScanNotice": "Scan the QR code with your phone camera for instant download",
@@ -3781,17 +3781,17 @@
     "officialBuild": "Android Package (APK)",
     "patient": {
       "badge": "Patient Application",
-      "name": "AAFIYA",
+      "name": "Aafiya",
       "platform": "Android 7.0+ (APK)",
       "description": "View appointments, access unified health records, inspect digital prescriptions, and receive real-time notices.",
       "downloadButton": "Download Patient App (APK)"
     },
     "pro": {
       "badge": "Clinical & Professional App",
-      "name": "AAFIYA Pro",
+      "name": "Aafiya Pro",
       "platform": "Android 7.0+ (APK)",
       "description": "Manage clinical queues, handle follow-up escalations, consult verified patient EHR, and streamline practice care.",
-      "downloadButton": "Download AAFIYA Pro (APK)"
+      "downloadButton": "Download Aafiya Pro (APK)"
     }
   },
   "ticker": {
@@ -3805,7 +3805,7 @@
   },
   "trust_privacy": {
     "section_badge": "Trust & Security",
-    "title": "Trust and privacy are fundamental to AAFIYA",
+    "title": "Trust and privacy are fundamental to Aafiya",
     "subtitle": "A digital health platform built on rigorous access controls and verified governance policies to protect patient and provider medical records.",
     "pillar_footer": "Verified operational mechanisms",
     "pillars": {

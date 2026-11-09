@@ -42,6 +42,23 @@ class VisitPassSheet extends StatelessWidget {
 
   bool get _isAttended => appointment.status == AppointmentStatus.attended;
 
+  AafiyaStatusType _resolveStatusType(AppointmentStatus status) {
+    return switch (status) {
+      AppointmentStatus.confirmed => AafiyaStatusType.confirmed,
+      AppointmentStatus.pending => AafiyaStatusType.pending,
+      AppointmentStatus.attended ||
+      AppointmentStatus.expired =>
+        AafiyaStatusType.concluded,
+      AppointmentStatus.cancelled ||
+      AppointmentStatus.rejected ||
+      AppointmentStatus.noShow =>
+        AafiyaStatusType.urgent,
+      AppointmentStatus.rescheduled ||
+      AppointmentStatus.unknown =>
+        AafiyaStatusType.custom,
+    };
+  }
+
   Color _resolveStatusColor(AppointmentStatus status) {
     return switch (status) {
       AppointmentStatus.pending => AafiyaColors.warning,
@@ -58,7 +75,6 @@ class VisitPassSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final strings = LocalizedStrings.of(context);
-    final statusColor = _resolveStatusColor(appointment.status);
     final isRtl = Directionality.of(context) == TextDirection.rtl;
 
     return DraggableScrollableSheet(
@@ -133,6 +149,7 @@ class VisitPassSheet extends StatelessWidget {
                       ),
                     ),
                     IconButton(
+                      constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
                       icon: const Icon(Icons.close_rounded),
                       tooltip: strings.close,
                       onPressed: () => Navigator.of(context).pop(),
@@ -152,20 +169,9 @@ class VisitPassSheet extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: statusColor.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(AafiyaRadius.sm),
-                            border: Border.all(color: statusColor.withValues(alpha: 0.4)),
-                          ),
-                          child: Text(
-                            strings.statusLabel(appointment.status),
-                            style: AafiyaTypography.bodyMedium.copyWith(
-                              color: statusColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                        AafiyaStatusChip(
+                          label: strings.statusLabel(appointment.status),
+                          type: _resolveStatusType(appointment.status),
                         ),
                         InkWell(
                           onTap: () {
@@ -323,6 +329,7 @@ class VisitPassSheet extends StatelessWidget {
                     // Close Button
                     AafiyaButton(
                       label: strings.close,
+                      height: 52.0,
                       onPressed: () => Navigator.of(context).pop(),
                       variant: AafiyaButtonVariant.outline,
                     ),

@@ -537,6 +537,7 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
           showBrandMark: true,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_rounded),
+            constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ),
@@ -558,6 +559,7 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
         showBrandMark: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded),
+          constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -594,6 +596,7 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
                 label: _isSubmitting
                     ? strings.bookingInProgress
                     : strings.confirmBookingButton,
+                height: 52.0,
                 isLoading: _isSubmitting,
                 onPressed: _isSubmitting ? null : _handleSubmit,
                 variant: AafiyaButtonVariant.primary,

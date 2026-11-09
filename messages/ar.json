@@ -3782,17 +3782,17 @@
     "officialBuild": "حزمة أندرويد (APK)",
     "patient": {
       "badge": "تطبيق المرضى",
-      "name": "AAFIYA",
+      "name": "Aafiya",
       "platform": "Android 7.0+ (APK)",
       "description": "استعراض المواعيد، متابعة السجل الطبي الموحد، الاطلاع على الوصفات الرقمية وتلقي إشعارات المواعيد الفورية.",
       "downloadButton": "تحميل تطبيق المرضى (APK)"
     },
     "pro": {
       "badge": "تطبيق الأطباء والعيادات",
-      "name": "AAFIYA Pro",
+      "name": "Aafiya Pro",
       "platform": "Android 7.0+ (APK)",
       "description": "إدارة طابور الانتظار، متابعة حالات التصعيد، استعراض الملفات الطبية، والتواصل المهني السريري المعتمد.",
-      "downloadButton": "تحميل تطبيق AAFIYA Pro (APK)"
+      "downloadButton": "تحميل تطبيق Aafiya Pro (APK)"
     }
   },
   "ticker": {

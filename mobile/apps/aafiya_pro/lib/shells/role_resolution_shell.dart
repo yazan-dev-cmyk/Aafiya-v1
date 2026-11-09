@@ -69,6 +69,7 @@ class RoleResolutionShell extends StatelessWidget {
               IconButton(
                 icon: const Icon(Icons.logout_rounded),
                 tooltip: strings.signOut,
+                constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
                 onPressed: () async {
                   await sessionManager.logout();
                   onSignOut();
@@ -96,6 +97,7 @@ class RoleResolutionShell extends StatelessWidget {
               IconButton(
                 icon: const Icon(Icons.logout_rounded),
                 tooltip: strings.signOut,
+                constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
                 onPressed: () async {
                   await sessionManager.logout();
                   onSignOut();

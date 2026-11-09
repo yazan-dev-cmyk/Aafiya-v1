@@ -292,6 +292,7 @@ class _CheckInSheetState extends State<CheckInSheet> {
               style: OutlinedButton.styleFrom(
                 foregroundColor: AafiyaColors.healingGreen,
                 side: const BorderSide(color: AafiyaColors.healingGreen),
+                minimumSize: const Size(0, 48),
                 padding: const EdgeInsets.symmetric(
                   horizontal: AafiyaSpacing.md,
                   vertical: AafiyaSpacing.sm + 2,
@@ -387,6 +388,9 @@ class _CheckInSheetState extends State<CheckInSheet> {
               children: [
                 Expanded(
                   child: TextButton(
+                    style: TextButton.styleFrom(
+                      minimumSize: const Size(0, 52),
+                    ),
                     onPressed: _isLoading
                         ? null
                         : () => Navigator.of(context).pop(false),
@@ -398,6 +402,7 @@ class _CheckInSheetState extends State<CheckInSheet> {
                   flex: 2,
                   child: AafiyaButton(
                     label: strings.submitCheckIn,
+                    height: 52.0,
                     isLoading: _isLoading,
                     onPressed: _submitCheckIn,
                     icon: const Icon(Icons.check_circle_outline_rounded,

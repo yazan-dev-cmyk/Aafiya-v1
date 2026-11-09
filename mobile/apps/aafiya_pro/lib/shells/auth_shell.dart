@@ -200,6 +200,8 @@ class _ProAuthShellState extends State<ProAuthShell> {
                               ? Icons.visibility_outlined
                               : Icons.visibility_off_outlined,
                         ),
+                        constraints:
+                            const BoxConstraints(minWidth: 48, minHeight: 48),
                         tooltip: _obscurePassword
                             ? strings.showPassword
                             : strings.hidePassword,
@@ -234,6 +236,7 @@ class _ProAuthShellState extends State<ProAuthShell> {
                     const SizedBox(height: 24),
                     AafiyaButton(
                       label: strings.signIn,
+                      height: 52.0,
                       isLoading: _isLoading,
                       onPressed: _isLoading ? null : _handleLogin,
                     ),

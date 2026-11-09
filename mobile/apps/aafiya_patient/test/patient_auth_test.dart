@@ -455,7 +455,7 @@ void main() {
         // Rejection Dialog appears
         expect(find.byType(AlertDialog), findsOneWidget);
         expect(find.text('الحساب الحالي غير مصرح له بالدخول إلى هذا التطبيق.'), findsOneWidget);
-        expect(find.text('هذا الحساب مخصص للكوادر الطبية والإدارية. يرجى استخدام تطبيق عافية للمهنيين (AAFIYA Pro).'), findsOneWidget);
+        expect(find.text('هذا الحساب مخصص للكوادر الطبية والإدارية. يرجى استخدام تطبيق عافية للمهنيين (Aafiya Pro).'), findsOneWidget);
 
         // Crucial: Must NOT navigate to Patient Home and token must NOT be stored
         expect(find.byType(PatientHomeShell), findsNothing);

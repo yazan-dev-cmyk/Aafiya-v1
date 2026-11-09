@@ -375,6 +375,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
       appBar: AafiyaAppBar(
         title: strings.appointmentDetails,
         leading: IconButton(
+          constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
           icon: const Icon(Icons.close_rounded),
           tooltip: strings.close,
           onPressed: () => Navigator.of(context).pop(),
@@ -401,22 +402,9 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: statusColor.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(AafiyaRadius.sm),
-                        border: Border.all(
-                            color: statusColor.withValues(alpha: 0.4)),
-                      ),
-                      child: Text(
-                        strings.statusLabel(appointment.status),
-                        style: AafiyaTypography.titleMedium.copyWith(
-                          color: statusColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                    AafiyaStatusChip(
+                      label: strings.statusLabel(appointment.status),
+                      type: _resolveStatusType(appointment.status),
                     ),
                   ],
                 ),
@@ -747,6 +735,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
                         ? 'Pass de visite digital (QR)'
                         : 'Digital Visit Pass (QR)',
                 icon: const Icon(Icons.qr_code_2_rounded, size: 20),
+                height: 52.0,
                 onPressed: () =>
                     VisitPassSheet.show(context, appointment: appointment),
                 variant: AafiyaButtonVariant.primary,
@@ -760,6 +749,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
                   label: strings.rescheduleAppointmentTitle,
                   icon: const Icon(Icons.edit_calendar_outlined,
                       size: 20, color: AafiyaColors.healthBlue),
+                  height: 52.0,
                   onPressed: _isCancelling ? null : _handleReschedule,
                   variant: AafiyaButtonVariant.outline,
                 ),
@@ -773,6 +763,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
                   label: strings.cancelAppointmentTitle,
                   icon: const Icon(Icons.cancel_outlined,
                       size: 20, color: AafiyaColors.error),
+                  height: 52.0,
                   onPressed: _isCancelling ? null : _handleCancel,
                   isLoading: _isCancelling,
                   variant: AafiyaButtonVariant.outline,
@@ -783,6 +774,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
               // 8. Close Action Button
               AafiyaButton(
                 label: strings.close,
+                height: 52.0,
                 onPressed: () => Navigator.of(context).pop(),
                 variant: AafiyaButtonVariant.outline,
               ),
@@ -792,6 +784,23 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
         ),
       ),
     );
+  }
+
+  AafiyaStatusType _resolveStatusType(AppointmentStatus status) {
+    return switch (status) {
+      AppointmentStatus.confirmed => AafiyaStatusType.confirmed,
+      AppointmentStatus.pending => AafiyaStatusType.pending,
+      AppointmentStatus.attended ||
+      AppointmentStatus.expired =>
+        AafiyaStatusType.concluded,
+      AppointmentStatus.cancelled ||
+      AppointmentStatus.rejected ||
+      AppointmentStatus.noShow =>
+        AafiyaStatusType.urgent,
+      AppointmentStatus.rescheduled ||
+      AppointmentStatus.unknown =>
+        AafiyaStatusType.custom,
+    };
   }
 
   Color _resolveStatusColor(AppointmentStatus status) {

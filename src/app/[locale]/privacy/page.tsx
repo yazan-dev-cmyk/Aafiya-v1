@@ -4,8 +4,8 @@ import Link from 'next/link';
 import { ArrowLeft, ArrowRight, ShieldCheck, Lock, AlertTriangle, Eye, Server, FileCheck, CheckCircle } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'AAFIYA — Privacy Notice | إشعار الخصوصية وحماية المعطيات',
-  description: 'Privacy Notice and Data Protection Framework for AAFIYA Medical Services Platform',
+  title: 'Aafiya — Privacy Notice | إشعار الخصوصية وحماية المعطيات',
+  description: 'Privacy Notice and Data Protection Framework for Aafiya Medical Services Platform',
 };
 
 interface PrivacyContent {
@@ -86,15 +86,15 @@ const privacyData: Record<string, PrivacyContent> = {
     version: '2026.1 (Cadre technique de transparence)',
     effectiveDate: "Date d'effet : Octobre 2026",
     disclaimerTitle: 'Avis Juridique Préalable & Information Réglementaire',
-    disclaimerText: "Cette politique documente les mesures techniques et organisationnelles appliquées par AAFIYA, conformément à la Loi n° 18-07 relative à la protection des données personnelles (modifiée par la Loi n° 25-11) et à la Loi n° 18-11 relative à la santé. Elle constitue une base d'information technique dans l'attente de la formalisation administrative définitive auprès de l'ANPDP.",
+    disclaimerText: "Cette politique documente les mesures techniques et organisationnelles appliquées par Aafiya, conformément à la Loi n° 18-07 relative à la protection des données personnelles (modifiée par la Loi n° 25-11) et à la Loi n° 18-11 relative à la santé. Elle constitue une base d'information technique dans l'attente de la formalisation administrative définitive auprès de l'ANPDP.",
     backHome: "Retour à l'accueil",
     sections: [
       {
         id: 'data-controller',
         title: '1. Identification et Rôles (Article 32 de la Loi 18-07)',
         content: [
-          "L'infrastructure est opérée par AAFIYA en qualité de fournisseur de solution technique (SaaS).",
-          "Les praticiens et centres médicaux sont responsables du traitement des données cliniques de leurs patients. AAFIYA intervient en qualité de sous-traitant technique soumis au strict respect du secret médical et de la confidentialité (Article 41 de la Loi 18-07 et Article 67 de la Loi 18-11).",
+          "L'infrastructure est opérée par Aafiya en qualité de fournisseur de solution technique (SaaS).",
+          "Les praticiens et centres médicaux sont responsables du traitement des données cliniques de leurs patients. Aafiya intervient en qualité de sous-traitant technique soumis au strict respect du secret médical et de la confidentialité (Article 41 de la Loi 18-07 et Article 67 de la Loi 18-11).",
         ],
       },
       {
@@ -138,15 +138,15 @@ const privacyData: Record<string, PrivacyContent> = {
     version: '2026.1 (Technical Transparency Baseline)',
     effectiveDate: 'Effective Date: October 2026',
     disclaimerTitle: 'Preliminary Regulatory Notice',
-    disclaimerText: 'This notice documents the technical and organizational safeguards implemented by AAFIYA under Algerian Law 18-07 (as amended by Law 25-11) and Public Health Law 18-11. It provides operational transparency pending formal administrative certification by the National Authority (ANPDP).',
+    disclaimerText: 'This notice documents the technical and organizational safeguards implemented by Aafiya under Algerian Law 18-07 (as amended by Law 25-11) and Public Health Law 18-11. It provides operational transparency pending formal administrative certification by the National Authority (ANPDP).',
     backHome: 'Back to Home',
     sections: [
       {
         id: 'data-controller',
         title: '1. Governance Roles (Article 32 of Law 18-07)',
         content: [
-          'The platform infrastructure is provided by AAFIYA as a technical software provider (SaaS).',
-          'Licensed healthcare practitioners and medical centers act as Controllers for clinical data. AAFIYA acts as a technical Processor bound by strict confidentiality and professional medical secrecy (Law 18-07 Art. 41 and Health Law 18-11 Art. 67).',
+          'The platform infrastructure is provided by Aafiya as a technical software provider (SaaS).',
+          'Licensed healthcare practitioners and medical centers act as Controllers for clinical data. Aafiya acts as a technical Processor bound by strict confidentiality and professional medical secrecy (Law 18-07 Art. 41 and Health Law 18-11 Art. 67).',
         ],
       },
       {
@@ -268,7 +268,7 @@ export default async function PrivacyPage({
         {/* Footer Nav Bar */}
         <div className="pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 font-medium">
           <div>
-            AAFIYA Digital Medical Services &copy; 2026. All rights reserved.
+            Aafiya Digital Medical Services &copy; 2026. All rights reserved.
           </div>
           <div className="flex items-center gap-4">
             <Link href={`/${locale}/terms`} className="text-teal-600 font-bold hover:underline">

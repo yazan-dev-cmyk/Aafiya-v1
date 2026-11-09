@@ -196,6 +196,7 @@ class _PatientSummarySheetState extends State<PatientSummarySheet> {
           IconButton(
             icon: const Icon(Icons.close, color: AafiyaColors.secondaryText),
             tooltip: strings.closeButtonLabel,
+            constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ],
