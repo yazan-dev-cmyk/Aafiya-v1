@@ -67,7 +67,8 @@ class _AafiyaOfflineBannerState extends State<AafiyaOfflineBanner>
       });
     }
 
-    _subscription = widget.connectivityService.onConnectivityChanged.listen((online) {
+    _subscription =
+        widget.connectivityService.onConnectivityChanged.listen((online) {
       if (!mounted) return;
 
       if (!online) {
@@ -121,9 +122,13 @@ class _AafiyaOfflineBannerState extends State<AafiyaOfflineBanner>
     final strings = LocalizedStrings.of(context);
     final isReconnected = _showReconnected;
 
-    final Color bgColor = isReconnected ? AafiyaColors.success : const Color(0xFFDC2626); // Alert red
-    final IconData icon = isReconnected ? Icons.wifi_rounded : Icons.wifi_off_rounded;
-    final String message = isReconnected ? strings.offlineReconnected : strings.offlineBannerTitle;
+    final Color bgColor = isReconnected
+        ? AafiyaColors.success
+        : const Color(0xFFDC2626); // Alert red
+    final IconData icon =
+        isReconnected ? Icons.wifi_rounded : Icons.wifi_off_rounded;
+    final String message =
+        isReconnected ? strings.offlineReconnected : strings.offlineBannerTitle;
 
     return SlideTransition(
       position: _slideAnimation,

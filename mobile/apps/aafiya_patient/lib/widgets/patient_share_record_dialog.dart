@@ -45,7 +45,8 @@ class PatientShareRecordDialog extends StatefulWidget {
   }
 
   @override
-  State<PatientShareRecordDialog> createState() => _PatientShareRecordDialogState();
+  State<PatientShareRecordDialog> createState() =>
+      _PatientShareRecordDialogState();
 }
 
 class _PatientShareRecordDialogState extends State<PatientShareRecordDialog> {
@@ -167,7 +168,8 @@ class _PatientShareRecordDialogState extends State<PatientShareRecordDialog> {
             children: [
               const CircleAvatar(
                 backgroundColor: AafiyaColors.lightBackground,
-                child: Icon(Icons.share_rounded, color: AafiyaColors.healthBlue),
+                child:
+                    Icon(Icons.share_rounded, color: AafiyaColors.healthBlue),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -235,7 +237,8 @@ class _PatientShareRecordDialogState extends State<PatientShareRecordDialog> {
             decoration: InputDecoration(
               hintText: strings.sharePinInputHint,
               prefixIcon: const Icon(Icons.pin_rounded),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               counterText: '',
             ),
             validator: (value) {
@@ -266,7 +269,8 @@ class _PatientShareRecordDialogState extends State<PatientShareRecordDialog> {
                   Expanded(
                     child: Text(
                       _errorMessage!,
-                      style: AafiyaTypography.bodySmall.copyWith(color: AafiyaColors.error),
+                      style: AafiyaTypography.bodySmall
+                          .copyWith(color: AafiyaColors.error),
                     ),
                   ),
                 ],
@@ -312,7 +316,8 @@ class _PatientShareRecordDialogState extends State<PatientShareRecordDialog> {
           children: [
             const CircleAvatar(
               backgroundColor: AafiyaColors.healingGreenSurface,
-              child: Icon(Icons.check_circle_rounded, color: AafiyaColors.success),
+              child:
+                  Icon(Icons.check_circle_rounded, color: AafiyaColors.success),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -325,7 +330,8 @@ class _PatientShareRecordDialogState extends State<PatientShareRecordDialog> {
                   ),
                   Text(
                     '${strings.expiresOn} ${share.expiresAt.toLocal().toString().split('.').first}',
-                    style: AafiyaTypography.caption.copyWith(color: AafiyaColors.secondaryText),
+                    style: AafiyaTypography.caption
+                        .copyWith(color: AafiyaColors.secondaryText),
                   ),
                 ],
               ),
@@ -345,12 +351,14 @@ class _PatientShareRecordDialogState extends State<PatientShareRecordDialog> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.warning_amber_rounded, color: AafiyaColors.warning),
+              const Icon(Icons.warning_amber_rounded,
+                  color: AafiyaColors.warning),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   strings.shareOneTimeNotice,
-                  style: AafiyaTypography.bodySmall.copyWith(color: AafiyaColors.warning),
+                  style: AafiyaTypography.bodySmall
+                      .copyWith(color: AafiyaColors.warning),
                 ),
               ),
             ],
@@ -360,7 +368,8 @@ class _PatientShareRecordDialogState extends State<PatientShareRecordDialog> {
 
         // Share URL Card
         if (share.shareUrl != null) ...[
-          Text(strings.sharedRecordTokenLabel, style: AafiyaTypography.labelLarge),
+          Text(strings.sharedRecordTokenLabel,
+              style: AafiyaTypography.labelLarge),
           const SizedBox(height: 6),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -380,9 +389,11 @@ class _PatientShareRecordDialogState extends State<PatientShareRecordDialog> {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.copy_rounded, color: AafiyaColors.healthBlue),
+                  icon: const Icon(Icons.copy_rounded,
+                      color: AafiyaColors.healthBlue),
                   tooltip: strings.copyShareUrl,
-                  onPressed: () => _copyToClipboard(share.shareUrl!, strings.copiedToClipboard),
+                  onPressed: () => _copyToClipboard(
+                      share.shareUrl!, strings.copiedToClipboard),
                 ),
               ],
             ),
@@ -392,7 +403,8 @@ class _PatientShareRecordDialogState extends State<PatientShareRecordDialog> {
 
         // PIN Card
         if (pin.isNotEmpty) ...[
-          Text(strings.sharedRecordPinLabel, style: AafiyaTypography.labelLarge),
+          Text(strings.sharedRecordPinLabel,
+              style: AafiyaTypography.labelLarge),
           const SizedBox(height: 6),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -412,9 +424,11 @@ class _PatientShareRecordDialogState extends State<PatientShareRecordDialog> {
                 ),
                 const Spacer(),
                 IconButton(
-                  icon: const Icon(Icons.copy_rounded, color: AafiyaColors.healthBlue),
+                  icon: const Icon(Icons.copy_rounded,
+                      color: AafiyaColors.healthBlue),
                   tooltip: strings.copyPin,
-                  onPressed: () => _copyToClipboard(pin, strings.copiedToClipboard),
+                  onPressed: () =>
+                      _copyToClipboard(pin, strings.copiedToClipboard),
                 ),
               ],
             ),

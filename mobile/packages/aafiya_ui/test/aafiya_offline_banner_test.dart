@@ -44,7 +44,9 @@ void main() {
       expect(find.text('لا يوجد اتصال بالإنترنت'), findsNothing);
     });
 
-    testWidgets('Banner appears with warning styling when going offline (Arabic)', (tester) async {
+    testWidgets(
+        'Banner appears with warning styling when going offline (Arabic)',
+        (tester) async {
       await tester.pumpWidget(buildTestableWidget(
         locale: const Locale('ar'),
         child: AafiyaOfflineBanner(connectivityService: mockConnectivity),
@@ -60,7 +62,8 @@ void main() {
       expect(find.text('لا يوجد اتصال بالإنترنت'), findsOneWidget);
     });
 
-    testWidgets('Banner appears with English localization when going offline', (tester) async {
+    testWidgets('Banner appears with English localization when going offline',
+        (tester) async {
       await tester.pumpWidget(buildTestableWidget(
         locale: const Locale('en'),
         child: AafiyaOfflineBanner(connectivityService: mockConnectivity),
@@ -75,7 +78,8 @@ void main() {
       expect(find.text('No Internet Connection'), findsOneWidget);
     });
 
-    testWidgets('Banner transitions to green Reconnected and auto-dismisses', (tester) async {
+    testWidgets('Banner transitions to green Reconnected and auto-dismisses',
+        (tester) async {
       await tester.pumpWidget(buildTestableWidget(
         locale: const Locale('ar'),
         child: AafiyaOfflineBanner(

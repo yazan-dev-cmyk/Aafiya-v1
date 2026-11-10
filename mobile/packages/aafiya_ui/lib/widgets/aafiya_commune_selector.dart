@@ -85,7 +85,8 @@ class _AafiyaCommuneSelectorState extends State<AafiyaCommuneSelector> {
       _errorMessage = null;
     });
 
-    final result = await widget.masterDataService.getCommunes(code, forceRefresh: forceRefresh);
+    final result = await widget.masterDataService
+        .getCommunes(code, forceRefresh: forceRefresh);
     if (!mounted) return;
 
     switch (result) {
@@ -108,18 +109,22 @@ class _AafiyaCommuneSelectorState extends State<AafiyaCommuneSelector> {
   }
 
   void _syncSelectedCommune() {
-    if (widget.selectedCode == null || widget.selectedCode!.isEmpty || widget.selectedCode == 'all') {
+    if (widget.selectedCode == null ||
+        widget.selectedCode!.isEmpty ||
+        widget.selectedCode == 'all') {
       _selectedCommune = null;
     } else {
       _selectedCommune = _communes.cast<Commune?>().firstWhere(
-        (c) => c?.code == widget.selectedCode,
-        orElse: () => null,
-      );
+            (c) => c?.code == widget.selectedCode,
+            orElse: () => null,
+          );
     }
   }
 
   void _openSelectionModal(BuildContext context, LocalizedStrings strings) {
-    final isWilayaSelected = widget.wilayaCode != null && widget.wilayaCode!.isNotEmpty && widget.wilayaCode != 'all';
+    final isWilayaSelected = widget.wilayaCode != null &&
+        widget.wilayaCode!.isNotEmpty &&
+        widget.wilayaCode != 'all';
     if (!widget.enabled || !isWilayaSelected || _isLoading) return;
 
     showModalBottomSheet<void>(
@@ -150,11 +155,15 @@ class _AafiyaCommuneSelectorState extends State<AafiyaCommuneSelector> {
   Widget build(BuildContext context) {
     final strings = LocalizedStrings.of(context);
     final locale = Localizations.localeOf(context).languageCode;
-    final isWilayaSelected = widget.wilayaCode != null && widget.wilayaCode!.isNotEmpty && widget.wilayaCode != 'all';
+    final isWilayaSelected = widget.wilayaCode != null &&
+        widget.wilayaCode!.isNotEmpty &&
+        widget.wilayaCode != 'all';
     final isControlEnabled = widget.enabled && isWilayaSelected;
 
     final effectiveLabel = widget.label ?? strings.communeLabel;
-    final effectiveHint = isWilayaSelected ? (widget.hint ?? strings.selectCommune) : strings.selectWilayaFirst;
+    final effectiveHint = isWilayaSelected
+        ? (widget.hint ?? strings.selectCommune)
+        : strings.selectWilayaFirst;
 
     String displayText = '';
     if (_selectedCommune != null) {
@@ -174,23 +183,31 @@ class _AafiyaCommuneSelectorState extends State<AafiyaCommuneSelector> {
           Text(
             effectiveLabel,
             style: AafiyaTypography.titleSmall.copyWith(
-              color: isControlEnabled ? AafiyaColors.primaryText : AafiyaColors.secondaryText,
+              color: isControlEnabled
+                  ? AafiyaColors.primaryText
+                  : AafiyaColors.secondaryText,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: AafiyaSpacing.xs),
         ],
         InkWell(
-          onTap: isControlEnabled && !_isLoading ? () => _openSelectionModal(context, strings) : null,
+          onTap: isControlEnabled && !_isLoading
+              ? () => _openSelectionModal(context, strings)
+              : null,
           borderRadius: AafiyaRadius.borderMd,
           child: Container(
             height: 48,
             padding: const EdgeInsets.symmetric(horizontal: AafiyaSpacing.md),
             decoration: BoxDecoration(
-              color: isControlEnabled ? AafiyaColors.pureWhite : AafiyaColors.border.withValues(alpha: 0.2),
+              color: isControlEnabled
+                  ? AafiyaColors.pureWhite
+                  : AafiyaColors.border.withValues(alpha: 0.2),
               borderRadius: AafiyaRadius.borderMd,
               border: Border.all(
-                color: _errorMessage != null ? AafiyaColors.error : AafiyaColors.border,
+                color: _errorMessage != null
+                    ? AafiyaColors.error
+                    : AafiyaColors.border,
                 width: 1.5,
               ),
             ),
@@ -200,7 +217,8 @@ class _AafiyaCommuneSelectorState extends State<AafiyaCommuneSelector> {
                   const SizedBox(
                     width: 20,
                     height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: AafiyaColors.primaryBlue),
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2, color: AafiyaColors.primaryBlue),
                   )
                 else
                   Icon(
@@ -208,7 +226,9 @@ class _AafiyaCommuneSelectorState extends State<AafiyaCommuneSelector> {
                     size: 20,
                     color: _errorMessage != null
                         ? AafiyaColors.error
-                        : (_selectedCommune != null ? AafiyaColors.primaryBlue : AafiyaColors.secondaryText),
+                        : (_selectedCommune != null
+                            ? AafiyaColors.primaryBlue
+                            : AafiyaColors.secondaryText),
                   ),
                 const SizedBox(width: AafiyaSpacing.sm),
                 Expanded(
@@ -217,14 +237,18 @@ class _AafiyaCommuneSelectorState extends State<AafiyaCommuneSelector> {
                         ? strings.loadingCommunes
                         : (_errorMessage != null
                             ? _errorMessage!
-                            : (displayText.isNotEmpty ? displayText : effectiveHint)),
+                            : (displayText.isNotEmpty
+                                ? displayText
+                                : effectiveHint)),
                     style: AafiyaTypography.bodyMedium.copyWith(
                       color: _errorMessage != null
                           ? AafiyaColors.error
                           : (displayText.isNotEmpty
                               ? AafiyaColors.primaryText
                               : AafiyaColors.secondaryText),
-                      fontWeight: displayText.isNotEmpty ? FontWeight.w600 : FontWeight.normal,
+                      fontWeight: displayText.isNotEmpty
+                          ? FontWeight.w600
+                          : FontWeight.normal,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -232,7 +256,8 @@ class _AafiyaCommuneSelectorState extends State<AafiyaCommuneSelector> {
                 ),
                 if (_errorMessage != null)
                   IconButton(
-                    icon: const Icon(Icons.refresh_rounded, size: 18, color: AafiyaColors.error),
+                    icon: const Icon(Icons.refresh_rounded,
+                        size: 18, color: AafiyaColors.error),
                     onPressed: () => _checkAndLoadCommunes(forceRefresh: true),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
@@ -241,7 +266,9 @@ class _AafiyaCommuneSelectorState extends State<AafiyaCommuneSelector> {
                   Icon(
                     Icons.keyboard_arrow_down_rounded,
                     size: 20,
-                    color: isControlEnabled ? AafiyaColors.secondaryText : AafiyaColors.border,
+                    color: isControlEnabled
+                        ? AafiyaColors.secondaryText
+                        : AafiyaColors.border,
                   ),
               ],
             ),
@@ -314,7 +341,8 @@ class _CommuneSelectionSheetState extends State<_CommuneSelectionSheet> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AafiyaSpacing.lg, vertical: AafiyaSpacing.xs),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AafiyaSpacing.lg, vertical: AafiyaSpacing.xs),
               child: Row(
                 children: [
                   Text(
@@ -333,7 +361,8 @@ class _CommuneSelectionSheetState extends State<_CommuneSelectionSheet> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AafiyaSpacing.lg, vertical: AafiyaSpacing.xs),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AafiyaSpacing.lg, vertical: AafiyaSpacing.xs),
               child: TextField(
                 controller: _searchController,
                 onChanged: (val) => setState(() => _filter = val.trim()),
@@ -342,7 +371,8 @@ class _CommuneSelectionSheetState extends State<_CommuneSelectionSheet> {
                   prefixIcon: const Icon(Icons.search_rounded, size: 20),
                   filled: true,
                   fillColor: AafiyaColors.lightBackground,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                  contentPadding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
@@ -356,7 +386,8 @@ class _CommuneSelectionSheetState extends State<_CommuneSelectionSheet> {
                 child: Center(
                   child: Text(
                     widget.strings.noCommunesFound,
-                    style: AafiyaTypography.bodyMedium.copyWith(color: AafiyaColors.secondaryText),
+                    style: AafiyaTypography.bodyMedium
+                        .copyWith(color: AafiyaColors.secondaryText),
                   ),
                 ),
               )
@@ -364,38 +395,56 @@ class _CommuneSelectionSheetState extends State<_CommuneSelectionSheet> {
               Expanded(
                 child: ListView.builder(
                   controller: scrollController,
-                  itemCount: (widget.includeAllOption ? 1 : 0) + filtered.length,
+                  itemCount:
+                      (widget.includeAllOption ? 1 : 0) + filtered.length,
                   itemBuilder: (ctx, index) {
                     if (widget.includeAllOption && index == 0) {
-                      final isSelected = widget.selectedCode == null || widget.selectedCode == 'all';
+                      final isSelected = widget.selectedCode == null ||
+                          widget.selectedCode == 'all';
                       return ListTile(
                         title: Text(
                           widget.allOptionLabel,
                           style: TextStyle(
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                            color: isSelected ? AafiyaColors.primaryBlue : AafiyaColors.primaryText,
+                            fontWeight: isSelected
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                            color: isSelected
+                                ? AafiyaColors.primaryBlue
+                                : AafiyaColors.primaryText,
                           ),
                         ),
-                        trailing: isSelected ? const Icon(Icons.check_rounded, color: AafiyaColors.primaryBlue) : null,
+                        trailing: isSelected
+                            ? const Icon(Icons.check_rounded,
+                                color: AafiyaColors.primaryBlue)
+                            : null,
                         onTap: () => widget.onSelected(null),
                       );
                     }
 
-                    final itemIndex = widget.includeAllOption ? index - 1 : index;
+                    final itemIndex =
+                        widget.includeAllOption ? index - 1 : index;
                     final commune = filtered[itemIndex];
                     final isSelected = widget.selectedCode == commune.code;
                     final name = commune.localizedName(locale);
-                    final title = commune.postalCode != null ? '$name (${commune.postalCode})' : name;
+                    final title = commune.postalCode != null
+                        ? '$name (${commune.postalCode})'
+                        : name;
 
                     return ListTile(
                       title: Text(
                         title,
                         style: TextStyle(
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                          color: isSelected ? AafiyaColors.primaryBlue : AafiyaColors.primaryText,
+                          fontWeight:
+                              isSelected ? FontWeight.bold : FontWeight.normal,
+                          color: isSelected
+                              ? AafiyaColors.primaryBlue
+                              : AafiyaColors.primaryText,
                         ),
                       ),
-                      trailing: isSelected ? const Icon(Icons.check_rounded, color: AafiyaColors.primaryBlue) : null,
+                      trailing: isSelected
+                          ? const Icon(Icons.check_rounded,
+                              color: AafiyaColors.primaryBlue)
+                          : null,
                       onTap: () => widget.onSelected(commune),
                     );
                   },

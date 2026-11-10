@@ -41,7 +41,8 @@ class PatientQrDialog extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AafiyaRadius.sheet),
       ),
-      insetPadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
+      insetPadding:
+          const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 380.0),
         child: SingleChildScrollView(
@@ -62,7 +63,8 @@ class PatientQrDialog extends StatelessWidget {
                           height: 40.0,
                           decoration: BoxDecoration(
                             color: AafiyaColors.tealSoft,
-                            borderRadius: BorderRadius.circular(AafiyaRadius.sm),
+                            borderRadius:
+                                BorderRadius.circular(AafiyaRadius.sm),
                           ),
                           child: const Icon(
                             Icons.qr_code_2_rounded,
@@ -107,7 +109,8 @@ class PatientQrDialog extends StatelessWidget {
                       icon: const Icon(Icons.close_rounded),
                       tooltip: strings.close,
                       iconSize: 24.0,
-                      constraints: const BoxConstraints(minWidth: 48.0, minHeight: 48.0),
+                      constraints:
+                          const BoxConstraints(minWidth: 48.0, minHeight: 48.0),
                       onPressed: () => Navigator.of(context).pop(),
                     ),
                   ),
@@ -168,7 +171,8 @@ class PatientQrDialog extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    if (appointment.doctor.name != null && appointment.doctor.name!.isNotEmpty)
+                    if (appointment.doctor.name != null &&
+                        appointment.doctor.name!.isNotEmpty)
                       Row(
                         children: [
                           const Icon(
@@ -190,7 +194,8 @@ class PatientQrDialog extends StatelessWidget {
                           ),
                         ],
                       ),
-                    if (appointment.clinic.name != null && appointment.clinic.name!.isNotEmpty) ...[
+                    if (appointment.clinic.name != null &&
+                        appointment.clinic.name!.isNotEmpty) ...[
                       const SizedBox(height: 6.0),
                       Row(
                         children: [
@@ -236,7 +241,8 @@ class PatientQrDialog extends StatelessWidget {
               // Copy Booking Reference Action
               InkWell(
                 onTap: () {
-                  Clipboard.setData(ClipboardData(text: appointment.bookingReference));
+                  Clipboard.setData(
+                      ClipboardData(text: appointment.bookingReference));
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(

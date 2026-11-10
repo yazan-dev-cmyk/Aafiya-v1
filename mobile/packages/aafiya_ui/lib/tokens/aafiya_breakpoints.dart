@@ -95,7 +95,8 @@ class AafiyaResponsiveBuilder extends StatelessWidget {
     required this.builder,
   });
 
-  final Widget Function(BuildContext context, AafiyaScreenType screenType) builder;
+  final Widget Function(BuildContext context, AafiyaScreenType screenType)
+      builder;
 
   @override
   Widget build(BuildContext context) {

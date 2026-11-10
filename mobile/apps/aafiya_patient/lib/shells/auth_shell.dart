@@ -669,6 +669,7 @@ class _PatientAuthShellState extends State<PatientAuthShell> {
                           ? strings.signIn
                           : strings.signUp,
                       isLoading: _isLoading,
+                      height: 52.0,
                       onPressed: _isLoading
                           ? null
                           : (_mode == AuthMode.login

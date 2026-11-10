@@ -46,7 +46,8 @@ class AafiyaButton extends StatelessWidget {
             foregroundColor: AafiyaColors.secondaryText,
             textStyle: AafiyaTypography.labelLarge,
             side: const BorderSide(color: Color(0xFFCBD5E1), width: 1.5),
-            shape: const RoundedRectangleBorder(borderRadius: AafiyaRadius.borderButton),
+            shape: const RoundedRectangleBorder(
+                borderRadius: AafiyaRadius.borderButton),
             elevation: 0,
           ),
           icon: effectiveIcon,
@@ -108,29 +109,35 @@ class AafiyaButton extends StatelessWidget {
           backgroundColor: AafiyaColors.healthBlue,
           foregroundColor: AafiyaColors.pureWhite,
           textStyle: AafiyaTypography.labelLarge,
-          shape: const RoundedRectangleBorder(borderRadius: AafiyaRadius.borderButton),
+          shape: const RoundedRectangleBorder(
+              borderRadius: AafiyaRadius.borderButton),
           elevation: 0,
         ),
       AafiyaButtonVariant.secondary => ElevatedButton.styleFrom(
           backgroundColor: AafiyaColors.healingGreen,
           foregroundColor: AafiyaColors.onHealingGreen,
-          textStyle: AafiyaTypography.labelLarge.copyWith(color: AafiyaColors.onHealingGreen),
-          shape: const RoundedRectangleBorder(borderRadius: AafiyaRadius.borderButton),
+          textStyle: AafiyaTypography.labelLarge
+              .copyWith(color: AafiyaColors.onHealingGreen),
+          shape: const RoundedRectangleBorder(
+              borderRadius: AafiyaRadius.borderButton),
           elevation: 0,
         ),
       AafiyaButtonVariant.outline => ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,
           foregroundColor: AafiyaColors.healthBlue,
-          textStyle: AafiyaTypography.labelLarge.copyWith(color: AafiyaColors.healthBlue),
+          textStyle: AafiyaTypography.labelLarge
+              .copyWith(color: AafiyaColors.healthBlue),
           side: const BorderSide(color: AafiyaColors.healthBlue, width: 1.5),
-          shape: const RoundedRectangleBorder(borderRadius: AafiyaRadius.borderButton),
+          shape: const RoundedRectangleBorder(
+              borderRadius: AafiyaRadius.borderButton),
           elevation: 0,
         ),
       AafiyaButtonVariant.action => ElevatedButton.styleFrom(
           backgroundColor: AafiyaColors.actionGreen,
           foregroundColor: AafiyaColors.pureWhite,
           textStyle: AafiyaTypography.labelLarge,
-          shape: const RoundedRectangleBorder(borderRadius: AafiyaRadius.borderButton),
+          shape: const RoundedRectangleBorder(
+              borderRadius: AafiyaRadius.borderButton),
           elevation: 0,
         ),
     };

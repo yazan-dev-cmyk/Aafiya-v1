@@ -369,7 +369,6 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final strings = LocalizedStrings.of(context);
-    final statusColor = _resolveStatusColor(appointment.status);
 
     return Scaffold(
       appBar: AafiyaAppBar(
@@ -419,11 +418,15 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
                         color: AafiyaColors.secondaryText,
                       ),
                       const SizedBox(width: 8),
-                      Text(
-                        '${strings.bookingReference}: #${appointment.bookingReference}',
-                        style: AafiyaTypography.bodyMedium.copyWith(
-                          color: AafiyaColors.secondaryText,
-                          fontWeight: FontWeight.w600,
+                      Flexible(
+                        child: Text(
+                          '${strings.bookingReference}: #${appointment.bookingReference}',
+                          style: AafiyaTypography.bodyMedium.copyWith(
+                            color: AafiyaColors.secondaryText,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
@@ -576,10 +579,13 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
                                     color: AafiyaColors.secondaryText,
                                   ),
                                   const SizedBox(width: 6),
-                                  Text(
-                                    strings.appointmentDate,
-                                    style: AafiyaTypography.caption.copyWith(
-                                      color: AafiyaColors.secondaryText,
+                                  Expanded(
+                                    child: Text(
+                                      strings.appointmentDate,
+                                      style: AafiyaTypography.caption.copyWith(
+                                        color: AafiyaColors.secondaryText,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
                                 ],
@@ -610,10 +616,14 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
                                       color: AafiyaColors.secondaryText,
                                     ),
                                     const SizedBox(width: 6),
-                                    Text(
-                                      strings.timeSlot,
-                                      style: AafiyaTypography.caption.copyWith(
-                                        color: AafiyaColors.secondaryText,
+                                    Expanded(
+                                      child: Text(
+                                        strings.timeSlot,
+                                        style:
+                                            AafiyaTypography.caption.copyWith(
+                                          color: AafiyaColors.secondaryText,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                                   ],
@@ -800,21 +810,6 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
       AppointmentStatus.rescheduled ||
       AppointmentStatus.unknown =>
         AafiyaStatusType.custom,
-    };
-  }
-
-  Color _resolveStatusColor(AppointmentStatus status) {
-    return switch (status) {
-      AppointmentStatus.pending => AafiyaColors.warning,
-      AppointmentStatus.confirmed => AafiyaColors.success,
-      AppointmentStatus.attended => AafiyaColors.healthBlue,
-      AppointmentStatus.noShow => AafiyaColors.warning,
-      AppointmentStatus.cancelled ||
-      AppointmentStatus.rejected =>
-        AafiyaColors.error,
-      AppointmentStatus.expired => AafiyaColors.secondaryText,
-      AppointmentStatus.rescheduled => AafiyaColors.info,
-      AppointmentStatus.unknown => AafiyaColors.secondaryText,
     };
   }
 }

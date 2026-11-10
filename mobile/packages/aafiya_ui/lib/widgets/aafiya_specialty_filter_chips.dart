@@ -20,10 +20,12 @@ class AafiyaSpecialtyFilterChips extends StatefulWidget {
   final ValueChanged<int?>? onSpecialtySelected;
 
   @override
-  State<AafiyaSpecialtyFilterChips> createState() => _AafiyaSpecialtyFilterChipsState();
+  State<AafiyaSpecialtyFilterChips> createState() =>
+      _AafiyaSpecialtyFilterChipsState();
 }
 
-class _AafiyaSpecialtyFilterChipsState extends State<AafiyaSpecialtyFilterChips> {
+class _AafiyaSpecialtyFilterChipsState
+    extends State<AafiyaSpecialtyFilterChips> {
   List<MedicalSpecialty> _specialties = [];
   bool _isLoading = true;
   String? _errorMessage;
@@ -40,14 +42,17 @@ class _AafiyaSpecialtyFilterChipsState extends State<AafiyaSpecialtyFilterChips>
       _errorMessage = null;
     });
 
-    final result = await widget.masterDataService.getSpecialties(forceRefresh: forceRefresh);
+    final result = await widget.masterDataService
+        .getSpecialties(forceRefresh: forceRefresh);
     if (!mounted) return;
 
     switch (result) {
       case ApiSuccess(:final data):
         setState(() {
           // Additional defensive filter guaranteeing zero RAD/PATH presence
-          _specialties = data.where((s) => s.isActive && s.code != 'RAD' && s.code != 'PATH').toList();
+          _specialties = data
+              .where((s) => s.isActive && s.code != 'RAD' && s.code != 'PATH')
+              .toList();
           _isLoading = false;
         });
       case ApiFailure(:final exception):
@@ -109,7 +114,8 @@ class _AafiyaSpecialtyFilterChipsState extends State<AafiyaSpecialtyFilterChips>
             style: const TextStyle(color: AafiyaColors.error, fontSize: 12),
           ),
           IconButton(
-            icon: const Icon(Icons.refresh_rounded, size: 16, color: AafiyaColors.error),
+            icon: const Icon(Icons.refresh_rounded,
+                size: 16, color: AafiyaColors.error),
             onPressed: () => _loadSpecialties(forceRefresh: true),
           ),
         ],
@@ -133,7 +139,8 @@ class _AafiyaSpecialtyFilterChipsState extends State<AafiyaSpecialtyFilterChips>
               label: Text(specialty.localizedName(locale)),
               selected: widget.selectedSpecialtyId == specialty.id,
               onSelected: (selected) {
-                widget.onSpecialtySelected?.call(selected ? specialty.id : null);
+                widget.onSpecialtySelected
+                    ?.call(selected ? specialty.id : null);
               },
             ),
           ],

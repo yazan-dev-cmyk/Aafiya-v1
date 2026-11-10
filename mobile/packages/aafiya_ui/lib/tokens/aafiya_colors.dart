@@ -33,7 +33,12 @@ abstract final class AafiyaColors {
   static const Color secondaryText = Color(0xFF475569);
   static const Color lightBackground = Color(0xFFF5F5F5);
   static const Color pureWhite = Color(0xFFFFFFFF);
+  static const Color pureBlack = Color(0xFF000000);
   static const Color border = Color(0xFFDCE6EE);
+  static const Color neutralLight = Color(0xFFF8FAFC);
+  static const Color blueSoft = Color(0xFFE6F1F9);
+  static const Color indigoSoft = Color(0xFFE8EEFB);
+  static const Color indigoInk = Color(0xFF2B4FA8);
 
   // Semantic Status Colors
   static const Color success = Color(0xFF16A34A);
@@ -63,8 +68,10 @@ abstract final class AafiyaColors {
 
   // Accessible Status Tokens (WCAG 2.1 AA Compliant >= 4.5:1)
   static const Color statusConfirmedBg = Color(0xFFE3F6EA);
+  static const Color statusConfirmedBorder = Color(0xFFBBF7D0);
   static const Color statusConfirmedInk = Color(0xFF166534); // CR: 6.33:1
 
+  static const Color amberDark = Color(0xFFF59E0B);
   static const Color statusPendingBg = Color(0xFFFEF1DC);
   static const Color statusPendingInk = Color(0xFF92400E); // CR: 6.36:1
 

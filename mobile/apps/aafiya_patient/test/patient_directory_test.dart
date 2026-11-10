@@ -100,7 +100,8 @@ void main() {
     // 1. DoctorCard Component Tests
     // =========================================================================
     group('1. DoctorCard Component', () {
-      testWidgets('renders doctor name, specialty, bio, and verified badge', (tester) async {
+      testWidgets('renders doctor name, specialty, bio, and verified badge',
+          (tester) async {
         await tester.pumpWidget(
           createTestableWidget(
             child: const DoctorCard(doctor: mockDoctor1),
@@ -118,7 +119,9 @@ void main() {
         expect(find.text('021445566'), findsOneWidget);
       });
 
-      testWidgets('renders unverified doctor without verified badge and empty clinics notice', (tester) async {
+      testWidgets(
+          'renders unverified doctor without verified badge and empty clinics notice',
+          (tester) async {
         await tester.pumpWidget(
           createTestableWidget(
             child: const DoctorCard(doctor: mockDoctor2),
@@ -132,7 +135,8 @@ void main() {
         expect(find.text('لا توجد عيادات تابعة مسجلة.'), findsOneWidget);
       });
 
-      testWidgets('DISC-01: Proves zero booking buttons in DoctorCard', (tester) async {
+      testWidgets('DISC-01: Proves zero booking buttons in DoctorCard',
+          (tester) async {
         await tester.pumpWidget(
           createTestableWidget(
             child: const DoctorCard(doctor: mockDoctor1),
@@ -146,7 +150,9 @@ void main() {
         expect(find.byType(ElevatedButton), findsNothing);
       });
 
-      testWidgets('DEF-02 Stage A: DoctorCard renders localized specialty and wilaya in English and French', (tester) async {
+      testWidgets(
+          'DEF-02 Stage A: DoctorCard renders localized specialty and wilaya in English and French',
+          (tester) async {
         // English
         await tester.pumpWidget(
           createTestableWidget(
@@ -172,7 +178,9 @@ void main() {
         expect(find.textContaining('Alger'), findsOneWidget);
       });
 
-      testWidgets('TASK-MD-12: DoctorCard renders canonical MedicalSpecialty across AR, FR, EN', (tester) async {
+      testWidgets(
+          'TASK-MD-12: DoctorCard renders canonical MedicalSpecialty across AR, FR, EN',
+          (tester) async {
         const canonicalDoctor = Doctor(
           id: 'doc-canonical',
           name: 'د. سامي دراجي',
@@ -227,7 +235,9 @@ void main() {
     // 2. ClinicCard Component Tests
     // =========================================================================
     group('2. ClinicCard Component', () {
-      testWidgets('renders clinic name, wilaya tag, address, phone, and director', (tester) async {
+      testWidgets(
+          'renders clinic name, wilaya tag, address, phone, and director',
+          (tester) async {
         await tester.pumpWidget(
           createTestableWidget(
             child: const ClinicCard(clinic: mockClinic1),
@@ -243,7 +253,8 @@ void main() {
         expect(find.textContaining('د. كريم بلقاسم'), findsOneWidget);
       });
 
-      testWidgets('renders clinic with no doctors and no director gracefully', (tester) async {
+      testWidgets('renders clinic with no doctors and no director gracefully',
+          (tester) async {
         await tester.pumpWidget(
           createTestableWidget(
             child: const ClinicCard(clinic: mockClinic3),
@@ -257,7 +268,8 @@ void main() {
         expect(find.text('041223344'), findsOneWidget);
       });
 
-      testWidgets('DISC-01: Proves zero booking buttons in ClinicCard', (tester) async {
+      testWidgets('DISC-01: Proves zero booking buttons in ClinicCard',
+          (tester) async {
         await tester.pumpWidget(
           createTestableWidget(
             child: const ClinicCard(clinic: mockClinic1),
@@ -276,7 +288,8 @@ void main() {
     // 3. DoctorDirectoryScreen Pagination & Lifecycle Tests
     // =========================================================================
     group('3. DoctorDirectoryScreen Tests', () {
-      testWidgets('renders loading state initially and then shows doctors', (tester) async {
+      testWidgets('renders loading state initially and then shows doctors',
+          (tester) async {
         final mockClient = MockClient((request) async {
           expect(request.url.path, '/api/v1/doctors');
           return http.Response(
@@ -305,7 +318,8 @@ void main() {
           );
         });
 
-        final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+        final apiClient =
+            ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
 
         await tester.pumpWidget(
           createTestableWidget(
@@ -321,14 +335,21 @@ void main() {
         // Loaded list shows doctor
         expect(find.byType(AafiyaLoadingView), findsNothing);
         expect(find.text('د. كريم بلقاسم'), findsOneWidget);
-        expect(find.descendant(of: find.byType(DoctorCard), matching: find.text('أمراض القلب')), findsOneWidget);
+        expect(
+            find.descendant(
+                of: find.byType(DoctorCard),
+                matching: find.text('أمراض القلب')),
+            findsOneWidget);
         expect(find.text('تم عرض جميع النتائج.'), findsOneWidget);
       });
 
-      testWidgets('multi-page pagination: scroll triggers page 2 and appends results', (tester) async {
+      testWidgets(
+          'multi-page pagination: scroll triggers page 2 and appends results',
+          (tester) async {
         int requestedPage = 0;
         final mockClient = MockClient((request) async {
-          final pageParam = int.tryParse(request.url.queryParameters['page'] ?? '1') ?? 1;
+          final pageParam =
+              int.tryParse(request.url.queryParameters['page'] ?? '1') ?? 1;
           requestedPage = pageParam;
 
           if (pageParam == 1) {
@@ -389,7 +410,8 @@ void main() {
           }
         });
 
-        final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+        final apiClient =
+            ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
 
         tester.view.physicalSize = const Size(800, 1400);
         tester.view.devicePixelRatio = 1.0;
@@ -424,10 +446,13 @@ void main() {
         expect(find.text('تم عرض جميع النتائج.'), findsOneWidget);
       });
 
-      testWidgets('next-page failure shows retry button and clicking retry loads page 2', (tester) async {
+      testWidgets(
+          'next-page failure shows retry button and clicking retry loads page 2',
+          (tester) async {
         int attempts = 0;
         final mockClient = MockClient((request) async {
-          final pageParam = int.tryParse(request.url.queryParameters['page'] ?? '1') ?? 1;
+          final pageParam =
+              int.tryParse(request.url.queryParameters['page'] ?? '1') ?? 1;
 
           if (pageParam == 1) {
             return http.Response(
@@ -487,7 +512,8 @@ void main() {
           }
         });
 
-        final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+        final apiClient =
+            ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
 
         await tester.pumpWidget(
           createTestableWidget(
@@ -505,7 +531,8 @@ void main() {
         await tester.pumpAndSettle();
 
         // Error footer is shown
-        expect(find.text('فشل تحميل المزيد، انقر للمحاولة مجدداً.'), findsOneWidget);
+        expect(find.text('فشل تحميل المزيد، انقر للمحاولة مجدداً.'),
+            findsOneWidget);
         expect(find.byType(OutlinedButton), findsOneWidget);
 
         // Tap retry button
@@ -517,7 +544,8 @@ void main() {
         expect(find.text('تم عرض جميع النتائج.'), findsOneWidget);
       });
 
-      testWidgets('search query debounces and queries API resetting to page 1', (tester) async {
+      testWidgets('search query debounces and queries API resetting to page 1',
+          (tester) async {
         String? lastSearchQuery;
         final mockClient = MockClient((request) async {
           lastSearchQuery = request.url.queryParameters['search'];
@@ -533,14 +561,20 @@ void main() {
                   'clinics': [],
                 },
               ],
-              'meta': {'current_page': 1, 'last_page': 1, 'per_page': 10, 'total': 1},
+              'meta': {
+                'current_page': 1,
+                'last_page': 1,
+                'per_page': 10,
+                'total': 1
+              },
             }),
             200,
             headers: {'content-type': 'application/json; charset=utf-8'},
           );
         });
 
-        final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+        final apiClient =
+            ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
 
         await tester.pumpWidget(
           createTestableWidget(
@@ -560,7 +594,9 @@ void main() {
         expect(lastSearchQuery, 'كريم');
       });
 
-      testWidgets('specialty filter chip resets page to 1 and passes canonical specialty_id query param', (tester) async {
+      testWidgets(
+          'specialty filter chip resets page to 1 and passes canonical specialty_id query param',
+          (tester) async {
         String? lastSpecialtyId;
         final mockClient = MockClient((request) async {
           if (request.url.path.contains('/master/specialties')) {
@@ -568,9 +604,33 @@ void main() {
               jsonEncode({
                 'status': 'success',
                 'data': [
-                  {'id': 1, 'code': 'CARD', 'name_ar': 'أمراض القلب', 'name_fr': 'Cardiologie', 'name_en': 'Cardiology', 'is_active': true, 'display_order': 1},
-                  {'id': 2, 'code': 'PED', 'name_ar': 'طب الأطفال', 'name_fr': 'Pédiatrie', 'name_en': 'Pediatrics', 'is_active': true, 'display_order': 2},
-                  {'id': 3, 'code': 'RAD', 'name_ar': 'الأشعة والتصوير الطبي', 'name_fr': 'Radiologie', 'name_en': 'Radiology', 'is_active': true, 'display_order': 3},
+                  {
+                    'id': 1,
+                    'code': 'CARD',
+                    'name_ar': 'أمراض القلب',
+                    'name_fr': 'Cardiologie',
+                    'name_en': 'Cardiology',
+                    'is_active': true,
+                    'display_order': 1
+                  },
+                  {
+                    'id': 2,
+                    'code': 'PED',
+                    'name_ar': 'طب الأطفال',
+                    'name_fr': 'Pédiatrie',
+                    'name_en': 'Pediatrics',
+                    'is_active': true,
+                    'display_order': 2
+                  },
+                  {
+                    'id': 3,
+                    'code': 'RAD',
+                    'name_ar': 'الأشعة والتصوير الطبي',
+                    'name_fr': 'Radiologie',
+                    'name_en': 'Radiology',
+                    'is_active': true,
+                    'display_order': 3
+                  },
                 ],
               }),
               200,
@@ -589,14 +649,20 @@ void main() {
             jsonEncode({
               'status': 'success',
               'data': [],
-              'meta': {'current_page': 1, 'last_page': 1, 'per_page': 10, 'total': 0},
+              'meta': {
+                'current_page': 1,
+                'last_page': 1,
+                'per_page': 10,
+                'total': 0
+              },
             }),
             200,
             headers: {'content-type': 'application/json; charset=utf-8'},
           );
         });
 
-        final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+        final apiClient =
+            ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
 
         await tester.pumpWidget(
           createTestableWidget(
@@ -619,7 +685,9 @@ void main() {
         expect(lastSpecialtyId, '1');
       });
 
-      testWidgets('DEF-02 Stage A / TASK-MD-12: filter chips render in English and French and preserve canonical ID query parameter binding', (tester) async {
+      testWidgets(
+          'DEF-02 Stage A / TASK-MD-12: filter chips render in English and French and preserve canonical ID query parameter binding',
+          (tester) async {
         String? lastSpecialtyId;
         String? lastWilaya;
         final mockClient = MockClient((request) async {
@@ -628,9 +696,33 @@ void main() {
               jsonEncode({
                 'status': 'success',
                 'data': [
-                  {'id': 1, 'code': 'CARD', 'name_ar': 'أمراض القلب', 'name_fr': 'Cardiologie', 'name_en': 'Cardiology', 'is_active': true, 'display_order': 1},
-                  {'id': 2, 'code': 'PED', 'name_ar': 'طب الأطفال', 'name_fr': 'Pédiatrie', 'name_en': 'Pediatrics', 'is_active': true, 'display_order': 2},
-                  {'id': 3, 'code': 'RAD', 'name_ar': 'الأشعة والتصوير الطبي', 'name_fr': 'Radiologie', 'name_en': 'Radiology', 'is_active': true, 'display_order': 3},
+                  {
+                    'id': 1,
+                    'code': 'CARD',
+                    'name_ar': 'أمراض القلب',
+                    'name_fr': 'Cardiologie',
+                    'name_en': 'Cardiology',
+                    'is_active': true,
+                    'display_order': 1
+                  },
+                  {
+                    'id': 2,
+                    'code': 'PED',
+                    'name_ar': 'طب الأطفال',
+                    'name_fr': 'Pédiatrie',
+                    'name_en': 'Pediatrics',
+                    'is_active': true,
+                    'display_order': 2
+                  },
+                  {
+                    'id': 3,
+                    'code': 'RAD',
+                    'name_ar': 'الأشعة والتصوير الطبي',
+                    'name_fr': 'Radiologie',
+                    'name_en': 'Radiology',
+                    'is_active': true,
+                    'display_order': 3
+                  },
                 ],
               }),
               200,
@@ -642,8 +734,22 @@ void main() {
               jsonEncode({
                 'status': 'success',
                 'data': [
-                  {'code': '16', 'name_ar': 'الجزائر', 'name_fr': 'Alger', 'name_en': 'Algiers', 'is_active': true, 'display_order': 16},
-                  {'code': '31', 'name_ar': 'وهران', 'name_fr': 'Oran', 'name_en': 'Oran', 'is_active': true, 'display_order': 31},
+                  {
+                    'code': '16',
+                    'name_ar': 'الجزائر',
+                    'name_fr': 'Alger',
+                    'name_en': 'Algiers',
+                    'is_active': true,
+                    'display_order': 16
+                  },
+                  {
+                    'code': '31',
+                    'name_ar': 'وهران',
+                    'name_fr': 'Oran',
+                    'name_en': 'Oran',
+                    'is_active': true,
+                    'display_order': 31
+                  },
                 ],
               }),
               200,
@@ -656,14 +762,20 @@ void main() {
             jsonEncode({
               'status': 'success',
               'data': [],
-              'meta': {'current_page': 1, 'last_page': 1, 'per_page': 10, 'total': 0},
+              'meta': {
+                'current_page': 1,
+                'last_page': 1,
+                'per_page': 10,
+                'total': 0
+              },
             }),
             200,
             headers: {'content-type': 'application/json; charset=utf-8'},
           );
         });
 
-        final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+        final apiClient =
+            ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
 
         // English
         await tester.pumpWidget(
@@ -703,20 +815,27 @@ void main() {
         expect(lastWilaya, 'الجزائر');
       });
 
-      testWidgets('empty results view is rendered when zero doctors found', (tester) async {
+      testWidgets('empty results view is rendered when zero doctors found',
+          (tester) async {
         final mockClient = MockClient((request) async {
           return http.Response(
             jsonEncode({
               'status': 'success',
               'data': [],
-              'meta': {'current_page': 1, 'last_page': 1, 'per_page': 10, 'total': 0},
+              'meta': {
+                'current_page': 1,
+                'last_page': 1,
+                'per_page': 10,
+                'total': 0
+              },
             }),
             200,
             headers: {'content-type': 'application/json; charset=utf-8'},
           );
         });
 
-        final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+        final apiClient =
+            ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
 
         await tester.pumpWidget(
           createTestableWidget(
@@ -727,10 +846,12 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.byType(AafiyaEmptyView), findsOneWidget);
-        expect(find.text('لم يتم العثور على أطباء مطابقين للبحث.'), findsOneWidget);
+        expect(find.text('لم يتم العثور على أطباء مطابقين للبحث.'),
+            findsOneWidget);
       });
 
-      testWidgets('initial error displays AafiyaErrorView and retry works', (tester) async {
+      testWidgets('initial error displays AafiyaErrorView and retry works',
+          (tester) async {
         int callCount = 0;
         final mockClient = MockClient((request) async {
           if (request.url.path.contains('/master/')) {
@@ -763,7 +884,12 @@ void main() {
                     'clinics': [],
                   },
                 ],
-                'meta': {'current_page': 1, 'last_page': 1, 'per_page': 10, 'total': 1},
+                'meta': {
+                  'current_page': 1,
+                  'last_page': 1,
+                  'per_page': 10,
+                  'total': 1
+                },
               }),
               200,
               headers: {'content-type': 'application/json; charset=utf-8'},
@@ -807,7 +933,14 @@ void main() {
               jsonEncode({
                 'status': 'success',
                 'data': [
-                  {'code': '16', 'name_ar': 'الجزائر', 'name_fr': 'Alger', 'name_en': 'Algiers', 'is_active': true, 'display_order': 16},
+                  {
+                    'code': '16',
+                    'name_ar': 'الجزائر',
+                    'name_fr': 'Alger',
+                    'name_en': 'Algiers',
+                    'is_active': true,
+                    'display_order': 16
+                  },
                 ],
               }),
               200,
@@ -829,14 +962,20 @@ void main() {
                   'doctors': [],
                 },
               ],
-              'meta': {'current_page': 1, 'last_page': 1, 'per_page': 10, 'total': 1},
+              'meta': {
+                'current_page': 1,
+                'last_page': 1,
+                'per_page': 10,
+                'total': 1
+              },
             }),
             200,
             headers: {'content-type': 'application/json; charset=utf-8'},
           );
         });
 
-        final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+        final apiClient =
+            ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
 
         await tester.pumpWidget(
           createTestableWidget(
@@ -857,20 +996,27 @@ void main() {
         expect(lastWilaya, 'الجزائر');
       });
 
-      testWidgets('empty state is rendered when zero clinics found', (tester) async {
+      testWidgets('empty state is rendered when zero clinics found',
+          (tester) async {
         final mockClient = MockClient((request) async {
           return http.Response(
             jsonEncode({
               'status': 'success',
               'data': [],
-              'meta': {'current_page': 1, 'last_page': 1, 'per_page': 10, 'total': 0},
+              'meta': {
+                'current_page': 1,
+                'last_page': 1,
+                'per_page': 10,
+                'total': 0
+              },
             }),
             200,
             headers: {'content-type': 'application/json; charset=utf-8'},
           );
         });
 
-        final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+        final apiClient =
+            ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
 
         await tester.pumpWidget(
           createTestableWidget(
@@ -881,7 +1027,8 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.byType(AafiyaEmptyView), findsOneWidget);
-        expect(find.text('لم يتم العثور على عيادات مطابقة للبحث.'), findsOneWidget);
+        expect(find.text('لم يتم العثور على عيادات مطابقة للبحث.'),
+            findsOneWidget);
       });
     });
 
@@ -889,7 +1036,9 @@ void main() {
     // 5. Patient Home Discovery Integration Tests
     // =========================================================================
     group('5. PatientHomeShell Directory Integration', () {
-      testWidgets('displays Doctor & Clinic discovery cards and navigates on tap', (tester) async {
+      testWidgets(
+          'displays Doctor & Clinic discovery cards and navigates on tap',
+          (tester) async {
         final mockClient = MockClient((request) async {
           if (request.url.path == '/api/v1/appointments') {
             return http.Response(
@@ -903,7 +1052,12 @@ void main() {
               jsonEncode({
                 'status': 'success',
                 'data': [],
-                'meta': {'current_page': 1, 'last_page': 1, 'per_page': 10, 'total': 0},
+                'meta': {
+                  'current_page': 1,
+                  'last_page': 1,
+                  'per_page': 10,
+                  'total': 0
+                },
               }),
               200,
               headers: {'content-type': 'application/json; charset=utf-8'},
@@ -913,14 +1067,20 @@ void main() {
             jsonEncode({
               'status': 'success',
               'data': [],
-              'meta': {'current_page': 1, 'last_page': 1, 'per_page': 10, 'total': 0},
+              'meta': {
+                'current_page': 1,
+                'last_page': 1,
+                'per_page': 10,
+                'total': 0
+              },
             }),
             200,
             headers: {'content-type': 'application/json; charset=utf-8'},
           );
         });
 
-        final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+        final apiClient =
+            ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
         final sessionManager = AuthSessionManager(
           tokenStorage: tokenStorage,
           apiClient: apiClient,
@@ -952,7 +1112,8 @@ void main() {
         expect(find.byType(AafiyaShortcutTile), findsWidgets);
 
         // Tap Doctor Directory shortcut tile
-        final doctorShortcut = find.widgetWithText(AafiyaShortcutTile, 'ابحث عن طبيب');
+        final doctorShortcut =
+            find.widgetWithText(AafiyaShortcutTile, 'ابحث عن طبيب');
         await tester.ensureVisible(doctorShortcut);
         await tester.tap(doctorShortcut);
         await tester.pumpAndSettle();
@@ -983,7 +1144,9 @@ void main() {
     // 6. DISC-01 Zero-Booking Comprehensive Proof
     // =========================================================================
     group('6. DISC-01 Zero-Booking Comprehensive Invariant Proof', () {
-      testWidgets('verifies zero direct booking buttons across DoctorDirectoryScreen', (tester) async {
+      testWidgets(
+          'verifies zero direct booking buttons across DoctorDirectoryScreen',
+          (tester) async {
         final mockClient = MockClient((request) async {
           return http.Response(
             jsonEncode({
@@ -1004,14 +1167,20 @@ void main() {
                   ],
                 }
               ],
-              'meta': {'current_page': 1, 'last_page': 1, 'per_page': 10, 'total': 1},
+              'meta': {
+                'current_page': 1,
+                'last_page': 1,
+                'per_page': 10,
+                'total': 1
+              },
             }),
             200,
             headers: {'content-type': 'application/json; charset=utf-8'},
           );
         });
 
-        final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+        final apiClient =
+            ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
 
         await tester.pumpWidget(
           createTestableWidget(
@@ -1028,7 +1197,9 @@ void main() {
         expect(find.byType(ElevatedButton), findsNothing);
       });
 
-      testWidgets('verifies zero direct booking buttons across ClinicDirectoryScreen', (tester) async {
+      testWidgets(
+          'verifies zero direct booking buttons across ClinicDirectoryScreen',
+          (tester) async {
         final mockClient = MockClient((request) async {
           return http.Response(
             jsonEncode({
@@ -1044,14 +1215,20 @@ void main() {
                   'doctors': [],
                 }
               ],
-              'meta': {'current_page': 1, 'last_page': 1, 'per_page': 10, 'total': 1},
+              'meta': {
+                'current_page': 1,
+                'last_page': 1,
+                'per_page': 10,
+                'total': 1
+              },
             }),
             200,
             headers: {'content-type': 'application/json; charset=utf-8'},
           );
         });
 
-        final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+        final apiClient =
+            ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
 
         await tester.pumpWidget(
           createTestableWidget(
@@ -1079,14 +1256,20 @@ void main() {
             jsonEncode({
               'status': 'success',
               'data': [],
-              'meta': {'current_page': 1, 'last_page': 1, 'per_page': 10, 'total': 0},
+              'meta': {
+                'current_page': 1,
+                'last_page': 1,
+                'per_page': 10,
+                'total': 0
+              },
             }),
             200,
             headers: {'content-type': 'application/json; charset=utf-8'},
           );
         });
 
-        final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+        final apiClient =
+            ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
 
         await tester.pumpWidget(
           createTestableWidget(
@@ -1097,7 +1280,8 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        final directionality = Directionality.of(tester.element(find.byType(DoctorDirectoryScreen)));
+        final directionality = Directionality.of(
+            tester.element(find.byType(DoctorDirectoryScreen)));
         expect(directionality, TextDirection.rtl);
         expect(find.text('دليل الأطباء'), findsOneWidget);
       });
@@ -1108,14 +1292,20 @@ void main() {
             jsonEncode({
               'status': 'success',
               'data': [],
-              'meta': {'current_page': 1, 'last_page': 1, 'per_page': 10, 'total': 0},
+              'meta': {
+                'current_page': 1,
+                'last_page': 1,
+                'per_page': 10,
+                'total': 0
+              },
             }),
             200,
             headers: {'content-type': 'application/json; charset=utf-8'},
           );
         });
 
-        final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+        final apiClient =
+            ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
 
         await tester.pumpWidget(
           createTestableWidget(
@@ -1126,7 +1316,8 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        final directionality = Directionality.of(tester.element(find.byType(DoctorDirectoryScreen)));
+        final directionality = Directionality.of(
+            tester.element(find.byType(DoctorDirectoryScreen)));
         expect(directionality, TextDirection.ltr);
         expect(find.text('Doctor Directory'), findsOneWidget);
         expect(find.text('No doctors found matching search.'), findsOneWidget);

@@ -207,12 +207,12 @@ class BcBookingTicketSheet extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AafiyaColors.pureWhite,
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: AafiyaColors.border),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.04),
+                                color: AafiyaColors.primaryText.withValues(alpha: 0.04),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               ),
@@ -222,7 +222,7 @@ class BcBookingTicketSheet extends StatelessWidget {
                             data: qrData,
                             version: QrVersions.auto,
                             size: 160.0,
-                            backgroundColor: Colors.white,
+                            backgroundColor: AafiyaColors.pureWhite,
                             errorCorrectionLevel: QrErrorCorrectLevel.M,
                           ),
                         ),

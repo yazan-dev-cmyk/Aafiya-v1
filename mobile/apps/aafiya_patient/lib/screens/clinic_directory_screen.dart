@@ -61,7 +61,8 @@ class _ClinicDirectoryScreenState extends State<ClinicDirectoryScreen> {
   @override
   void initState() {
     super.initState();
-    _masterDataService = widget.masterDataService ?? MasterDataService(widget.apiClient);
+    _masterDataService =
+        widget.masterDataService ?? MasterDataService(widget.apiClient);
     _scrollController.addListener(_onScroll);
     _fetchClinics(page: 1, reset: true);
   }
@@ -191,9 +192,12 @@ class _ClinicDirectoryScreenState extends State<ClinicDirectoryScreen> {
     if (_searchQuery.isEmpty) return _clinics;
     return _clinics.where((c) {
       final nameMatches = c.name.toLowerCase().contains(_searchQuery);
-      final wilayaMatches = c.wilaya?.toLowerCase().contains(_searchQuery) ?? false;
-      final addressMatches = c.address?.toLowerCase().contains(_searchQuery) ?? false;
-      final directorMatches = c.director?.name.toLowerCase().contains(_searchQuery) ?? false;
+      final wilayaMatches =
+          c.wilaya?.toLowerCase().contains(_searchQuery) ?? false;
+      final addressMatches =
+          c.address?.toLowerCase().contains(_searchQuery) ?? false;
+      final directorMatches =
+          c.director?.name.toLowerCase().contains(_searchQuery) ?? false;
       return nameMatches || wilayaMatches || addressMatches || directorMatches;
     }).toList();
   }
@@ -223,7 +227,8 @@ class _ClinicDirectoryScreenState extends State<ClinicDirectoryScreen> {
     );
   }
 
-  Widget _buildSearchAndFilters(BuildContext context, LocalizedStrings strings) {
+  Widget _buildSearchAndFilters(
+      BuildContext context, LocalizedStrings strings) {
     return Container(
       color: AafiyaColors.pureWhite,
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
@@ -235,7 +240,8 @@ class _ClinicDirectoryScreenState extends State<ClinicDirectoryScreen> {
             onChanged: _onSearchChanged,
             decoration: InputDecoration(
               hintText: strings.searchClinicsHint,
-              prefixIcon: const Icon(Icons.search_rounded, color: AafiyaColors.secondaryText),
+              prefixIcon: const Icon(Icons.search_rounded,
+                  color: AafiyaColors.secondaryText),
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
                       icon: const Icon(Icons.clear_rounded, size: 18),
@@ -245,7 +251,8 @@ class _ClinicDirectoryScreenState extends State<ClinicDirectoryScreen> {
                       },
                     )
                   : null,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               filled: true,
               fillColor: AafiyaColors.lightBackground,
               border: OutlineInputBorder(
@@ -258,7 +265,8 @@ class _ClinicDirectoryScreenState extends State<ClinicDirectoryScreen> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AafiyaRadius.md),
-                borderSide: const BorderSide(color: AafiyaColors.healthBlue, width: 1.5),
+                borderSide: const BorderSide(
+                    color: AafiyaColors.healthBlue, width: 1.5),
               ),
             ),
           ),
@@ -333,7 +341,8 @@ class _ClinicDirectoryScreenState extends State<ClinicDirectoryScreen> {
     );
   }
 
-  Widget _buildPaginationFooter(BuildContext context, LocalizedStrings strings) {
+  Widget _buildPaginationFooter(
+      BuildContext context, LocalizedStrings strings) {
     if (_isLoadingMore) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 20),
@@ -346,7 +355,8 @@ class _ClinicDirectoryScreenState extends State<ClinicDirectoryScreen> {
                 height: 18,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(AafiyaColors.healthBlue),
+                  valueColor:
+                      AlwaysStoppedAnimation<Color>(AafiyaColors.healthBlue),
                 ),
               ),
               const SizedBox(width: 12),
@@ -377,7 +387,8 @@ class _ClinicDirectoryScreenState extends State<ClinicDirectoryScreen> {
               ),
               const SizedBox(height: 8),
               OutlinedButton.icon(
-                onPressed: () => _fetchClinics(page: _currentPage + 1, reset: false),
+                onPressed: () =>
+                    _fetchClinics(page: _currentPage + 1, reset: false),
                 icon: const Icon(Icons.refresh_rounded, size: 16),
                 label: Text(strings.retry),
               ),
@@ -392,7 +403,8 @@ class _ClinicDirectoryScreenState extends State<ClinicDirectoryScreen> {
         padding: const EdgeInsets.symmetric(vertical: 12),
         child: Center(
           child: TextButton.icon(
-            onPressed: () => _fetchClinics(page: _currentPage + 1, reset: false),
+            onPressed: () =>
+                _fetchClinics(page: _currentPage + 1, reset: false),
             icon: const Icon(Icons.expand_more_rounded, size: 18),
             label: Text(strings.loadMore),
           ),

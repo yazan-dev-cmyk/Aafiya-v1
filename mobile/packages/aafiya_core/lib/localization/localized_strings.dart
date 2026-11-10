@@ -4258,10 +4258,15 @@ class LocalizedStrings {
           ? 'Éligible au virement'
           : 'Eligible for Payout';
   String get assistantRewardsThresholdNotMet => isArabic
-      ? 'لم يبلغ الحد الأدنى للصرف (10,000 دج)'
+      ? 'لم يبلغ الحد الأدنى للصرف'
       : isFrench
-          ? 'Seuil minimum (10 000 DZD) non atteint'
-          : 'Threshold (10,000 DZD) not yet reached';
+          ? 'Seuil minimum de versement non atteint'
+          : 'Minimum payout threshold not yet reached';
+  String get payoutThresholdUnavailable => isArabic
+      ? 'غير متاح حالياً'
+      : isFrench
+          ? 'Actuellement indisponible'
+          : 'Currently unavailable';
   String get assistantRewardsMissingProfile => isArabic
       ? 'يتطلب حساب RIP مفعل ومعتمد'
       : isFrench

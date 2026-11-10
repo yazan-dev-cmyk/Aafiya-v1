@@ -32,7 +32,8 @@ class VisitPassSheet extends StatelessWidget {
   }
 
   bool get _hasToken =>
-      appointment.secureToken != null && appointment.secureToken!.trim().isNotEmpty;
+      appointment.secureToken != null &&
+      appointment.secureToken!.trim().isNotEmpty;
 
   bool get _isTerminal =>
       appointment.status == AppointmentStatus.cancelled ||
@@ -59,19 +60,6 @@ class VisitPassSheet extends StatelessWidget {
     };
   }
 
-  Color _resolveStatusColor(AppointmentStatus status) {
-    return switch (status) {
-      AppointmentStatus.pending => AafiyaColors.warning,
-      AppointmentStatus.confirmed => AafiyaColors.success,
-      AppointmentStatus.attended => AafiyaColors.healthBlue,
-      AppointmentStatus.noShow => AafiyaColors.warning,
-      AppointmentStatus.cancelled || AppointmentStatus.rejected => AafiyaColors.error,
-      AppointmentStatus.expired => AafiyaColors.secondaryText,
-      AppointmentStatus.rescheduled => AafiyaColors.info,
-      AppointmentStatus.unknown => AafiyaColors.secondaryText,
-    };
-  }
-
   @override
   Widget build(BuildContext context) {
     final strings = LocalizedStrings.of(context);
@@ -85,7 +73,8 @@ class VisitPassSheet extends StatelessWidget {
         return Container(
           decoration: const BoxDecoration(
             color: AafiyaColors.pureWhite,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(AafiyaRadius.lg)),
+            borderRadius:
+                BorderRadius.vertical(top: Radius.circular(AafiyaRadius.lg)),
           ),
           child: Column(
             children: [
@@ -104,7 +93,8 @@ class VisitPassSheet extends StatelessWidget {
 
               // 2. Sheet Header
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                 child: Row(
                   children: [
                     Container(
@@ -149,7 +139,8 @@ class VisitPassSheet extends StatelessWidget {
                       ),
                     ),
                     IconButton(
-                      constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+                      constraints:
+                          const BoxConstraints(minWidth: 48, minHeight: 48),
                       icon: const Icon(Icons.close_rounded),
                       tooltip: strings.close,
                       onPressed: () => Navigator.of(context).pop(),
@@ -173,41 +164,50 @@ class VisitPassSheet extends StatelessWidget {
                           label: strings.statusLabel(appointment.status),
                           type: _resolveStatusType(appointment.status),
                         ),
-                        InkWell(
-                          onTap: () {
-                            Clipboard.setData(ClipboardData(text: appointment.bookingReference));
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  strings.isArabic
-                                      ? 'تم نسخ رقم الحجز #${appointment.bookingReference}'
-                                      : 'Copied booking reference #${appointment.bookingReference}',
+                        Flexible(
+                          child: InkWell(
+                            onTap: () {
+                              Clipboard.setData(ClipboardData(
+                                  text: appointment.bookingReference));
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    strings.isArabic
+                                        ? 'تم نسخ رقم الحجز #${appointment.bookingReference}'
+                                        : 'Copied booking reference #${appointment.bookingReference}',
+                                  ),
+                                  duration: const Duration(seconds: 2),
+                                  behavior: SnackBarBehavior.floating,
                                 ),
-                                duration: const Duration(seconds: 2),
-                                behavior: SnackBarBehavior.floating,
-                              ),
-                            );
-                          },
-                          borderRadius: BorderRadius.circular(AafiyaRadius.sm),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  '#${appointment.bookingReference}',
-                                  style: AafiyaTypography.bodyMedium.copyWith(
-                                    fontWeight: FontWeight.bold,
+                              );
+                            },
+                            borderRadius:
+                                BorderRadius.circular(AafiyaRadius.sm),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      '#${appointment.bookingReference}',
+                                      style:
+                                          AafiyaTypography.bodyMedium.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: AafiyaColors.healthBlue,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  const Icon(
+                                    Icons.copy_rounded,
+                                    size: 16,
                                     color: AafiyaColors.healthBlue,
                                   ),
-                                ),
-                                const SizedBox(width: 4),
-                                const Icon(
-                                  Icons.copy_rounded,
-                                  size: 16,
-                                  color: AafiyaColors.healthBlue,
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -236,7 +236,8 @@ class VisitPassSheet extends StatelessWidget {
                                 Expanded(
                                   child: Text(
                                     appointment.doctor.name!,
-                                    style: AafiyaTypography.titleMedium.copyWith(
+                                    style:
+                                        AafiyaTypography.titleMedium.copyWith(
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -249,7 +250,8 @@ class VisitPassSheet extends StatelessWidget {
                             Row(
                               children: [
                                 const Icon(Icons.apartment_rounded,
-                                    size: 18, color: AafiyaColors.secondaryText),
+                                    size: 18,
+                                    color: AafiyaColors.secondaryText),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
@@ -266,12 +268,15 @@ class VisitPassSheet extends StatelessWidget {
                               const Icon(Icons.calendar_today_outlined,
                                   size: 18, color: AafiyaColors.secondaryText),
                               const SizedBox(width: 8),
-                              Text(
-                                appointment.appointmentDate?.isNotEmpty == true
-                                    ? strings.formatDate(appointment.appointmentDate)
-                                    : '-',
-                                style: AafiyaTypography.bodyMedium.copyWith(
-                                  fontWeight: FontWeight.w600,
+                              Flexible(
+                                child: Text(
+                                  appointment.appointmentDate?.isNotEmpty == true
+                                      ? strings.formatDate(appointment.appointmentDate)
+                                      : '-',
+                                  style: AafiyaTypography.bodyMedium.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                               if (appointment.timeSlot?.isNotEmpty == true) ...[
@@ -343,7 +348,8 @@ class VisitPassSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildQrSection(BuildContext context, LocalizedStrings strings, bool isRtl) {
+  Widget _buildQrSection(
+      BuildContext context, LocalizedStrings strings, bool isRtl) {
     if (!_hasToken) {
       return Container(
         key: const Key('visit_pass_missing_token_card'),
@@ -351,11 +357,13 @@ class VisitPassSheet extends StatelessWidget {
         decoration: BoxDecoration(
           color: AafiyaColors.warning.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(AafiyaRadius.lg),
-          border: Border.all(color: AafiyaColors.warning.withValues(alpha: 0.3)),
+          border:
+              Border.all(color: AafiyaColors.warning.withValues(alpha: 0.3)),
         ),
         child: Column(
           children: [
-            const Icon(Icons.qr_code_scanner_rounded, size: 48, color: AafiyaColors.warning),
+            const Icon(Icons.qr_code_scanner_rounded,
+                size: 48, color: AafiyaColors.warning),
             const SizedBox(height: 12),
             Text(
               strings.isArabic
@@ -372,7 +380,8 @@ class VisitPassSheet extends StatelessWidget {
               strings.isArabic
                   ? 'يرجى مراجعة موظف الاستقبال أو استخدام الرقم المرجعي للحجز.'
                   : 'Please check with reception or provide your booking reference.',
-              style: AafiyaTypography.caption.copyWith(color: AafiyaColors.secondaryText),
+              style: AafiyaTypography.caption
+                  .copyWith(color: AafiyaColors.secondaryText),
               textAlign: TextAlign.center,
             ),
           ],
@@ -391,7 +400,8 @@ class VisitPassSheet extends StatelessWidget {
         ),
         child: Column(
           children: [
-            const Icon(Icons.block_rounded, size: 48, color: AafiyaColors.error),
+            const Icon(Icons.block_rounded,
+                size: 48, color: AafiyaColors.error),
             const SizedBox(height: 12),
             Text(
               strings.isArabic
@@ -408,7 +418,8 @@ class VisitPassSheet extends StatelessWidget {
               strings.isArabic
                   ? 'تم إلغاء الموعد أو انقضاء صلاحيته مسبقاً.'
                   : 'This appointment has been cancelled or has expired.',
-              style: AafiyaTypography.caption.copyWith(color: AafiyaColors.secondaryText),
+              style: AafiyaTypography.caption
+                  .copyWith(color: AafiyaColors.secondaryText),
               textAlign: TextAlign.center,
             ),
           ],
@@ -420,12 +431,12 @@ class VisitPassSheet extends StatelessWidget {
       key: const Key('visit_pass_qr_container'),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AafiyaColors.pureWhite,
         borderRadius: BorderRadius.circular(AafiyaRadius.lg),
         border: Border.all(color: AafiyaColors.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
+            color: AafiyaColors.pureBlack.withValues(alpha: 0.06),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -440,15 +451,19 @@ class VisitPassSheet extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AafiyaColors.success.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(AafiyaRadius.sm),
-                border: Border.all(color: AafiyaColors.success.withValues(alpha: 0.3)),
+                border: Border.all(
+                    color: AafiyaColors.success.withValues(alpha: 0.3)),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.check_circle_rounded, size: 16, color: AafiyaColors.success),
+                  const Icon(Icons.check_circle_rounded,
+                      size: 16, color: AafiyaColors.success),
                   const SizedBox(width: 6),
                   Text(
-                    strings.isArabic ? 'تم تسجيل الحضور مسبقاً' : 'Attendance Already Recorded',
+                    strings.isArabic
+                        ? 'تم تسجيل الحضور مسبقاً'
+                        : 'Attendance Already Recorded',
                     style: AafiyaTypography.caption.copyWith(
                       color: AafiyaColors.success,
                       fontWeight: FontWeight.bold,
@@ -463,12 +478,14 @@ class VisitPassSheet extends StatelessWidget {
             data: appointment.secureToken!,
             version: QrVersions.auto,
             size: 200.0,
-            backgroundColor: Colors.white,
+            backgroundColor: AafiyaColors.pureWhite,
             errorCorrectionLevel: QrErrorCorrectLevel.M,
           ),
           const SizedBox(height: 12),
           Text(
-            strings.isArabic ? 'تصريح صالح للاستخدام مرة واحدة' : 'Single-use validated pass',
+            strings.isArabic
+                ? 'تصريح صالح للاستخدام مرة واحدة'
+                : 'Single-use validated pass',
             style: AafiyaTypography.caption.copyWith(
               color: AafiyaColors.secondaryText,
               fontWeight: FontWeight.w600,

@@ -31,8 +31,7 @@ void main() {
     test(
         '1. In-flight refresh race: stale in-flight refresh completing after markAcknowledged does NOT resurrect notification',
         () async {
-      final refreshCompleter =
-          Completer<http.Response>();
+      final refreshCompleter = Completer<http.Response>();
 
       final client = MockClient((request) async {
         if (request.method == 'GET' &&
@@ -182,9 +181,8 @@ void main() {
               {
                 'id': 'notif-101',
                 'created_at': '2026-10-23T08:00:00Z',
-                'acknowledged_at': serverAcknowledged
-                    ? '2026-10-23T09:30:00Z'
-                    : null,
+                'acknowledged_at':
+                    serverAcknowledged ? '2026-10-23T09:30:00Z' : null,
                 'template': 'vacation_reschedule_success',
                 'payload': {'message': 'تمت إعادة جدولة موعدكم'},
               }

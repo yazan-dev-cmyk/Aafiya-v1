@@ -9,7 +9,8 @@ import 'package:http/testing.dart';
 import 'package:aafiya_core/aafiya_core.dart';
 import 'package:aafiya_ui/aafiya_ui.dart';
 
-Widget createTestableWidget({required Widget child, Locale locale = const Locale('ar')}) {
+Widget createTestableWidget(
+    {required Widget child, Locale locale = const Locale('ar')}) {
   return MaterialApp(
     locale: locale,
     supportedLocales: const [Locale('ar'), Locale('fr'), Locale('en')],
@@ -18,20 +19,36 @@ Widget createTestableWidget({required Widget child, Locale locale = const Locale
       GlobalWidgetsLocalizations.delegate,
       GlobalCupertinoLocalizations.delegate,
     ],
-    home: Scaffold(body: Padding(padding: const EdgeInsets.all(16), child: child)),
+    home: Scaffold(
+        body: Padding(padding: const EdgeInsets.all(16), child: child)),
   );
 }
 
 void main() {
   group('1. AafiyaWilayaSelector Widget Tests', () {
-    testWidgets('renders loading state initially, then displays loaded wilaya', (tester) async {
+    testWidgets('renders loading state initially, then displays loaded wilaya',
+        (tester) async {
       final mockClient = MockClient((request) async {
         return http.Response(
           jsonEncode({
             'status': 'success',
             'data': [
-              {'code': '16', 'name_ar': 'الجزائر', 'name_fr': 'Alger', 'name_en': 'Algiers', 'is_active': true, 'display_order': 16},
-              {'code': '31', 'name_ar': 'وهران', 'name_fr': 'Oran', 'name_en': 'Oran', 'is_active': true, 'display_order': 31},
+              {
+                'code': '16',
+                'name_ar': 'الجزائر',
+                'name_fr': 'Alger',
+                'name_en': 'Algiers',
+                'is_active': true,
+                'display_order': 16
+              },
+              {
+                'code': '31',
+                'name_ar': 'وهران',
+                'name_fr': 'Oran',
+                'name_en': 'Oran',
+                'is_active': true,
+                'display_order': 31
+              },
             ],
           }),
           200,
@@ -89,7 +106,14 @@ void main() {
           jsonEncode({
             'status': 'success',
             'data': [
-              {'code': '16', 'name_ar': 'الجزائر', 'name_fr': 'Alger', 'name_en': 'Algiers', 'is_active': true, 'display_order': 16},
+              {
+                'code': '16',
+                'name_ar': 'الجزائر',
+                'name_fr': 'Alger',
+                'name_en': 'Algiers',
+                'is_active': true,
+                'display_order': 16
+              },
             ],
           }),
           200,
@@ -124,8 +148,10 @@ void main() {
   });
 
   group('2. AafiyaCommuneSelector Widget Tests', () {
-    testWidgets('disabled when wilayaCode is null/empty and displays prompt', (tester) async {
-      final mockClient = MockClient((request) async => http.Response('Not Found', 404));
+    testWidgets('disabled when wilayaCode is null/empty and displays prompt',
+        (tester) async {
+      final mockClient =
+          MockClient((request) async => http.Response('Not Found', 404));
       final apiClient = ApiClient(httpClient: mockClient);
       final masterDataService = MasterDataService(apiClient);
 
@@ -149,14 +175,25 @@ void main() {
       expect(find.text('اختر البلدية'), findsNothing);
     });
 
-    testWidgets('loads communes for wilaya and cascades/resets on wilaya change', (tester) async {
+    testWidgets(
+        'loads communes for wilaya and cascades/resets on wilaya change',
+        (tester) async {
       final mockClient = MockClient((request) async {
         if (request.url.path.contains('/16/communes')) {
           return http.Response(
             jsonEncode({
               'status': 'success',
               'data': [
-                {'code': '1601', 'wilaya_code': '16', 'name_ar': 'الجزائر الوسطى', 'name_fr': 'Alger-Centre', 'name_en': 'Algiers Centre', 'postal_code': '16000', 'is_active': true, 'display_order': 1},
+                {
+                  'code': '1601',
+                  'wilaya_code': '16',
+                  'name_ar': 'الجزائر الوسطى',
+                  'name_fr': 'Alger-Centre',
+                  'name_en': 'Algiers Centre',
+                  'postal_code': '16000',
+                  'is_active': true,
+                  'display_order': 1
+                },
               ],
             }),
             200,
@@ -167,7 +204,16 @@ void main() {
             jsonEncode({
               'status': 'success',
               'data': [
-                {'code': '3101', 'wilaya_code': '31', 'name_ar': 'وهران', 'name_fr': 'Oran', 'name_en': 'Oran', 'postal_code': '31000', 'is_active': true, 'display_order': 1},
+                {
+                  'code': '3101',
+                  'wilaya_code': '31',
+                  'name_ar': 'وهران',
+                  'name_fr': 'Oran',
+                  'name_en': 'Oran',
+                  'postal_code': '31000',
+                  'is_active': true,
+                  'display_order': 1
+                },
               ],
             }),
             200,
@@ -235,14 +281,29 @@ void main() {
   });
 
   group('3. AafiyaWilayaFilterChips Widget Tests', () {
-    testWidgets('renders all wilayas chips and invokes callback on tap', (tester) async {
+    testWidgets('renders all wilayas chips and invokes callback on tap',
+        (tester) async {
       final mockClient = MockClient((request) async {
         return http.Response(
           jsonEncode({
             'status': 'success',
             'data': [
-              {'code': '16', 'name_ar': 'الجزائر', 'name_fr': 'Alger', 'name_en': 'Algiers', 'is_active': true, 'display_order': 16},
-              {'code': '31', 'name_ar': 'وهران', 'name_fr': 'Oran', 'name_en': 'Oran', 'is_active': true, 'display_order': 31},
+              {
+                'code': '16',
+                'name_ar': 'الجزائر',
+                'name_fr': 'Alger',
+                'name_en': 'Algiers',
+                'is_active': true,
+                'display_order': 16
+              },
+              {
+                'code': '31',
+                'name_ar': 'وهران',
+                'name_fr': 'Oran',
+                'name_en': 'Oran',
+                'is_active': true,
+                'display_order': 31
+              },
             ],
           }),
           200,
@@ -280,18 +341,60 @@ void main() {
   });
 
   group('4. AafiyaSpecialtyFilterChips Widget Tests', () {
-    testWidgets('renders all specialties chips, excludes RAD and PATH, and invokes callback with canonical ID', (tester) async {
+    testWidgets(
+        'renders all specialties chips, excludes RAD and PATH, and invokes callback with canonical ID',
+        (tester) async {
       final mockClient = MockClient((request) async {
         return http.Response(
           jsonEncode({
             'status': 'success',
             'data': [
-              {'id': 1, 'code': 'GP', 'name_ar': 'طب عام', 'name_fr': 'Médecine générale', 'name_en': 'General Practice', 'is_active': true, 'display_order': 1},
-              {'id': 2, 'code': 'CARD', 'name_ar': 'أمراض القلب', 'name_fr': 'Cardiologie', 'name_en': 'Cardiology', 'is_active': true, 'display_order': 2},
-              {'id': 3, 'code': 'PED', 'name_ar': 'طب الأطفال', 'name_fr': 'Pédiatrie', 'name_en': 'Pediatrics', 'is_active': true, 'display_order': 3},
+              {
+                'id': 1,
+                'code': 'GP',
+                'name_ar': 'طب عام',
+                'name_fr': 'Médecine générale',
+                'name_en': 'General Practice',
+                'is_active': true,
+                'display_order': 1
+              },
+              {
+                'id': 2,
+                'code': 'CARD',
+                'name_ar': 'أمراض القلب',
+                'name_fr': 'Cardiologie',
+                'name_en': 'Cardiology',
+                'is_active': true,
+                'display_order': 2
+              },
+              {
+                'id': 3,
+                'code': 'PED',
+                'name_ar': 'طب الأطفال',
+                'name_fr': 'Pédiatrie',
+                'name_en': 'Pediatrics',
+                'is_active': true,
+                'display_order': 3
+              },
               // RAD and PATH must not appear
-              {'id': 37, 'code': 'RAD', 'name_ar': 'الأشعة والتصوير الطبي', 'name_fr': 'Radiologie', 'name_en': 'Radiology', 'is_active': false, 'display_order': 37},
-              {'id': 38, 'code': 'PATH', 'name_ar': 'علم الأمراض', 'name_fr': 'Pathologie', 'name_en': 'Pathology', 'is_active': false, 'display_order': 38},
+              {
+                'id': 37,
+                'code': 'RAD',
+                'name_ar': 'الأشعة والتصوير الطبي',
+                'name_fr': 'Radiologie',
+                'name_en': 'Radiology',
+                'is_active': false,
+                'display_order': 37
+              },
+              {
+                'id': 38,
+                'code': 'PATH',
+                'name_ar': 'علم الأمراض',
+                'name_fr': 'Pathologie',
+                'name_en': 'Pathology',
+                'is_active': false,
+                'display_order': 38
+              },
             ],
           }),
           200,
@@ -335,13 +438,23 @@ void main() {
       expect(selectedId, equals(2));
     });
 
-    testWidgets('REQUIRED ID INVARIANT: localized name adapts across AR, FR, EN while selecting same canonical ID 2', (tester) async {
+    testWidgets(
+        'REQUIRED ID INVARIANT: localized name adapts across AR, FR, EN while selecting same canonical ID 2',
+        (tester) async {
       final mockClient = MockClient((request) async {
         return http.Response(
           jsonEncode({
             'status': 'success',
             'data': [
-              {'id': 2, 'code': 'CARD', 'name_ar': 'أمراض القلب', 'name_fr': 'Cardiologie', 'name_en': 'Cardiology', 'is_active': true, 'display_order': 2},
+              {
+                'id': 2,
+                'code': 'CARD',
+                'name_ar': 'أمراض القلب',
+                'name_fr': 'Cardiologie',
+                'name_en': 'Cardiology',
+                'is_active': true,
+                'display_order': 2
+              },
             ],
           }),
           200,
@@ -390,15 +503,41 @@ void main() {
   });
 
   group('5. AafiyaSpecialtySelector Widget Tests', () {
-    testWidgets('opens sheet, excludes RAD/PATH, and selects canonical specialty', (tester) async {
+    testWidgets(
+        'opens sheet, excludes RAD/PATH, and selects canonical specialty',
+        (tester) async {
       final mockClient = MockClient((request) async {
         return http.Response(
           jsonEncode({
             'status': 'success',
             'data': [
-              {'id': 2, 'code': 'CARD', 'name_ar': 'أمراض القلب', 'name_fr': 'Cardiologie', 'name_en': 'Cardiology', 'is_active': true, 'display_order': 2},
-              {'id': 3, 'code': 'PED', 'name_ar': 'طب الأطفال', 'name_fr': 'Pédiatrie', 'name_en': 'Pediatrics', 'is_active': true, 'display_order': 3},
-              {'id': 37, 'code': 'RAD', 'name_ar': 'الأشعة والتصوير الطبي', 'name_fr': 'Radiologie', 'name_en': 'Radiology', 'is_active': false, 'display_order': 37},
+              {
+                'id': 2,
+                'code': 'CARD',
+                'name_ar': 'أمراض القلب',
+                'name_fr': 'Cardiologie',
+                'name_en': 'Cardiology',
+                'is_active': true,
+                'display_order': 2
+              },
+              {
+                'id': 3,
+                'code': 'PED',
+                'name_ar': 'طب الأطفال',
+                'name_fr': 'Pédiatrie',
+                'name_en': 'Pediatrics',
+                'is_active': true,
+                'display_order': 3
+              },
+              {
+                'id': 37,
+                'code': 'RAD',
+                'name_ar': 'الأشعة والتصوير الطبي',
+                'name_fr': 'Radiologie',
+                'name_en': 'Radiology',
+                'is_active': false,
+                'display_order': 37
+              },
             ],
           }),
           200,

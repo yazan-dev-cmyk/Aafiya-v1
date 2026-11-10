@@ -98,7 +98,9 @@ void main() {
     // 1. PrescriptionCard Component Tests
     // =========================================================================
     group('1. PrescriptionCard Component', () {
-      testWidgets('renders reference, doctor name, clinic, and medication count', (tester) async {
+      testWidgets(
+          'renders reference, doctor name, clinic, and medication count',
+          (tester) async {
         bool tapped = false;
 
         await tester.pumpWidget(
@@ -146,10 +148,13 @@ void main() {
     // 2. PrescriptionDetailScreen Tests
     // =========================================================================
     group('2. PrescriptionDetailScreen', () {
-      testWidgets('renders read-only notice, doctor details, and medications list', (tester) async {
+      testWidgets(
+          'renders read-only notice, doctor details, and medications list',
+          (tester) async {
         await tester.pumpWidget(
           createTestableWidget(
-            child: const PrescriptionDetailScreen(prescription: mockPrescription1),
+            child:
+                const PrescriptionDetailScreen(prescription: mockPrescription1),
           ),
         );
         await tester.pumpAndSettle();
@@ -178,7 +183,8 @@ void main() {
         expect(find.text('يُسمح بالبديل'), findsOneWidget);
 
         // Doctor notes
-        expect(find.text('تناول الدواء مع كأس ماء كبير بعد الأكل.'), findsOneWidget);
+        expect(find.text('تناول الدواء مع كأس ماء كبير بعد الأكل.'),
+            findsOneWidget);
 
         // SEC-02 & DISC-01: Zero edit / update / delete buttons exist
         expect(find.text('تعديل'), findsNothing);
@@ -187,10 +193,13 @@ void main() {
         expect(find.byType(ElevatedButton), findsNothing);
       });
 
-      testWidgets('renders QR code widget with verification link and token (AC-03)', (tester) async {
+      testWidgets(
+          'renders QR code widget with verification link and token (AC-03)',
+          (tester) async {
         await tester.pumpWidget(
           createTestableWidget(
-            child: const PrescriptionDetailScreen(prescription: mockPrescription1),
+            child:
+                const PrescriptionDetailScreen(prescription: mockPrescription1),
           ),
         );
         await tester.pumpAndSettle();
@@ -198,7 +207,8 @@ void main() {
         // QR verification section
         expect(find.text('التحقق الرقمي (QR)'), findsOneWidget);
         expect(
-          find.text('امسح رمز الاستجابة السريعة لدى الصيدلية للتحقق الفوري من أصالة الوصفة.'),
+          find.text(
+              'امسح رمز الاستجابة السريعة لدى الصيدلية للتحقق الفوري من أصالة الوصفة.'),
           findsOneWidget,
         );
         expect(find.byType(QrImageView), findsOneWidget);
@@ -211,7 +221,8 @@ void main() {
         await tester.pumpWidget(
           createTestableWidget(
             locale: const Locale('en'),
-            child: const PrescriptionDetailScreen(prescription: mockPrescription1),
+            child:
+                const PrescriptionDetailScreen(prescription: mockPrescription1),
           ),
         );
         await tester.pumpAndSettle();
@@ -224,7 +235,8 @@ void main() {
         await tester.pumpWidget(
           createTestableWidget(
             locale: const Locale('fr'),
-            child: const PrescriptionDetailScreen(prescription: mockPrescription1),
+            child:
+                const PrescriptionDetailScreen(prescription: mockPrescription1),
           ),
         );
         await tester.pumpAndSettle();
@@ -234,41 +246,49 @@ void main() {
         expect(find.text('Copier le lien'), findsOneWidget);
       });
 
-      testWidgets('DEF-01: empty prescription items list displays dedicated localized empty-state string (not noDoctorsFound)', (tester) async {
+      testWidgets(
+          'DEF-01: empty prescription items list displays dedicated localized empty-state string (not noDoctorsFound)',
+          (tester) async {
         // Arabic (default)
         await tester.pumpWidget(
           createTestableWidget(
             locale: const Locale('ar'),
-            child: const PrescriptionDetailScreen(prescription: mockPrescriptionVoided),
+            child: const PrescriptionDetailScreen(
+                prescription: mockPrescriptionVoided),
           ),
         );
         await tester.pumpAndSettle();
 
         expect(find.text('لا توجد أدوية مدرجة في هذه الوصفة'), findsOneWidget);
-        expect(find.text('لم يتم العثور على أطباء مطابقين للبحث.'), findsNothing);
+        expect(
+            find.text('لم يتم العثور على أطباء مطابقين للبحث.'), findsNothing);
 
         // English
         await tester.pumpWidget(
           createTestableWidget(
             locale: const Locale('en'),
-            child: const PrescriptionDetailScreen(prescription: mockPrescriptionVoided),
+            child: const PrescriptionDetailScreen(
+                prescription: mockPrescriptionVoided),
           ),
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('No medications listed in this prescription'), findsOneWidget);
+        expect(find.text('No medications listed in this prescription'),
+            findsOneWidget);
         expect(find.text('No doctors found matching search.'), findsNothing);
 
         // French
         await tester.pumpWidget(
           createTestableWidget(
             locale: const Locale('fr'),
-            child: const PrescriptionDetailScreen(prescription: mockPrescriptionVoided),
+            child: const PrescriptionDetailScreen(
+                prescription: mockPrescriptionVoided),
           ),
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Aucun médicament inscrit sur cette ordonnance'), findsOneWidget);
+        expect(find.text('Aucun médicament inscrit sur cette ordonnance'),
+            findsOneWidget);
         expect(find.text('Aucun médecin trouvé.'), findsNothing);
       });
     });
@@ -277,7 +297,8 @@ void main() {
     // 3. PrescriptionsScreen List & Pagination Tests
     // =========================================================================
     group('3. PrescriptionsScreen List & Flow', () {
-      testWidgets('renders loading state initially then displays prescriptions', (tester) async {
+      testWidgets('renders loading state initially then displays prescriptions',
+          (tester) async {
         final mockClient = MockClient((request) async {
           return http.Response(
             jsonEncode({
@@ -286,7 +307,8 @@ void main() {
                   'id': 'rx-1',
                   'prescription_reference': 'RX-2026-0001',
                   'secure_token': 'token_abc_123',
-                  'qr_verification_url': 'https://api.aafiya.dz/v/token_abc_123',
+                  'qr_verification_url':
+                      'https://api.aafiya.dz/v/token_abc_123',
                   'patient': {'id': 'p-1', 'name': 'Ahmed'},
                   'doctor': {'id': 'd-1', 'name': 'Dr. Mansouri'},
                   'clinic': {'id': 'c-1', 'name': 'Clinic 1'},
@@ -324,7 +346,8 @@ void main() {
         expect(find.text('RX-2026-0001'), findsOneWidget);
       });
 
-      testWidgets('renders empty state when patient has no prescriptions', (tester) async {
+      testWidgets('renders empty state when patient has no prescriptions',
+          (tester) async {
         final mockClient = MockClient((request) async {
           return http.Response(
             jsonEncode({
@@ -349,7 +372,8 @@ void main() {
         expect(find.text('لا توجد وصفات طبية مسجلة.'), findsOneWidget);
       });
 
-      testWidgets('renders error state with retry on network error', (tester) async {
+      testWidgets('renders error state with retry on network error',
+          (tester) async {
         int callCount = 0;
         final mockClient = MockClient((request) async {
           callCount++;
@@ -403,7 +427,8 @@ void main() {
         expect(find.text('RX-RECOVERED'), findsOneWidget);
       });
 
-      testWidgets('filters by status when clicking status chips', (tester) async {
+      testWidgets('filters by status when clicking status chips',
+          (tester) async {
         String? lastStatusRequested;
         final mockClient = MockClient((request) async {
           lastStatusRequested = request.url.queryParameters['status'];
@@ -439,7 +464,9 @@ void main() {
         expect(lastStatusRequested, equals('completed'));
       });
 
-      testWidgets('navigation: tapping card navigates to PrescriptionDetailScreen and back', (tester) async {
+      testWidgets(
+          'navigation: tapping card navigates to PrescriptionDetailScreen and back',
+          (tester) async {
         final mockClient = MockClient((request) async {
           return http.Response(
             jsonEncode({

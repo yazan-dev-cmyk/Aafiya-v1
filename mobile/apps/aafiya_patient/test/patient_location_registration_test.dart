@@ -18,7 +18,8 @@ void main() {
       tokenStorage = InMemoryTokenStorage();
     });
 
-    testWidgets('registration form displays Wilaya, Commune, and Address fields',
+    testWidgets(
+        'registration form displays Wilaya, Commune, and Address fields',
         (tester) async {
       tester.view.physicalSize = const Size(800, 1600);
       tester.view.devicePixelRatio = 1.0;
@@ -48,8 +49,10 @@ void main() {
         return http.Response('Not Found', 404);
       });
 
-      final client = ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
-      final manager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
+      final client =
+          ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
+      final manager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
 
       await tester.pumpWidget(
         AafiyaPatientApp(
@@ -67,7 +70,8 @@ void main() {
       expect(find.text('العنوان (اختياري)'), findsOneWidget);
     });
 
-    testWidgets('submitting registration without Wilaya triggers validation dialog',
+    testWidgets(
+        'submitting registration without Wilaya triggers validation dialog',
         (tester) async {
       tester.view.physicalSize = const Size(800, 1600);
       tester.view.devicePixelRatio = 1.0;
@@ -97,8 +101,10 @@ void main() {
         return http.Response('Not Found', 404);
       });
 
-      final client = ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
-      final manager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
+      final client =
+          ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
+      final manager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
 
       await tester.pumpWidget(
         AafiyaPatientApp(
@@ -119,7 +125,8 @@ void main() {
           find.widgetWithText(AafiyaTextField, 'البريد الإلكتروني'),
           'khaled@aafiya.dz');
       await tester.enterText(
-          find.widgetWithText(AafiyaTextField, 'كلمة المرور'), 'SecurePass2026!');
+          find.widgetWithText(AafiyaTextField, 'كلمة المرور'),
+          'SecurePass2026!');
       await tester.enterText(
           find.widgetWithText(AafiyaTextField, 'تأكيد كلمة المرور'),
           'SecurePass2026!');
@@ -217,8 +224,10 @@ void main() {
         return http.Response('Not Found', 404);
       });
 
-      final client = ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
-      final manager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
+      final client =
+          ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
+      final manager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
 
       await tester.pumpWidget(
         AafiyaPatientApp(
@@ -239,7 +248,8 @@ void main() {
           find.widgetWithText(AafiyaTextField, 'البريد الإلكتروني'),
           'khaled@aafiya.dz');
       await tester.enterText(
-          find.widgetWithText(AafiyaTextField, 'كلمة المرور'), 'SecurePass2026!');
+          find.widgetWithText(AafiyaTextField, 'كلمة المرور'),
+          'SecurePass2026!');
       await tester.enterText(
           find.widgetWithText(AafiyaTextField, 'تأكيد كلمة المرور'),
           'SecurePass2026!');

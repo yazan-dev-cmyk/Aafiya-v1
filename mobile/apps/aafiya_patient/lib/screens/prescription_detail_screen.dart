@@ -248,7 +248,7 @@ class PrescriptionDetailScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AafiyaColors.pureWhite,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: AafiyaColors.border),
                     ),
@@ -256,7 +256,7 @@ class PrescriptionDetailScreen extends StatelessWidget {
                       data: qrData,
                       version: QrVersions.auto,
                       size: 180.0,
-                      backgroundColor: Colors.white,
+                      backgroundColor: AafiyaColors.pureWhite,
                       errorCorrectionLevel: QrErrorCorrectLevel.M,
                     ),
                   ),
@@ -466,7 +466,8 @@ class PrescriptionDetailScreen extends StatelessWidget {
     );
   }
 
-  static String _resolveStatusLabel(LocalizedStrings strings, Prescription prescription) {
+  static String _resolveStatusLabel(
+      LocalizedStrings strings, Prescription prescription) {
     switch (prescription.status.toLowerCase()) {
       case 'active':
         return prescription.isValid

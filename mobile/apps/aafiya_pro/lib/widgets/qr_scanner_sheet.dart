@@ -165,7 +165,7 @@ class _QrScannerSheetState extends State<QrScannerSheet>
                 // Close button
                 IconButton(
                   key: const Key('qr_scanner_close_button'),
-                  icon: const Icon(Icons.close_rounded, color: Colors.white),
+                  icon: const Icon(Icons.close_rounded, color: AafiyaColors.pureWhite),
                   constraints:
                       const BoxConstraints(minWidth: 48, minHeight: 48),
                   onPressed: () => Navigator.of(context).pop(),
@@ -173,11 +173,14 @@ class _QrScannerSheetState extends State<QrScannerSheet>
                 ),
 
                 // Sheet Title
-                Text(
-                  strings.qrScannerTitle,
-                  style: AafiyaTypography.titleMedium.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Text(
+                    strings.qrScannerTitle,
+                    textAlign: TextAlign.center,
+                    style: AafiyaTypography.titleMedium.copyWith(
+                      color: AafiyaColors.pureWhite,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
 
@@ -192,7 +195,7 @@ class _QrScannerSheetState extends State<QrScannerSheet>
                         isTorchOn
                             ? Icons.flash_on_rounded
                             : Icons.flash_off_rounded,
-                        color: isTorchOn ? Colors.amber : Colors.white,
+                        color: isTorchOn ? AafiyaColors.warning : AafiyaColors.pureWhite,
                       ),
                       constraints:
                           const BoxConstraints(minWidth: 48, minHeight: 48),
@@ -237,7 +240,7 @@ class _QrScannerSheetState extends State<QrScannerSheet>
                         border: Border.all(
                           color: _isProcessing
                               ? AafiyaColors.healingGreen
-                              : Colors.white.withValues(alpha: 0.8),
+                              : AafiyaColors.pureWhite.withValues(alpha: 0.8),
                           width: 2.5,
                         ),
                         borderRadius: BorderRadius.circular(AafiyaRadius.lg),
@@ -259,7 +262,7 @@ class _QrScannerSheetState extends State<QrScannerSheet>
                     strings.qrScannerPrompt,
                     textAlign: TextAlign.center,
                     style: AafiyaTypography.bodySmall.copyWith(
-                      color: Colors.white70,
+                      color: AafiyaColors.pureWhite.withValues(alpha: 0.7),
                     ),
                   ),
                   const SizedBox(height: AafiyaSpacing.md),
@@ -269,8 +272,8 @@ class _QrScannerSheetState extends State<QrScannerSheet>
                     icon: const Icon(Icons.keyboard_outlined, size: 18),
                     label: Text(strings.checkInTokenLabel),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      side: const BorderSide(color: Colors.white38),
+                      foregroundColor: AafiyaColors.pureWhite,
+                      side: BorderSide(color: AafiyaColors.pureWhite.withValues(alpha: 0.38)),
                       padding: const EdgeInsets.symmetric(
                         horizontal: AafiyaSpacing.lg,
                         vertical: AafiyaSpacing.sm,
@@ -310,7 +313,7 @@ class _QrScannerSheetState extends State<QrScannerSheet>
                   : strings.qrScanInvalidToken,
               textAlign: TextAlign.center,
               style: AafiyaTypography.titleMedium.copyWith(
-                color: Colors.white,
+                color: AafiyaColors.pureWhite,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -321,7 +324,7 @@ class _QrScannerSheetState extends State<QrScannerSheet>
                   : strings.cameraPermissionMessage,
               textAlign: TextAlign.center,
               style: AafiyaTypography.bodySmall.copyWith(
-                color: Colors.white70,
+                color: AafiyaColors.pureWhite.withValues(alpha: 0.7),
               ),
             ),
             const SizedBox(height: AafiyaSpacing.lg),

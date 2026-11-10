@@ -66,7 +66,8 @@ class _DoctorDirectoryScreenState extends State<DoctorDirectoryScreen> {
   @override
   void initState() {
     super.initState();
-    _masterDataService = widget.masterDataService ?? MasterDataService(widget.apiClient);
+    _masterDataService =
+        widget.masterDataService ?? MasterDataService(widget.apiClient);
     _selectedSpecialtyId = widget.initialSpecialtyId;
     _scrollController.addListener(_onScroll);
     _fetchDoctors(page: 1, reset: true);
@@ -230,7 +231,8 @@ class _DoctorDirectoryScreenState extends State<DoctorDirectoryScreen> {
     );
   }
 
-  Widget _buildSearchAndFilters(BuildContext context, LocalizedStrings strings) {
+  Widget _buildSearchAndFilters(
+      BuildContext context, LocalizedStrings strings) {
     return Container(
       color: AafiyaColors.pureWhite,
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
@@ -242,7 +244,8 @@ class _DoctorDirectoryScreenState extends State<DoctorDirectoryScreen> {
             onChanged: _onSearchChanged,
             decoration: InputDecoration(
               hintText: strings.searchDoctorsHint,
-              prefixIcon: const Icon(Icons.search_rounded, color: AafiyaColors.secondaryText),
+              prefixIcon: const Icon(Icons.search_rounded,
+                  color: AafiyaColors.secondaryText),
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
                       icon: const Icon(Icons.clear_rounded, size: 18),
@@ -252,7 +255,8 @@ class _DoctorDirectoryScreenState extends State<DoctorDirectoryScreen> {
                       },
                     )
                   : null,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               filled: true,
               fillColor: AafiyaColors.lightBackground,
               border: OutlineInputBorder(
@@ -265,7 +269,8 @@ class _DoctorDirectoryScreenState extends State<DoctorDirectoryScreen> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AafiyaRadius.md),
-                borderSide: const BorderSide(color: AafiyaColors.healthBlue, width: 1.5),
+                borderSide: const BorderSide(
+                    color: AafiyaColors.healthBlue, width: 1.5),
               ),
             ),
           ),
@@ -353,7 +358,8 @@ class _DoctorDirectoryScreenState extends State<DoctorDirectoryScreen> {
     );
   }
 
-  Widget _buildPaginationFooter(BuildContext context, LocalizedStrings strings) {
+  Widget _buildPaginationFooter(
+      BuildContext context, LocalizedStrings strings) {
     if (_isLoadingMore) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 20),
@@ -366,7 +372,8 @@ class _DoctorDirectoryScreenState extends State<DoctorDirectoryScreen> {
                 height: 18,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(AafiyaColors.healthBlue),
+                  valueColor:
+                      AlwaysStoppedAnimation<Color>(AafiyaColors.healthBlue),
                 ),
               ),
               const SizedBox(width: 12),
@@ -397,7 +404,8 @@ class _DoctorDirectoryScreenState extends State<DoctorDirectoryScreen> {
               ),
               const SizedBox(height: 8),
               OutlinedButton.icon(
-                onPressed: () => _fetchDoctors(page: _currentPage + 1, reset: false),
+                onPressed: () =>
+                    _fetchDoctors(page: _currentPage + 1, reset: false),
                 icon: const Icon(Icons.refresh_rounded, size: 16),
                 label: Text(strings.retry),
               ),
@@ -412,7 +420,8 @@ class _DoctorDirectoryScreenState extends State<DoctorDirectoryScreen> {
         padding: const EdgeInsets.symmetric(vertical: 12),
         child: Center(
           child: TextButton.icon(
-            onPressed: () => _fetchDoctors(page: _currentPage + 1, reset: false),
+            onPressed: () =>
+                _fetchDoctors(page: _currentPage + 1, reset: false),
             icon: const Icon(Icons.expand_more_rounded, size: 18),
             label: Text(strings.loadMore),
           ),

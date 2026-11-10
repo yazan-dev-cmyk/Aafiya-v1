@@ -177,7 +177,8 @@ class PrescriptionCard extends StatelessWidget {
     );
   }
 
-  static String _resolveStatusLabel(LocalizedStrings strings, Prescription prescription) {
+  static String _resolveStatusLabel(
+      LocalizedStrings strings, Prescription prescription) {
     switch (prescription.status.toLowerCase()) {
       case 'active':
         return prescription.isValid

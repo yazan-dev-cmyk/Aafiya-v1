@@ -6,25 +6,38 @@ void main() {
   group('AafiyaBreakpoints & Responsive Tokens Tests', () {
     test('screenTypeFromWidth resolves correct screen categories', () {
       // Compact (< 400dp)
-      expect(AafiyaBreakpoints.screenTypeFromWidth(320.0), equals(AafiyaScreenType.compact));
-      expect(AafiyaBreakpoints.screenTypeFromWidth(360.0), equals(AafiyaScreenType.compact));
-      expect(AafiyaBreakpoints.screenTypeFromWidth(375.0), equals(AafiyaScreenType.compact));
-      expect(AafiyaBreakpoints.screenTypeFromWidth(390.0), equals(AafiyaScreenType.compact));
-      expect(AafiyaBreakpoints.screenTypeFromWidth(399.9), equals(AafiyaScreenType.compact));
+      expect(AafiyaBreakpoints.screenTypeFromWidth(320.0),
+          equals(AafiyaScreenType.compact));
+      expect(AafiyaBreakpoints.screenTypeFromWidth(360.0),
+          equals(AafiyaScreenType.compact));
+      expect(AafiyaBreakpoints.screenTypeFromWidth(375.0),
+          equals(AafiyaScreenType.compact));
+      expect(AafiyaBreakpoints.screenTypeFromWidth(390.0),
+          equals(AafiyaScreenType.compact));
+      expect(AafiyaBreakpoints.screenTypeFromWidth(399.9),
+          equals(AafiyaScreenType.compact));
 
       // Medium (400dp - 599dp)
-      expect(AafiyaBreakpoints.screenTypeFromWidth(400.0), equals(AafiyaScreenType.medium));
-      expect(AafiyaBreakpoints.screenTypeFromWidth(412.0), equals(AafiyaScreenType.medium));
-      expect(AafiyaBreakpoints.screenTypeFromWidth(500.0), equals(AafiyaScreenType.medium));
-      expect(AafiyaBreakpoints.screenTypeFromWidth(599.9), equals(AafiyaScreenType.medium));
+      expect(AafiyaBreakpoints.screenTypeFromWidth(400.0),
+          equals(AafiyaScreenType.medium));
+      expect(AafiyaBreakpoints.screenTypeFromWidth(412.0),
+          equals(AafiyaScreenType.medium));
+      expect(AafiyaBreakpoints.screenTypeFromWidth(500.0),
+          equals(AafiyaScreenType.medium));
+      expect(AafiyaBreakpoints.screenTypeFromWidth(599.9),
+          equals(AafiyaScreenType.medium));
 
       // Expanded (>= 600dp)
-      expect(AafiyaBreakpoints.screenTypeFromWidth(600.0), equals(AafiyaScreenType.expanded));
-      expect(AafiyaBreakpoints.screenTypeFromWidth(768.0), equals(AafiyaScreenType.expanded));
-      expect(AafiyaBreakpoints.screenTypeFromWidth(1024.0), equals(AafiyaScreenType.expanded));
+      expect(AafiyaBreakpoints.screenTypeFromWidth(600.0),
+          equals(AafiyaScreenType.expanded));
+      expect(AafiyaBreakpoints.screenTypeFromWidth(768.0),
+          equals(AafiyaScreenType.expanded));
+      expect(AafiyaBreakpoints.screenTypeFromWidth(1024.0),
+          equals(AafiyaScreenType.expanded));
     });
 
-    testWidgets('AafiyaResponsive renders compact layout on 360dp phone width', (tester) async {
+    testWidgets('AafiyaResponsive renders compact layout on 360dp phone width',
+        (tester) async {
       tester.view.physicalSize = const Size(360, 800);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -47,7 +60,8 @@ void main() {
       expect(find.text('Expanded View'), findsNothing);
     });
 
-    testWidgets('AafiyaResponsive renders medium layout on 480dp width', (tester) async {
+    testWidgets('AafiyaResponsive renders medium layout on 480dp width',
+        (tester) async {
       tester.view.physicalSize = const Size(480, 800);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -70,7 +84,8 @@ void main() {
       expect(find.text('Expanded View'), findsNothing);
     });
 
-    testWidgets('AafiyaResponsive renders expanded layout on 720dp width', (tester) async {
+    testWidgets('AafiyaResponsive renders expanded layout on 720dp width',
+        (tester) async {
       tester.view.physicalSize = const Size(720, 900);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -93,7 +108,9 @@ void main() {
       expect(find.text('Expanded View'), findsOneWidget);
     });
 
-    testWidgets('AafiyaResponsive falls back gracefully when medium/expanded omitted', (tester) async {
+    testWidgets(
+        'AafiyaResponsive falls back gracefully when medium/expanded omitted',
+        (tester) async {
       // 500dp with only compact provided -> fallback to compact
       tester.view.physicalSize = const Size(500, 800);
       tester.view.devicePixelRatio = 1.0;
@@ -113,7 +130,9 @@ void main() {
       expect(find.text('Fallback Compact View'), findsOneWidget);
     });
 
-    testWidgets('AafiyaResponsiveBuilder delivers active screen type and context extensions work', (tester) async {
+    testWidgets(
+        'AafiyaResponsiveBuilder delivers active screen type and context extensions work',
+        (tester) async {
       tester.view.physicalSize = const Size(375, 667);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);

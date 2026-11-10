@@ -32,7 +32,8 @@ class AafiyaSpecialtySelector extends StatefulWidget {
   final FormFieldValidator<String>? validator;
 
   @override
-  State<AafiyaSpecialtySelector> createState() => _AafiyaSpecialtySelectorState();
+  State<AafiyaSpecialtySelector> createState() =>
+      _AafiyaSpecialtySelectorState();
 }
 
 class _AafiyaSpecialtySelectorState extends State<AafiyaSpecialtySelector> {
@@ -61,14 +62,17 @@ class _AafiyaSpecialtySelectorState extends State<AafiyaSpecialtySelector> {
       _errorMessage = null;
     });
 
-    final result = await widget.masterDataService.getSpecialties(forceRefresh: forceRefresh);
+    final result = await widget.masterDataService
+        .getSpecialties(forceRefresh: forceRefresh);
     if (!mounted) return;
 
     switch (result) {
       case ApiSuccess(:final data):
         setState(() {
           // Additional defensive filter guaranteeing zero RAD/PATH presence
-          _specialties = data.where((s) => s.isActive && s.code != 'RAD' && s.code != 'PATH').toList();
+          _specialties = data
+              .where((s) => s.isActive && s.code != 'RAD' && s.code != 'PATH')
+              .toList();
           _isLoading = false;
           _syncSelectedSpecialty();
         });
@@ -87,9 +91,9 @@ class _AafiyaSpecialtySelectorState extends State<AafiyaSpecialtySelector> {
       _selectedSpecialty = null;
     } else {
       _selectedSpecialty = _specialties.cast<MedicalSpecialty?>().firstWhere(
-        (s) => s?.id == widget.selectedSpecialtyId,
-        orElse: () => null,
-      );
+            (s) => s?.id == widget.selectedSpecialtyId,
+            orElse: () => null,
+          );
     }
   }
 
@@ -149,16 +153,22 @@ class _AafiyaSpecialtySelectorState extends State<AafiyaSpecialtySelector> {
           const SizedBox(height: AafiyaSpacing.xs),
         ],
         InkWell(
-          onTap: widget.enabled && !_isLoading ? () => _openSelectionModal(context, strings) : null,
+          onTap: widget.enabled && !_isLoading
+              ? () => _openSelectionModal(context, strings)
+              : null,
           borderRadius: AafiyaRadius.borderMd,
           child: Container(
             height: 48,
             padding: const EdgeInsets.symmetric(horizontal: AafiyaSpacing.md),
             decoration: BoxDecoration(
-              color: widget.enabled ? AafiyaColors.pureWhite : AafiyaColors.border.withValues(alpha: 0.2),
+              color: widget.enabled
+                  ? AafiyaColors.pureWhite
+                  : AafiyaColors.border.withValues(alpha: 0.2),
               borderRadius: AafiyaRadius.borderMd,
               border: Border.all(
-                color: _errorMessage != null ? AafiyaColors.error : AafiyaColors.border,
+                color: _errorMessage != null
+                    ? AafiyaColors.error
+                    : AafiyaColors.border,
                 width: 1.5,
               ),
             ),
@@ -168,7 +178,8 @@ class _AafiyaSpecialtySelectorState extends State<AafiyaSpecialtySelector> {
                   const SizedBox(
                     width: 20,
                     height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: AafiyaColors.primaryBlue),
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2, color: AafiyaColors.primaryBlue),
                   )
                 else
                   Icon(
@@ -176,7 +187,9 @@ class _AafiyaSpecialtySelectorState extends State<AafiyaSpecialtySelector> {
                     size: 20,
                     color: _errorMessage != null
                         ? AafiyaColors.error
-                        : (_selectedSpecialty != null ? AafiyaColors.primaryBlue : AafiyaColors.secondaryText),
+                        : (_selectedSpecialty != null
+                            ? AafiyaColors.primaryBlue
+                            : AafiyaColors.secondaryText),
                   ),
                 const SizedBox(width: AafiyaSpacing.sm),
                 Expanded(
@@ -185,14 +198,18 @@ class _AafiyaSpecialtySelectorState extends State<AafiyaSpecialtySelector> {
                         ? strings.loadingSpecialties
                         : (_errorMessage != null
                             ? _errorMessage!
-                            : (displayText.isNotEmpty ? displayText : effectiveHint)),
+                            : (displayText.isNotEmpty
+                                ? displayText
+                                : effectiveHint)),
                     style: AafiyaTypography.bodyMedium.copyWith(
                       color: _errorMessage != null
                           ? AafiyaColors.error
                           : (displayText.isNotEmpty
                               ? AafiyaColors.primaryText
                               : AafiyaColors.secondaryText),
-                      fontWeight: displayText.isNotEmpty ? FontWeight.w600 : FontWeight.normal,
+                      fontWeight: displayText.isNotEmpty
+                          ? FontWeight.w600
+                          : FontWeight.normal,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -200,7 +217,8 @@ class _AafiyaSpecialtySelectorState extends State<AafiyaSpecialtySelector> {
                 ),
                 if (_errorMessage != null)
                   IconButton(
-                    icon: const Icon(Icons.refresh_rounded, size: 18, color: AafiyaColors.error),
+                    icon: const Icon(Icons.refresh_rounded,
+                        size: 18, color: AafiyaColors.error),
                     onPressed: () => _loadSpecialties(forceRefresh: true),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
@@ -238,7 +256,8 @@ class _SpecialtySelectionSheet extends StatefulWidget {
   final ValueChanged<MedicalSpecialty?> onSelected;
 
   @override
-  State<_SpecialtySelectionSheet> createState() => _SpecialtySelectionSheetState();
+  State<_SpecialtySelectionSheet> createState() =>
+      _SpecialtySelectionSheetState();
 }
 
 class _SpecialtySelectionSheetState extends State<_SpecialtySelectionSheet> {
@@ -283,7 +302,8 @@ class _SpecialtySelectionSheetState extends State<_SpecialtySelectionSheet> {
             ),
             // Header
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AafiyaSpacing.lg, vertical: AafiyaSpacing.xs),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AafiyaSpacing.lg, vertical: AafiyaSpacing.xs),
               child: Row(
                 children: [
                   Text(
@@ -303,7 +323,8 @@ class _SpecialtySelectionSheetState extends State<_SpecialtySelectionSheet> {
             ),
             // Search field
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AafiyaSpacing.lg, vertical: AafiyaSpacing.xs),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AafiyaSpacing.lg, vertical: AafiyaSpacing.xs),
               child: TextField(
                 controller: _searchController,
                 onChanged: (val) => setState(() => _filter = val.trim()),
@@ -312,7 +333,8 @@ class _SpecialtySelectionSheetState extends State<_SpecialtySelectionSheet> {
                   prefixIcon: const Icon(Icons.search_rounded, size: 20),
                   filled: true,
                   fillColor: AafiyaColors.lightBackground,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                  contentPadding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
@@ -333,11 +355,17 @@ class _SpecialtySelectionSheetState extends State<_SpecialtySelectionSheet> {
                       title: Text(
                         widget.allOptionLabel,
                         style: TextStyle(
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                          color: isSelected ? AafiyaColors.primaryBlue : AafiyaColors.primaryText,
+                          fontWeight:
+                              isSelected ? FontWeight.bold : FontWeight.normal,
+                          color: isSelected
+                              ? AafiyaColors.primaryBlue
+                              : AafiyaColors.primaryText,
                         ),
                       ),
-                      trailing: isSelected ? const Icon(Icons.check_rounded, color: AafiyaColors.primaryBlue) : null,
+                      trailing: isSelected
+                          ? const Icon(Icons.check_rounded,
+                              color: AafiyaColors.primaryBlue)
+                          : null,
                       onTap: () => widget.onSelected(null),
                     );
                   }
@@ -350,11 +378,17 @@ class _SpecialtySelectionSheetState extends State<_SpecialtySelectionSheet> {
                     title: Text(
                       specialty.localizedName(locale),
                       style: TextStyle(
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                        color: isSelected ? AafiyaColors.primaryBlue : AafiyaColors.primaryText,
+                        fontWeight:
+                            isSelected ? FontWeight.bold : FontWeight.normal,
+                        color: isSelected
+                            ? AafiyaColors.primaryBlue
+                            : AafiyaColors.primaryText,
                       ),
                     ),
-                    trailing: isSelected ? const Icon(Icons.check_rounded, color: AafiyaColors.primaryBlue) : null,
+                    trailing: isSelected
+                        ? const Icon(Icons.check_rounded,
+                            color: AafiyaColors.primaryBlue)
+                        : null,
                     onTap: () => widget.onSelected(specialty),
                   );
                 },

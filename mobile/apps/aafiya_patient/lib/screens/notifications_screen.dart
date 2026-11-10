@@ -157,7 +157,8 @@ class _NotificationsScreenState extends State<NotificationsScreen>
     }
   }
 
-  Future<void> _loadData({bool isRefresh = false, bool isSilent = false}) async {
+  Future<void> _loadData(
+      {bool isRefresh = false, bool isSilent = false}) async {
     if (!widget.sessionManager.isAuthenticated) {
       setState(() {
         _items = [];

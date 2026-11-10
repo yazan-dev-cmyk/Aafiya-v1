@@ -223,7 +223,7 @@ class DoctorOnboardingDialog extends StatelessWidget {
             },
             style: FilledButton.styleFrom(
               backgroundColor: AafiyaColors.warning,
-              foregroundColor: Colors.black87,
+              foregroundColor: AafiyaColors.primaryText,
             ),
             icon: const Icon(Icons.store_mall_directory_outlined, size: 18),
             label: Text(
@@ -239,7 +239,7 @@ class DoctorOnboardingDialog extends StatelessWidget {
             },
             style: FilledButton.styleFrom(
               backgroundColor: AafiyaColors.primaryBlue,
-              foregroundColor: Colors.white,
+              foregroundColor: AafiyaColors.pureWhite,
             ),
             icon: const Icon(Icons.event_available_rounded, size: 18),
             label: Text(
@@ -255,7 +255,7 @@ class DoctorOnboardingDialog extends StatelessWidget {
             },
             style: FilledButton.styleFrom(
               backgroundColor: AafiyaColors.info,
-              foregroundColor: Colors.white,
+              foregroundColor: AafiyaColors.pureWhite,
             ),
             child: Text(
               strings.onboardingUnderstoodAction,
@@ -297,14 +297,14 @@ class DoctorOnboardingDialog extends StatelessWidget {
           ),
           child: Center(
             child: isCompleted
-                ? const Icon(Icons.check, size: 14, color: Colors.white)
+                ? const Icon(Icons.check, size: 14, color: AafiyaColors.pureWhite)
                 : Text(
                     '$stepNumber',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                       color:
-                          isCurrent ? Colors.white : AafiyaColors.secondaryText,
+                          isCurrent ? AafiyaColors.pureWhite : AafiyaColors.secondaryText,
                     ),
                   ),
           ),

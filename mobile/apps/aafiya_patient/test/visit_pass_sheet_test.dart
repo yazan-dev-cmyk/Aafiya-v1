@@ -13,7 +13,8 @@ void main() {
   Appointment createTestAppointment({
     String id = 'appt-101',
     String bookingReference = 'BK-998877',
-    String? secureToken = 'sec_tok_alpha_numeric_64_character_hash_value_1234567890abcdef',
+    String? secureToken =
+        'sec_tok_alpha_numeric_64_character_hash_value_1234567890abcdef',
     AppointmentStatus status = AppointmentStatus.confirmed,
     String doctorName = 'د. كمال عماري',
     String clinicName = 'عيادة النور المركزية',
@@ -25,7 +26,8 @@ void main() {
       bookingReference: bookingReference,
       secureToken: secureToken,
       status: status,
-      doctor: AppointmentDoctor(id: 'doc-1', name: doctorName, specialty: 'Cardiology'),
+      doctor: AppointmentDoctor(
+          id: 'doc-1', name: doctorName, specialty: 'Cardiology'),
       clinic: AppointmentClinic(id: 'cl-1', name: clinicName, wilaya: '16'),
       patient: const AppointmentPatient(id: 'pat-1', name: 'أحمد بن علي'),
       appointmentDate: appointmentDate,
@@ -49,7 +51,8 @@ void main() {
   }
 
   group('P-02 VisitPassSheet Unit & Widget Tests', () {
-    testWidgets('renders QR code with exact secureToken for confirmed appointment',
+    testWidgets(
+        'renders QR code with exact secureToken for confirmed appointment',
         (tester) async {
       const token = 'sec_tok_verified_token_1234567890abcdef';
       final appt = createTestAppointment(
@@ -57,7 +60,8 @@ void main() {
         status: AppointmentStatus.confirmed,
       );
 
-      await tester.pumpWidget(createTestWidget(VisitPassSheet(appointment: appt)));
+      await tester
+          .pumpWidget(createTestWidget(VisitPassSheet(appointment: appt)));
       await tester.pumpAndSettle();
 
       // Check header and titles
@@ -72,7 +76,8 @@ void main() {
       expect(find.byKey(const Key('visit_pass_qr_image')), findsOneWidget);
 
       expect(find.byKey(const Key('visit_pass_qr_container')), findsOneWidget);
-      expect(find.byKey(const Key('visit_pass_missing_token_card')), findsNothing);
+      expect(
+          find.byKey(const Key('visit_pass_missing_token_card')), findsNothing);
       expect(find.byKey(const Key('visit_pass_ineligible_card')), findsNothing);
     });
 
@@ -81,21 +86,25 @@ void main() {
         status: AppointmentStatus.pending,
       );
 
-      await tester.pumpWidget(createTestWidget(VisitPassSheet(appointment: appt)));
+      await tester
+          .pumpWidget(createTestWidget(VisitPassSheet(appointment: appt)));
       await tester.pumpAndSettle();
 
       expect(find.byType(QrImageView), findsOneWidget);
       expect(find.byKey(const Key('visit_pass_qr_container')), findsOneWidget);
     });
 
-    testWidgets('displays missing token card and NO QR code when secureToken is null',
+    testWidgets(
+        'displays missing token card and NO QR code when secureToken is null',
         (tester) async {
       final appt = createTestAppointment(secureToken: null);
 
-      await tester.pumpWidget(createTestWidget(VisitPassSheet(appointment: appt)));
+      await tester
+          .pumpWidget(createTestWidget(VisitPassSheet(appointment: appt)));
       await tester.pumpAndSettle();
 
-      expect(find.byKey(const Key('visit_pass_missing_token_card')), findsOneWidget);
+      expect(find.byKey(const Key('visit_pass_missing_token_card')),
+          findsOneWidget);
       expect(find.text('رمز المرور غير متوفر لهذا الموعد'), findsOneWidget);
       expect(find.byType(QrImageView), findsNothing);
       expect(find.byKey(const Key('visit_pass_qr_container')), findsNothing);
@@ -105,48 +114,63 @@ void main() {
         (tester) async {
       final appt = createTestAppointment(secureToken: '   ');
 
-      await tester.pumpWidget(createTestWidget(VisitPassSheet(appointment: appt)));
+      await tester
+          .pumpWidget(createTestWidget(VisitPassSheet(appointment: appt)));
       await tester.pumpAndSettle();
 
-      expect(find.byKey(const Key('visit_pass_missing_token_card')), findsOneWidget);
+      expect(find.byKey(const Key('visit_pass_missing_token_card')),
+          findsOneWidget);
       expect(find.byType(QrImageView), findsNothing);
     });
 
-    testWidgets('displays ineligible card and suppresses QR when appointment is cancelled',
+    testWidgets(
+        'displays ineligible card and suppresses QR when appointment is cancelled',
         (tester) async {
       final appt = createTestAppointment(status: AppointmentStatus.cancelled);
 
-      await tester.pumpWidget(createTestWidget(VisitPassSheet(appointment: appt)));
+      await tester
+          .pumpWidget(createTestWidget(VisitPassSheet(appointment: appt)));
       await tester.pumpAndSettle();
 
-      expect(find.byKey(const Key('visit_pass_ineligible_card')), findsOneWidget);
+      expect(
+          find.byKey(const Key('visit_pass_ineligible_card')), findsOneWidget);
       expect(find.text('هذا الموعد غير مؤهل لتسجيل الحضور'), findsOneWidget);
       expect(find.byType(QrImageView), findsNothing);
       expect(find.byKey(const Key('visit_pass_qr_container')), findsNothing);
     });
 
-    testWidgets('displays ineligible card when appointment is expired', (tester) async {
+    testWidgets('displays ineligible card when appointment is expired',
+        (tester) async {
       final appt = createTestAppointment(status: AppointmentStatus.expired);
 
-      await tester.pumpWidget(createTestWidget(VisitPassSheet(appointment: appt)));
+      await tester
+          .pumpWidget(createTestWidget(VisitPassSheet(appointment: appt)));
       await tester.pumpAndSettle();
 
-      expect(find.byKey(const Key('visit_pass_ineligible_card')), findsOneWidget);
+      expect(
+          find.byKey(const Key('visit_pass_ineligible_card')), findsOneWidget);
       expect(find.byType(QrImageView), findsNothing);
     });
 
-    testWidgets('displays ineligible card when appointment is rejected or noShow',
+    testWidgets(
+        'displays ineligible card when appointment is rejected or noShow',
         (tester) async {
-      final apptRejected = createTestAppointment(status: AppointmentStatus.rejected);
-      await tester.pumpWidget(createTestWidget(VisitPassSheet(appointment: apptRejected)));
+      final apptRejected =
+          createTestAppointment(status: AppointmentStatus.rejected);
+      await tester.pumpWidget(
+          createTestWidget(VisitPassSheet(appointment: apptRejected)));
       await tester.pumpAndSettle();
-      expect(find.byKey(const Key('visit_pass_ineligible_card')), findsOneWidget);
+      expect(
+          find.byKey(const Key('visit_pass_ineligible_card')), findsOneWidget);
       expect(find.byType(QrImageView), findsNothing);
 
-      final apptNoShow = createTestAppointment(status: AppointmentStatus.noShow);
-      await tester.pumpWidget(createTestWidget(VisitPassSheet(appointment: apptNoShow)));
+      final apptNoShow =
+          createTestAppointment(status: AppointmentStatus.noShow);
+      await tester.pumpWidget(
+          createTestWidget(VisitPassSheet(appointment: apptNoShow)));
       await tester.pumpAndSettle();
-      expect(find.byKey(const Key('visit_pass_ineligible_card')), findsOneWidget);
+      expect(
+          find.byKey(const Key('visit_pass_ineligible_card')), findsOneWidget);
       expect(find.byType(QrImageView), findsNothing);
     });
 
@@ -154,7 +178,8 @@ void main() {
         (tester) async {
       final appt = createTestAppointment(status: AppointmentStatus.attended);
 
-      await tester.pumpWidget(createTestWidget(VisitPassSheet(appointment: appt)));
+      await tester
+          .pumpWidget(createTestWidget(VisitPassSheet(appointment: appt)));
       await tester.pumpAndSettle();
 
       expect(find.text('تم تسجيل الحضور مسبقاً'), findsOneWidget);
@@ -164,7 +189,8 @@ void main() {
     testWidgets('copies booking reference to clipboard on tap', (tester) async {
       final appt = createTestAppointment(bookingReference: 'REF-123456');
 
-      await tester.pumpWidget(createTestWidget(VisitPassSheet(appointment: appt)));
+      await tester
+          .pumpWidget(createTestWidget(VisitPassSheet(appointment: appt)));
       await tester.pumpAndSettle();
 
       // Tap on booking reference
@@ -175,21 +201,25 @@ void main() {
       expect(find.text('تم نسخ رقم الحجز #REF-123456'), findsOneWidget);
     });
 
-    testWidgets('displays missing token card when secureToken is exact empty string ""',
+    testWidgets(
+        'displays missing token card when secureToken is exact empty string ""',
         (tester) async {
       final appt = createTestAppointment(secureToken: '');
 
-      await tester.pumpWidget(createTestWidget(VisitPassSheet(appointment: appt)));
+      await tester
+          .pumpWidget(createTestWidget(VisitPassSheet(appointment: appt)));
       await tester.pumpAndSettle();
 
-      expect(find.byKey(const Key('visit_pass_missing_token_card')), findsOneWidget);
+      expect(find.byKey(const Key('visit_pass_missing_token_card')),
+          findsOneWidget);
       expect(find.byType(QrImageView), findsNothing);
     });
 
     testWidgets('renders QR code for rescheduled appointment', (tester) async {
       final appt = createTestAppointment(status: AppointmentStatus.rescheduled);
 
-      await tester.pumpWidget(createTestWidget(VisitPassSheet(appointment: appt)));
+      await tester
+          .pumpWidget(createTestWidget(VisitPassSheet(appointment: appt)));
       await tester.pumpAndSettle();
 
       expect(find.byType(QrImageView), findsOneWidget);
@@ -212,7 +242,8 @@ void main() {
         timeSlot: null,
       );
 
-      await tester.pumpWidget(createTestWidget(VisitPassSheet(appointment: appt)));
+      await tester
+          .pumpWidget(createTestWidget(VisitPassSheet(appointment: appt)));
       await tester.pumpAndSettle();
 
       expect(find.byType(QrImageView), findsOneWidget);
@@ -220,7 +251,8 @@ void main() {
       expect(find.text('-'), findsOneWidget);
     });
 
-    testWidgets('dismisses modal sheet when close icon button is tapped', (tester) async {
+    testWidgets('dismisses modal sheet when close icon button is tapped',
+        (tester) async {
       final appt = createTestAppointment();
 
       await tester.pumpWidget(
@@ -282,7 +314,8 @@ void main() {
         (tester) async {
       final appt = createTestAppointment();
 
-      await tester.pumpWidget(createTestWidget(VisitPassSheet(appointment: appt)));
+      await tester
+          .pumpWidget(createTestWidget(VisitPassSheet(appointment: appt)));
       await tester.pumpAndSettle();
 
       expect(find.textContaining('تشخيص'), findsNothing);
@@ -328,7 +361,8 @@ void main() {
       expect(find.byKey(const Key('visit_pass_qr_image')), findsOneWidget);
     });
 
-    testWidgets('renders localized button and sheet in English', (tester) async {
+    testWidgets('renders localized button and sheet in English',
+        (tester) async {
       final appt = createTestAppointment();
 
       await tester.pumpWidget(

@@ -45,7 +45,8 @@ final class AppointmentDetailsDestination extends DeepLinkDestination {
   int get hashCode => appointmentId.hashCode;
 
   @override
-  String toString() => 'AppointmentDetailsDestination(appointmentId: $appointmentId)';
+  String toString() =>
+      'AppointmentDetailsDestination(appointmentId: $appointmentId)';
 }
 
 /// Destination for encrypted shared medical record viewing.

@@ -24,7 +24,8 @@ class AafiyaWilayaFilterChips extends StatefulWidget {
   final bool useArabicNamesForQuery;
 
   @override
-  State<AafiyaWilayaFilterChips> createState() => _AafiyaWilayaFilterChipsState();
+  State<AafiyaWilayaFilterChips> createState() =>
+      _AafiyaWilayaFilterChipsState();
 }
 
 class _AafiyaWilayaFilterChipsState extends State<AafiyaWilayaFilterChips> {
@@ -44,7 +45,8 @@ class _AafiyaWilayaFilterChipsState extends State<AafiyaWilayaFilterChips> {
       _errorMessage = null;
     });
 
-    final result = await widget.masterDataService.getWilayas(forceRefresh: forceRefresh);
+    final result =
+        await widget.masterDataService.getWilayas(forceRefresh: forceRefresh);
     if (!mounted) return;
 
     switch (result) {
@@ -112,7 +114,8 @@ class _AafiyaWilayaFilterChipsState extends State<AafiyaWilayaFilterChips> {
             style: const TextStyle(color: AafiyaColors.error, fontSize: 12),
           ),
           IconButton(
-            icon: const Icon(Icons.refresh_rounded, size: 16, color: AafiyaColors.error),
+            icon: const Icon(Icons.refresh_rounded,
+                size: 16, color: AafiyaColors.error),
             onPressed: () => _loadWilayas(forceRefresh: true),
           ),
         ],
@@ -133,7 +136,8 @@ class _AafiyaWilayaFilterChipsState extends State<AafiyaWilayaFilterChips> {
           for (final wilaya in _wilayas) ...[
             const SizedBox(width: AafiyaSpacing.sm),
             Builder(builder: (ctx) {
-              final queryVal = widget.useArabicNamesForQuery ? wilaya.nameAr : wilaya.code;
+              final queryVal =
+                  widget.useArabicNamesForQuery ? wilaya.nameAr : wilaya.code;
               final isSelected = widget.selectedWilaya == queryVal ||
                   widget.selectedWilaya == wilaya.code ||
                   widget.selectedWilaya == wilaya.nameAr;

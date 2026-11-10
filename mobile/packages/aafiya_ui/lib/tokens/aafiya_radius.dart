@@ -33,20 +33,34 @@ abstract final class AafiyaRadius {
   static const BorderRadius borderMd = BorderRadius.all(Radius.circular(md));
   static const BorderRadius borderLg = BorderRadius.all(Radius.circular(lg));
   static const BorderRadius borderXl = BorderRadius.all(Radius.circular(xl));
-  static const BorderRadius borderPill = BorderRadius.all(Radius.circular(pill));
-  static const BorderRadius borderBrandMark = BorderRadius.all(Radius.circular(brandMark));
-  static const BorderRadius borderButton = BorderRadius.all(Radius.circular(button));
-  static const BorderRadius borderCard = BorderRadius.all(Radius.circular(card));
-  static const BorderRadius borderTicket = BorderRadius.all(Radius.circular(ticket));
-  static const BorderRadius borderSheet = BorderRadius.vertical(top: Radius.circular(sheet));
+  static const BorderRadius borderPill =
+      BorderRadius.all(Radius.circular(pill));
+  static const BorderRadius borderBrandMark =
+      BorderRadius.all(Radius.circular(brandMark));
+  static const BorderRadius borderButton =
+      BorderRadius.all(Radius.circular(button));
+  static const BorderRadius borderCard =
+      BorderRadius.all(Radius.circular(card));
+  static const BorderRadius borderTicket =
+      BorderRadius.all(Radius.circular(ticket));
+  static const BorderRadius borderSheet =
+      BorderRadius.vertical(top: Radius.circular(sheet));
 
   // Directional border radius tokens (RTL-aware logical start/end)
-  static const BorderRadiusDirectional directionalSmStart = BorderRadiusDirectional.horizontal(start: Radius.circular(sm));
-  static const BorderRadiusDirectional directionalSmEnd = BorderRadiusDirectional.horizontal(end: Radius.circular(sm));
-  static const BorderRadiusDirectional directionalMdStart = BorderRadiusDirectional.horizontal(start: Radius.circular(md));
-  static const BorderRadiusDirectional directionalMdEnd = BorderRadiusDirectional.horizontal(end: Radius.circular(md));
-  static const BorderRadiusDirectional directionalLgStart = BorderRadiusDirectional.horizontal(start: Radius.circular(lg));
-  static const BorderRadiusDirectional directionalLgEnd = BorderRadiusDirectional.horizontal(end: Radius.circular(lg));
-  static const BorderRadiusDirectional directionalXlStart = BorderRadiusDirectional.horizontal(start: Radius.circular(xl));
-  static const BorderRadiusDirectional directionalXlEnd = BorderRadiusDirectional.horizontal(end: Radius.circular(xl));
+  static const BorderRadiusDirectional directionalSmStart =
+      BorderRadiusDirectional.horizontal(start: Radius.circular(sm));
+  static const BorderRadiusDirectional directionalSmEnd =
+      BorderRadiusDirectional.horizontal(end: Radius.circular(sm));
+  static const BorderRadiusDirectional directionalMdStart =
+      BorderRadiusDirectional.horizontal(start: Radius.circular(md));
+  static const BorderRadiusDirectional directionalMdEnd =
+      BorderRadiusDirectional.horizontal(end: Radius.circular(md));
+  static const BorderRadiusDirectional directionalLgStart =
+      BorderRadiusDirectional.horizontal(start: Radius.circular(lg));
+  static const BorderRadiusDirectional directionalLgEnd =
+      BorderRadiusDirectional.horizontal(end: Radius.circular(lg));
+  static const BorderRadiusDirectional directionalXlStart =
+      BorderRadiusDirectional.horizontal(start: Radius.circular(xl));
+  static const BorderRadiusDirectional directionalXlEnd =
+      BorderRadiusDirectional.horizontal(end: Radius.circular(xl));
 }

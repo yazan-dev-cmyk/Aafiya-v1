@@ -71,7 +71,8 @@ class AafiyaSkeleton extends StatefulWidget {
   State<AafiyaSkeleton> createState() => _AafiyaSkeletonState();
 }
 
-class _AafiyaSkeletonState extends State<AafiyaSkeleton> with SingleTickerProviderStateMixin {
+class _AafiyaSkeletonState extends State<AafiyaSkeleton>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
 
   @override
@@ -93,8 +94,10 @@ class _AafiyaSkeletonState extends State<AafiyaSkeleton> with SingleTickerProvid
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final baseColor = isDark ? AafiyaColors.darkSurface : const Color(0xFFE2E8F0);
-    final highlightColor = isDark ? const Color(0xFF334155) : const Color(0xFFF8FAFC);
+    final baseColor =
+        isDark ? AafiyaColors.darkSurface : const Color(0xFFE2E8F0);
+    final highlightColor =
+        isDark ? const Color(0xFF334155) : const Color(0xFFF8FAFC);
 
     return AnimatedBuilder(
       animation: _controller,
@@ -104,7 +107,8 @@ class _AafiyaSkeletonState extends State<AafiyaSkeleton> with SingleTickerProvid
           height: widget.height,
           decoration: BoxDecoration(
             shape: widget.shape,
-            borderRadius: widget.shape == BoxShape.circle ? null : widget.borderRadius,
+            borderRadius:
+                widget.shape == BoxShape.circle ? null : widget.borderRadius,
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,

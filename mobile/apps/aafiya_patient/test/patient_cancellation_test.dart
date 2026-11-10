@@ -30,8 +30,10 @@ void main() {
       bookingReference: bookingReference,
       secureToken: secureToken,
       status: status,
-      doctor: AppointmentDoctor(id: 'doc-1', name: doctorName, specialty: 'Cardiology'),
-      clinic: AppointmentClinic(id: 'cl-1', name: clinicName, wilaya: '16', phone: '021000000'),
+      doctor: AppointmentDoctor(
+          id: 'doc-1', name: doctorName, specialty: 'Cardiology'),
+      clinic: AppointmentClinic(
+          id: 'cl-1', name: clinicName, wilaya: '16', phone: '021000000'),
       patient: AppointmentPatient(id: patientId, name: patientName),
       appointmentDate: appointmentDate,
       timeSlot: timeSlot,
@@ -64,7 +66,8 @@ void main() {
 
   group('FIX-PAT-01 / P-01: Patient Appointment Cancellation Tests', () {
     // 1. Cancellation button visible for active future appointments
-    testWidgets('cancellation button is visible for pending, confirmed, and rescheduled future appointments',
+    testWidgets(
+        'cancellation button is visible for pending, confirmed, and rescheduled future appointments',
         (tester) async {
       configureViewport(tester);
       final now = DateTime(2026, 10, 25, 8, 0); // 2 hours before 10:00
@@ -95,7 +98,8 @@ void main() {
     });
 
     // 2. Cancellation button hidden for terminal appointments
-    testWidgets('cancellation button is hidden for terminal/completed appointments',
+    testWidgets(
+        'cancellation button is hidden for terminal/completed appointments',
         (tester) async {
       configureViewport(tester);
       final now = DateTime(2026, 10, 25, 8, 0);
@@ -128,7 +132,8 @@ void main() {
     });
 
     // 3. DEC-POL-02 Policy Boundary: Cancellation button hidden when now >= appointment start time
-    testWidgets('cancellation button is hidden when current time is at or after appointment start time (DEC-POL-02)',
+    testWidgets(
+        'cancellation button is hidden when current time is at or after appointment start time (DEC-POL-02)',
         (tester) async {
       configureViewport(tester);
       final appt = createTestAppointment(
@@ -177,11 +182,13 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      expect(find.byKey(const Key('cancel_appointment_button')), findsOneWidget);
+      expect(
+          find.byKey(const Key('cancel_appointment_button')), findsOneWidget);
     });
 
     // 4. Ownership verification: Cancellation button hidden if currentPatientId does not match
-    testWidgets('cancellation button is hidden when patient ID does not match appointment patient ID',
+    testWidgets(
+        'cancellation button is hidden when patient ID does not match appointment patient ID',
         (tester) async {
       configureViewport(tester);
       final now = DateTime(2026, 10, 25, 8, 0);
@@ -205,7 +212,8 @@ void main() {
     });
 
     // 5. Dialog dismissal: Cancel button in confirmation dialog dismisses without API call
-    testWidgets('dialog dismissal does not trigger cancellation or API call', (tester) async {
+    testWidgets('dialog dismissal does not trigger cancellation or API call',
+        (tester) async {
       configureViewport(tester);
       var apiCalled = false;
       final mockClient = MockClient((request) async {
@@ -237,8 +245,10 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify dialog is open
-      expect(find.byKey(const Key('cancellation_reason_input')), findsOneWidget);
-      expect(find.byKey(const Key('cancel_dialog_dismiss_button')), findsOneWidget);
+      expect(
+          find.byKey(const Key('cancellation_reason_input')), findsOneWidget);
+      expect(find.byKey(const Key('cancel_dialog_dismiss_button')),
+          findsOneWidget);
 
       // Tap dismiss (strings.cancel)
       await tester.tap(find.byKey(const Key('cancel_dialog_dismiss_button')));
@@ -248,11 +258,13 @@ void main() {
       expect(find.byKey(const Key('cancellation_reason_input')), findsNothing);
       expect(apiCalled, isFalse);
       // Cancel button remains visible because appointment is still confirmed
-      expect(find.byKey(const Key('cancel_appointment_button')), findsOneWidget);
+      expect(
+          find.byKey(const Key('cancel_appointment_button')), findsOneWidget);
     });
 
     // 6. Successful cancellation flow with reason, API call, status mutation, callback and SnackBar
-    testWidgets('successful cancellation sends POST with reason, updates status, and fires callback',
+    testWidgets(
+        'successful cancellation sends POST with reason, updates status, and fires callback',
         (tester) async {
       configureViewport(tester);
       String? sentMethod;
@@ -339,11 +351,13 @@ void main() {
 
       // Verify SnackBar message displayed
       expect(find.byType(SnackBar), findsOneWidget);
-      expect(find.text('تم إلغاء الموعد بنجاح وتحديث الرصيد إن كان مؤكداً.'), findsOneWidget);
+      expect(find.text('تم إلغاء الموعد بنجاح وتحديث الرصيد إن كان مؤكداً.'),
+          findsOneWidget);
     });
 
     // 7. Successful cancellation without reason (optional reason contract)
-    testWidgets('cancellation without reason sends empty payload to API', (tester) async {
+    testWidgets('cancellation without reason sends empty payload to API',
+        (tester) async {
       configureViewport(tester);
       String? sentBody;
 
@@ -392,7 +406,8 @@ void main() {
     });
 
     // 8. Backend error handling (422 / 403 / 500)
-    testWidgets('backend error displays error SnackBar and keeps appointment in active status',
+    testWidgets(
+        'backend error displays error SnackBar and keeps appointment in active status',
         (tester) async {
       configureViewport(tester);
       final mockClient = MockClient((request) async {
@@ -432,12 +447,14 @@ void main() {
       expect(find.text('لا يمكن إلغاء الموعد بعد موعد بدئه.'), findsOneWidget);
 
       // Verify appointment remains confirmed and cancel button is still available
-      expect(find.byKey(const Key('cancel_appointment_button')), findsOneWidget);
+      expect(
+          find.byKey(const Key('cancel_appointment_button')), findsOneWidget);
       expect(find.text('مؤكد'), findsWidgets);
     });
 
     // 9. In-flight loading state and double-click prevention
-    testWidgets('in-flight loading indicator and double-click prevention while cancelling',
+    testWidgets(
+        'in-flight loading indicator and double-click prevention while cancelling',
         (tester) async {
       configureViewport(tester);
       final completer = Completer<http.Response>();
@@ -497,16 +514,32 @@ void main() {
     });
 
     // 10. Localization coverage across Arabic, French, and English
-    testWidgets('cancellation dialog and action labels render correctly in Arabic, French, and English',
+    testWidgets(
+        'cancellation dialog and action labels render correctly in Arabic, French, and English',
         (tester) async {
       configureViewport(tester);
       final appt = createTestAppointment(status: AppointmentStatus.confirmed);
       final now = DateTime(2026, 10, 25, 8, 0);
 
       final locales = [
-        (const Locale('ar'), 'إلغاء الموعد الطبي', 'هل أنت متأكد من رغبتك في إلغاء هذا الموعد؟', 'تأكيد الإلغاء'),
-        (const Locale('fr'), 'Annuler le rendez-vous', 'Êtes-vous sûr de vouloir annuler ce rendez-vous ?', "Confirmer l'annulation"),
-        (const Locale('en'), 'Cancel Appointment', 'Are you sure you want to cancel this appointment?', 'Confirm Cancellation'),
+        (
+          const Locale('ar'),
+          'إلغاء الموعد الطبي',
+          'هل أنت متأكد من رغبتك في إلغاء هذا الموعد؟',
+          'تأكيد الإلغاء'
+        ),
+        (
+          const Locale('fr'),
+          'Annuler le rendez-vous',
+          'Êtes-vous sûr de vouloir annuler ce rendez-vous ?',
+          "Confirmer l'annulation"
+        ),
+        (
+          const Locale('en'),
+          'Cancel Appointment',
+          'Are you sure you want to cancel this appointment?',
+          'Confirm Cancellation'
+        ),
       ];
 
       for (final (locale, title, prompt, confirmLabel) in locales) {
@@ -540,7 +573,8 @@ void main() {
     });
 
     // 11. Interaction with VisitPassSheet: After cancellation, VisitPassSheet suppresses QR code and shows ineligible card
-    testWidgets('after cancellation, opening VisitPassSheet suppresses QR and shows ineligible card',
+    testWidgets(
+        'after cancellation, opening VisitPassSheet suppresses QR and shows ineligible card',
         (tester) async {
       configureViewport(tester);
       final mockClient = MockClient((request) async {
@@ -584,7 +618,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify VisitPassSheet is opened for the updated cancelled appointment
-      expect(find.byKey(const Key('visit_pass_ineligible_card')), findsOneWidget);
+      expect(
+          find.byKey(const Key('visit_pass_ineligible_card')), findsOneWidget);
       expect(find.byKey(const Key('visit_pass_qr_container')), findsNothing);
       expect(find.byType(QrImageView), findsNothing);
       expect(find.text('هذا الموعد غير مؤهل لتسجيل الحضور'), findsOneWidget);

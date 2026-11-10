@@ -32,6 +32,8 @@ abstract final class AafiyaTheme {
     return ThemeData(
       useMaterial3: true,
       fontFamily: primaryFont,
+      package: AafiyaTypography.package,
+      fontFamilyFallback: AafiyaTypography.fontFallbacksFor(languageCode),
       colorScheme: colorScheme,
       textTheme: textTheme,
       scaffoldBackgroundColor: AafiyaColors.lightBackground,
@@ -136,6 +138,8 @@ abstract final class AafiyaTheme {
     return ThemeData(
       useMaterial3: true,
       fontFamily: primaryFont,
+      package: AafiyaTypography.package,
+      fontFamilyFallback: AafiyaTypography.fontFallbacksFor(languageCode),
       colorScheme: colorScheme,
       textTheme: darkTextTheme,
       scaffoldBackgroundColor: AafiyaColors.darkBackground,
@@ -144,7 +148,8 @@ abstract final class AafiyaTheme {
         foregroundColor: AafiyaColors.darkPrimaryText,
         elevation: 0,
         centerTitle: true,
-        titleTextStyle: (darkTextTheme.titleLarge ?? AafiyaTypography.titleLarge).copyWith(
+        titleTextStyle:
+            (darkTextTheme.titleLarge ?? AafiyaTypography.titleLarge).copyWith(
           color: AafiyaColors.darkPrimaryText,
         ),
       ),

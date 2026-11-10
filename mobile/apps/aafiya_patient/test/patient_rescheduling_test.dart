@@ -34,8 +34,10 @@ void main() {
       bookingReference: bookingReference,
       secureToken: secureToken,
       status: status,
-      doctor: AppointmentDoctor(id: doctorId, name: doctorName, specialty: 'Cardiology'),
-      clinic: AppointmentClinic(id: clinicId, name: clinicName, wilaya: '16', phone: '021000000'),
+      doctor: AppointmentDoctor(
+          id: doctorId, name: doctorName, specialty: 'Cardiology'),
+      clinic: AppointmentClinic(
+          id: clinicId, name: clinicName, wilaya: '16', phone: '021000000'),
       patient: AppointmentPatient(id: patientId, name: patientName),
       appointmentDate: appointmentDate,
       timeSlot: timeSlot,
@@ -69,7 +71,8 @@ void main() {
 
   group('FIX-PAT-02: Patient Appointment Rescheduling in Flutter Tests', () {
     // 1. Visibility for eligible future appointments
-    testWidgets('1. Reschedule button is visible for pending, confirmed, and rescheduled future appointments',
+    testWidgets(
+        '1. Reschedule button is visible for pending, confirmed, and rescheduled future appointments',
         (tester) async {
       configureViewport(tester);
       final now = DateTime(2026, 10, 25, 8, 0); // 2 hours before 10:00
@@ -94,13 +97,15 @@ void main() {
         expect(
           find.byKey(const Key('reschedule_appointment_button')),
           findsOneWidget,
-          reason: 'Reschedule button should be visible for status $activeStatus',
+          reason:
+              'Reschedule button should be visible for status $activeStatus',
         );
       }
     });
 
     // 2. Prevent rescheduling for past appointments (even if pending or confirmed)
-    testWidgets('2. Reschedule button is hidden when current time is at or after appointment start time (Option A)',
+    testWidgets(
+        '2. Reschedule button is hidden when current time is at or after appointment start time (Option A)',
         (tester) async {
       configureViewport(tester);
       final appt = createTestAppointment(
@@ -121,7 +126,8 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      expect(find.byKey(const Key('reschedule_appointment_button')), findsNothing);
+      expect(
+          find.byKey(const Key('reschedule_appointment_button')), findsNothing);
 
       // Scenario B: 1 minute past start time (10:01) -> Ineligible
       await tester.pumpWidget(
@@ -135,7 +141,8 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      expect(find.byKey(const Key('reschedule_appointment_button')), findsNothing);
+      expect(
+          find.byKey(const Key('reschedule_appointment_button')), findsNothing);
 
       // Scenario C: Days in the past with pending status -> Ineligible
       final pendingPast = createTestAppointment(
@@ -155,11 +162,13 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      expect(find.byKey(const Key('reschedule_appointment_button')), findsNothing);
+      expect(
+          find.byKey(const Key('reschedule_appointment_button')), findsNothing);
     });
 
     // 3. Ownership validation
-    testWidgets('3. Reschedule button is hidden if appointment does not belong to current patient',
+    testWidgets(
+        '3. Reschedule button is hidden if appointment does not belong to current patient',
         (tester) async {
       configureViewport(tester);
       final now = DateTime(2026, 10, 25, 8, 0);
@@ -176,11 +185,13 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.byKey(const Key('reschedule_appointment_button')), findsNothing);
+      expect(
+          find.byKey(const Key('reschedule_appointment_button')), findsNothing);
     });
 
     // 4. Ineligible statuses
-    testWidgets('4. Reschedule button is hidden for attended, cancelled, rejected, expired, and noShow statuses',
+    testWidgets(
+        '4. Reschedule button is hidden for attended, cancelled, rejected, expired, and noShow statuses',
         (tester) async {
       configureViewport(tester);
       final now = DateTime(2026, 10, 25, 8, 0);
@@ -207,13 +218,15 @@ void main() {
         expect(
           find.byKey(const Key('reschedule_appointment_button')),
           findsNothing,
-          reason: 'Reschedule button should be hidden for status $terminalStatus',
+          reason:
+              'Reschedule button should be hidden for status $terminalStatus',
         );
       }
     });
 
     // 5. Slot fetching and availability rendering
-    testWidgets('5. Slot fetching queries GET /slots, displays available slots and disables full slots',
+    testWidgets(
+        '5. Slot fetching queries GET /slots, displays available slots and disables full slots',
         (tester) async {
       configureViewport(tester);
       String? queriedPath;
@@ -295,7 +308,8 @@ void main() {
       expect(find.byKey(const Key('slot_chip_11:00')), findsOneWidget);
 
       // Verify confirm button is disabled before selecting a slot
-      final confirmBtnFinder = find.byKey(const Key('confirm_reschedule_button'));
+      final confirmBtnFinder =
+          find.byKey(const Key('confirm_reschedule_button'));
       expect(confirmBtnFinder, findsOneWidget);
 
       // Select full slot (10:00) -> should NOT select it
@@ -308,7 +322,8 @@ void main() {
     });
 
     // 6. Empty slots handling & error state with retry
-    testWidgets('6. Empty slots displays empty view; slot fetch failure displays error view with retry',
+    testWidgets(
+        '6. Empty slots displays empty view; slot fetch failure displays error view with retry',
         (tester) async {
       configureViewport(tester);
       int fetchCount = 0;
@@ -371,7 +386,8 @@ void main() {
     });
 
     // 7. Successful reschedule flow
-    testWidgets('7. Successful reschedule sends POST payload, updates local appointment state and fires callback',
+    testWidgets(
+        '7. Successful reschedule sends POST payload, updates local appointment state and fires callback',
         (tester) async {
       configureViewport(tester);
       String? postPath;
@@ -379,7 +395,8 @@ void main() {
       Appointment? callbackUpdated;
 
       final mockClient = MockClient((request) async {
-        if (request.method == 'GET' && request.url.path.contains('/appointments/slots')) {
+        if (request.method == 'GET' &&
+            request.url.path.contains('/appointments/slots')) {
           return http.Response(
             jsonEncode({
               'data': {
@@ -402,7 +419,8 @@ void main() {
           );
         }
 
-        if (request.method == 'POST' && request.url.path.contains('/reschedule')) {
+        if (request.method == 'POST' &&
+            request.url.path.contains('/reschedule')) {
           postPath = request.url.path;
           postBody = jsonDecode(request.body) as Map<String, dynamic>;
 
@@ -481,20 +499,23 @@ void main() {
       expect(callbackUpdated?.timeSlot, '14:00');
       expect(callbackUpdated?.appointmentDate, '2026-10-25');
       expect(callbackUpdated?.notes, 'تغيير لظرف مسائي');
-      expect(callbackUpdated?.secureToken, 'sec_tok_valid_test_token_1234567890abcdef');
+      expect(callbackUpdated?.secureToken,
+          'sec_tok_valid_test_token_1234567890abcdef');
 
       // Verify success SnackBar is displayed
       expect(find.text('تمت إعادة جدولة الموعد بنجاح.'), findsOneWidget);
     });
 
     // 8. No-op reschedule prevention
-    testWidgets('8. Rescheduling to identical date and time slot is prevented with inline error banner',
+    testWidgets(
+        '8. Rescheduling to identical date and time slot is prevented with inline error banner',
         (tester) async {
       configureViewport(tester);
       bool postCalled = false;
 
       final mockClient = MockClient((request) async {
-        if (request.method == 'GET' && request.url.path.contains('/appointments/slots')) {
+        if (request.method == 'GET' &&
+            request.url.path.contains('/appointments/slots')) {
           return http.Response(
             jsonEncode({
               'data': {
@@ -554,12 +575,14 @@ void main() {
 
       // Verify error banner is shown and no POST request was sent
       expect(find.byKey(const Key('reschedule_error_banner')), findsOneWidget);
-      expect(find.text('التاريخ والفترة المحددة مطابقة لموعدك الحالي بالفعل.'), findsOneWidget);
+      expect(find.text('التاريخ والفترة المحددة مطابقة لموعدك الحالي بالفعل.'),
+          findsOneWidget);
       expect(postCalled, isFalse);
     });
 
     // 9. Double-click prevention
-    testWidgets('9. Confirm button is disabled during submission and prevents multiple requests',
+    testWidgets(
+        '9. Confirm button is disabled during submission and prevents multiple requests',
         (tester) async {
       configureViewport(tester);
       final completer = Completer<http.Response>();
@@ -598,7 +621,8 @@ void main() {
       });
 
       final apiClient = ApiClient(httpClient: mockClient);
-      final appt = createTestAppointment(appointmentDate: '2026-10-25', timeSlot: '10:00');
+      final appt = createTestAppointment(
+          appointmentDate: '2026-10-25', timeSlot: '10:00');
 
       await tester.pumpWidget(
         createTestWidget(
@@ -651,10 +675,12 @@ void main() {
     });
 
     // 10. Backend 422 errors and network recovery
-    testWidgets('10. Backend 422 errors (capacity, vacation, duplicate) display error banner without corrupting state',
+    testWidgets(
+        '10. Backend 422 errors (capacity, vacation, duplicate) display error banner without corrupting state',
         (tester) async {
       configureViewport(tester);
-      const serverErrorMessage = 'اكتملت السعة القصوى المحددة (5 مرضى) للطبيب في هذه الفترة الزمنية (14:00).';
+      const serverErrorMessage =
+          'اكتملت السعة القصوى المحددة (5 مرضى) للطبيب في هذه الفترة الزمنية (14:00).';
 
       final mockClient = MockClient((request) async {
         if (request.method == 'GET') {
@@ -697,7 +723,8 @@ void main() {
       });
 
       final apiClient = ApiClient(httpClient: mockClient);
-      final appt = createTestAppointment(appointmentDate: '2026-10-25', timeSlot: '10:00');
+      final appt = createTestAppointment(
+          appointmentDate: '2026-10-25', timeSlot: '10:00');
 
       await tester.pumpWidget(
         createTestWidget(
@@ -733,7 +760,8 @@ void main() {
     });
 
     // 11. QR Integration (P-02 with FIX-PAT-02)
-    testWidgets('11. QR pass reflects updated date and time slot while keeping exact same secureToken',
+    testWidgets(
+        '11. QR pass reflects updated date and time slot while keeping exact same secureToken',
         (tester) async {
       configureViewport(tester);
       const token = 'sec_tok_fixed_immutable_token_777';
@@ -840,7 +868,8 @@ void main() {
     });
 
     // 12. Trilingual localization verification
-    testWidgets('12. Trilingual localization verification across Arabic, English, and French',
+    testWidgets(
+        '12. Trilingual localization verification across Arabic, English, and French',
         (tester) async {
       configureViewport(tester);
       final now = DateTime(2026, 10, 25, 8, 0);

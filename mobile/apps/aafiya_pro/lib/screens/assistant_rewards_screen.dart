@@ -210,7 +210,7 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(strings.assistantRewardsFileTooLarge),
-              backgroundColor: Colors.red.shade700,
+              backgroundColor: AafiyaColors.error,
             ),
           );
           return;
@@ -227,7 +227,7 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(strings.assistantRewardsFileInvalidType),
-              backgroundColor: Colors.red.shade700,
+              backgroundColor: AafiyaColors.error,
             ),
           );
           return;
@@ -244,7 +244,7 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error selecting document: $e'),
-          backgroundColor: Colors.red.shade700,
+          backgroundColor: AafiyaColors.error,
         ),
       );
     }
@@ -282,7 +282,7 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(strings.assistantRewardsSuccessSubmitted),
-            backgroundColor: Colors.green.shade700,
+            backgroundColor: AafiyaColors.actionGreen,
           ),
         );
         _loadProfiles();
@@ -291,7 +291,7 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(exception.message),
-            backgroundColor: Colors.red.shade700,
+            backgroundColor: AafiyaColors.error,
           ),
         );
     }
@@ -326,11 +326,17 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                        const Icon(Icons.error_outline,
+                            size: 48, color: AafiyaColors.error),
                         const SizedBox(height: 12),
-                        Text(_errorMessage!, textAlign: TextAlign.center),
+                        Text(_errorMessage!,
+                            textAlign: TextAlign.center,
+                            style: AafiyaTypography.bodyMedium),
                         const SizedBox(height: 16),
                         ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: const Size(120, 48),
+                          ),
                           onPressed: _loadInitialData,
                           child: Text(strings.retry),
                         ),
@@ -360,9 +366,9 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
                       delegate: _SliverAppBarDelegate(
                         TabBar(
                           controller: _tabController,
-                          labelColor: theme.colorScheme.primary,
-                          unselectedLabelColor: Colors.grey,
-                          indicatorColor: theme.colorScheme.primary,
+                          labelColor: AafiyaColors.healthBlue,
+                          unselectedLabelColor: AafiyaColors.secondaryText,
+                          indicatorColor: AafiyaColors.healthBlue,
                           tabs: [
                             Tab(
                               icon: const Icon(Icons.account_balance_wallet_outlined),
@@ -400,18 +406,42 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
   Widget _buildEligibilityCard(LocalizedStrings strings, ThemeData theme) {
     if (_summary == null) return const SizedBox.shrink();
 
-    final isEligible = _summary!.isEligibleForPayout;
+    final threshold = _summary!.payoutThreshold;
+    final isThresholdValid = threshold != null && threshold > 0;
+    final isEligible = _summary!.isEligibleForPayout && isThresholdValid;
     final hasProfile = _summary!.activeProfile != null;
 
     final badgeColor = isEligible
-        ? Colors.green.shade50
-        : Colors.amber.shade50;
+        ? AafiyaColors.statusConfirmedBg
+        : AafiyaColors.statusPendingBg;
     final borderColor = isEligible
-        ? Colors.green.shade300
-        : Colors.amber.shade300;
+        ? AafiyaColors.statusConfirmedBorder
+        : AafiyaColors.border;
     final textColor = isEligible
-        ? Colors.green.shade900
-        : Colors.amber.shade900;
+        ? AafiyaColors.statusConfirmedInk
+        : AafiyaColors.statusPendingInk;
+
+    final String statusMessage;
+    if (!isThresholdValid) {
+      statusMessage = strings.payoutThresholdUnavailable;
+      debugPrint(
+          '[AAFIYA_REWARDS] Payout threshold is unavailable or invalid from backend contract: $threshold');
+    } else if (isEligible) {
+      statusMessage = strings.assistantRewardsEligible;
+    } else if (_summary!.ineligibilityReason ==
+        'pending_profile_verification') {
+      statusMessage = strings.assistantRewardsPayoutSuspendedPending;
+    } else if (_summary!.ineligibilityReason == 'profile_rejected') {
+      statusMessage = strings.assistantRewardsPayoutSuspendedRejected;
+    } else if (!hasProfile) {
+      statusMessage = strings.assistantRewardsMissingProfile;
+    } else {
+      statusMessage = strings.assistantRewardsThresholdNotMet;
+    }
+
+    final String amountText = isThresholdValid
+        ? '${_summary!.currentBalance.toStringAsFixed(2)} / ${threshold.toStringAsFixed(2)} ${strings.currencyDzd}'
+        : '${strings.assistantRewardsCurrentBalance}: ${_summary!.currentBalance.toStringAsFixed(2)} ${strings.currencyDzd} • ${strings.payoutThresholdUnavailable}';
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -423,7 +453,9 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
       child: Row(
         children: [
           Icon(
-            isEligible ? Icons.check_circle_rounded : Icons.info_outline_rounded,
+            isEligible
+                ? Icons.check_circle_rounded
+                : Icons.info_outline_rounded,
             color: textColor,
             size: 26,
           ),
@@ -433,16 +465,8 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  isEligible
-                      ? strings.assistantRewardsEligible
-                      : _summary!.ineligibilityReason == 'pending_profile_verification'
-                          ? strings.assistantRewardsPayoutSuspendedPending
-                          : _summary!.ineligibilityReason == 'profile_rejected'
-                              ? strings.assistantRewardsPayoutSuspendedRejected
-                              : !hasProfile
-                                  ? strings.assistantRewardsMissingProfile
-                                  : strings.assistantRewardsThresholdNotMet,
-                  style: TextStyle(
+                  statusMessage,
+                  style: AafiyaTypography.titleMedium.copyWith(
                     fontWeight: FontWeight.bold,
                     fontSize: 13,
                     color: textColor,
@@ -450,8 +474,11 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '${_summary!.currentBalance.toStringAsFixed(2)} / ${_summary!.payoutThreshold.toStringAsFixed(2)} ${strings.currencyDzd}',
-                  style: TextStyle(fontSize: 11, color: textColor.withValues(alpha: 0.8)),
+                  amountText,
+                  style: AafiyaTypography.caption.copyWith(
+                    fontSize: 11,
+                    color: textColor.withValues(alpha: 0.8),
+                  ),
                 ),
               ],
             ),
@@ -467,33 +494,37 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
     final kpis = [
       _KpiData(
         label: strings.assistantRewardsCurrentBalance,
-        value: '${_summary!.currentBalance.toStringAsFixed(2)} ${strings.currencyDzd}',
-        color: Colors.teal.shade700,
+        value:
+            '${_summary!.currentBalance.toStringAsFixed(2)} ${strings.currencyDzd}',
+        color: AafiyaColors.healthBlue,
         icon: Icons.account_balance_wallet,
       ),
       _KpiData(
         label: strings.assistantRewardsTotalEarned,
-        value: '${_summary!.totalEarned.toStringAsFixed(2)} ${strings.currencyDzd}',
-        color: Colors.green.shade700,
+        value:
+            '${_summary!.totalEarned.toStringAsFixed(2)} ${strings.currencyDzd}',
+        color: AafiyaColors.success,
         icon: Icons.trending_up,
       ),
       _KpiData(
         label: strings.assistantRewardsTotalPaid,
-        value: '${_summary!.totalPaid.toStringAsFixed(2)} ${strings.currencyDzd}',
-        color: Colors.blueGrey.shade700,
+        value:
+            '${_summary!.totalPaid.toStringAsFixed(2)} ${strings.currencyDzd}',
+        color: AafiyaColors.primaryText,
         icon: Icons.payment,
       ),
       _KpiData(
         label: strings.assistantRewardsPendingPayout,
-        value: '${_summary!.pendingPayout.toStringAsFixed(2)} ${strings.currencyDzd}',
-        color: Colors.orange.shade800,
+        value:
+            '${_summary!.pendingPayout.toStringAsFixed(2)} ${strings.currencyDzd}',
+        color: AafiyaColors.warning,
         icon: Icons.hourglass_top,
       ),
       _KpiData(
         label: strings.assistantRewardsDeductions,
         value:
             '${(_summary!.totalDeducted + _summary!.totalReversed).toStringAsFixed(2)} ${strings.currencyDzd}',
-        color: Colors.red.shade700,
+        color: AafiyaColors.error,
         icon: Icons.money_off,
       ),
     ];
@@ -506,40 +537,40 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
         separatorBuilder: (_, __) => const SizedBox(width: 8),
         itemBuilder: (context, index) {
           final item = kpis[index];
-          return Container(
-            width: 140,
+          return AafiyaCard(
             padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: theme.cardColor,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        item.label,
-                        style: const TextStyle(fontSize: 10, color: Colors.grey),
-                        overflow: TextOverflow.ellipsis,
+            child: SizedBox(
+              width: 120,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          item.label,
+                          style: AafiyaTypography.caption.copyWith(
+                            fontSize: 10,
+                            color: AafiyaColors.secondaryText,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                    ),
-                    Icon(item.icon, size: 14, color: item.color),
-                  ],
-                ),
-                Text(
-                  item.value,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: item.color,
+                      Icon(item.icon, size: 14, color: item.color),
+                    ],
                   ),
-                ),
-              ],
+                  Text(
+                    item.value,
+                    style: AafiyaTypography.titleMedium.copyWith(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: item.color,
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         },
@@ -559,9 +590,15 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.receipt_outlined, size: 48, color: Colors.grey),
+              const Icon(Icons.receipt_outlined,
+                  size: 48, color: AafiyaColors.secondaryText),
               const SizedBox(height: 12),
-              Text(strings.assistantRewardsNoTransactions, textAlign: TextAlign.center),
+              Text(
+                strings.assistantRewardsNoTransactions,
+                textAlign: TextAlign.center,
+                style: AafiyaTypography.bodyMedium
+                    .copyWith(color: AafiyaColors.secondaryText),
+              ),
             ],
           ),
         ),
@@ -578,28 +615,33 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
           final tx = _transactions[index];
           final isCredit = tx.isCredit;
 
-          return Card(
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
-            ),
+          return AafiyaCard(
             child: ListTile(
               leading: CircleAvatar(
-                backgroundColor: isCredit ? Colors.green.shade50 : Colors.red.shade50,
+                backgroundColor: isCredit
+                    ? AafiyaColors.statusConfirmedBg
+                    : AafiyaColors.statusUrgentBg,
                 child: Icon(
                   isCredit ? Icons.arrow_downward : Icons.arrow_upward,
-                  color: isCredit ? Colors.green.shade700 : Colors.red.shade700,
+                  color: isCredit
+                      ? AafiyaColors.success
+                      : AafiyaColors.error,
                   size: 18,
                 ),
               ),
               title: Text(
                 tx.transactionType,
-                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                style: AafiyaTypography.titleMedium.copyWith(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               subtitle: Text(
                 '${tx.sourceType} #${tx.sourceId.length > 8 ? tx.sourceId.substring(0, 8) : tx.sourceId} • ${tx.createdAt}',
-                style: const TextStyle(fontSize: 10, color: Colors.grey),
+                style: AafiyaTypography.caption.copyWith(
+                  fontSize: 10,
+                  color: AafiyaColors.secondaryText,
+                ),
               ),
               trailing: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -607,15 +649,20 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
                 children: [
                   Text(
                     '${isCredit ? '+' : '-'}${tx.amount.toStringAsFixed(2)} ${strings.currencyDzd}',
-                    style: TextStyle(
+                    style: AafiyaTypography.titleMedium.copyWith(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
-                      color: isCredit ? Colors.green.shade700 : Colors.red.shade700,
+                      color: isCredit
+                          ? AafiyaColors.success
+                          : AafiyaColors.error,
                     ),
                   ),
                   Text(
                     'Bal: ${tx.balanceAfter.toStringAsFixed(2)}',
-                    style: const TextStyle(fontSize: 10, color: Colors.grey),
+                    style: AafiyaTypography.caption.copyWith(
+                      fontSize: 10,
+                      color: AafiyaColors.secondaryText,
+                    ),
                   ),
                 ],
               ),
@@ -638,9 +685,15 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.payments_outlined, size: 48, color: Colors.grey),
+              const Icon(Icons.payments_outlined,
+                  size: 48, color: AafiyaColors.secondaryText),
               const SizedBox(height: 12),
-              Text(strings.assistantRewardsNoPayouts, textAlign: TextAlign.center),
+              Text(
+                strings.assistantRewardsNoPayouts,
+                textAlign: TextAlign.center,
+                style: AafiyaTypography.bodyMedium
+                    .copyWith(color: AafiyaColors.secondaryText),
+              ),
             ],
           ),
         ),
@@ -656,34 +709,40 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
         itemBuilder: (context, index) {
           final item = _payouts[index];
 
-          Color statusColor = Colors.orange;
-          if (item.isPaid) statusColor = Colors.green;
-          if (item.isFailed) statusColor = Colors.red;
+          Color statusColor = AafiyaColors.warning;
+          if (item.isPaid) statusColor = AafiyaColors.success;
+          if (item.isFailed) statusColor = AafiyaColors.error;
 
-          return Card(
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
-            ),
+          return AafiyaCard(
             child: ListTile(
               leading: CircleAvatar(
                 backgroundColor: statusColor.withValues(alpha: 0.1),
-                child: Icon(Icons.account_balance, color: statusColor, size: 18),
+                child:
+                    Icon(Icons.account_balance, color: statusColor, size: 18),
               ),
               title: Text(
                 '${item.amount.toStringAsFixed(2)} ${strings.currencyDzd}',
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                style: AafiyaTypography.titleMedium.copyWith(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               subtitle: Text(
                 'Batch: ${item.batchNumber ?? item.batchId.substring(0, 8)}\nRef: ${item.transferReference ?? '—'}',
-                style: const TextStyle(fontSize: 11, color: Colors.grey),
+                style: AafiyaTypography.caption.copyWith(
+                  fontSize: 11,
+                  color: AafiyaColors.secondaryText,
+                ),
               ),
               isThreeLine: true,
               trailing: Chip(
                 label: Text(
                   item.status.toUpperCase(),
-                  style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: statusColor),
+                  style: AafiyaTypography.caption.copyWith(
+                    fontSize: 9,
+                    fontWeight: FontWeight.bold,
+                    color: statusColor,
+                  ),
                 ),
                 backgroundColor: statusColor.withValues(alpha: 0.1),
                 side: BorderSide.none,
@@ -724,24 +783,25 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.red.shade50,
+                  color: AafiyaColors.statusUrgentBg,
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: Colors.red.shade200),
+                  border: Border.all(color: AafiyaColors.border),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.error_outline, color: Colors.red.shade700, size: 20),
+                        const Icon(Icons.error_outline,
+                            color: AafiyaColors.error, size: 20),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             '${strings.assistantRewardsRejectionAlertTitle} (v${latestProfile.version})',
-                            style: TextStyle(
+                            style: AafiyaTypography.titleMedium.copyWith(
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
-                              color: Colors.red.shade900,
+                              color: AafiyaColors.statusUrgentInk,
                             ),
                           ),
                         ),
@@ -750,18 +810,18 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
                     const SizedBox(height: 8),
                     Text(
                       '${strings.assistantRewardsRejectionReasonLabel} ${latestProfile.rejectionReason}',
-                      style: TextStyle(
+                      style: AafiyaTypography.bodyMedium.copyWith(
                         fontSize: 12,
-                        color: Colors.red.shade800,
+                        color: AafiyaColors.statusUrgentInk,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     const SizedBox(height: 6),
                     Text(
                       strings.assistantRewardsRejectionActionHint,
-                      style: TextStyle(
+                      style: AafiyaTypography.caption.copyWith(
                         fontSize: 11,
-                        color: Colors.red.shade700,
+                        color: AafiyaColors.error,
                       ),
                     ),
                   ],
@@ -775,21 +835,22 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: Colors.amber.shade50,
+                  color: AafiyaColors.statusPendingBg,
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: Colors.amber.shade300),
+                  border: Border.all(color: AafiyaColors.border),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.hourglass_top, color: Colors.amber.shade800, size: 20),
+                    const Icon(Icons.hourglass_top,
+                        color: AafiyaColors.warning, size: 20),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
                         strings.assistantRewardsPayoutSuspendedPending,
-                        style: TextStyle(
+                        style: AafiyaTypography.bodyMedium.copyWith(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: Colors.amber.shade900,
+                          color: AafiyaColors.statusPendingInk,
                         ),
                       ),
                     ),
@@ -802,16 +863,23 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
             // 3. Active Profile Box
             Text(
               strings.assistantRewardsActiveProfile,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+              style: AafiyaTypography.titleMedium.copyWith(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: activeProfile != null ? Colors.teal.shade50 : Colors.grey.shade100,
+                color: activeProfile != null
+                    ? AafiyaColors.healthBlue.withValues(alpha: 0.08)
+                    : AafiyaColors.lightBackground,
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  color: activeProfile != null ? Colors.teal.shade200 : Colors.grey.shade300,
+                  color: activeProfile != null
+                      ? AafiyaColors.healthBlue.withValues(alpha: 0.3)
+                      : AafiyaColors.border,
                 ),
               ),
               child: activeProfile != null
@@ -821,16 +889,19 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text(
+                            Text(
                               'Algérie Poste (CCP)',
-                              style: TextStyle(fontSize: 11, color: Colors.teal),
+                              style: AafiyaTypography.caption.copyWith(
+                                fontSize: 11,
+                                color: AafiyaColors.healthBlue,
+                              ),
                             ),
                             Text(
                               'v${activeProfile.version} — ${strings.assistantRewardsStatusActive}',
-                              style: const TextStyle(
+                              style: AafiyaTypography.caption.copyWith(
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.teal,
+                                color: AafiyaColors.healthBlue,
                               ),
                             ),
                           ],
@@ -838,7 +909,7 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
                         const SizedBox(height: 6),
                         Text(
                           activeProfile.ripNumber,
-                          style: const TextStyle(
+                          style: AafiyaTypography.titleMedium.copyWith(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 1.5,
@@ -849,7 +920,10 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
                     )
                   : Text(
                       strings.assistantRewardsMissingProfile,
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                      style: AafiyaTypography.caption.copyWith(
+                        fontSize: 12,
+                        color: AafiyaColors.secondaryText,
+                      ),
                     ),
             ),
             const SizedBox(height: 24),
@@ -861,17 +935,15 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
             ),
             const SizedBox(height: 8),
             if (_profiles.isEmpty)
-              Card(
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
-                ),
+              AafiyaCard(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Text(
                     strings.assistantRewardsNoHistory,
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    style: AafiyaTypography.caption.copyWith(
+                      fontSize: 12,
+                      color: AafiyaColors.secondaryText,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -885,26 +957,21 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
                 itemBuilder: (context, index) {
                   final p = _profiles[index];
 
-                  Color statusColor = Colors.grey;
+                  Color statusColor = AafiyaColors.secondaryText;
                   String statusLabel = strings.assistantRewardsStatusSuperseded;
 
                   if (p.isActive) {
-                    statusColor = Colors.green;
+                    statusColor = AafiyaColors.success;
                     statusLabel = strings.assistantRewardsStatusActive;
                   } else if (p.isPending) {
-                    statusColor = Colors.orange;
+                    statusColor = AafiyaColors.warning;
                     statusLabel = strings.assistantRewardsStatusPending;
                   } else if (p.isRejected) {
-                    statusColor = Colors.red;
+                    statusColor = AafiyaColors.error;
                     statusLabel = strings.assistantRewardsStatusRejected;
                   }
 
-                  return Card(
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
-                    ),
+                  return AafiyaCard(
                     child: Padding(
                       padding: const EdgeInsets.all(12),
                       child: Column(
@@ -915,20 +982,21 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
                             children: [
                               Text(
                                 'v${p.version}',
-                                style: const TextStyle(
+                                style: AafiyaTypography.titleMedium.copyWith(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 13,
                                 ),
                               ),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 3),
                                 decoration: BoxDecoration(
                                   color: statusColor.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
                                   statusLabel,
-                                  style: TextStyle(
+                                  style: AafiyaTypography.caption.copyWith(
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,
                                     color: statusColor,
@@ -940,7 +1008,7 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
                           const SizedBox(height: 6),
                           Text(
                             p.ripNumber,
-                            style: const TextStyle(
+                            style: AafiyaTypography.bodyMedium.copyWith(
                               fontFamily: 'monospace',
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
@@ -949,25 +1017,34 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
                           if (p.createdAt.isNotEmpty) ...[
                             const SizedBox(height: 4),
                             Text(
-                              p.createdAt.length >= 10 ? p.createdAt.substring(0, 10) : p.createdAt,
-                              style: const TextStyle(fontSize: 10, color: Colors.grey),
+                              p.createdAt.length >= 10
+                                  ? p.createdAt.substring(0, 10)
+                                  : p.createdAt,
+                              style: AafiyaTypography.caption.copyWith(
+                                fontSize: 10,
+                                color: AafiyaColors.secondaryText,
+                              ),
                             ),
                           ],
-                          if (p.isRejected && p.rejectionReason != null && p.rejectionReason!.isNotEmpty) ...[
+                          if (p.isRejected &&
+                              p.rejectionReason != null &&
+                              p.rejectionReason!.isNotEmpty) ...[
                             const SizedBox(height: 8),
                             Container(
                               width: double.infinity,
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                color: Colors.red.shade50,
+                                color: AafiyaColors.statusUrgentBg,
                                 borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: Colors.red.shade100),
+                                border: Border.all(
+                                    color:
+                                        AafiyaColors.border),
                               ),
                               child: Text(
                                 '${strings.assistantRewardsRejectionReasonLabel} ${p.rejectionReason}',
-                                style: TextStyle(
+                                style: AafiyaTypography.caption.copyWith(
                                   fontSize: 11,
-                                  color: Colors.red.shade800,
+                                  color: AafiyaColors.error,
                                 ),
                               ),
                             ),
@@ -983,15 +1060,13 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
             // 5. Submit / Update Form
             Text(
               strings.assistantRewardsSubmitNewProfile,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+              style: AafiyaTypography.titleMedium.copyWith(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 8),
-            Card(
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-                side: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
-              ),
+            AafiyaCard(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Form(
@@ -1010,7 +1085,8 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
                           labelText: strings.assistantRewardsRipNumber,
                           hintText: strings.assistantRewardsRipHint,
                           prefixIcon: const Icon(Icons.pin),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10)),
                         ),
                         validator: (value) {
                           if (value == null || value.trim().length != 20) {
@@ -1026,21 +1102,28 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Colors.teal.shade50,
+                            color:
+                                AafiyaColors.healthBlue.withValues(alpha: 0.08),
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Colors.teal.shade200),
+                            border: Border.all(
+                              color: AafiyaColors.healthBlue
+                                  .withValues(alpha: 0.3),
+                            ),
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.check_circle, color: Colors.teal, size: 22),
+                              const Icon(Icons.check_circle,
+                                  color: AafiyaColors.healthBlue, size: 22),
                               const SizedBox(width: 10),
                               Expanded(
                                 child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.start,
                                   children: [
                                     Text(
                                       _selectedChequeFileName ?? 'cheque.jpg',
-                                      style: const TextStyle(
+                                      style: AafiyaTypography.titleMedium
+                                          .copyWith(
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -1050,7 +1133,11 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
                                     if (_selectedChequeSize != null)
                                       Text(
                                         '${(_selectedChequeSize! / 1024).toStringAsFixed(1)} KB',
-                                        style: const TextStyle(fontSize: 10, color: Colors.grey),
+                                        style:
+                                            AafiyaTypography.caption.copyWith(
+                                          fontSize: 10,
+                                          color: AafiyaColors.secondaryText,
+                                        ),
                                       ),
                                   ],
                                 ),
@@ -1061,7 +1148,8 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
                                     : () => _pickChequeDocument(strings),
                                 child: Text(
                                   strings.assistantRewardsReplaceFile,
-                                  style: const TextStyle(fontSize: 11),
+                                  style: AafiyaTypography.caption
+                                      .copyWith(fontSize: 11),
                                 ),
                               ),
                             ],
@@ -1072,6 +1160,7 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
                           icon: const Icon(Icons.attach_file),
                           label: Text(strings.assistantRewardsChequeDocLabel),
                           style: OutlinedButton.styleFrom(
+                            minimumSize: const Size(0, 48),
                             padding: const EdgeInsets.symmetric(vertical: 12),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
@@ -1086,17 +1175,21 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
 
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
+                          minimumSize: const Size(0, 52),
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        onPressed: _isSubmittingProfile ? null : () => _submitProfile(strings),
+                        onPressed: _isSubmittingProfile
+                            ? null
+                            : () => _submitProfile(strings),
                         child: _isSubmittingProfile
                             ? const SizedBox(
                                 height: 18,
                                 width: 18,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
                               )
                             : Text(strings.assistantRewardsSubmitButton),
                       ),

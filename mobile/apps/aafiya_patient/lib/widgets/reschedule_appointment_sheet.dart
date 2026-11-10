@@ -105,7 +105,8 @@ class _RescheduleAppointmentSheetState
   @override
   void initState() {
     super.initState();
-    _notesController = TextEditingController(text: widget.appointment.notes ?? '');
+    _notesController =
+        TextEditingController(text: widget.appointment.notes ?? '');
 
     // Set initial date to appointment date if >= today, else default to today
     DateTime initial = _today;
@@ -136,7 +137,10 @@ class _RescheduleAppointmentSheetState
     final clinicId = widget.appointment.clinic.id?.trim();
     final doctorId = widget.appointment.doctor.id?.trim();
 
-    if (clinicId == null || clinicId.isEmpty || doctorId == null || doctorId.isEmpty) {
+    if (clinicId == null ||
+        clinicId.isEmpty ||
+        doctorId == null ||
+        doctorId.isEmpty) {
       setState(() {
         _slotsError = 'بيانات العيادة أو الطبيب غير مكتملة.';
         _slots = [];
@@ -206,8 +210,10 @@ class _RescheduleAppointmentSheetState
     }
   }
 
-  String _extractErrorMessage(AppException exception, LocalizedStrings strings) {
-    if (exception is ValidationException && exception.validationErrors.isNotEmpty) {
+  String _extractErrorMessage(
+      AppException exception, LocalizedStrings strings) {
+    if (exception is ValidationException &&
+        exception.validationErrors.isNotEmpty) {
       for (final errors in exception.validationErrors.values) {
         if (errors.isNotEmpty) {
           return errors.first;
@@ -294,25 +300,31 @@ class _RescheduleAppointmentSheetState
             bookingReference: parsed.bookingReference.isNotEmpty
                 ? parsed.bookingReference
                 : widget.appointment.bookingReference,
-            secureToken: (parsed.secureToken != null && parsed.secureToken!.isNotEmpty)
-                ? parsed.secureToken
-                : widget.appointment.secureToken,
-            clinic: (parsed.clinic.name != null && parsed.clinic.name!.isNotEmpty)
-                ? parsed.clinic
-                : widget.appointment.clinic,
-            doctor: (parsed.doctor.name != null && parsed.doctor.name!.isNotEmpty)
-                ? parsed.doctor
-                : widget.appointment.doctor,
-            patient: (parsed.patient.name != null && parsed.patient.name!.isNotEmpty)
-                ? parsed.patient
-                : widget.appointment.patient,
-            bookingCenter: parsed.bookingCenter ?? widget.appointment.bookingCenter,
+            secureToken:
+                (parsed.secureToken != null && parsed.secureToken!.isNotEmpty)
+                    ? parsed.secureToken
+                    : widget.appointment.secureToken,
+            clinic:
+                (parsed.clinic.name != null && parsed.clinic.name!.isNotEmpty)
+                    ? parsed.clinic
+                    : widget.appointment.clinic,
+            doctor:
+                (parsed.doctor.name != null && parsed.doctor.name!.isNotEmpty)
+                    ? parsed.doctor
+                    : widget.appointment.doctor,
+            patient:
+                (parsed.patient.name != null && parsed.patient.name!.isNotEmpty)
+                    ? parsed.patient
+                    : widget.appointment.patient,
+            bookingCenter:
+                parsed.bookingCenter ?? widget.appointment.bookingCenter,
             appointmentDate: parsed.appointmentDate ?? formattedDate,
             timeSlot: parsed.timeSlot ?? _selectedSlot!.timeSlot,
             status: parsed.status != AppointmentStatus.unknown
                 ? parsed.status
                 : widget.appointment.status,
-            notes: parsed.notes ?? (notes.isNotEmpty ? notes : widget.appointment.notes),
+            notes: parsed.notes ??
+                (notes.isNotEmpty ? notes : widget.appointment.notes),
             confirmedAt: parsed.confirmedAt ?? widget.appointment.confirmedAt,
             confirmedBy: parsed.confirmedBy ?? widget.appointment.confirmedBy,
             checkedInAt: parsed.checkedInAt ?? widget.appointment.checkedInAt,
@@ -365,7 +377,8 @@ class _RescheduleAppointmentSheetState
           return Container(
             decoration: const BoxDecoration(
               color: AafiyaColors.pureWhite,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(AafiyaRadius.lg)),
+              borderRadius:
+                  BorderRadius.vertical(top: Radius.circular(AafiyaRadius.lg)),
             ),
             child: Column(
               children: [
@@ -384,7 +397,8 @@ class _RescheduleAppointmentSheetState
 
                 // 2. Header
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                   child: Row(
                     children: [
                       Container(
@@ -411,8 +425,11 @@ class _RescheduleAppointmentSheetState
                       ),
                       IconButton(
                         key: const Key('close_reschedule_sheet_button'),
-                        icon: const Icon(Icons.close_rounded, color: AafiyaColors.secondaryText),
-                        onPressed: _isSubmitting ? null : () => Navigator.of(context).pop(),
+                        icon: const Icon(Icons.close_rounded,
+                            color: AafiyaColors.secondaryText),
+                        onPressed: _isSubmitting
+                            ? null
+                            : () => Navigator.of(context).pop(),
                       ),
                     ],
                   ),
@@ -446,7 +463,8 @@ class _RescheduleAppointmentSheetState
                                   Expanded(
                                     child: Text(
                                       widget.appointment.doctor.name!,
-                                      style: AafiyaTypography.bodyMedium.copyWith(
+                                      style:
+                                          AafiyaTypography.bodyMedium.copyWith(
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -457,7 +475,8 @@ class _RescheduleAppointmentSheetState
                             Row(
                               children: [
                                 const Icon(Icons.access_time_rounded,
-                                    size: 16, color: AafiyaColors.secondaryText),
+                                    size: 16,
+                                    color: AafiyaColors.secondaryText),
                                 const SizedBox(width: 6),
                                 Text(
                                   strings.isArabic
@@ -480,7 +499,8 @@ class _RescheduleAppointmentSheetState
                       // Date Picker Section
                       Text(
                         strings.selectDateLabel,
-                        style: AafiyaTypography.titleMedium.copyWith(fontSize: 14),
+                        style:
+                            AafiyaTypography.titleMedium.copyWith(fontSize: 14),
                       ),
                       const SizedBox(height: 6),
                       InkWell(
@@ -488,10 +508,12 @@ class _RescheduleAppointmentSheetState
                         onTap: _isSubmitting ? null : _selectDate,
                         borderRadius: BorderRadius.circular(AafiyaRadius.md),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 12),
                           decoration: BoxDecoration(
                             border: Border.all(color: AafiyaColors.border),
-                            borderRadius: BorderRadius.circular(AafiyaRadius.md),
+                            borderRadius:
+                                BorderRadius.circular(AafiyaRadius.md),
                             color: AafiyaColors.pureWhite,
                           ),
                           child: Row(
@@ -521,7 +543,8 @@ class _RescheduleAppointmentSheetState
                       // Time Slot Selection Section
                       Text(
                         strings.selectTimeSlotLabel,
-                        style: AafiyaTypography.titleMedium.copyWith(fontSize: 14),
+                        style:
+                            AafiyaTypography.titleMedium.copyWith(fontSize: 14),
                       ),
                       const SizedBox(height: 8),
 
@@ -554,8 +577,11 @@ class _RescheduleAppointmentSheetState
                           padding: AafiyaSpacing.insetAllMd,
                           decoration: BoxDecoration(
                             color: AafiyaColors.error.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(AafiyaRadius.md),
-                            border: Border.all(color: AafiyaColors.error.withValues(alpha: 0.3)),
+                            borderRadius:
+                                BorderRadius.circular(AafiyaRadius.md),
+                            border: Border.all(
+                                color:
+                                    AafiyaColors.error.withValues(alpha: 0.3)),
                           ),
                           child: Row(
                             children: [
@@ -584,7 +610,8 @@ class _RescheduleAppointmentSheetState
                           padding: AafiyaSpacing.insetAllLg,
                           decoration: BoxDecoration(
                             color: AafiyaColors.lightBackground,
-                            borderRadius: BorderRadius.circular(AafiyaRadius.md),
+                            borderRadius:
+                                BorderRadius.circular(AafiyaRadius.md),
                             border: Border.all(color: AafiyaColors.border),
                           ),
                           child: Row(
@@ -610,20 +637,24 @@ class _RescheduleAppointmentSheetState
                           spacing: 8,
                           runSpacing: 8,
                           children: _slots.map((slot) {
-                            final isSelected = _selectedSlot?.timeSlot == slot.timeSlot;
-                            final isAvailable = slot.isAvailable && slot.available > 0;
+                            final isSelected =
+                                _selectedSlot?.timeSlot == slot.timeSlot;
+                            final isAvailable =
+                                slot.isAvailable && slot.available > 0;
 
                             Color bgColor = AafiyaColors.pureWhite;
                             Color borderColor = AafiyaColors.border;
                             Color textColor = AafiyaColors.primaryText;
 
                             if (isSelected) {
-                              bgColor = AafiyaColors.healthBlue.withValues(alpha: 0.12);
+                              bgColor = AafiyaColors.healthBlue
+                                  .withValues(alpha: 0.12);
                               borderColor = AafiyaColors.healthBlue;
                               textColor = AafiyaColors.healthBlue;
                             } else if (!isAvailable) {
                               bgColor = AafiyaColors.lightBackground;
-                              borderColor = AafiyaColors.border.withValues(alpha: 0.5);
+                              borderColor =
+                                  AafiyaColors.border.withValues(alpha: 0.5);
                               textColor = AafiyaColors.secondaryText;
                             }
 
@@ -637,13 +668,18 @@ class _RescheduleAppointmentSheetState
                                       });
                                     }
                                   : null,
-                              borderRadius: BorderRadius.circular(AafiyaRadius.md),
+                              borderRadius:
+                                  BorderRadius.circular(AafiyaRadius.md),
                               child: Container(
-                                width: (MediaQuery.of(context).size.width - 56) / 3,
-                                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                                width:
+                                    (MediaQuery.of(context).size.width - 56) /
+                                        3,
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 8),
                                 decoration: BoxDecoration(
                                   color: bgColor,
-                                  borderRadius: BorderRadius.circular(AafiyaRadius.md),
+                                  borderRadius:
+                                      BorderRadius.circular(AafiyaRadius.md),
                                   border: Border.all(
                                     color: borderColor,
                                     width: isSelected ? 2.0 : 1.0,
@@ -654,9 +690,11 @@ class _RescheduleAppointmentSheetState
                                   children: [
                                     Text(
                                       slot.timeSlot,
-                                      style: AafiyaTypography.bodyMedium.copyWith(
-                                        fontWeight:
-                                            isSelected ? FontWeight.bold : FontWeight.w600,
+                                      style:
+                                          AafiyaTypography.bodyMedium.copyWith(
+                                        fontWeight: isSelected
+                                            ? FontWeight.bold
+                                            : FontWeight.w600,
                                         color: textColor,
                                       ),
                                     ),
@@ -684,7 +722,8 @@ class _RescheduleAppointmentSheetState
                       // Optional Notes Field
                       Text(
                         strings.bookingNotesLabel,
-                        style: AafiyaTypography.titleMedium.copyWith(fontSize: 14),
+                        style:
+                            AafiyaTypography.titleMedium.copyWith(fontSize: 14),
                       ),
                       const SizedBox(height: 6),
                       TextField(
@@ -695,12 +734,15 @@ class _RescheduleAppointmentSheetState
                         decoration: InputDecoration(
                           hintText: strings.bookingNotesHint,
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(AafiyaRadius.md),
-                            borderSide: const BorderSide(color: AafiyaColors.border),
+                            borderRadius:
+                                BorderRadius.circular(AafiyaRadius.md),
+                            borderSide:
+                                const BorderSide(color: AafiyaColors.border),
                           ),
                           filled: true,
                           fillColor: AafiyaColors.pureWhite,
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 10),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -712,8 +754,11 @@ class _RescheduleAppointmentSheetState
                           padding: AafiyaSpacing.insetAllMd,
                           decoration: BoxDecoration(
                             color: AafiyaColors.error.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(AafiyaRadius.md),
-                            border: Border.all(color: AafiyaColors.error.withValues(alpha: 0.3)),
+                            borderRadius:
+                                BorderRadius.circular(AafiyaRadius.md),
+                            border: Border.all(
+                                color:
+                                    AafiyaColors.error.withValues(alpha: 0.3)),
                           ),
                           child: Row(
                             children: [
@@ -739,7 +784,8 @@ class _RescheduleAppointmentSheetState
                       AafiyaButton(
                         key: const Key('confirm_reschedule_button'),
                         label: strings.confirmRescheduleAction,
-                        icon: const Icon(Icons.check_circle_outline_rounded, size: 20),
+                        icon: const Icon(Icons.check_circle_outline_rounded,
+                            size: 20),
                         onPressed: (_selectedSlot == null || _isSubmitting)
                             ? null
                             : _confirmReschedule,
@@ -750,7 +796,9 @@ class _RescheduleAppointmentSheetState
 
                       AafiyaButton(
                         label: strings.cancel,
-                        onPressed: _isSubmitting ? null : () => Navigator.of(context).pop(),
+                        onPressed: _isSubmitting
+                            ? null
+                            : () => Navigator.of(context).pop(),
                         variant: AafiyaButtonVariant.outline,
                       ),
                     ],

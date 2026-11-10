@@ -15,7 +15,8 @@ import 'package:aafiya_patient/shells/patient_home_shell.dart';
 import 'package:aafiya_patient/shells/auth_shell.dart';
 
 void main() {
-  group('Section 5.1: Booking Center Directory & Brand Mark Acceptance Tests', () {
+  group('Section 5.1: Booking Center Directory & Brand Mark Acceptance Tests',
+      () {
     late InMemoryTokenStorage tokenStorage;
 
     const testPatient = User(
@@ -82,7 +83,9 @@ void main() {
       );
     }
 
-    testWidgets('BookingCenterDirectoryScreen loads, renders centers, and shows AafiyaBrandMark', (tester) async {
+    testWidgets(
+        'BookingCenterDirectoryScreen loads, renders centers, and shows AafiyaBrandMark',
+        (tester) async {
       final mockClient = MockClient((request) async {
         if (request.url.path.contains('/booking-centers')) {
           return http.Response(
@@ -123,10 +126,15 @@ void main() {
       expect(find.textContaining('041554433'), findsOneWidget);
 
       // Verify DISC-01 informational badge
-      expect(find.text('دليل استعلامي فقط — الحجز المباشر عبر مراكز الحجز المعتمدة'), findsAtLeastNWidgets(1));
+      expect(
+          find.text(
+              'دليل استعلامي فقط — الحجز المباشر عبر مراكز الحجز المعتمدة'),
+          findsAtLeastNWidgets(1));
     });
 
-    testWidgets('Empty state findBookingCenterAction button routes to BookingCenterDirectoryScreen', (tester) async {
+    testWidgets(
+        'Empty state findBookingCenterAction button routes to BookingCenterDirectoryScreen',
+        (tester) async {
       final mockClient = MockClient((request) async {
         if (request.url.path.contains('/appointments')) {
           return http.Response(
@@ -158,7 +166,8 @@ void main() {
         apiClient: apiClient,
         tokenStorage: tokenStorage,
       );
-      await sessionManager.setAuthenticatedUser(token: 'valid_test_token', user: testPatient);
+      await sessionManager.setAuthenticatedUser(
+          token: 'valid_test_token', user: testPatient);
 
       await tester.pumpWidget(
         MaterialApp(
@@ -193,10 +202,14 @@ void main() {
       expect(find.byType(ClinicDirectoryScreen), findsNothing);
     });
 
-    testWidgets('AuthShell renders AafiyaBrandMark hero header', (tester) async {
-      final mockClient = MockClient((request) async => http.Response(jsonEncode({}), 200));
-      final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
-      final sessionManager = AuthSessionManager(apiClient: apiClient, tokenStorage: tokenStorage);
+    testWidgets('AuthShell renders AafiyaBrandMark hero header',
+        (tester) async {
+      final mockClient =
+          MockClient((request) async => http.Response(jsonEncode({}), 200));
+      final apiClient =
+          ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+      final sessionManager =
+          AuthSessionManager(apiClient: apiClient, tokenStorage: tokenStorage);
 
       await tester.pumpWidget(
         createTestableWidget(
@@ -214,9 +227,13 @@ void main() {
       expect(find.text('عافية للمرضى'), findsWidgets);
     });
 
-    testWidgets('DoctorDirectoryScreen & ClinicDirectoryScreen render AafiyaBrandMark', (tester) async {
-      final mockClient = MockClient((request) async => http.Response(jsonEncode({'data': []}), 200));
-      final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+    testWidgets(
+        'DoctorDirectoryScreen & ClinicDirectoryScreen render AafiyaBrandMark',
+        (tester) async {
+      final mockClient = MockClient(
+          (request) async => http.Response(jsonEncode({'data': []}), 200));
+      final apiClient =
+          ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
 
       // Check DoctorDirectoryScreen
       await tester.pumpWidget(

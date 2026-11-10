@@ -16,30 +16,47 @@ abstract final class AafiyaSpacing {
   static const EdgeInsets insetAllLg = EdgeInsets.all(lg);
   static const EdgeInsets insetAllXl = EdgeInsets.all(xl);
 
-  static const EdgeInsets insetScreen = EdgeInsets.symmetric(horizontal: md, vertical: sm);
+  static const EdgeInsets insetScreen =
+      EdgeInsets.symmetric(horizontal: md, vertical: sm);
   static const EdgeInsets insetCard = EdgeInsets.all(md);
 
   // Directional insets for RTL-aware geometry (Logical start/end)
-  static const EdgeInsetsDirectional insetDirectionalAllXs = EdgeInsetsDirectional.all(xs);
-  static const EdgeInsetsDirectional insetDirectionalAllSm = EdgeInsetsDirectional.all(sm);
-  static const EdgeInsetsDirectional insetDirectionalAllMd = EdgeInsetsDirectional.all(md);
-  static const EdgeInsetsDirectional insetDirectionalAllLg = EdgeInsetsDirectional.all(lg);
-  static const EdgeInsetsDirectional insetDirectionalAllXl = EdgeInsetsDirectional.all(xl);
+  static const EdgeInsetsDirectional insetDirectionalAllXs =
+      EdgeInsetsDirectional.all(xs);
+  static const EdgeInsetsDirectional insetDirectionalAllSm =
+      EdgeInsetsDirectional.all(sm);
+  static const EdgeInsetsDirectional insetDirectionalAllMd =
+      EdgeInsetsDirectional.all(md);
+  static const EdgeInsetsDirectional insetDirectionalAllLg =
+      EdgeInsetsDirectional.all(lg);
+  static const EdgeInsetsDirectional insetDirectionalAllXl =
+      EdgeInsetsDirectional.all(xl);
 
-  static const EdgeInsetsDirectional insetDirectionalScreen = EdgeInsetsDirectional.symmetric(horizontal: md, vertical: sm);
-  static const EdgeInsetsDirectional insetDirectionalCard = EdgeInsetsDirectional.all(md);
+  static const EdgeInsetsDirectional insetDirectionalScreen =
+      EdgeInsetsDirectional.symmetric(horizontal: md, vertical: sm);
+  static const EdgeInsetsDirectional insetDirectionalCard =
+      EdgeInsetsDirectional.all(md);
 
-  static const EdgeInsetsDirectional insetHorizontalSm = EdgeInsetsDirectional.symmetric(horizontal: sm);
-  static const EdgeInsetsDirectional insetHorizontalMd = EdgeInsetsDirectional.symmetric(horizontal: md);
-  static const EdgeInsetsDirectional insetHorizontalLg = EdgeInsetsDirectional.symmetric(horizontal: lg);
+  static const EdgeInsetsDirectional insetHorizontalSm =
+      EdgeInsetsDirectional.symmetric(horizontal: sm);
+  static const EdgeInsetsDirectional insetHorizontalMd =
+      EdgeInsetsDirectional.symmetric(horizontal: md);
+  static const EdgeInsetsDirectional insetHorizontalLg =
+      EdgeInsetsDirectional.symmetric(horizontal: lg);
 
-  static const EdgeInsetsDirectional insetStartSm = EdgeInsetsDirectional.only(start: sm);
-  static const EdgeInsetsDirectional insetStartMd = EdgeInsetsDirectional.only(start: md);
-  static const EdgeInsetsDirectional insetStartLg = EdgeInsetsDirectional.only(start: lg);
+  static const EdgeInsetsDirectional insetStartSm =
+      EdgeInsetsDirectional.only(start: sm);
+  static const EdgeInsetsDirectional insetStartMd =
+      EdgeInsetsDirectional.only(start: md);
+  static const EdgeInsetsDirectional insetStartLg =
+      EdgeInsetsDirectional.only(start: lg);
 
-  static const EdgeInsetsDirectional insetEndSm = EdgeInsetsDirectional.only(end: sm);
-  static const EdgeInsetsDirectional insetEndMd = EdgeInsetsDirectional.only(end: md);
-  static const EdgeInsetsDirectional insetEndLg = EdgeInsetsDirectional.only(end: lg);
+  static const EdgeInsetsDirectional insetEndSm =
+      EdgeInsetsDirectional.only(end: sm);
+  static const EdgeInsetsDirectional insetEndMd =
+      EdgeInsetsDirectional.only(end: md);
+  static const EdgeInsetsDirectional insetEndLg =
+      EdgeInsetsDirectional.only(end: lg);
 
   // Gap constants for layout spacing
   static const SizedBox gapXs = SizedBox(width: xs, height: xs);

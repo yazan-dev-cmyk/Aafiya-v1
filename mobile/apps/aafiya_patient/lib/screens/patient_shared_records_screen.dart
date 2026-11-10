@@ -40,10 +40,12 @@ class PatientSharedRecordsScreen extends StatefulWidget {
   }
 
   @override
-  State<PatientSharedRecordsScreen> createState() => _PatientSharedRecordsScreenState();
+  State<PatientSharedRecordsScreen> createState() =>
+      _PatientSharedRecordsScreenState();
 }
 
-class _PatientSharedRecordsScreenState extends State<PatientSharedRecordsScreen> {
+class _PatientSharedRecordsScreenState
+    extends State<PatientSharedRecordsScreen> {
   late final PatientShareService _service;
   bool _isLoading = false;
   String? _errorMessage;
@@ -108,9 +110,11 @@ class _PatientSharedRecordsScreenState extends State<PatientSharedRecordsScreen>
             child: Text(strings.cancel),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: AafiyaColors.error),
+            style:
+                ElevatedButton.styleFrom(backgroundColor: AafiyaColors.error),
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(strings.revokeShare, style: const TextStyle(color: AafiyaColors.pureWhite)),
+            child: Text(strings.revokeShare,
+                style: const TextStyle(color: AafiyaColors.pureWhite)),
           ),
         ],
       ),
@@ -177,7 +181,8 @@ class _PatientSharedRecordsScreenState extends State<PatientSharedRecordsScreen>
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: AafiyaColors.healthBlue,
         icon: const Icon(Icons.add_link_rounded, color: AafiyaColors.pureWhite),
-        label: Text(strings.createNewShare, style: const TextStyle(color: AafiyaColors.pureWhite)),
+        label: Text(strings.createNewShare,
+            style: const TextStyle(color: AafiyaColors.pureWhite)),
         onPressed: _openCreateDialog,
       ),
       body: _buildBody(context, strings),
@@ -198,9 +203,12 @@ class _PatientSharedRecordsScreenState extends State<PatientSharedRecordsScreen>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.error_outline_rounded, size: 48, color: AafiyaColors.error),
+              const Icon(Icons.error_outline_rounded,
+                  size: 48, color: AafiyaColors.error),
               const SizedBox(height: 12),
-              Text(_errorMessage!, textAlign: TextAlign.center, style: AafiyaTypography.bodyMedium),
+              Text(_errorMessage!,
+                  textAlign: TextAlign.center,
+                  style: AafiyaTypography.bodyMedium),
               const SizedBox(height: 16),
               AafiyaButton(
                 label: strings.retry,
@@ -219,12 +227,14 @@ class _PatientSharedRecordsScreenState extends State<PatientSharedRecordsScreen>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.folder_shared_outlined, size: 64, color: AafiyaColors.secondaryText),
+              const Icon(Icons.folder_shared_outlined,
+                  size: 64, color: AafiyaColors.secondaryText),
               const SizedBox(height: 16),
               Text(
                 strings.noActiveSharesMessage,
                 textAlign: TextAlign.center,
-                style: AafiyaTypography.bodyLarge.copyWith(color: AafiyaColors.secondaryText),
+                style: AafiyaTypography.bodyLarge
+                    .copyWith(color: AafiyaColors.secondaryText),
               ),
               const SizedBox(height: 24),
               AafiyaButton(
@@ -240,7 +250,8 @@ class _PatientSharedRecordsScreenState extends State<PatientSharedRecordsScreen>
     return RefreshIndicator(
       onRefresh: _fetchShares,
       child: ListView.separated(
-        padding: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 88),
+        padding:
+            const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 88),
         itemCount: _shares.length,
         separatorBuilder: (_, __) => const SizedBox(height: 12),
         itemBuilder: (context, index) {
@@ -258,14 +269,39 @@ class _PatientSharedRecordsScreenState extends State<PatientSharedRecordsScreen>
   ) {
     final isRevoking = _revokingId == share.id;
 
-    final (statusLabel, statusColor, statusBg) = switch (share.status.toLowerCase()) {
+    final (statusLabel, statusColor, statusBg) =
+        switch (share.status.toLowerCase()) {
       'active' => share.isExpired
-          ? (strings.statusExpired, AafiyaColors.secondaryText, AafiyaColors.lightBackground)
-          : (strings.statusActive, AafiyaColors.success, AafiyaColors.healingGreenSurface),
-      'revoked' => (strings.statusRevoked, AafiyaColors.error, AafiyaColors.error.withValues(alpha: 0.1)),
-      'locked' => (strings.statusLocked, AafiyaColors.warning, AafiyaColors.warning.withValues(alpha: 0.15)),
-      'expired' => (strings.statusExpired, AafiyaColors.secondaryText, AafiyaColors.lightBackground),
-      _ => (share.status, AafiyaColors.secondaryText, AafiyaColors.lightBackground),
+          ? (
+              strings.statusExpired,
+              AafiyaColors.secondaryText,
+              AafiyaColors.lightBackground
+            )
+          : (
+              strings.statusActive,
+              AafiyaColors.success,
+              AafiyaColors.healingGreenSurface
+            ),
+      'revoked' => (
+          strings.statusRevoked,
+          AafiyaColors.error,
+          AafiyaColors.error.withValues(alpha: 0.1)
+        ),
+      'locked' => (
+          strings.statusLocked,
+          AafiyaColors.warning,
+          AafiyaColors.warning.withValues(alpha: 0.15)
+        ),
+      'expired' => (
+          strings.statusExpired,
+          AafiyaColors.secondaryText,
+          AafiyaColors.lightBackground
+        ),
+      _ => (
+          share.status,
+          AafiyaColors.secondaryText,
+          AafiyaColors.lightBackground
+        ),
     };
 
     return AafiyaCard(
@@ -292,15 +328,18 @@ class _PatientSharedRecordsScreenState extends State<PatientSharedRecordsScreen>
               const SizedBox(width: 8),
               Text(
                 'Scope: ${share.scope}',
-                style: AafiyaTypography.caption.copyWith(color: AafiyaColors.secondaryText),
+                style: AafiyaTypography.caption
+                    .copyWith(color: AafiyaColors.secondaryText),
               ),
               const Spacer(),
               if (share.accessCount > 0) ...[
-                const Icon(Icons.visibility_outlined, size: 16, color: AafiyaColors.secondaryText),
+                const Icon(Icons.visibility_outlined,
+                    size: 16, color: AafiyaColors.secondaryText),
                 const SizedBox(width: 4),
                 Text(
                   '${share.accessCount}',
-                  style: AafiyaTypography.caption.copyWith(color: AafiyaColors.secondaryText),
+                  style: AafiyaTypography.caption
+                      .copyWith(color: AafiyaColors.secondaryText),
                 ),
               ],
             ],
@@ -308,7 +347,8 @@ class _PatientSharedRecordsScreenState extends State<PatientSharedRecordsScreen>
           const SizedBox(height: 10),
           Row(
             children: [
-              const Icon(Icons.access_time_rounded, size: 16, color: AafiyaColors.secondaryText),
+              const Icon(Icons.access_time_rounded,
+                  size: 16, color: AafiyaColors.secondaryText),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(

@@ -278,7 +278,7 @@ class _ClinicEscalationsScreenState extends State<ClinicEscalationsScreen> {
             onPressed: () => Navigator.of(ctx).pop(true),
             style: ElevatedButton.styleFrom(
               backgroundColor: AafiyaColors.primaryBlue,
-              foregroundColor: Colors.white,
+              foregroundColor: AafiyaColors.pureWhite,
             ),
             child: Text(strings.escalationConfirmAction),
           ),

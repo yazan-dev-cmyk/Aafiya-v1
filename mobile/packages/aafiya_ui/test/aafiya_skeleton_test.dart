@@ -4,7 +4,9 @@ import 'package:aafiya_ui/aafiya_ui.dart';
 
 void main() {
   group('AafiyaSkeleton Widget Tests', () {
-    testWidgets('AafiyaSkeleton base widget renders with custom dimensions and animates', (tester) async {
+    testWidgets(
+        'AafiyaSkeleton base widget renders with custom dimensions and animates',
+        (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: AafiyaTheme.lightTheme,
@@ -18,7 +20,8 @@ void main() {
         ),
       );
 
-      final skeleton = tester.widget<AafiyaSkeleton>(find.byType(AafiyaSkeleton));
+      final skeleton =
+          tester.widget<AafiyaSkeleton>(find.byType(AafiyaSkeleton));
       expect(skeleton.width, equals(120.0));
       expect(skeleton.height, equals(24.0));
 
@@ -27,7 +30,8 @@ void main() {
       await tester.pump(const Duration(milliseconds: 300));
     });
 
-    testWidgets('AafiyaSkeleton.line renders full width line placeholder', (tester) async {
+    testWidgets('AafiyaSkeleton.line renders full width line placeholder',
+        (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: AafiyaTheme.lightTheme,
@@ -43,7 +47,8 @@ void main() {
       expect(find.byType(AafiyaSkeleton), findsOneWidget);
     });
 
-    testWidgets('AafiyaSkeleton.circle renders circular avatar placeholder', (tester) async {
+    testWidgets('AafiyaSkeleton.circle renders circular avatar placeholder',
+        (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: AafiyaTheme.lightTheme,
@@ -54,13 +59,16 @@ void main() {
       );
 
       expect(find.byType(AafiyaSkeleton), findsOneWidget);
-      final skeleton = tester.widget<AafiyaSkeleton>(find.byType(AafiyaSkeleton));
+      final skeleton =
+          tester.widget<AafiyaSkeleton>(find.byType(AafiyaSkeleton));
       expect(skeleton.shape, equals(BoxShape.circle));
       expect(skeleton.width, equals(48.0));
       expect(skeleton.height, equals(48.0));
     });
 
-    testWidgets('AafiyaSkeleton.card renders default structured card placeholder', (tester) async {
+    testWidgets(
+        'AafiyaSkeleton.card renders default structured card placeholder',
+        (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: AafiyaTheme.lightTheme,
@@ -77,7 +85,8 @@ void main() {
       expect(find.byType(AafiyaSkeleton), findsNWidgets(3));
     });
 
-    testWidgets('AafiyaSkeleton.card renders in dark mode with dark surfaces', (tester) async {
+    testWidgets('AafiyaSkeleton.card renders in dark mode with dark surfaces',
+        (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: AafiyaTheme.darkTheme,
@@ -92,7 +101,9 @@ void main() {
       expect(find.text('Dark Card Skeleton'), findsOneWidget);
     });
 
-    testWidgets('AafiyaSkeleton.listTile renders with leading and trailing placeholders', (tester) async {
+    testWidgets(
+        'AafiyaSkeleton.listTile renders with leading and trailing placeholders',
+        (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: AafiyaTheme.lightTheme,
@@ -109,7 +120,9 @@ void main() {
       expect(find.byType(AafiyaSkeleton), findsNWidgets(4));
     });
 
-    testWidgets('AafiyaSkeleton disposes AnimationController cleanly when removed from tree', (tester) async {
+    testWidgets(
+        'AafiyaSkeleton disposes AnimationController cleanly when removed from tree',
+        (tester) async {
       var showSkeleton = true;
 
       await tester.pumpWidget(

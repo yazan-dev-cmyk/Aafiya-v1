@@ -507,4 +507,305 @@ void main() {
           findsOneWidget);
     });
   });
+
+  group('Doctor Working Hours — Permanent Lock Lifecycle & Session Durability (FIND-04)', () {
+    testWidgets(
+        '1. Level 1 (Widget rebuild & In-situ State): Locked schedule disables all controls and action buttons',
+        (tester) async {
+      final mockClient = MockClient((request) async {
+        return http.Response(
+          jsonEncode(createSampleScheduleJson(isActivated: true)),
+          200,
+          headers: {'content-type': 'application/json'},
+        );
+      });
+
+      final apiClient = ApiClient(httpClient: mockClient);
+      final sessionManager = AuthSessionManager(
+        apiClient: apiClient,
+        tokenStorage: InMemoryTokenStorage('test-token-01'),
+      );
+      sessionManager.setAuthorizedClinics([testClinic]);
+      sessionManager.switchActiveClinic('clinic-hours-01');
+
+      await tester.pumpWidget(
+        createTestWidget(
+          child: DoctorWorkingHoursScreen(
+            sessionManager: sessionManager,
+            user: testDoctor,
+            clinicId: 'clinic-hours-01',
+            apiClient: apiClient,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Check locked banner & invariants
+      expect(find.textContaining('جدول مفعل ومقفل نهائياً'), findsOneWidget);
+      expect(find.byKey(const Key('save_draft_button')), findsNothing);
+      expect(find.byKey(const Key('activate_schedule_button')), findsNothing);
+
+      // Rebuild widget (Level 1: Rebuild)
+      await tester.pump();
+      expect(find.textContaining('جدول مفعل ومقفل نهائياً'), findsOneWidget);
+    });
+
+    testWidgets(
+        '2. Level 2 (Navigation Away & Pop Return): Locked state remains intact upon route return',
+        (tester) async {
+      final mockClient = MockClient((request) async {
+        return http.Response(
+          jsonEncode(createSampleScheduleJson(isActivated: true)),
+          200,
+          headers: {'content-type': 'application/json'},
+        );
+      });
+
+      final apiClient = ApiClient(httpClient: mockClient);
+      final sessionManager = AuthSessionManager(
+        apiClient: apiClient,
+        tokenStorage: InMemoryTokenStorage('test-token-01'),
+      );
+      sessionManager.setAuthorizedClinics([testClinic]);
+      sessionManager.switchActiveClinic('clinic-hours-01');
+
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('ar'),
+          supportedLocales: AafiyaSupportedLocale.supportedLocales,
+          localizationsDelegates: const [
+            AafiyaLocalizationsDelegate(),
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          theme: AafiyaTheme.lightTheme,
+          home: Builder(
+            builder: (context) => Scaffold(
+              body: Center(
+                child: ElevatedButton(
+                  key: const Key('open_hours'),
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (_) => DoctorWorkingHoursScreen(
+                        sessionManager: sessionManager,
+                        user: testDoctor,
+                        clinicId: 'clinic-hours-01',
+                        apiClient: apiClient,
+                      ),
+                    ));
+                  },
+                  child: const Text('افتح مواعيد العمل'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Open screen
+      await tester.tap(find.byKey(const Key('open_hours')));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('جدول مفعل ومقفل نهائياً'), findsOneWidget);
+
+      // Push secondary screen on top (Navigate away)
+      final navigator = tester.state<NavigatorState>(find.byType(Navigator));
+      navigator.push(MaterialPageRoute(
+        builder: (_) => const Scaffold(body: Text('شاشة فرعية مؤقتة')),
+      ));
+      await tester.pumpAndSettle();
+      expect(find.text('شاشة فرعية مؤقتة'), findsOneWidget);
+
+      // Pop back to working hours
+      navigator.pop();
+      await tester.pumpAndSettle();
+
+      // Verify lock persists after returning
+      expect(find.textContaining('جدول مفعل ومقفل نهائياً'), findsOneWidget);
+      expect(find.byKey(const Key('save_draft_button')), findsNothing);
+      expect(find.byKey(const Key('activate_schedule_button')), findsNothing);
+    });
+
+    testWidgets(
+        '3. Level 3 (Widget State Recreation): Complete disposal and re-initialization reloads locked state from backend',
+        (tester) async {
+      int requestCount = 0;
+      final mockClient = MockClient((request) async {
+        if (request.url.path.contains('/working-hours')) {
+          requestCount++;
+          return http.Response(
+            jsonEncode(createSampleScheduleJson(isActivated: true)),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        }
+        return http.Response('{}', 200);
+      });
+
+      final apiClient = ApiClient(httpClient: mockClient);
+      final sessionManager = AuthSessionManager(
+        apiClient: apiClient,
+        tokenStorage: InMemoryTokenStorage('test-token-01'),
+      );
+      sessionManager.setAuthorizedClinics([testClinic]);
+      sessionManager.switchActiveClinic('clinic-hours-01');
+
+      // First mount
+      await tester.pumpWidget(
+        createTestWidget(
+          child: DoctorWorkingHoursScreen(
+            sessionManager: sessionManager,
+            user: testDoctor,
+            clinicId: 'clinic-hours-01',
+            apiClient: apiClient,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.textContaining('جدول مفعل ومقفل نهائياً'), findsOneWidget);
+      expect(requestCount, 1);
+
+      // Dispose state completely
+      await tester.pumpWidget(createTestWidget(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+      expect(find.byType(DoctorWorkingHoursScreen), findsNothing);
+
+      // Re-create and re-mount (State recreation)
+      await tester.pumpWidget(
+        createTestWidget(
+          child: DoctorWorkingHoursScreen(
+            sessionManager: sessionManager,
+            user: testDoctor,
+            clinicId: 'clinic-hours-01',
+            apiClient: apiClient,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(requestCount, 2);
+      expect(find.textContaining('جدول مفعل ومقفل نهائياً'), findsOneWidget);
+      expect(find.byKey(const Key('save_draft_button')), findsNothing);
+      expect(find.byKey(const Key('activate_schedule_button')), findsNothing);
+    });
+
+    testWidgets(
+        '4. Level 4 (Session Restoration & Re-Login): Lock survives logout and re-authentication with new session',
+        (tester) async {
+      int fetchCount = 0;
+      final mockClient = MockClient((request) async {
+        if (request.url.path.contains('/working-hours')) {
+          fetchCount++;
+          return http.Response(
+            jsonEncode(createSampleScheduleJson(isActivated: true)),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        }
+        if (request.url.path.contains('/auth/logout')) {
+          return http.Response('{"status":"success"}', 200,
+              headers: {'content-type': 'application/json'});
+        }
+        return http.Response('{}', 200);
+      });
+
+      final apiClient = ApiClient(httpClient: mockClient);
+      final initialSessionManager = AuthSessionManager(
+        apiClient: apiClient,
+        tokenStorage: InMemoryTokenStorage('initial-doctor-token-111'),
+      );
+      initialSessionManager.setAuthorizedClinics([testClinic]);
+      initialSessionManager.switchActiveClinic('clinic-hours-01');
+
+      // 1. Initial authenticated session
+      await tester.pumpWidget(
+        createTestWidget(
+          child: DoctorWorkingHoursScreen(
+            sessionManager: initialSessionManager,
+            user: testDoctor,
+            clinicId: 'clinic-hours-01',
+            apiClient: apiClient,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.textContaining('جدول مفعل ومقفل نهائياً'), findsOneWidget);
+
+      // 2. Doctor logs out: session cleared and widget destroyed
+      await initialSessionManager.logout();
+      await tester.pumpWidget(createTestWidget(child: const SizedBox.shrink()));
+      await tester.pumpAndSettle();
+
+      // 3. New login: fresh session manager and new token
+      final restoredSessionManager = AuthSessionManager(
+        apiClient: apiClient,
+        tokenStorage: InMemoryTokenStorage('new-doctor-token-222'),
+      );
+      restoredSessionManager.setAuthorizedClinics([testClinic]);
+      restoredSessionManager.switchActiveClinic('clinic-hours-01');
+
+      // 4. Re-enter DoctorWorkingHoursScreen
+      await tester.pumpWidget(
+        createTestWidget(
+          child: DoctorWorkingHoursScreen(
+            sessionManager: restoredSessionManager,
+            user: testDoctor,
+            clinicId: 'clinic-hours-01',
+            apiClient: apiClient,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // 5. Verify permanent lock is strictly enforced in the new session
+      expect(fetchCount, 2);
+      expect(find.textContaining('جدول مفعل ومقفل نهائياً'), findsOneWidget);
+      expect(find.byKey(const Key('save_draft_button')), findsNothing);
+      expect(find.byKey(const Key('activate_schedule_button')), findsNothing);
+
+      final switches = tester.widgetList<Switch>(find.byType(Switch));
+      for (final s in switches) {
+        expect(s.onChanged, isNull);
+      }
+    });
+
+    testWidgets(
+        '5. Verification of Zero Mobile Unlock Controls: No unlock action or override exists in UI',
+        (tester) async {
+      final mockClient = MockClient((request) async {
+        return http.Response(
+          jsonEncode(createSampleScheduleJson(isActivated: true)),
+          200,
+          headers: {'content-type': 'application/json'},
+        );
+      });
+
+      final apiClient = ApiClient(httpClient: mockClient);
+      final sessionManager = AuthSessionManager(
+        apiClient: apiClient,
+        tokenStorage: InMemoryTokenStorage('test-token-01'),
+      );
+      sessionManager.setAuthorizedClinics([testClinic]);
+      sessionManager.switchActiveClinic('clinic-hours-01');
+
+      await tester.pumpWidget(
+        createTestWidget(
+          child: DoctorWorkingHoursScreen(
+            sessionManager: sessionManager,
+            user: testDoctor,
+            clinicId: 'clinic-hours-01',
+            apiClient: apiClient,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Verify no unlock-related texts, buttons, or overrides exist
+      expect(find.textContaining('إلغاء القفل'), findsNothing);
+      expect(find.textContaining('فتح الجدول'), findsNothing);
+      expect(find.textContaining('unlock'), findsNothing);
+      expect(find.textContaining('تعديل الدوام'), findsNothing);
+      expect(find.byKey(const Key('unlock_schedule_button')), findsNothing);
+    });
+  });
 }

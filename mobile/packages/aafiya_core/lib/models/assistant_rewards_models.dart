@@ -11,7 +11,7 @@ class AssistantRewardSummary {
     required this.totalPaid,
     required this.totalRelieved,
     required this.pendingPayout,
-    required this.payoutThreshold,
+    this.payoutThreshold,
     required this.isEligibleForPayout,
     this.ineligibilityReason,
     this.activeProfile,
@@ -24,12 +24,13 @@ class AssistantRewardSummary {
   final double totalPaid;
   final double totalRelieved;
   final double pendingPayout;
-  final double payoutThreshold;
+  final double? payoutThreshold;
   final bool isEligibleForPayout;
   final String? ineligibilityReason;
   final AssistantPayoutProfile? activeProfile;
 
   factory AssistantRewardSummary.fromJson(Map<String, dynamic> json) {
+    final rawThreshold = (json['payout_threshold'] as num?)?.toDouble();
     return AssistantRewardSummary(
       currentBalance: (json['current_balance'] as num?)?.toDouble() ?? 0.0,
       totalEarned: (json['total_earned'] as num?)?.toDouble() ?? 0.0,
@@ -38,7 +39,8 @@ class AssistantRewardSummary {
       totalPaid: (json['total_paid'] as num?)?.toDouble() ?? 0.0,
       totalRelieved: (json['total_relieved'] as num?)?.toDouble() ?? 0.0,
       pendingPayout: (json['pending_payout'] as num?)?.toDouble() ?? 0.0,
-      payoutThreshold: (json['payout_threshold'] as num?)?.toDouble() ?? 10000.0,
+      payoutThreshold:
+          rawThreshold != null && rawThreshold > 0 ? rawThreshold : null,
       isEligibleForPayout: json['is_eligible_for_payout'] as bool? ?? false,
       ineligibilityReason: json['ineligibility_reason'] as String?,
       activeProfile: json['active_profile'] is Map<String, dynamic>

@@ -23,7 +23,8 @@ Widget buildTestableWidget({
 
 void main() {
   group('AafiyaCrashBoundary Widget Tests', () {
-    testWidgets('Renders localized Arabic crash boundary and invokes recovery', (tester) async {
+    testWidgets('Renders localized Arabic crash boundary and invokes recovery',
+        (tester) async {
       bool recovered = false;
 
       await tester.pumpWidget(buildTestableWidget(
@@ -36,7 +37,10 @@ void main() {
 
       expect(find.byIcon(Icons.shield_outlined), findsOneWidget);
       expect(find.text('حدث خطأ غير متوقع'), findsOneWidget);
-      expect(find.text('نعتذر عن هذا الخطأ. يمكنك إعادة المحاولة أو العودة للرئيسية.'), findsOneWidget);
+      expect(
+          find.text(
+              'نعتذر عن هذا الخطأ. يمكنك إعادة المحاولة أو العودة للرئيسية.'),
+          findsOneWidget);
       expect(find.text('العودة للرئيسية'), findsOneWidget);
 
       // Verify recovery action
@@ -45,7 +49,9 @@ void main() {
       expect(recovered, isTrue);
     });
 
-    testWidgets('Renders English localization and supports custom title/message', (tester) async {
+    testWidgets(
+        'Renders English localization and supports custom title/message',
+        (tester) async {
       await tester.pumpWidget(buildTestableWidget(
         locale: const Locale('en'),
         child: const AafiyaCrashBoundary(
@@ -58,7 +64,8 @@ void main() {
 
       expect(find.text('Custom Recovery Title'), findsOneWidget);
       expect(find.text('Custom recovery message details.'), findsOneWidget);
-      expect(find.byType(AafiyaButton), findsNothing, reason: 'No onRecover callback provided');
+      expect(find.byType(AafiyaButton), findsNothing,
+          reason: 'No onRecover callback provided');
     });
 
     testWidgets('Renders French localization cleanly', (tester) async {

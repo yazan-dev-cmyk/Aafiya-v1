@@ -34,10 +34,12 @@ class BookingCenterDirectoryScreen extends StatefulWidget {
   }
 
   @override
-  State<BookingCenterDirectoryScreen> createState() => _BookingCenterDirectoryScreenState();
+  State<BookingCenterDirectoryScreen> createState() =>
+      _BookingCenterDirectoryScreenState();
 }
 
-class _BookingCenterDirectoryScreenState extends State<BookingCenterDirectoryScreen> {
+class _BookingCenterDirectoryScreenState
+    extends State<BookingCenterDirectoryScreen> {
   late final MasterDataService _masterDataService;
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
@@ -59,7 +61,8 @@ class _BookingCenterDirectoryScreenState extends State<BookingCenterDirectoryScr
   @override
   void initState() {
     super.initState();
-    _masterDataService = widget.masterDataService ?? MasterDataService(widget.apiClient);
+    _masterDataService =
+        widget.masterDataService ?? MasterDataService(widget.apiClient);
     _scrollController.addListener(_onScroll);
     _fetchCenters(page: 1, reset: true);
   }
@@ -222,7 +225,8 @@ class _BookingCenterDirectoryScreenState extends State<BookingCenterDirectoryScr
     );
   }
 
-  Widget _buildSearchAndFilters(BuildContext context, LocalizedStrings strings) {
+  Widget _buildSearchAndFilters(
+      BuildContext context, LocalizedStrings strings) {
     return Container(
       color: AafiyaColors.pureWhite,
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
@@ -234,7 +238,8 @@ class _BookingCenterDirectoryScreenState extends State<BookingCenterDirectoryScr
             onChanged: _onSearchChanged,
             decoration: InputDecoration(
               hintText: strings.searchBookingCentersHint,
-              prefixIcon: const Icon(Icons.search_rounded, color: AafiyaColors.secondaryText),
+              prefixIcon: const Icon(Icons.search_rounded,
+                  color: AafiyaColors.secondaryText),
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
                       icon: const Icon(Icons.clear_rounded, size: 18),
@@ -244,7 +249,8 @@ class _BookingCenterDirectoryScreenState extends State<BookingCenterDirectoryScr
                       },
                     )
                   : null,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               filled: true,
               fillColor: AafiyaColors.lightBackground,
               border: OutlineInputBorder(
@@ -257,7 +263,8 @@ class _BookingCenterDirectoryScreenState extends State<BookingCenterDirectoryScr
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AafiyaRadius.md),
-                borderSide: const BorderSide(color: AafiyaColors.healthBlue, width: 1.5),
+                borderSide: const BorderSide(
+                    color: AafiyaColors.healthBlue, width: 1.5),
               ),
             ),
           ),
@@ -334,7 +341,8 @@ class _BookingCenterDirectoryScreenState extends State<BookingCenterDirectoryScr
     );
   }
 
-  Widget _buildCenterCard(BuildContext context, LocalizedStrings strings, BookingCenter center) {
+  Widget _buildCenterCard(
+      BuildContext context, LocalizedStrings strings, BookingCenter center) {
     return AafiyaCard(
       padding: AafiyaSpacing.insetAllMd,
       child: Column(
@@ -345,10 +353,10 @@ class _BookingCenterDirectoryScreenState extends State<BookingCenterDirectoryScr
             children: [
               CircleAvatar(
                 radius: 24,
-                backgroundColor: const Color(0xFFE8EEFB),
+                backgroundColor: AafiyaColors.indigoSoft,
                 child: const Icon(
                   Icons.apartment_rounded,
-                  color: Color(0xFF2B4FA8),
+                  color: AafiyaColors.indigoInk,
                   size: 26,
                 ),
               ),
@@ -373,11 +381,14 @@ class _BookingCenterDirectoryScreenState extends State<BookingCenterDirectoryScr
                           color: AafiyaColors.tealDeep,
                         ),
                         const SizedBox(width: 4),
-                        Text(
-                          strings.verifiedBookingCenter,
-                          style: AafiyaTypography.caption.copyWith(
-                            color: AafiyaColors.tealDeep,
-                            fontWeight: FontWeight.w600,
+                        Expanded(
+                          child: Text(
+                            strings.verifiedBookingCenter,
+                            style: AafiyaTypography.caption.copyWith(
+                              color: AafiyaColors.tealDeep,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
@@ -387,7 +398,8 @@ class _BookingCenterDirectoryScreenState extends State<BookingCenterDirectoryScr
               ),
               if (center.wilaya != null && center.wilaya!.isNotEmpty)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: AafiyaColors.lightBackground,
                     borderRadius: BorderRadius.circular(AafiyaRadius.sm),
@@ -407,12 +419,14 @@ class _BookingCenterDirectoryScreenState extends State<BookingCenterDirectoryScr
             const SizedBox(height: 12),
             Row(
               children: [
-                const Icon(Icons.location_on_outlined, size: 16, color: AafiyaColors.secondaryText),
+                const Icon(Icons.location_on_outlined,
+                    size: 16, color: AafiyaColors.secondaryText),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
                     center.address!,
-                    style: AafiyaTypography.bodyMedium.copyWith(color: AafiyaColors.secondaryText),
+                    style: AafiyaTypography.bodyMedium
+                        .copyWith(color: AafiyaColors.secondaryText),
                   ),
                 ),
               ],
@@ -422,7 +436,8 @@ class _BookingCenterDirectoryScreenState extends State<BookingCenterDirectoryScr
             const SizedBox(height: 8),
             Row(
               children: [
-                const Icon(Icons.phone_outlined, size: 16, color: AafiyaColors.secondaryText),
+                const Icon(Icons.phone_outlined,
+                    size: 16, color: AafiyaColors.secondaryText),
                 const SizedBox(width: 6),
                 Text(
                   '\u200E${center.phone!}\u200E',
@@ -443,7 +458,8 @@ class _BookingCenterDirectoryScreenState extends State<BookingCenterDirectoryScr
             ),
             child: Row(
               children: [
-                const Icon(Icons.info_outline_rounded, size: 14, color: AafiyaColors.info),
+                const Icon(Icons.info_outline_rounded,
+                    size: 14, color: AafiyaColors.info),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
@@ -462,7 +478,8 @@ class _BookingCenterDirectoryScreenState extends State<BookingCenterDirectoryScr
     );
   }
 
-  Widget _buildPaginationFooter(BuildContext context, LocalizedStrings strings) {
+  Widget _buildPaginationFooter(
+      BuildContext context, LocalizedStrings strings) {
     if (_isLoadingMore) {
       return const Padding(
         padding: EdgeInsets.symmetric(vertical: 16),
@@ -481,7 +498,8 @@ class _BookingCenterDirectoryScreenState extends State<BookingCenterDirectoryScr
         padding: const EdgeInsets.symmetric(vertical: 16),
         child: Center(
           child: OutlinedButton.icon(
-            onPressed: () => _fetchCenters(page: _currentPage + 1, reset: false),
+            onPressed: () =>
+                _fetchCenters(page: _currentPage + 1, reset: false),
             icon: const Icon(Icons.refresh_rounded, size: 16),
             label: Text(strings.retry),
           ),

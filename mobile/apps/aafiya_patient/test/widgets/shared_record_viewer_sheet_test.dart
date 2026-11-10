@@ -11,7 +11,8 @@ import 'package:aafiya_ui/aafiya_ui.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  const sampleToken = '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
+  const sampleToken =
+      '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
 
   final validRecordJson = {
     'data': {
@@ -68,7 +69,8 @@ void main() {
         'scope': 'all_emr',
         'access_granted_at': '2026-10-16T08:00:00Z',
         'expires_at': '2026-10-16T12:00:00Z',
-        'authorized_clinical_scope': 'ملف طبي موحد معتمد (خالٍ من بيانات الاتصال والهوية الشخصية)',
+        'authorized_clinical_scope':
+            'ملف طبي موحد معتمد (خالٍ من بيانات الاتصال والهوية الشخصية)',
       },
     }
   };
@@ -92,9 +94,11 @@ void main() {
   }
 
   group('SharedRecordViewerSheet Widget Tests', () {
-    testWidgets('renders PIN entry form in Arabic with RTL layout', (tester) async {
+    testWidgets('renders PIN entry form in Arabic with RTL layout',
+        (tester) async {
       final mockClient = MockClient((_) async => http.Response('{}', 200));
-      final apiClient = ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
+      final apiClient =
+          ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
 
       await tester.pumpWidget(
         buildTestApp(
@@ -111,13 +115,16 @@ void main() {
       expect(find.text('رمز الحماية PIN'), findsOneWidget);
       expect(find.text('فك التشفير وعرض السجل'), findsOneWidget);
       // Directionality in Arabic
-      final textDirection = Directionality.of(tester.element(find.text('عرض السجل الطبي المشفر')));
+      final textDirection = Directionality.of(
+          tester.element(find.text('عرض السجل الطبي المشفر')));
       expect(textDirection, equals(TextDirection.rtl));
     });
 
-    testWidgets('renders PIN entry form in English with LTR layout', (tester) async {
+    testWidgets('renders PIN entry form in English with LTR layout',
+        (tester) async {
       final mockClient = MockClient((_) async => http.Response('{}', 200));
-      final apiClient = ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
+      final apiClient =
+          ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
 
       await tester.pumpWidget(
         buildTestApp(
@@ -133,17 +140,20 @@ void main() {
       expect(find.text('View Encrypted Medical Record'), findsOneWidget);
       expect(find.text('Security PIN'), findsOneWidget);
       expect(find.text('Decrypt & View Record'), findsOneWidget);
-      final textDirection = Directionality.of(tester.element(find.text('View Encrypted Medical Record')));
+      final textDirection = Directionality.of(
+          tester.element(find.text('View Encrypted Medical Record')));
       expect(textDirection, equals(TextDirection.ltr));
     });
 
-    testWidgets('validates PIN length locally before network call', (tester) async {
+    testWidgets('validates PIN length locally before network call',
+        (tester) async {
       bool networkCalled = false;
       final mockClient = MockClient((_) async {
         networkCalled = true;
         return http.Response('{}', 200);
       });
-      final apiClient = ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
+      final apiClient =
+          ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
 
       await tester.pumpWidget(
         buildTestApp(
@@ -160,13 +170,16 @@ void main() {
       await tester.tap(find.text('فك التشفير وعرض السجل'));
       await tester.pumpAndSettle();
 
-      expect(find.text('يجب أن يتكون رمز الحماية من 4 إلى 8 أرقام'), findsOneWidget);
+      expect(find.text('يجب أن يتكون رمز الحماية من 4 إلى 8 أرقام'),
+          findsOneWidget);
       expect(networkCalled, isFalse);
     });
 
     const jsonHeaders = {'content-type': 'application/json; charset=utf-8'};
 
-    testWidgets('displays remaining attempts on 403 Wrong PIN and clears PIN field', (tester) async {
+    testWidgets(
+        'displays remaining attempts on 403 Wrong PIN and clears PIN field',
+        (tester) async {
       final mockClient = MockClient((_) async {
         return http.Response(
           jsonEncode({
@@ -179,7 +192,8 @@ void main() {
           headers: jsonHeaders,
         );
       });
-      final apiClient = ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
+      final apiClient =
+          ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
 
       await tester.pumpWidget(
         buildTestApp(
@@ -203,19 +217,23 @@ void main() {
       expect(pinField.controller?.text, isEmpty);
     });
 
-    testWidgets('clears PIN and token and disables submission on 410 Expired/Revoked', (tester) async {
+    testWidgets(
+        'clears PIN and token and disables submission on 410 Expired/Revoked',
+        (tester) async {
       final mockClient = MockClient((_) async {
         return http.Response(
           jsonEncode({
             'status': 'error',
             'code': 410,
-            'message': 'تم إلغاء رابط المشاركة من قِبل المريض، ولم يعد صالحاً للاستخدام.',
+            'message':
+                'تم إلغاء رابط المشاركة من قِبل المريض، ولم يعد صالحاً للاستخدام.',
           }),
           410,
           headers: jsonHeaders,
         );
       });
-      final apiClient = ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
+      final apiClient =
+          ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
 
       await tester.pumpWidget(
         buildTestApp(
@@ -231,24 +249,29 @@ void main() {
       await tester.tap(find.text('فك التشفير وعرض السجل'));
       await tester.pumpAndSettle();
 
-      expect(find.text('انتهت صلاحية رابط المشاركة أو تم إلغاؤه من قِبل المريض.'), findsOneWidget);
+      expect(
+          find.text('انتهت صلاحية رابط المشاركة أو تم إلغاؤه من قِبل المريض.'),
+          findsOneWidget);
       // Submit button should be hidden on terminal state
       expect(find.text('فك التشفير وعرض السجل'), findsNothing);
     });
 
-    testWidgets('clears PIN and disables submission on 423 Locked', (tester) async {
+    testWidgets('clears PIN and disables submission on 423 Locked',
+        (tester) async {
       final mockClient = MockClient((_) async {
         return http.Response(
           jsonEncode({
             'status': 'error',
             'code': 423,
-            'message': 'تم قفل الرابط مؤقتاً بسبب تكرار المحاولات الخاطئة. يرجى الانتظار والمحاولة لاحقاً.',
+            'message':
+                'تم قفل الرابط مؤقتاً بسبب تكرار المحاولات الخاطئة. يرجى الانتظار والمحاولة لاحقاً.',
           }),
           423,
           headers: jsonHeaders,
         );
       });
-      final apiClient = ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
+      final apiClient =
+          ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
 
       await tester.pumpWidget(
         buildTestApp(
@@ -264,15 +287,22 @@ void main() {
       await tester.tap(find.text('فك التشفير وعرض السجل'));
       await tester.pumpAndSettle();
 
-      expect(find.text('تم قفل الوصول مؤقتاً بسبب تكرار المحاولات الخاطئة. يرجى المحاولة لاحقاً.'), findsOneWidget);
+      expect(
+          find.text(
+              'تم قفل الوصول مؤقتاً بسبب تكرار المحاولات الخاطئة. يرجى المحاولة لاحقاً.'),
+          findsOneWidget);
       expect(find.text('فك التشفير وعرض السجل'), findsNothing);
     });
 
-    testWidgets('successfully resolves and displays medical record with zero prohibited PII', (tester) async {
+    testWidgets(
+        'successfully resolves and displays medical record with zero prohibited PII',
+        (tester) async {
       final mockClient = MockClient((_) async {
-        return http.Response(jsonEncode(validRecordJson), 200, headers: jsonHeaders);
+        return http.Response(jsonEncode(validRecordJson), 200,
+            headers: jsonHeaders);
       });
-      final apiClient = ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
+      final apiClient =
+          ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
 
       await tester.pumpWidget(
         buildTestApp(
@@ -296,7 +326,10 @@ void main() {
       expect(find.text('Salbutamol Inhaler'), findsOneWidget);
 
       // Verified notice badge displayed
-      expect(find.text('ملف طبي موحد معتمد (خالٍ من بيانات الاتصال والهوية الشخصية)'), findsOneWidget);
+      expect(
+          find.text(
+              'ملف طبي موحد معتمد (خالٍ من بيانات الاتصال والهوية الشخصية)'),
+          findsOneWidget);
 
       // Verify prohibited fields are absent
       expect(find.textContaining('phone'), findsNothing);
@@ -305,9 +338,12 @@ void main() {
       expect(find.textContaining('address'), findsNothing);
     });
 
-    testWidgets('handles keyboard viewInsets and renders token input when initialToken is null', (tester) async {
+    testWidgets(
+        'handles keyboard viewInsets and renders token input when initialToken is null',
+        (tester) async {
       final mockClient = MockClient((_) async => http.Response('{}', 200));
-      final apiClient = ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
+      final apiClient =
+          ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
 
       await tester.pumpWidget(
         buildTestApp(

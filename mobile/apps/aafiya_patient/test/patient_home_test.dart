@@ -24,8 +24,16 @@ void main() {
       roles: [UserRole.patient],
     );
 
-    final upcomingDate = DateTime.now().add(const Duration(days: 7)).toIso8601String().split('T').first;
-    final pendingUpcomingDate = DateTime.now().add(const Duration(days: 10)).toIso8601String().split('T').first;
+    final upcomingDate = DateTime.now()
+        .add(const Duration(days: 7))
+        .toIso8601String()
+        .split('T')
+        .first;
+    final pendingUpcomingDate = DateTime.now()
+        .add(const Duration(days: 10))
+        .toIso8601String()
+        .split('T')
+        .first;
 
     final mockUpcomingAppointmentJson = {
       'id': 'app-upcoming-1',
@@ -167,15 +175,21 @@ void main() {
     // =========================================================================
     // TEST 1 — LOADING STATE
     // =========================================================================
-    testWidgets('1. Loading: displays AafiyaLoadingView while appointment request is in-flight', (tester) async {
+    testWidgets(
+        '1. Loading: displays AafiyaLoadingView while appointment request is in-flight',
+        (tester) async {
       final completer = Completer<http.Response>();
       final mockHttp = MockClient((request) => completer.future);
 
-      final client = ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
-      final manager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
-      await manager.setAuthenticatedUser(token: 'test_token', user: testPatient);
+      final client =
+          ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
+      final manager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
+      await manager.setAuthenticatedUser(
+          token: 'test_token', user: testPatient);
 
-      await tester.pumpWidget(createPatientHomeWidget(client: client, manager: manager));
+      await tester.pumpWidget(
+          createPatientHomeWidget(client: client, manager: manager));
 
       // Switch to appointments tab (index 1)
       await tester.tap(find.byIcon(Icons.calendar_month_outlined));
@@ -185,14 +199,17 @@ void main() {
       expect(find.text('جاري تحميل المواعيد...'), findsOneWidget);
 
       // Complete request to avoid pending timer/future
-      completer.complete(http.Response(jsonEncode({'data': []}), 200, headers: {'content-type': 'application/json'}));
+      completer.complete(http.Response(jsonEncode({'data': []}), 200,
+          headers: {'content-type': 'application/json'}));
       await tester.pumpAndSettle();
     });
 
     // =========================================================================
     // TEST 2 — UPCOMING APPOINTMENTS RENDERING
     // =========================================================================
-    testWidgets('2. Upcoming Rendering: displays doctor, specialty, clinic, date, time, reference and status', (tester) async {
+    testWidgets(
+        '2. Upcoming Rendering: displays doctor, specialty, clinic, date, time, reference and status',
+        (tester) async {
       final mockHttp = MockClient((request) async {
         if (request.url.path.contains('/appointments')) {
           return http.Response(
@@ -206,11 +223,15 @@ void main() {
         return http.Response('Not Found', 404);
       });
 
-      final client = ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
-      final manager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
-      await manager.setAuthenticatedUser(token: 'test_token', user: testPatient);
+      final client =
+          ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
+      final manager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
+      await manager.setAuthenticatedUser(
+          token: 'test_token', user: testPatient);
 
-      await tester.pumpWidget(createPatientHomeWidget(client: client, manager: manager));
+      await tester.pumpWidget(
+          createPatientHomeWidget(client: client, manager: manager));
       await tester.pumpAndSettle();
 
       // Switch to Appointments tab
@@ -231,7 +252,9 @@ void main() {
     // =========================================================================
     // TEST 3 — PAST VISITS / HISTORY PARTITIONING
     // =========================================================================
-    testWidgets('3. Past History: partitions past and attended appointments into past history tab', (tester) async {
+    testWidgets(
+        '3. Past History: partitions past and attended appointments into past history tab',
+        (tester) async {
       final mockHttp = MockClient((request) async {
         if (request.url.path.contains('/appointments')) {
           return http.Response(
@@ -249,11 +272,15 @@ void main() {
         return http.Response('Not Found', 404);
       });
 
-      final client = ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
-      final manager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
-      await manager.setAuthenticatedUser(token: 'test_token', user: testPatient);
+      final client =
+          ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
+      final manager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
+      await manager.setAuthenticatedUser(
+          token: 'test_token', user: testPatient);
 
-      await tester.pumpWidget(createPatientHomeWidget(client: client, manager: manager));
+      await tester.pumpWidget(
+          createPatientHomeWidget(client: client, manager: manager));
       await tester.pumpAndSettle();
 
       // Switch to Appointments tab
@@ -278,17 +305,19 @@ void main() {
     // =========================================================================
     // TEST 4 — STATUS LABELS
     // =========================================================================
-    testWidgets('4. Status Labels: verifies representative statuses render correct localized text', (tester) async {
+    testWidgets(
+        '4. Status Labels: verifies representative statuses render correct localized text',
+        (tester) async {
       final mockHttp = MockClient((request) async {
         if (request.url.path.contains('/appointments')) {
           return http.Response(
             jsonEncode({
               'data': [
                 mockUpcomingAppointmentJson, // confirmed
-                mockPendingUpcomingJson,     // pending
-                mockPastAttendedJson,        // attended
-                mockPastCancelledJson,       // cancelled
-                mockPastNoShowJson,          // no_show
+                mockPendingUpcomingJson, // pending
+                mockPastAttendedJson, // attended
+                mockPastCancelledJson, // cancelled
+                mockPastNoShowJson, // no_show
               ],
             }),
             200,
@@ -298,11 +327,15 @@ void main() {
         return http.Response('Not Found', 404);
       });
 
-      final client = ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
-      final manager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
-      await manager.setAuthenticatedUser(token: 'test_token', user: testPatient);
+      final client =
+          ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
+      final manager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
+      await manager.setAuthenticatedUser(
+          token: 'test_token', user: testPatient);
 
-      await tester.pumpWidget(createPatientHomeWidget(client: client, manager: manager));
+      await tester.pumpWidget(
+          createPatientHomeWidget(client: client, manager: manager));
       await tester.pumpAndSettle();
 
       await tester.tap(find.byIcon(Icons.calendar_month_outlined));
@@ -324,7 +357,9 @@ void main() {
     // =========================================================================
     // TEST 5 — APPOINTMENT DETAILS SCREEN
     // =========================================================================
-    testWidgets('5. Details: tapping an appointment opens AppointmentDetailScreen with full info', (tester) async {
+    testWidgets(
+        '5. Details: tapping an appointment opens AppointmentDetailScreen with full info',
+        (tester) async {
       tester.view.physicalSize = const Size(800, 1400);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() => tester.view.resetPhysicalSize());
@@ -342,11 +377,15 @@ void main() {
         return http.Response('Not Found', 404);
       });
 
-      final client = ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
-      final manager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
-      await manager.setAuthenticatedUser(token: 'test_token', user: testPatient);
+      final client =
+          ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
+      final manager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
+      await manager.setAuthenticatedUser(
+          token: 'test_token', user: testPatient);
 
-      await tester.pumpWidget(createPatientHomeWidget(client: client, manager: manager));
+      await tester.pumpWidget(
+          createPatientHomeWidget(client: client, manager: manager));
       await tester.pumpAndSettle();
 
       await tester.tap(find.byIcon(Icons.calendar_month_outlined));
@@ -372,7 +411,9 @@ void main() {
     // =========================================================================
     // TEST 6 — EMPTY UPCOMING APPOINTMENTS
     // =========================================================================
-    testWidgets('6. Empty Upcoming: displays AafiyaEmptyView when no upcoming appointments exist', (tester) async {
+    testWidgets(
+        '6. Empty Upcoming: displays AafiyaEmptyView when no upcoming appointments exist',
+        (tester) async {
       final mockHttp = MockClient((request) async {
         if (request.url.path.contains('/appointments')) {
           return http.Response(
@@ -386,11 +427,15 @@ void main() {
         return http.Response('Not Found', 404);
       });
 
-      final client = ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
-      final manager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
-      await manager.setAuthenticatedUser(token: 'test_token', user: testPatient);
+      final client =
+          ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
+      final manager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
+      await manager.setAuthenticatedUser(
+          token: 'test_token', user: testPatient);
 
-      await tester.pumpWidget(createPatientHomeWidget(client: client, manager: manager));
+      await tester.pumpWidget(
+          createPatientHomeWidget(client: client, manager: manager));
       await tester.pumpAndSettle();
 
       await tester.tap(find.byIcon(Icons.calendar_month_outlined));
@@ -404,7 +449,9 @@ void main() {
     // =========================================================================
     // TEST 7 — EMPTY PAST APPOINTMENTS
     // =========================================================================
-    testWidgets('7. Empty Past: displays AafiyaEmptyView when no past appointments exist', (tester) async {
+    testWidgets(
+        '7. Empty Past: displays AafiyaEmptyView when no past appointments exist',
+        (tester) async {
       final mockHttp = MockClient((request) async {
         if (request.url.path.contains('/appointments')) {
           return http.Response(
@@ -418,11 +465,15 @@ void main() {
         return http.Response('Not Found', 404);
       });
 
-      final client = ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
-      final manager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
-      await manager.setAuthenticatedUser(token: 'test_token', user: testPatient);
+      final client =
+          ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
+      final manager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
+      await manager.setAuthenticatedUser(
+          token: 'test_token', user: testPatient);
 
-      await tester.pumpWidget(createPatientHomeWidget(client: client, manager: manager));
+      await tester.pumpWidget(
+          createPatientHomeWidget(client: client, manager: manager));
       await tester.pumpAndSettle();
 
       await tester.tap(find.byIcon(Icons.calendar_month_outlined));
@@ -439,7 +490,9 @@ void main() {
     // =========================================================================
     // TEST 8 — ERROR AND RETRY
     // =========================================================================
-    testWidgets('8. Error & Retry: request failure displays AafiyaErrorView and retry refetches', (tester) async {
+    testWidgets(
+        '8. Error & Retry: request failure displays AafiyaErrorView and retry refetches',
+        (tester) async {
       int requestCount = 0;
       final mockHttp = MockClient((request) async {
         requestCount++;
@@ -463,11 +516,15 @@ void main() {
         }
       });
 
-      final client = ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
-      final manager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
-      await manager.setAuthenticatedUser(token: 'test_token', user: testPatient);
+      final client =
+          ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
+      final manager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
+      await manager.setAuthenticatedUser(
+          token: 'test_token', user: testPatient);
 
-      await tester.pumpWidget(createPatientHomeWidget(client: client, manager: manager));
+      await tester.pumpWidget(
+          createPatientHomeWidget(client: client, manager: manager));
       await tester.pumpAndSettle();
 
       await tester.tap(find.byIcon(Icons.calendar_month_outlined));
@@ -475,7 +532,8 @@ void main() {
 
       // Error view displayed
       expect(find.byType(AafiyaErrorView), findsOneWidget);
-      expect(find.text('تعذر الاتصال بالخادم، يرجى التحقق من الشبكة.'), findsOneWidget);
+      expect(find.text('تعذر الاتصال بالخادم، يرجى التحقق من الشبكة.'),
+          findsOneWidget);
       expect(find.text('إعادة محاولة تحميل المواعيد'), findsOneWidget);
 
       // Tap Retry
@@ -490,7 +548,9 @@ void main() {
     // =========================================================================
     // TEST 9 — DISC-01 STRICT DIRECT BOOKING PROHIBITION
     // =========================================================================
-    testWidgets('9. DISC-01: Proves ZERO direct booking buttons or slot pickers exist in PatientHome', (tester) async {
+    testWidgets(
+        '9. DISC-01: Proves ZERO direct booking buttons or slot pickers exist in PatientHome',
+        (tester) async {
       final mockHttp = MockClient((request) async {
         return http.Response(
           jsonEncode({
@@ -501,15 +561,20 @@ void main() {
         );
       });
 
-      final client = ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
-      final manager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
-      await manager.setAuthenticatedUser(token: 'test_token', user: testPatient);
+      final client =
+          ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
+      final manager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
+      await manager.setAuthenticatedUser(
+          token: 'test_token', user: testPatient);
 
-      await tester.pumpWidget(createPatientHomeWidget(client: client, manager: manager));
+      await tester.pumpWidget(
+          createPatientHomeWidget(client: client, manager: manager));
       await tester.pumpAndSettle();
 
       // In Home overview: Verify DISC-01 notice is present
-      expect(find.text('يتم حجز المواعيد حصرياً عبر مراكز الحجز المعتمدة.'), findsOneWidget);
+      expect(find.text('يتم حجز المواعيد حصرياً عبر مراكز الحجز المعتمدة.'),
+          findsOneWidget);
 
       // Verify no booking action exists on Home
       expect(find.text('احجز موعد'), findsNothing);
@@ -544,7 +609,9 @@ void main() {
     // =========================================================================
     // TEST 10 — LOCALIZATION & RTL/LTR
     // =========================================================================
-    testWidgets('10. Localization: Arabic renders RTL, English renders LTR with proper translations', (tester) async {
+    testWidgets(
+        '10. Localization: Arabic renders RTL, English renders LTR with proper translations',
+        (tester) async {
       final mockHttp = MockClient((request) async {
         return http.Response(
           jsonEncode({
@@ -555,9 +622,12 @@ void main() {
         );
       });
 
-      final client = ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
-      final manager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
-      await manager.setAuthenticatedUser(token: 'test_token', user: testPatient);
+      final client =
+          ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
+      final manager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
+      await manager.setAuthenticatedUser(
+          token: 'test_token', user: testPatient);
 
       // 1. Arabic: RTL
       await tester.pumpWidget(
@@ -571,7 +641,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(Directionality.of(tester.element(find.byType(PatientHomeShell))), TextDirection.rtl);
+      expect(Directionality.of(tester.element(find.byType(PatientHomeShell))),
+          TextDirection.rtl);
       expect(find.text('الرئيسية'), findsOneWidget);
       expect(find.text('المواعيد'), findsWidgets);
 
@@ -587,10 +658,14 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(Directionality.of(tester.element(find.byType(PatientHomeShell))), TextDirection.ltr);
+      expect(Directionality.of(tester.element(find.byType(PatientHomeShell))),
+          TextDirection.ltr);
       expect(find.text('Home'), findsOneWidget);
       expect(find.text('Appointments'), findsWidgets);
-      expect(find.text('Appointments are arranged exclusively through registered Booking Centers.'), findsOneWidget);
+      expect(
+          find.text(
+              'Appointments are arranged exclusively through registered Booking Centers.'),
+          findsOneWidget);
 
       // 3. French: LTR
       await tester.pumpWidget(
@@ -604,16 +679,22 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(Directionality.of(tester.element(find.byType(PatientHomeShell))), TextDirection.ltr);
+      expect(Directionality.of(tester.element(find.byType(PatientHomeShell))),
+          TextDirection.ltr);
       expect(find.text('Accueil'), findsOneWidget);
       expect(find.text('Rendez-vous'), findsWidgets);
-      expect(find.text('Les rendez-vous sont réservés exclusivement via les centres de réservation agréés.'), findsOneWidget);
+      expect(
+          find.text(
+              'Les rendez-vous sont réservés exclusivement via les centres de réservation agréés.'),
+          findsOneWidget);
     });
 
     // =========================================================================
     // TEST 11 — PULL-TO-REFRESH
     // =========================================================================
-    testWidgets('11. Pull-to-refresh: RefreshIndicator triggers fresh appointments fetch', (tester) async {
+    testWidgets(
+        '11. Pull-to-refresh: RefreshIndicator triggers fresh appointments fetch',
+        (tester) async {
       int requestCount = 0;
       final mockHttp = MockClient((request) async {
         requestCount++;
@@ -626,17 +707,22 @@ void main() {
         );
       });
 
-      final client = ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
-      final manager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
-      await manager.setAuthenticatedUser(token: 'test_token', user: testPatient);
+      final client =
+          ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
+      final manager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
+      await manager.setAuthenticatedUser(
+          token: 'test_token', user: testPatient);
 
-      await tester.pumpWidget(createPatientHomeWidget(client: client, manager: manager));
+      await tester.pumpWidget(
+          createPatientHomeWidget(client: client, manager: manager));
       await tester.pumpAndSettle();
 
       final initialRequests = requestCount;
 
       // Trigger pull to refresh on Home overview
-      await tester.fling(find.byType(SingleChildScrollView).first, const Offset(0, 300), 1000);
+      await tester.fling(
+          find.byType(SingleChildScrollView).first, const Offset(0, 300), 1000);
       await tester.pumpAndSettle();
 
       expect(requestCount, greaterThan(initialRequests));

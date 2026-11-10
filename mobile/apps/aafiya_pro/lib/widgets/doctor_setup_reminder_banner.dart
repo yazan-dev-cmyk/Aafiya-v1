@@ -146,7 +146,7 @@ class DoctorSetupReminderBanner extends StatelessWidget {
                   onPressed: onConfigureClinic,
                   style: FilledButton.styleFrom(
                     backgroundColor: AafiyaColors.warning,
-                    foregroundColor: Colors.black87,
+                    foregroundColor: AafiyaColors.primaryText,
                     visualDensity: VisualDensity.compact,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(AafiyaRadius.sm),
@@ -276,7 +276,7 @@ class DoctorSetupReminderBanner extends StatelessWidget {
                 onPressed: onConfigureDoctorSchedule,
                 style: FilledButton.styleFrom(
                   backgroundColor: AafiyaColors.primaryBlue,
-                  foregroundColor: Colors.white,
+                  foregroundColor: AafiyaColors.pureWhite,
                   visualDensity: VisualDensity.compact,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(AafiyaRadius.sm),

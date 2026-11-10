@@ -21,7 +21,9 @@ class DoctorCard extends StatelessWidget {
     final strings = LocalizedStrings.of(context);
     final specialtyText = doctor.medicalSpecialty != null
         ? doctor.localizedSpecialty(strings.locale.languageCode)
-        : (doctor.specialty.isNotEmpty ? strings.specialtyName(doctor.specialty) : strings.doctor);
+        : (doctor.specialty.isNotEmpty
+            ? strings.specialtyName(doctor.specialty)
+            : strings.doctor);
 
     return AafiyaCard(
       padding: AafiyaSpacing.insetAllMd,
@@ -37,7 +39,8 @@ class DoctorCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 24,
-                  backgroundColor: AafiyaColors.healthBlue.withValues(alpha: 0.1),
+                  backgroundColor:
+                      AafiyaColors.healthBlue.withValues(alpha: 0.1),
                   child: const Icon(
                     Icons.person_outline_rounded,
                     color: AafiyaColors.healthBlue,
@@ -58,7 +61,9 @@ class DoctorCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        specialtyText.isNotEmpty ? specialtyText : strings.doctor,
+                        specialtyText.isNotEmpty
+                            ? specialtyText
+                            : strings.doctor,
                         style: AafiyaTypography.bodyMedium.copyWith(
                           color: AafiyaColors.secondaryText,
                           fontSize: 13,
@@ -70,7 +75,8 @@ class DoctorCard extends StatelessWidget {
                 if (doctor.isVerified) ...[
                   const SizedBox(width: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: AafiyaColors.success.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(AafiyaRadius.sm),
@@ -150,7 +156,8 @@ class DoctorCard extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 6),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                     decoration: BoxDecoration(
                       color: AafiyaColors.lightBackground,
                       borderRadius: BorderRadius.circular(AafiyaRadius.sm),
@@ -165,8 +172,10 @@ class DoctorCard extends StatelessWidget {
                             fontSize: 13,
                           ),
                         ),
-                        if ((clinic.wilaya != null && clinic.wilaya!.isNotEmpty) ||
-                            (clinic.address != null && clinic.address!.isNotEmpty)) ...[
+                        if ((clinic.wilaya != null &&
+                                clinic.wilaya!.isNotEmpty) ||
+                            (clinic.address != null &&
+                                clinic.address!.isNotEmpty)) ...[
                           const SizedBox(height: 2),
                           Row(
                             children: [
@@ -179,9 +188,11 @@ class DoctorCard extends StatelessWidget {
                               Expanded(
                                 child: Text(
                                   [
-                                    if (clinic.wilaya != null && clinic.wilaya!.isNotEmpty)
+                                    if (clinic.wilaya != null &&
+                                        clinic.wilaya!.isNotEmpty)
                                       strings.wilayaName(clinic.wilaya!),
-                                    if (clinic.address != null && clinic.address!.isNotEmpty)
+                                    if (clinic.address != null &&
+                                        clinic.address!.isNotEmpty)
                                       clinic.address!,
                                   ].join(' - '),
                                   style: AafiyaTypography.caption.copyWith(
@@ -195,7 +206,8 @@ class DoctorCard extends StatelessWidget {
                             ],
                           ),
                         ],
-                        if (clinic.phone != null && clinic.phone!.isNotEmpty) ...[
+                        if (clinic.phone != null &&
+                            clinic.phone!.isNotEmpty) ...[
                           const SizedBox(height: 2),
                           Row(
                             children: [

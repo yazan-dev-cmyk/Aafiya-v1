@@ -69,7 +69,8 @@ class AafiyaPatientAppState extends State<AafiyaPatientApp>
     _locale = widget.initialLocale;
     _navState = widget.initialNavState;
     _navigatorKey = widget.navigatorKey ?? GlobalKey<NavigatorState>();
-    _connectivityService = widget.connectivityService ?? PlatformConnectivityService();
+    _connectivityService =
+        widget.connectivityService ?? PlatformConnectivityService();
     widget.sessionManager.addListener(_onSessionStateChanged);
 
     // Process cold-start deep link after the first frame is rendered
@@ -123,7 +124,8 @@ class AafiyaPatientAppState extends State<AafiyaPatientApp>
     final now = DateTime.now();
     if (_lastHandledUri == uriString &&
         _lastHandledTimestamp != null &&
-        now.difference(_lastHandledTimestamp!) < const Duration(milliseconds: 1500)) {
+        now.difference(_lastHandledTimestamp!) <
+            const Duration(milliseconds: 1500)) {
       return true;
     }
     _lastHandledUri = uriString;
@@ -159,8 +161,8 @@ class AafiyaPatientAppState extends State<AafiyaPatientApp>
   }
 
   void _handleSharedRecordDestination(String token) {
-    final isAuthenticated =
-        widget.sessionManager.isAuthenticated && _navState == PatientNavState.home;
+    final isAuthenticated = widget.sessionManager.isAuthenticated &&
+        _navState == PatientNavState.home;
 
     if (isAuthenticated) {
       _presentSharedRecordViewer(token);
@@ -192,8 +194,8 @@ class AafiyaPatientAppState extends State<AafiyaPatientApp>
   }
 
   void _handleAppointmentDestination(String appointmentId) {
-    final isAuthenticated =
-        widget.sessionManager.isAuthenticated && _navState == PatientNavState.home;
+    final isAuthenticated = widget.sessionManager.isAuthenticated &&
+        _navState == PatientNavState.home;
 
     if (isAuthenticated) {
       _navigateToAppointment(appointmentId);
@@ -280,7 +282,8 @@ class AafiyaPatientAppState extends State<AafiyaPatientApp>
   void _onSessionStateChanged() {
     final state = widget.sessionManager.state;
     if (state is Unauthenticated) {
-      _pendingAppointmentId = null; // Clear pending appointment on session expiration
+      _pendingAppointmentId =
+          null; // Clear pending appointment on session expiration
       if (_navState == PatientNavState.home) {
         _navigatorKey.currentState?.popUntil((route) => route.isFirst);
         setState(() {
@@ -312,7 +315,8 @@ class AafiyaPatientAppState extends State<AafiyaPatientApp>
       barrierDismissible: false,
       builder: (dialogCtx) => AlertDialog(
         backgroundColor: AafiyaColors.pureWhite,
-        shape: const RoundedRectangleBorder(borderRadius: AafiyaRadius.borderLg),
+        shape:
+            const RoundedRectangleBorder(borderRadius: AafiyaRadius.borderLg),
         title: Row(
           children: [
             const Icon(Icons.timer_outlined, color: AafiyaColors.warning),
@@ -320,7 +324,8 @@ class AafiyaPatientAppState extends State<AafiyaPatientApp>
             Expanded(
               child: Text(
                 strings.sessionExpiredTitle,
-                style: AafiyaTypography.titleLarge.copyWith(color: AafiyaColors.primaryText),
+                style: AafiyaTypography.titleLarge
+                    .copyWith(color: AafiyaColors.primaryText),
               ),
             ),
           ],
@@ -334,7 +339,8 @@ class AafiyaPatientAppState extends State<AafiyaPatientApp>
             style: ElevatedButton.styleFrom(
               backgroundColor: AafiyaColors.healthBlue,
               foregroundColor: AafiyaColors.pureWhite,
-              shape: const RoundedRectangleBorder(borderRadius: AafiyaRadius.borderMd),
+              shape: const RoundedRectangleBorder(
+                  borderRadius: AafiyaRadius.borderMd),
             ),
             onPressed: () => Navigator.of(dialogCtx).pop(),
             child: Text(
@@ -373,8 +379,8 @@ class AafiyaPatientAppState extends State<AafiyaPatientApp>
       navigatorKey: _navigatorKey,
       title: 'Aafiya Patient',
       debugShowCheckedModeBanner: false,
-      theme: AafiyaTheme.lightTheme,
-      darkTheme: AafiyaTheme.darkTheme,
+      theme: AafiyaTheme.themeFor(_locale),
+      darkTheme: AafiyaTheme.darkThemeFor(_locale),
       themeMode: ThemeMode.light,
       locale: _locale,
       supportedLocales: AafiyaSupportedLocale.supportedLocales,
@@ -406,7 +412,8 @@ class AafiyaPatientAppState extends State<AafiyaPatientApp>
         PatientNavState.splash => PatientSplashShell(
             sessionManager: widget.sessionManager,
             onAuthenticated: _onLoginSuccess,
-            onUnauthenticated: () => setState(() => _navState = PatientNavState.auth),
+            onUnauthenticated: () =>
+                setState(() => _navState = PatientNavState.auth),
             onLocaleChanged: setLocale,
             currentLocale: _locale,
           ),

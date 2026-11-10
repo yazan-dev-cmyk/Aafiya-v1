@@ -16,7 +16,8 @@ class EmergencyProfileScreen extends StatefulWidget {
 
   final ApiClient apiClient;
 
-  static Future<void> show(BuildContext context, {required ApiClient apiClient}) {
+  static Future<void> show(BuildContext context,
+      {required ApiClient apiClient}) {
     return Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => EmergencyProfileScreen(apiClient: apiClient),
@@ -82,7 +83,8 @@ class _EmergencyProfileScreenState extends State<EmergencyProfileScreen> {
             icon: const Icon(Icons.share_rounded),
             tooltip: strings.shareMedicalRecordTitle,
             constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-            onPressed: () => PatientShareRecordDialog.show(context, apiClient: widget.apiClient),
+            onPressed: () => PatientShareRecordDialog.show(context,
+                apiClient: widget.apiClient),
           ),
         ],
       ),
@@ -134,7 +136,8 @@ class _EmergencyProfileScreenState extends State<EmergencyProfileScreen> {
               padding: AafiyaSpacing.insetAllMd,
               child: Row(
                 children: [
-                  const Icon(Icons.privacy_tip_outlined, color: AafiyaColors.info, size: 22),
+                  const Icon(Icons.privacy_tip_outlined,
+                      color: AafiyaColors.info, size: 22),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
@@ -163,15 +166,18 @@ class _EmergencyProfileScreenState extends State<EmergencyProfileScreen> {
                     decoration: BoxDecoration(
                       color: AafiyaColors.error.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AafiyaColors.error.withValues(alpha: 0.3)),
+                      border: Border.all(
+                          color: AafiyaColors.error.withValues(alpha: 0.3)),
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.water_drop, color: AafiyaColors.error, size: 24),
+                        const Icon(Icons.water_drop,
+                            color: AafiyaColors.error, size: 24),
                         const SizedBox(height: 2),
                         Text(
-                          profile.bloodGroup != null && profile.bloodGroup!.isNotEmpty
+                          profile.bloodGroup != null &&
+                                  profile.bloodGroup!.isNotEmpty
                               ? profile.bloodGroup!
                               : '--',
                           style: AafiyaTypography.titleMedium.copyWith(
@@ -190,7 +196,9 @@ class _EmergencyProfileScreenState extends State<EmergencyProfileScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          profile.fullName.isNotEmpty ? profile.fullName : strings.appBrandName,
+                          profile.fullName.isNotEmpty
+                              ? profile.fullName
+                              : strings.appBrandName,
                           style: AafiyaTypography.titleMedium.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
@@ -226,51 +234,48 @@ class _EmergencyProfileScreenState extends State<EmergencyProfileScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.healing_outlined,
-                              color: AafiyaColors.healthBlue,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 8),
-                            Flexible(
-                              child: Text(
-                                strings.chronicConditionsTitle,
-                                style: AafiyaTypography.titleMedium.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
+                      const Icon(
+                        Icons.healing_outlined,
+                        color: AafiyaColors.healthBlue,
+                        size: 20,
                       ),
                       const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: profile.isChronic
-                              ? AafiyaColors.warning.withValues(alpha: 0.15)
-                              : AafiyaColors.success.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                      Expanded(
                         child: Text(
-                          profile.isChronic
-                              ? strings.isChronicPatient
-                              : strings.notChronicPatient,
-                          style: AafiyaTypography.caption.copyWith(
-                            color: profile.isChronic
-                                ? AafiyaColors.warning
-                                : AafiyaColors.success,
+                          strings.chronicConditionsTitle,
+                          style: AafiyaTypography.titleMedium.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 8),
+                  Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: profile.isChronic
+                            ? AafiyaColors.warning.withValues(alpha: 0.15)
+                            : AafiyaColors.success.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        profile.isChronic
+                            ? strings.isChronicPatient
+                            : strings.notChronicPatient,
+                        style: AafiyaTypography.caption.copyWith(
+                          color: profile.isChronic
+                              ? AafiyaColors.warning
+                              : AafiyaColors.success,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
                   ),
                   if (profile.chronicConditions.isNotEmpty) ...[
                     const SizedBox(height: 12),
@@ -282,7 +287,8 @@ class _EmergencyProfileScreenState extends State<EmergencyProfileScreen> {
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Icon(Icons.circle, size: 8, color: AafiyaColors.warning),
+                            const Icon(Icons.circle,
+                                size: 8, color: AafiyaColors.warning),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Column(
@@ -341,10 +347,13 @@ class _EmergencyProfileScreenState extends State<EmergencyProfileScreen> {
                         size: 20,
                       ),
                       const SizedBox(width: 8),
-                      Text(
-                        '${strings.allergiesTitle} (${profile.allergies.length})',
-                        style: AafiyaTypography.titleMedium.copyWith(
-                          fontWeight: FontWeight.bold,
+                      Expanded(
+                        child: Text(
+                          '${strings.allergiesTitle} (${profile.allergies.length})',
+                          style: AafiyaTypography.titleMedium.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
@@ -383,10 +392,13 @@ class _EmergencyProfileScreenState extends State<EmergencyProfileScreen> {
                         size: 20,
                       ),
                       const SizedBox(width: 8),
-                      Text(
-                        '${strings.emergencyContactsTitle} (${profile.emergencyContacts.length})',
-                        style: AafiyaTypography.titleMedium.copyWith(
-                          fontWeight: FontWeight.bold,
+                      Expanded(
+                        child: Text(
+                          '${strings.emergencyContactsTitle} (${profile.emergencyContacts.length})',
+                          style: AafiyaTypography.titleMedium.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
@@ -516,7 +528,8 @@ class _EmergencyProfileScreenState extends State<EmergencyProfileScreen> {
           CircleAvatar(
             radius: 20,
             backgroundColor: AafiyaColors.healthBlue.withValues(alpha: 0.1),
-            child: const Icon(Icons.person, color: AafiyaColors.healthBlue, size: 22),
+            child: const Icon(Icons.person,
+                color: AafiyaColors.healthBlue, size: 22),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -537,7 +550,8 @@ class _EmergencyProfileScreenState extends State<EmergencyProfileScreen> {
                     if (contact.isPrimary) ...[
                       const SizedBox(width: 6),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
                           color: AafiyaColors.success.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(4),
@@ -572,7 +586,8 @@ class _EmergencyProfileScreenState extends State<EmergencyProfileScreen> {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.phone_in_talk, color: AafiyaColors.healthBlue),
+            icon:
+                const Icon(Icons.phone_in_talk, color: AafiyaColors.healthBlue),
             tooltip: strings.call,
             constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
             onPressed: () {

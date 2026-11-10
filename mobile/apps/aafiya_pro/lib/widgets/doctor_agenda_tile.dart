@@ -101,10 +101,14 @@ class DoctorAgendaTile extends StatelessWidget {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      Text(
-                        '${strings.bookingRefLabel}: \u200E${appointment.bookingReference}\u200E',
-                        style: AafiyaTypography.caption.copyWith(
-                          color: AafiyaColors.secondaryText,
+                      Flexible(
+                        child: Text(
+                          '${strings.bookingRefLabel}: \u200E${appointment.bookingReference}\u200E',
+                          style: AafiyaTypography.caption.copyWith(
+                            color: AafiyaColors.secondaryText,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       if (appointment.bookingCenter?.name != null) ...[
@@ -113,7 +117,7 @@ class DoctorAgendaTile extends StatelessWidget {
                             style:
                                 TextStyle(color: AafiyaColors.secondaryText)),
                         const SizedBox(width: 8),
-                        Expanded(
+                        Flexible(
                           child: Text(
                             appointment.bookingCenter!.name!,
                             style: AafiyaTypography.caption.copyWith(

@@ -17,7 +17,8 @@ void main() {
     setUp(() {
       tokenStorage = InMemoryTokenStorage();
       apiClient = ApiClient(
-        httpClient: MockClient((request) async => http.Response('{"data": {}}', 200)),
+        httpClient:
+            MockClient((request) async => http.Response('{"data": {}}', 200)),
         tokenStorage: tokenStorage,
         retryPolicy: const RetryPolicy(useDelays: false),
       );
@@ -32,7 +33,8 @@ void main() {
       mockConnectivity.dispose();
     });
 
-    testWidgets('Patient app boots with offline banner hidden when online', (tester) async {
+    testWidgets('Patient app boots with offline banner hidden when online',
+        (tester) async {
       await tester.pumpWidget(AafiyaPatientApp(
         sessionManager: sessionManager,
         apiClient: apiClient,
@@ -45,7 +47,8 @@ void main() {
       expect(find.text('لا يوجد اتصال بالإنترنت'), findsNothing);
     });
 
-    testWidgets('Patient app displays offline banner when network drops', (tester) async {
+    testWidgets('Patient app displays offline banner when network drops',
+        (tester) async {
       await tester.pumpWidget(AafiyaPatientApp(
         sessionManager: sessionManager,
         apiClient: apiClient,
@@ -63,7 +66,9 @@ void main() {
       expect(find.byIcon(Icons.wifi_off_rounded), findsOneWidget);
     });
 
-    testWidgets('AafiyaCrashBoundary renders safely without PHI or raw traces on error', (tester) async {
+    testWidgets(
+        'AafiyaCrashBoundary renders safely without PHI or raw traces on error',
+        (tester) async {
       bool recovered = false;
       await tester.pumpWidget(MaterialApp(
         locale: const Locale('ar'),

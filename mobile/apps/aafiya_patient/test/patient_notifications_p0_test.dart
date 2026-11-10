@@ -63,14 +63,17 @@ void main() {
       expect(notif.prescriptionId, 'rx-uuid-999');
       expect(notif.prescriptionReference, 'RX-2026-00042');
       expect(notif.clinicName, 'عيادة النور التخصصية');
-      expect(notif.message, 'تم إصدار وصفة طبية إلكترونية جديدة (RX-2026-00042)');
+      expect(
+          notif.message, 'تم إصدار وصفة طبية إلكترونية جديدة (RX-2026-00042)');
 
       final serialized = notif.toJson();
       expect(serialized['prescription_id'], 'rx-uuid-999');
       expect(serialized['prescription_reference'], 'RX-2026-00042');
     });
 
-    test('Resolves localized messages for prescription_issued in Arabic, French, and English', () {
+    test(
+        'Resolves localized messages for prescription_issued in Arabic, French, and English',
+        () {
       final notif = PatientNotification(
         id: 'rx-2',
         createdAt: DateTime.now(),
@@ -84,16 +87,21 @@ void main() {
       final frenchStrings = LocalizedStrings(const Locale('fr'));
       final englishStrings = LocalizedStrings(const Locale('en'));
 
-      expect(notif.displayMessage(arabicStrings), contains('وصفة طبية إلكترونية'));
+      expect(
+          notif.displayMessage(arabicStrings), contains('وصفة طبية إلكترونية'));
       expect(notif.displayMessage(frenchStrings), contains('ordonnance'));
       expect(notif.displayMessage(englishStrings), contains('prescription'));
     });
   });
 
-  group('NotificationsScreen Prescription Rendering & Live Refresh (N-03, N-10)', () {
-    testWidgets('renders prescription notification card and details', (tester) async {
+  group(
+      'NotificationsScreen Prescription Rendering & Live Refresh (N-03, N-10)',
+      () {
+    testWidgets('renders prescription notification card and details',
+        (tester) async {
       final client = MockClient((request) async {
-        if (request.method == 'GET' && request.url.path.contains('/patient/notifications')) {
+        if (request.method == 'GET' &&
+            request.url.path.contains('/patient/notifications')) {
           return http.Response(
             jsonEncode({
               'data': [
@@ -105,7 +113,8 @@ void main() {
                     'prescription_id': 'rx-uuid-101',
                     'prescription_reference': 'RX-2026-00101',
                     'clinic_name': 'عيادة الأمل',
-                    'message': 'تم إصدار وصفة طبية إلكترونية جديدة (RX-2026-00101)',
+                    'message':
+                        'تم إصدار وصفة طبية إلكترونية جديدة (RX-2026-00101)',
                   },
                 },
               ],
@@ -146,10 +155,13 @@ void main() {
       expect(find.byIcon(Icons.receipt_long_outlined), findsOneWidget);
     });
 
-    testWidgets('30-second periodic timer triggers refresh while screen is open', (tester) async {
+    testWidgets(
+        '30-second periodic timer triggers refresh while screen is open',
+        (tester) async {
       int requestCount = 0;
       final client = MockClient((request) async {
-        if (request.method == 'GET' && request.url.path.contains('/patient/notifications')) {
+        if (request.method == 'GET' &&
+            request.url.path.contains('/patient/notifications')) {
           requestCount++;
           return http.Response(
             jsonEncode({
@@ -207,10 +219,13 @@ void main() {
   });
 
   group('PatientHomeShell Live Unread Badge Refresh (N-03)', () {
-    testWidgets('30-second periodic timer refreshes unread count while home shell is open', (tester) async {
+    testWidgets(
+        '30-second periodic timer refreshes unread count while home shell is open',
+        (tester) async {
       int countRequests = 0;
       final client = MockClient((request) async {
-        if (request.method == 'GET' && request.url.path.contains('/patient/notifications/unread-count')) {
+        if (request.method == 'GET' &&
+            request.url.path.contains('/patient/notifications/unread-count')) {
           countRequests++;
           return http.Response(
             jsonEncode({'unread_count': countRequests}),
@@ -218,7 +233,8 @@ void main() {
             headers: {'content-type': 'application/json'},
           );
         }
-        if (request.method == 'GET' && request.url.path.contains('/appointments')) {
+        if (request.method == 'GET' &&
+            request.url.path.contains('/appointments')) {
           return http.Response(
             jsonEncode({'data': []}),
             200,

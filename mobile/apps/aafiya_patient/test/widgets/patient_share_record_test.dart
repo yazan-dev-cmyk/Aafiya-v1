@@ -16,7 +16,8 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   const jsonHeaders = {'content-type': 'application/json; charset=utf-8'};
-  final futureExpiry = DateTime.now().add(const Duration(days: 2)).toIso8601String();
+  final futureExpiry =
+      DateTime.now().add(const Duration(days: 2)).toIso8601String();
 
   final mockCreateResponse = {
     'message': 'تم إنشاء رابط المشاركة الآمن والمشفر بنجاح.',
@@ -26,7 +27,8 @@ void main() {
       'scope': 'all_emr',
       'duration': '24h',
       'expires_at': futureExpiry,
-      'share_url': 'http://localhost:3000/records/view#token=pst_mockSecretToken1234567890abcdef',
+      'share_url':
+          'http://localhost:3000/records/view#token=pst_mockSecretToken1234567890abcdef',
       'has_pin': true,
       'status': 'active',
     }
@@ -89,9 +91,11 @@ void main() {
   }
 
   group('PatientShareRecordDialog Widget Tests', () {
-    testWidgets('renders creation dialog in Arabic with RTL layout', (tester) async {
+    testWidgets('renders creation dialog in Arabic with RTL layout',
+        (tester) async {
       final mockClient = MockClient((_) async => http.Response('{}', 200));
-      final apiClient = ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
+      final apiClient =
+          ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
 
       await tester.pumpWidget(
         buildTestApp(
@@ -108,17 +112,20 @@ void main() {
       expect(find.text('30 يوماً (شهر)'), findsOneWidget);
       expect(find.text('إنشاء رابط المشاركة المشفر'), findsOneWidget);
 
-      final directionality = Directionality.of(tester.element(find.text('مشاركة السجل الطبي المشفر')));
+      final directionality = Directionality.of(
+          tester.element(find.text('مشاركة السجل الطبي المشفر')));
       expect(directionality, equals(TextDirection.rtl));
     });
 
-    testWidgets('validates PIN length locally before network call', (tester) async {
+    testWidgets('validates PIN length locally before network call',
+        (tester) async {
       bool networkCalled = false;
       final mockClient = MockClient((_) async {
         networkCalled = true;
         return http.Response('{}', 200);
       });
-      final apiClient = ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
+      final apiClient =
+          ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
 
       await tester.pumpWidget(
         buildTestApp(
@@ -137,13 +144,17 @@ void main() {
       await tester.pumpAndSettle();
 
       // Expect validation error
-      expect(find.text('يجب أن يتكون رمز الحماية من 4 إلى 8 أرقام'), findsOneWidget);
+      expect(find.text('يجب أن يتكون رمز الحماية من 4 إلى 8 أرقام'),
+          findsOneWidget);
       expect(networkCalled, isFalse);
     });
 
-    testWidgets('successfully creates share and displays one-time credentials with copy buttons', (tester) async {
+    testWidgets(
+        'successfully creates share and displays one-time credentials with copy buttons',
+        (tester) async {
       final mockClient = MockClient((request) async {
-        return http.Response(jsonEncode(mockCreateResponse), 201, headers: jsonHeaders);
+        return http.Response(jsonEncode(mockCreateResponse), 201,
+            headers: jsonHeaders);
       });
       final tokenStorage = InMemoryTokenStorage('sanctum-test-token');
       final apiClient = ApiClient(
@@ -186,7 +197,8 @@ void main() {
   group('PatientSharedRecordsScreen Widget Tests', () {
     testWidgets('renders empty state when no shares exist', (tester) async {
       final mockClient = MockClient((request) async {
-        return http.Response(jsonEncode({'data': []}), 200, headers: jsonHeaders);
+        return http.Response(jsonEncode({'data': []}), 200,
+            headers: jsonHeaders);
       });
       final tokenStorage = InMemoryTokenStorage('sanctum-test-token');
       final apiClient = ApiClient(
@@ -204,13 +216,16 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('المشاركات النشطة والسابقة'), findsOneWidget);
-      expect(find.textContaining('لا توجد مشاركات نشطة حالياً'), findsOneWidget);
+      expect(
+          find.textContaining('لا توجد مشاركات نشطة حالياً'), findsOneWidget);
       expect(find.text('مشاركة جديدة'), findsWidgets);
     });
 
-    testWidgets('renders list of shares with status badges and access count', (tester) async {
+    testWidgets('renders list of shares with status badges and access count',
+        (tester) async {
       final mockClient = MockClient((request) async {
-        return http.Response(jsonEncode(mockListResponse), 200, headers: jsonHeaders);
+        return http.Response(jsonEncode(mockListResponse), 200,
+            headers: jsonHeaders);
       });
       final tokenStorage = InMemoryTokenStorage('sanctum-test-token');
       final apiClient = ApiClient(
@@ -233,15 +248,18 @@ void main() {
       expect(find.text('إلغاء المشاركة'), findsOneWidget);
     });
 
-    testWidgets('confirms and revokes an active share immediately', (tester) async {
+    testWidgets('confirms and revokes an active share immediately',
+        (tester) async {
       bool deleteCalled = false;
       final mockClient = MockClient((request) async {
         if (request.method == 'GET') {
-          return http.Response(jsonEncode(mockListResponse), 200, headers: jsonHeaders);
+          return http.Response(jsonEncode(mockListResponse), 200,
+              headers: jsonHeaders);
         }
         if (request.method == 'DELETE') {
           deleteCalled = true;
-          return http.Response(jsonEncode(mockRevokeResponse), 200, headers: jsonHeaders);
+          return http.Response(jsonEncode(mockRevokeResponse), 200,
+              headers: jsonHeaders);
         }
         return http.Response('{}', 404);
       });
@@ -266,7 +284,10 @@ void main() {
 
       // Verify confirmation dialog
       expect(find.text('تأكيد إلغاء المشاركة'), findsOneWidget);
-      expect(find.textContaining('هل أنت متأكد من رغبتك في إبطال رابط المشاركة هذا؟'), findsOneWidget);
+      expect(
+          find.textContaining(
+              'هل أنت متأكد من رغبتك في إبطال رابط المشاركة هذا؟'),
+          findsOneWidget);
 
       // Confirm revocation
       await tester.tap(find.widgetWithText(ElevatedButton, 'إلغاء المشاركة'));
@@ -280,9 +301,12 @@ void main() {
   });
 
   group('PatientHomeShell Medical Records Tab Hub Integration', () {
-    testWidgets('renders Sender and Recipient cards in Medical Records tab', (tester) async {
-      final mockClient = MockClient((_) async => http.Response('{"data":[]}', 200, headers: jsonHeaders));
-      final apiClient = ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
+    testWidgets('renders Sender and Recipient cards in Medical Records tab',
+        (tester) async {
+      final mockClient = MockClient(
+          (_) async => http.Response('{"data":[]}', 200, headers: jsonHeaders));
+      final apiClient =
+          ApiClient(httpClient: mockClient, config: AppConfig.devLocal);
 
       final sessionManager = AuthSessionManager(
         tokenStorage: InMemoryTokenStorage(),
@@ -320,11 +344,13 @@ void main() {
 
       // Verify Sender card is present
       expect(find.text('مشاركة السجل الطبي المشفر'), findsOneWidget);
-      expect(find.text('إنشاء روابط آمنة وإدارة الروابط النشطة'), findsOneWidget);
+      expect(
+          find.text('إنشاء روابط آمنة وإدارة الروابط النشطة'), findsOneWidget);
 
       // Verify Recipient card is present
       expect(find.text('استعراض سجل مشارك'), findsOneWidget);
-      expect(find.text('فك تشفير واستعراض سجل طبي عبر رمز الحماية'), findsOneWidget);
+      expect(find.text('فك تشفير واستعراض سجل طبي عبر رمز الحماية'),
+          findsOneWidget);
 
       // Tap Recipient card: opens SharedRecordViewerSheet with empty initialToken
       await tester.ensureVisible(find.text('استعراض سجل مشارك'));

@@ -14,7 +14,8 @@ class PrescriptionsScreen extends StatefulWidget {
 
   final ApiClient apiClient;
 
-  static Future<void> show(BuildContext context, {required ApiClient apiClient}) {
+  static Future<void> show(BuildContext context,
+      {required ApiClient apiClient}) {
     return Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => PrescriptionsScreen(apiClient: apiClient),
@@ -76,7 +77,8 @@ class _PrescriptionsScreenState extends State<PrescriptionsScreen> {
     _fetchPrescriptions(page: 1, reset: true);
   }
 
-  Future<void> _fetchPrescriptions({required int page, required bool reset}) async {
+  Future<void> _fetchPrescriptions(
+      {required int page, required bool reset}) async {
     if (reset) {
       setState(() {
         _isInitialLoading = true;
@@ -177,13 +179,15 @@ class _PrescriptionsScreenState extends State<PrescriptionsScreen> {
             selected: isSelected,
             label: Text(filter.label),
             labelStyle: TextStyle(
-              color: isSelected ? Colors.white : AafiyaColors.primaryText,
+              color: isSelected
+                  ? AafiyaColors.pureWhite
+                  : AafiyaColors.primaryText,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               fontSize: 13,
             ),
             selectedColor: AafiyaColors.healthBlue,
             backgroundColor: AafiyaColors.lightBackground,
-            checkmarkColor: Colors.white,
+            checkmarkColor: AafiyaColors.pureWhite,
             side: BorderSide(
               color: isSelected ? AafiyaColors.healthBlue : AafiyaColors.border,
             ),

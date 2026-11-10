@@ -34,7 +34,8 @@ class ClinicCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 24,
-                  backgroundColor: AafiyaColors.healthBlue.withValues(alpha: 0.1),
+                  backgroundColor:
+                      AafiyaColors.healthBlue.withValues(alpha: 0.1),
                   child: const Icon(
                     Icons.local_hospital_rounded,
                     color: AafiyaColors.healthBlue,
@@ -53,7 +54,8 @@ class ClinicCard extends StatelessWidget {
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      if (clinic.wilaya != null && clinic.wilaya!.isNotEmpty) ...[
+                      if (clinic.wilaya != null &&
+                          clinic.wilaya!.isNotEmpty) ...[
                         const SizedBox(height: 2),
                         Text(
                           strings.wilayaName(clinic.wilaya!),
@@ -69,7 +71,8 @@ class ClinicCard extends StatelessWidget {
                 if (clinic.wilaya != null && clinic.wilaya!.isNotEmpty) ...[
                   const SizedBox(width: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: AafiyaColors.healthBlue.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(AafiyaRadius.sm),
@@ -129,11 +132,14 @@ class ClinicCard extends StatelessWidget {
                     color: AafiyaColors.healthBlue,
                   ),
                   const SizedBox(width: 6),
-                  Text(
-                    '${strings.callClinic}: ',
-                    style: AafiyaTypography.caption.copyWith(
-                      color: AafiyaColors.secondaryText,
-                      fontSize: 12,
+                  Flexible(
+                    child: Text(
+                      '${strings.callClinic}: ',
+                      style: AafiyaTypography.caption.copyWith(
+                        color: AafiyaColors.secondaryText,
+                        fontSize: 12,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   Text(
@@ -183,7 +189,8 @@ class ClinicCard extends StatelessWidget {
                 runSpacing: 4,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
                       color: AafiyaColors.lightBackground,
                       borderRadius: BorderRadius.circular(AafiyaRadius.sm),
@@ -199,7 +206,8 @@ class ClinicCard extends StatelessWidget {
                   ),
                   for (final doc in clinic.doctors.take(3))
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
                         color: AafiyaColors.lightBackground,
                         borderRadius: BorderRadius.circular(AafiyaRadius.sm),
@@ -214,7 +222,8 @@ class ClinicCard extends StatelessWidget {
                     ),
                   if (clinic.doctors.length > 3)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 3),
                       decoration: BoxDecoration(
                         color: AafiyaColors.lightBackground,
                         borderRadius: BorderRadius.circular(AafiyaRadius.sm),

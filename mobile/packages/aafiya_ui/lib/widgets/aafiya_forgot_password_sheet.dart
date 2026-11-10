@@ -48,7 +48,8 @@ class AafiyaForgotPasswordSheet extends StatefulWidget {
   }
 
   @override
-  State<AafiyaForgotPasswordSheet> createState() => _AafiyaForgotPasswordSheetState();
+  State<AafiyaForgotPasswordSheet> createState() =>
+      _AafiyaForgotPasswordSheetState();
 }
 
 class _AafiyaForgotPasswordSheetState extends State<AafiyaForgotPasswordSheet> {
@@ -100,7 +101,8 @@ class _AafiyaForgotPasswordSheetState extends State<AafiyaForgotPasswordSheet> {
       } else {
         setState(() {
           _isLoading = false;
-          _errorMessage = result.exceptionOrNull?.message ?? loc.uniformRecoveryNotice;
+          _errorMessage =
+              result.exceptionOrNull?.message ?? loc.uniformRecoveryNotice;
         });
       }
     } catch (e) {
@@ -123,11 +125,11 @@ class _AafiyaForgotPasswordSheetState extends State<AafiyaForgotPasswordSheet> {
         borderRadius: const BorderRadius.vertical(
           top: Radius.circular(AafiyaRadius.sheet),
         ),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
-            color: Colors.black12,
+            color: AafiyaColors.primaryText.withValues(alpha: 0.08),
             blurRadius: 16,
-            offset: Offset(0, -4),
+            offset: const Offset(0, -4),
           ),
         ],
       ),
@@ -158,7 +160,7 @@ class _AafiyaForgotPasswordSheetState extends State<AafiyaForgotPasswordSheet> {
               height: 4,
               margin: const EdgeInsets.only(bottom: AafiyaSpacing.md),
               decoration: BoxDecoration(
-                color: Colors.grey.shade300,
+                color: AafiyaColors.border,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -195,7 +197,7 @@ class _AafiyaForgotPasswordSheetState extends State<AafiyaForgotPasswordSheet> {
                     Text(
                       loc.forgotPasswordDesc,
                       style: AafiyaTypography.bodySmall.copyWith(
-                        color: Colors.grey.shade600,
+                        color: AafiyaColors.secondaryText,
                       ),
                     ),
                   ],
@@ -211,19 +213,25 @@ class _AafiyaForgotPasswordSheetState extends State<AafiyaForgotPasswordSheet> {
             Container(
               padding: const EdgeInsets.all(AafiyaSpacing.sm),
               decoration: BoxDecoration(
-                color: Colors.red.shade50,
+                color: AafiyaColors.error.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(AafiyaRadius.card),
-                border: Border.all(color: Colors.red.shade200),
+                border: Border.all(
+                  color: AafiyaColors.error.withValues(alpha: 0.3),
+                ),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.error_outline_rounded, color: Colors.red.shade700, size: 20),
+                  const Icon(
+                    Icons.error_outline_rounded,
+                    color: AafiyaColors.error,
+                    size: 20,
+                  ),
                   const SizedBox(width: AafiyaSpacing.xs),
                   Expanded(
                     child: Text(
                       _errorMessage!,
                       style: AafiyaTypography.bodySmall.copyWith(
-                        color: Colors.red.shade800,
+                        color: AafiyaColors.error,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -280,7 +288,7 @@ class _AafiyaForgotPasswordSheetState extends State<AafiyaForgotPasswordSheet> {
             height: 4,
             margin: const EdgeInsets.only(bottom: AafiyaSpacing.md),
             decoration: BoxDecoration(
-              color: Colors.grey.shade300,
+              color: AafiyaColors.border,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -290,13 +298,15 @@ class _AafiyaForgotPasswordSheetState extends State<AafiyaForgotPasswordSheet> {
           width: 56,
           height: 56,
           decoration: BoxDecoration(
-            color: Colors.green.shade50,
+            color: AafiyaColors.success.withValues(alpha: 0.12),
             shape: BoxShape.circle,
-            border: Border.all(color: Colors.green.shade200),
+            border: Border.all(
+              color: AafiyaColors.success.withValues(alpha: 0.3),
+            ),
           ),
-          child: Icon(
+          child: const Icon(
             Icons.mark_email_read_rounded,
-            color: Colors.green.shade700,
+            color: AafiyaColors.success,
             size: 32,
           ),
         ),
@@ -314,7 +324,7 @@ class _AafiyaForgotPasswordSheetState extends State<AafiyaForgotPasswordSheet> {
           child: Text(
             loc.uniformRecoveryNotice,
             style: AafiyaTypography.bodyMedium.copyWith(
-              color: Colors.grey.shade700,
+              color: AafiyaColors.secondaryText,
             ),
             textAlign: TextAlign.center,
           ),

@@ -60,7 +60,8 @@ class _AafiyaWilayaSelectorState extends State<AafiyaWilayaSelector> {
       _errorMessage = null;
     });
 
-    final result = await widget.masterDataService.getWilayas(forceRefresh: forceRefresh);
+    final result =
+        await widget.masterDataService.getWilayas(forceRefresh: forceRefresh);
     if (!mounted) return;
 
     switch (result) {
@@ -81,13 +82,16 @@ class _AafiyaWilayaSelectorState extends State<AafiyaWilayaSelector> {
   }
 
   void _syncSelectedWilaya() {
-    if (widget.selectedCode == null || widget.selectedCode!.isEmpty || widget.selectedCode == 'all') {
+    if (widget.selectedCode == null ||
+        widget.selectedCode!.isEmpty ||
+        widget.selectedCode == 'all') {
       _selectedWilaya = null;
     } else {
       _selectedWilaya = _wilayas.cast<Wilaya?>().firstWhere(
-        (w) => w?.code == widget.selectedCode,
-        orElse: () => widget.masterDataService.resolveLegacyWilaya(widget.selectedCode!),
-      );
+            (w) => w?.code == widget.selectedCode,
+            orElse: () => widget.masterDataService
+                .resolveLegacyWilaya(widget.selectedCode!),
+          );
     }
   }
 
@@ -127,7 +131,8 @@ class _AafiyaWilayaSelectorState extends State<AafiyaWilayaSelector> {
 
     String displayText = '';
     if (_selectedWilaya != null) {
-      displayText = '${_selectedWilaya!.code} - ${_selectedWilaya!.localizedName(locale)}';
+      displayText =
+          '${_selectedWilaya!.code} - ${_selectedWilaya!.localizedName(locale)}';
     } else if (widget.includeAllOption &&
         (widget.selectedCode == null ||
             widget.selectedCode!.isEmpty ||
@@ -150,16 +155,22 @@ class _AafiyaWilayaSelectorState extends State<AafiyaWilayaSelector> {
           const SizedBox(height: AafiyaSpacing.xs),
         ],
         InkWell(
-          onTap: widget.enabled && !_isLoading ? () => _openSelectionModal(context, strings) : null,
+          onTap: widget.enabled && !_isLoading
+              ? () => _openSelectionModal(context, strings)
+              : null,
           borderRadius: AafiyaRadius.borderMd,
           child: Container(
             height: 48,
             padding: const EdgeInsets.symmetric(horizontal: AafiyaSpacing.md),
             decoration: BoxDecoration(
-              color: widget.enabled ? AafiyaColors.pureWhite : AafiyaColors.border.withValues(alpha: 0.2),
+              color: widget.enabled
+                  ? AafiyaColors.pureWhite
+                  : AafiyaColors.border.withValues(alpha: 0.2),
               borderRadius: AafiyaRadius.borderMd,
               border: Border.all(
-                color: _errorMessage != null ? AafiyaColors.error : AafiyaColors.border,
+                color: _errorMessage != null
+                    ? AafiyaColors.error
+                    : AafiyaColors.border,
                 width: 1.5,
               ),
             ),
@@ -169,7 +180,8 @@ class _AafiyaWilayaSelectorState extends State<AafiyaWilayaSelector> {
                   const SizedBox(
                     width: 20,
                     height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: AafiyaColors.primaryBlue),
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2, color: AafiyaColors.primaryBlue),
                   )
                 else
                   Icon(
@@ -177,7 +189,9 @@ class _AafiyaWilayaSelectorState extends State<AafiyaWilayaSelector> {
                     size: 20,
                     color: _errorMessage != null
                         ? AafiyaColors.error
-                        : (_selectedWilaya != null ? AafiyaColors.primaryBlue : AafiyaColors.secondaryText),
+                        : (_selectedWilaya != null
+                            ? AafiyaColors.primaryBlue
+                            : AafiyaColors.secondaryText),
                   ),
                 const SizedBox(width: AafiyaSpacing.sm),
                 Expanded(
@@ -186,14 +200,18 @@ class _AafiyaWilayaSelectorState extends State<AafiyaWilayaSelector> {
                         ? strings.loadingWilayas
                         : (_errorMessage != null
                             ? _errorMessage!
-                            : (displayText.isNotEmpty ? displayText : effectiveHint)),
+                            : (displayText.isNotEmpty
+                                ? displayText
+                                : effectiveHint)),
                     style: AafiyaTypography.bodyMedium.copyWith(
                       color: _errorMessage != null
                           ? AafiyaColors.error
                           : (displayText.isNotEmpty
                               ? AafiyaColors.primaryText
                               : AafiyaColors.secondaryText),
-                      fontWeight: displayText.isNotEmpty ? FontWeight.w600 : FontWeight.normal,
+                      fontWeight: displayText.isNotEmpty
+                          ? FontWeight.w600
+                          : FontWeight.normal,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -201,7 +219,8 @@ class _AafiyaWilayaSelectorState extends State<AafiyaWilayaSelector> {
                 ),
                 if (_errorMessage != null)
                   IconButton(
-                    icon: const Icon(Icons.refresh_rounded, size: 18, color: AafiyaColors.error),
+                    icon: const Icon(Icons.refresh_rounded,
+                        size: 18, color: AafiyaColors.error),
                     onPressed: () => _loadWilayas(forceRefresh: true),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
@@ -284,7 +303,8 @@ class _WilayaSelectionSheetState extends State<_WilayaSelectionSheet> {
             ),
             // Header
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AafiyaSpacing.lg, vertical: AafiyaSpacing.xs),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AafiyaSpacing.lg, vertical: AafiyaSpacing.xs),
               child: Row(
                 children: [
                   Text(
@@ -304,7 +324,8 @@ class _WilayaSelectionSheetState extends State<_WilayaSelectionSheet> {
             ),
             // Search field
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AafiyaSpacing.lg, vertical: AafiyaSpacing.xs),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AafiyaSpacing.lg, vertical: AafiyaSpacing.xs),
               child: TextField(
                 controller: _searchController,
                 onChanged: (val) => setState(() => _filter = val.trim()),
@@ -313,7 +334,8 @@ class _WilayaSelectionSheetState extends State<_WilayaSelectionSheet> {
                   prefixIcon: const Icon(Icons.search_rounded, size: 20),
                   filled: true,
                   fillColor: AafiyaColors.lightBackground,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                  contentPadding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
@@ -329,16 +351,23 @@ class _WilayaSelectionSheetState extends State<_WilayaSelectionSheet> {
                 itemCount: (widget.includeAllOption ? 1 : 0) + filtered.length,
                 itemBuilder: (ctx, index) {
                   if (widget.includeAllOption && index == 0) {
-                    final isSelected = widget.selectedCode == null || widget.selectedCode == 'all';
+                    final isSelected = widget.selectedCode == null ||
+                        widget.selectedCode == 'all';
                     return ListTile(
                       title: Text(
                         widget.allOptionLabel,
                         style: TextStyle(
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                          color: isSelected ? AafiyaColors.primaryBlue : AafiyaColors.primaryText,
+                          fontWeight:
+                              isSelected ? FontWeight.bold : FontWeight.normal,
+                          color: isSelected
+                              ? AafiyaColors.primaryBlue
+                              : AafiyaColors.primaryText,
                         ),
                       ),
-                      trailing: isSelected ? const Icon(Icons.check_rounded, color: AafiyaColors.primaryBlue) : null,
+                      trailing: isSelected
+                          ? const Icon(Icons.check_rounded,
+                              color: AafiyaColors.primaryBlue)
+                          : null,
                       onTap: () => widget.onSelected(null),
                     );
                   }
@@ -351,11 +380,17 @@ class _WilayaSelectionSheetState extends State<_WilayaSelectionSheet> {
                     title: Text(
                       '${wilaya.code} - ${wilaya.localizedName(locale)}',
                       style: TextStyle(
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                        color: isSelected ? AafiyaColors.primaryBlue : AafiyaColors.primaryText,
+                        fontWeight:
+                            isSelected ? FontWeight.bold : FontWeight.normal,
+                        color: isSelected
+                            ? AafiyaColors.primaryBlue
+                            : AafiyaColors.primaryText,
                       ),
                     ),
-                    trailing: isSelected ? const Icon(Icons.check_rounded, color: AafiyaColors.primaryBlue) : null,
+                    trailing: isSelected
+                        ? const Icon(Icons.check_rounded,
+                            color: AafiyaColors.primaryBlue)
+                        : null,
                     onTap: () => widget.onSelected(wilaya),
                   );
                 },

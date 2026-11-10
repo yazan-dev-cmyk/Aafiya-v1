@@ -240,7 +240,8 @@ class _AafiyaChangePasswordCardState extends State<AafiyaChangePasswordCard> {
                 IconButton(
                   icon: const Icon(Icons.close_rounded),
                   color: AafiyaColors.secondaryText,
-                  onPressed: widget.onCancel ?? () => Navigator.of(context).pop(),
+                  onPressed:
+                      widget.onCancel ?? () => Navigator.of(context).pop(),
                 ),
             ],
           ),

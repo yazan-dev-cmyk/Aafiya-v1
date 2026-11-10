@@ -24,9 +24,11 @@ void main() {
     // 1. SPLASH SCREEN & SESSION RESTORATION
     // =========================================================================
     group('1. Splash Screen & Session Restore', () {
-      testWidgets('renders brand mark, Arabic titles, and language selector', (tester) async {
+      testWidgets('renders brand mark, Arabic titles, and language selector',
+          (tester) async {
         final client = ApiClient(tokenStorage: tokenStorage);
-        final manager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
+        final manager =
+            AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
 
         await tester.pumpWidget(
           AafiyaPatientApp(
@@ -45,9 +47,11 @@ void main() {
         await tester.pumpAndSettle();
       });
 
-      testWidgets('splash navigates to auth shell when no token exists', (tester) async {
+      testWidgets('splash navigates to auth shell when no token exists',
+          (tester) async {
         final client = ApiClient(tokenStorage: tokenStorage);
-        final manager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
+        final manager =
+            AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
 
         await tester.pumpWidget(
           AafiyaPatientApp(
@@ -68,7 +72,9 @@ void main() {
         expect(find.text('تسجيل الدخول'), findsWidgets);
       });
 
-      testWidgets('splash navigates to patient home when restorable session exists', (tester) async {
+      testWidgets(
+          'splash navigates to patient home when restorable session exists',
+          (tester) async {
         await tokenStorage.saveToken('valid_test_token');
 
         final mockHttp = MockClient((request) async {
@@ -80,7 +86,9 @@ void main() {
                   'id': 'pat-100',
                   'name': 'فاطمة بن علي',
                   'email': 'fatima@aafiya.dz',
-                  'roles': [{'name': 'patient_registered'}],
+                  'roles': [
+                    {'name': 'patient_registered'}
+                  ],
                 },
               }),
               200,
@@ -96,8 +104,10 @@ void main() {
           return http.Response('Not Found', 404);
         });
 
-        final client = ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
-        final manager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
+        final client =
+            ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
+        final manager =
+            AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
 
         await tester.pumpWidget(
           AafiyaPatientApp(
@@ -114,7 +124,9 @@ void main() {
         expect(find.textContaining('فاطمة بن علي'), findsOneWidget);
       });
 
-      testWidgets('splash navigates to auth shell when token is expired (HTTP 401)', (tester) async {
+      testWidgets(
+          'splash navigates to auth shell when token is expired (HTTP 401)',
+          (tester) async {
         await tokenStorage.saveToken('expired_token');
 
         final mockHttp = MockClient((request) async {
@@ -128,8 +140,10 @@ void main() {
           return http.Response('Not Found', 404);
         });
 
-        final client = ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
-        final manager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
+        final client =
+            ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
+        final manager =
+            AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
 
         await tester.pumpWidget(
           AafiyaPatientApp(
@@ -151,9 +165,12 @@ void main() {
     // 2. DYNAMIC LANGUAGE SELECTION & DIRECTIONALITY
     // =========================================================================
     group('2. Language Selection & RTL Mirroring', () {
-      testWidgets('toggling language to English in splash flips directionality to LTR and text to English', (tester) async {
+      testWidgets(
+          'toggling language to English in splash flips directionality to LTR and text to English',
+          (tester) async {
         final client = ApiClient(tokenStorage: tokenStorage);
-        final manager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
+        final manager =
+            AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
 
         await tester.pumpWidget(
           AafiyaPatientApp(
@@ -165,7 +182,9 @@ void main() {
         );
 
         // Initial Arabic state: RTL
-        expect(Directionality.of(tester.element(find.byType(PatientSplashShell))), TextDirection.rtl);
+        expect(
+            Directionality.of(tester.element(find.byType(PatientSplashShell))),
+            TextDirection.rtl);
         expect(find.byType(Image), findsOneWidget);
 
         // Switch to English
@@ -173,7 +192,9 @@ void main() {
         await tester.pump();
 
         // Directionality becomes LTR
-        expect(Directionality.of(tester.element(find.byType(PatientSplashShell))), TextDirection.ltr);
+        expect(
+            Directionality.of(tester.element(find.byType(PatientSplashShell))),
+            TextDirection.ltr);
         expect(find.byType(Image), findsOneWidget);
 
         // Drain pending splash timer
@@ -181,9 +202,12 @@ void main() {
         await tester.pumpAndSettle();
       });
 
-      testWidgets('switching languages in AuthShell AppBar popup menu dynamically updates strings and RTL', (tester) async {
+      testWidgets(
+          'switching languages in AuthShell AppBar popup menu dynamically updates strings and RTL',
+          (tester) async {
         final client = ApiClient(tokenStorage: tokenStorage);
-        final manager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
+        final manager =
+            AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
 
         await tester.pumpWidget(
           AafiyaPatientApp(
@@ -195,7 +219,8 @@ void main() {
         );
 
         expect(find.text('عافية للمرضى'), findsOneWidget);
-        expect(Directionality.of(tester.element(find.byType(PatientAuthShell))), TextDirection.rtl);
+        expect(Directionality.of(tester.element(find.byType(PatientAuthShell))),
+            TextDirection.rtl);
 
         // Open language menu and select French
         await tester.tap(find.byIcon(Icons.language_rounded));
@@ -205,7 +230,8 @@ void main() {
         await tester.pumpAndSettle();
 
         // French UI (LTR)
-        expect(Directionality.of(tester.element(find.byType(PatientAuthShell))), TextDirection.ltr);
+        expect(Directionality.of(tester.element(find.byType(PatientAuthShell))),
+            TextDirection.ltr);
         expect(find.text('Connexion'), findsWidgets);
         expect(find.text('Adresse e-mail'), findsOneWidget);
 
@@ -216,7 +242,8 @@ void main() {
         await tester.tap(find.text('English'));
         await tester.pumpAndSettle();
 
-        expect(Directionality.of(tester.element(find.byType(PatientAuthShell))), TextDirection.ltr);
+        expect(Directionality.of(tester.element(find.byType(PatientAuthShell))),
+            TextDirection.ltr);
         expect(find.text('Sign In'), findsWidgets);
         expect(find.text('Email Address'), findsOneWidget);
 
@@ -227,7 +254,8 @@ void main() {
         await tester.tap(find.text('العربية'));
         await tester.pumpAndSettle();
 
-        expect(Directionality.of(tester.element(find.byType(PatientAuthShell))), TextDirection.rtl);
+        expect(Directionality.of(tester.element(find.byType(PatientAuthShell))),
+            TextDirection.rtl);
         expect(find.text('تسجيل الدخول'), findsWidgets);
         expect(find.text('البريد الإلكتروني'), findsOneWidget);
       });
@@ -237,9 +265,11 @@ void main() {
     // 3. LOGIN FORM VALIDATION & ERROR DIALOGS
     // =========================================================================
     group('3. Login Validation & Localized Dialogs', () {
-      testWidgets('empty fields display localized error dialog', (tester) async {
+      testWidgets('empty fields display localized error dialog',
+          (tester) async {
         final client = ApiClient(tokenStorage: tokenStorage);
-        final manager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
+        final manager =
+            AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
 
         await tester.pumpWidget(
           AafiyaPatientApp(
@@ -264,9 +294,11 @@ void main() {
         expect(find.byType(AlertDialog), findsNothing);
       });
 
-      testWidgets('invalid email format displays validation dialog', (tester) async {
+      testWidgets('invalid email format displays validation dialog',
+          (tester) async {
         final client = ApiClient(tokenStorage: tokenStorage);
-        final manager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
+        final manager =
+            AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
 
         await tester.pumpWidget(
           AafiyaPatientApp(
@@ -277,8 +309,12 @@ void main() {
         );
 
         // Enter malformed email
-        await tester.enterText(find.widgetWithText(AafiyaTextField, 'البريد الإلكتروني').first, 'invalid-email');
-        await tester.enterText(find.widgetWithText(AafiyaTextField, 'كلمة المرور').first, 'password123');
+        await tester.enterText(
+            find.widgetWithText(AafiyaTextField, 'البريد الإلكتروني').first,
+            'invalid-email');
+        await tester.enterText(
+            find.widgetWithText(AafiyaTextField, 'كلمة المرور').first,
+            'password123');
 
         await tester.tap(find.widgetWithText(AafiyaButton, 'تسجيل الدخول'));
         await tester.pumpAndSettle();
@@ -292,7 +328,8 @@ void main() {
 
       testWidgets('short password displays validation dialog', (tester) async {
         final client = ApiClient(tokenStorage: tokenStorage);
-        final manager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
+        final manager =
+            AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
 
         await tester.pumpWidget(
           AafiyaPatientApp(
@@ -302,8 +339,11 @@ void main() {
           ),
         );
 
-        await tester.enterText(find.widgetWithText(AafiyaTextField, 'البريد الإلكتروني').first, 'patient@aafiya.dz');
-        await tester.enterText(find.widgetWithText(AafiyaTextField, 'كلمة المرور').first, 'short');
+        await tester.enterText(
+            find.widgetWithText(AafiyaTextField, 'البريد الإلكتروني').first,
+            'patient@aafiya.dz');
+        await tester.enterText(
+            find.widgetWithText(AafiyaTextField, 'كلمة المرور').first, 'short');
 
         await tester.tap(find.widgetWithText(AafiyaButton, 'تسجيل الدخول'));
         await tester.pumpAndSettle();
@@ -315,7 +355,8 @@ void main() {
         await tester.pumpAndSettle();
       });
 
-      testWidgets('invalid credentials displays localized error dialog', (tester) async {
+      testWidgets('invalid credentials displays localized error dialog',
+          (tester) async {
         final mockHttp = MockClient((request) async {
           if (request.url.path.contains('/auth/login')) {
             return http.Response(
@@ -331,8 +372,10 @@ void main() {
           return http.Response('Not Found', 404);
         });
 
-        final client = ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
-        final manager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
+        final client =
+            ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
+        final manager =
+            AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
 
         await tester.pumpWidget(
           AafiyaPatientApp(
@@ -342,20 +385,27 @@ void main() {
           ),
         );
 
-        await tester.enterText(find.widgetWithText(AafiyaTextField, 'البريد الإلكتروني').first, 'wrong@aafiya.dz');
-        await tester.enterText(find.widgetWithText(AafiyaTextField, 'كلمة المرور').first, 'wrong_pass');
+        await tester.enterText(
+            find.widgetWithText(AafiyaTextField, 'البريد الإلكتروني').first,
+            'wrong@aafiya.dz');
+        await tester.enterText(
+            find.widgetWithText(AafiyaTextField, 'كلمة المرور').first,
+            'wrong_pass');
 
         await tester.tap(find.widgetWithText(AafiyaButton, 'تسجيل الدخول'));
         await tester.pumpAndSettle();
 
         expect(find.byType(AlertDialog), findsOneWidget);
-        expect(find.text('البريد الإلكتروني أو كلمة المرور غير صحيحة.'), findsOneWidget);
+        expect(find.text('البريد الإلكتروني أو كلمة المرور غير صحيحة.'),
+            findsOneWidget);
 
         await tester.tap(find.text('حسناً'));
         await tester.pumpAndSettle();
       });
 
-      testWidgets('successful patient login stores token and navigates to patient home', (tester) async {
+      testWidgets(
+          'successful patient login stores token and navigates to patient home',
+          (tester) async {
         final mockHttp = MockClient((request) async {
           if (request.url.path.contains('/auth/login')) {
             return http.Response(
@@ -367,7 +417,9 @@ void main() {
                     'id': 'pat-999',
                     'name': 'ياسمين بوزيد',
                     'email': 'yasmine@aafiya.dz',
-                    'roles': [{'name': 'patient_registered'}],
+                    'roles': [
+                      {'name': 'patient_registered'}
+                    ],
                   },
                 },
               }),
@@ -384,8 +436,10 @@ void main() {
           return http.Response('Not Found', 404);
         });
 
-        final client = ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
-        final manager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
+        final client =
+            ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
+        final manager =
+            AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
 
         await tester.pumpWidget(
           AafiyaPatientApp(
@@ -395,8 +449,12 @@ void main() {
           ),
         );
 
-        await tester.enterText(find.widgetWithText(AafiyaTextField, 'البريد الإلكتروني').first, 'yasmine@aafiya.dz');
-        await tester.enterText(find.widgetWithText(AafiyaTextField, 'كلمة المرور').first, 'secret1234');
+        await tester.enterText(
+            find.widgetWithText(AafiyaTextField, 'البريد الإلكتروني').first,
+            'yasmine@aafiya.dz');
+        await tester.enterText(
+            find.widgetWithText(AafiyaTextField, 'كلمة المرور').first,
+            'secret1234');
 
         await tester.tap(find.widgetWithText(AafiyaButton, 'تسجيل الدخول'));
         await tester.pumpAndSettle();
@@ -412,7 +470,9 @@ void main() {
     // 4. CRITICAL ROLE BOUNDARY ENFORCEMENT
     // =========================================================================
     group('4. Role Boundary Security', () {
-      testWidgets('doctor account login is rejected with guidance dialog and does NOT enter patient home', (tester) async {
+      testWidgets(
+          'doctor account login is rejected with guidance dialog and does NOT enter patient home',
+          (tester) async {
         final mockHttp = MockClient((request) async {
           if (request.url.path.contains('/auth/login')) {
             return http.Response(
@@ -424,7 +484,9 @@ void main() {
                     'id': 'doc-1',
                     'name': 'Dr. Ahmed',
                     'email': 'dr.ahmed@aafiya.dz',
-                    'roles': [{'name': 'doctor'}],
+                    'roles': [
+                      {'name': 'doctor'}
+                    ],
                   },
                 },
               }),
@@ -435,8 +497,10 @@ void main() {
           return http.Response('Not Found', 404);
         });
 
-        final client = ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
-        final manager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
+        final client =
+            ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
+        final manager =
+            AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
 
         await tester.pumpWidget(
           AafiyaPatientApp(
@@ -446,16 +510,24 @@ void main() {
           ),
         );
 
-        await tester.enterText(find.widgetWithText(AafiyaTextField, 'البريد الإلكتروني').first, 'dr.ahmed@aafiya.dz');
-        await tester.enterText(find.widgetWithText(AafiyaTextField, 'كلمة المرور').first, 'secret1234');
+        await tester.enterText(
+            find.widgetWithText(AafiyaTextField, 'البريد الإلكتروني').first,
+            'dr.ahmed@aafiya.dz');
+        await tester.enterText(
+            find.widgetWithText(AafiyaTextField, 'كلمة المرور').first,
+            'secret1234');
 
         await tester.tap(find.widgetWithText(AafiyaButton, 'تسجيل الدخول'));
         await tester.pumpAndSettle();
 
         // Rejection Dialog appears
         expect(find.byType(AlertDialog), findsOneWidget);
-        expect(find.text('الحساب الحالي غير مصرح له بالدخول إلى هذا التطبيق.'), findsOneWidget);
-        expect(find.text('هذا الحساب مخصص للكوادر الطبية والإدارية. يرجى استخدام تطبيق عافية للمهنيين (Aafiya Pro).'), findsOneWidget);
+        expect(find.text('الحساب الحالي غير مصرح له بالدخول إلى هذا التطبيق.'),
+            findsOneWidget);
+        expect(
+            find.text(
+                'هذا الحساب مخصص للكوادر الطبية والإدارية. يرجى استخدام تطبيق عافية للمهنيين (Aafiya Pro).'),
+            findsOneWidget);
 
         // Crucial: Must NOT navigate to Patient Home and token must NOT be stored
         expect(find.byType(PatientHomeShell), findsNothing);
@@ -464,7 +536,9 @@ void main() {
         expect(await tokenStorage.getToken(), isNull);
       });
 
-      testWidgets('web-only admin role login is rejected with web portal guidance', (tester) async {
+      testWidgets(
+          'web-only admin role login is rejected with web portal guidance',
+          (tester) async {
         final mockHttp = MockClient((request) async {
           if (request.url.path.contains('/auth/login')) {
             return http.Response(
@@ -476,7 +550,9 @@ void main() {
                     'id': 'adm-1',
                     'name': 'Admin User',
                     'email': 'admin@aafiya.dz',
-                    'roles': [{'name': 'admin'}],
+                    'roles': [
+                      {'name': 'admin'}
+                    ],
                   },
                 },
               }),
@@ -487,8 +563,10 @@ void main() {
           return http.Response('Not Found', 404);
         });
 
-        final client = ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
-        final manager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
+        final client =
+            ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
+        final manager =
+            AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
 
         await tester.pumpWidget(
           AafiyaPatientApp(
@@ -498,14 +576,21 @@ void main() {
           ),
         );
 
-        await tester.enterText(find.widgetWithText(AafiyaTextField, 'البريد الإلكتروني').first, 'admin@aafiya.dz');
-        await tester.enterText(find.widgetWithText(AafiyaTextField, 'كلمة المرور').first, 'secret1234');
+        await tester.enterText(
+            find.widgetWithText(AafiyaTextField, 'البريد الإلكتروني').first,
+            'admin@aafiya.dz');
+        await tester.enterText(
+            find.widgetWithText(AafiyaTextField, 'كلمة المرور').first,
+            'secret1234');
 
         await tester.tap(find.widgetWithText(AafiyaButton, 'تسجيل الدخول'));
         await tester.pumpAndSettle();
 
         expect(find.byType(AlertDialog), findsOneWidget);
-        expect(find.text('الوظائف الإدارية والتشخيصية مخصصة للاستخدام عبر بوابة الويب حصرياً.'), findsOneWidget);
+        expect(
+            find.text(
+                'الوظائف الإدارية والتشخيصية مخصصة للاستخدام عبر بوابة الويب حصرياً.'),
+            findsOneWidget);
         expect(find.byType(PatientHomeShell), findsNothing);
         expect(manager.isAuthenticated, isFalse);
       });
@@ -515,13 +600,15 @@ void main() {
     // 5. REGISTRATION FLOW & TOGGLING
     // =========================================================================
     group('5. Registration Flow', () {
-      testWidgets('toggling between Sign In and Register switches form fields', (tester) async {
+      testWidgets('toggling between Sign In and Register switches form fields',
+          (tester) async {
         tester.view.physicalSize = const Size(800, 1400);
         tester.view.devicePixelRatio = 1.0;
         addTearDown(() => tester.view.resetPhysicalSize());
 
         final client = ApiClient(tokenStorage: tokenStorage);
-        final manager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
+        final manager =
+            AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
 
         await tester.pumpWidget(
           AafiyaPatientApp(
@@ -557,16 +644,19 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('الاسم الكامل'), findsNothing);
-        expect(find.widgetWithText(AafiyaButton, 'تسجيل الدخول'), findsOneWidget);
+        expect(
+            find.widgetWithText(AafiyaButton, 'تسجيل الدخول'), findsOneWidget);
       });
 
-      testWidgets('registration empty fields trigger validation dialog', (tester) async {
+      testWidgets('registration empty fields trigger validation dialog',
+          (tester) async {
         tester.view.physicalSize = const Size(800, 1400);
         tester.view.devicePixelRatio = 1.0;
         addTearDown(() => tester.view.resetPhysicalSize());
 
         final client = ApiClient(tokenStorage: tokenStorage);
-        final manager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
+        final manager =
+            AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
 
         await tester.pumpWidget(
           AafiyaPatientApp(
@@ -592,13 +682,15 @@ void main() {
         await tester.pumpAndSettle();
       });
 
-      testWidgets('registration password mismatch triggers validation dialog', (tester) async {
+      testWidgets('registration password mismatch triggers validation dialog',
+          (tester) async {
         tester.view.physicalSize = const Size(800, 1400);
         tester.view.devicePixelRatio = 1.0;
         addTearDown(() => tester.view.resetPhysicalSize());
 
         final client = ApiClient(tokenStorage: tokenStorage);
-        final manager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
+        final manager =
+            AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
 
         await tester.pumpWidget(
           AafiyaPatientApp(
@@ -611,11 +703,18 @@ void main() {
         await tester.tap(find.text('ليس لديك حساب؟ إنشاء حساب جديد'));
         await tester.pumpAndSettle();
 
-        await tester.enterText(find.widgetWithText(AafiyaTextField, 'الاسم الكامل'), 'مراد قادري');
-        await tester.enterText(find.widgetWithText(AafiyaTextField, 'رقم الهاتف'), '0555333444');
-        await tester.enterText(find.widgetWithText(AafiyaTextField, 'البريد الإلكتروني'), 'mourad@aafiya.dz');
-        await tester.enterText(find.widgetWithText(AafiyaTextField, 'كلمة المرور'), 'password123');
-        await tester.enterText(find.widgetWithText(AafiyaTextField, 'تأكيد كلمة المرور'), 'mismatch999');
+        await tester.enterText(
+            find.widgetWithText(AafiyaTextField, 'الاسم الكامل'), 'مراد قادري');
+        await tester.enterText(
+            find.widgetWithText(AafiyaTextField, 'رقم الهاتف'), '0555333444');
+        await tester.enterText(
+            find.widgetWithText(AafiyaTextField, 'البريد الإلكتروني'),
+            'mourad@aafiya.dz');
+        await tester.enterText(
+            find.widgetWithText(AafiyaTextField, 'كلمة المرور'), 'password123');
+        await tester.enterText(
+            find.widgetWithText(AafiyaTextField, 'تأكيد كلمة المرور'),
+            'mismatch999');
 
         final submitBtn = find.widgetWithText(AafiyaButton, 'إنشاء حساب');
         await tester.ensureVisible(submitBtn);
@@ -629,7 +728,8 @@ void main() {
         await tester.pumpAndSettle();
       });
 
-      testWidgets('registration backend error displays localized error dialog', (tester) async {
+      testWidgets('registration backend error displays localized error dialog',
+          (tester) async {
         tester.view.physicalSize = const Size(800, 1400);
         tester.view.devicePixelRatio = 1.0;
         addTearDown(() => tester.view.resetPhysicalSize());
@@ -689,8 +789,10 @@ void main() {
           return http.Response('Not Found', 404);
         });
 
-        final client = ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
-        final manager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
+        final client =
+            ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
+        final manager =
+            AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
 
         await tester.pumpWidget(
           AafiyaPatientApp(
@@ -703,11 +805,18 @@ void main() {
         await tester.tap(find.text('ليس لديك حساب؟ إنشاء حساب جديد'));
         await tester.pumpAndSettle();
 
-        await tester.enterText(find.widgetWithText(AafiyaTextField, 'الاسم الكامل'), 'مراد قادري');
-        await tester.enterText(find.widgetWithText(AafiyaTextField, 'رقم الهاتف'), '0555333444');
-        await tester.enterText(find.widgetWithText(AafiyaTextField, 'البريد الإلكتروني'), 'taken@aafiya.dz');
-        await tester.enterText(find.widgetWithText(AafiyaTextField, 'كلمة المرور'), 'password123');
-        await tester.enterText(find.widgetWithText(AafiyaTextField, 'تأكيد كلمة المرور'), 'password123');
+        await tester.enterText(
+            find.widgetWithText(AafiyaTextField, 'الاسم الكامل'), 'مراد قادري');
+        await tester.enterText(
+            find.widgetWithText(AafiyaTextField, 'رقم الهاتف'), '0555333444');
+        await tester.enterText(
+            find.widgetWithText(AafiyaTextField, 'البريد الإلكتروني'),
+            'taken@aafiya.dz');
+        await tester.enterText(
+            find.widgetWithText(AafiyaTextField, 'كلمة المرور'), 'password123');
+        await tester.enterText(
+            find.widgetWithText(AafiyaTextField, 'تأكيد كلمة المرور'),
+            'password123');
 
         // Select Wilaya
         final wilayaField = find.byType(AafiyaWilayaSelector);
@@ -743,7 +852,9 @@ void main() {
         await tester.pumpAndSettle();
       });
 
-      testWidgets('successful registration provisions session, verifies patient role, and navigates to home', (tester) async {
+      testWidgets(
+          'successful registration provisions session, verifies patient role, and navigates to home',
+          (tester) async {
         tester.view.physicalSize = const Size(800, 1400);
         tester.view.devicePixelRatio = 1.0;
         addTearDown(() => tester.view.resetPhysicalSize());
@@ -809,7 +920,9 @@ void main() {
                     'name': 'مراد قادري',
                     'email': 'mourad@aafiya.dz',
                     'phone': '0555333444',
-                    'roles': [{'name': 'patient_registered'}],
+                    'roles': [
+                      {'name': 'patient_registered'}
+                    ],
                   },
                 },
               }),
@@ -826,8 +939,10 @@ void main() {
           return http.Response('Not Found', 404);
         });
 
-        final client = ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
-        final manager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
+        final client =
+            ApiClient(httpClient: mockHttp, tokenStorage: tokenStorage);
+        final manager =
+            AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
 
         await tester.pumpWidget(
           AafiyaPatientApp(
@@ -840,11 +955,18 @@ void main() {
         await tester.tap(find.text('ليس لديك حساب؟ إنشاء حساب جديد'));
         await tester.pumpAndSettle();
 
-        await tester.enterText(find.widgetWithText(AafiyaTextField, 'الاسم الكامل'), 'مراد قادري');
-        await tester.enterText(find.widgetWithText(AafiyaTextField, 'رقم الهاتف'), '0555333444');
-        await tester.enterText(find.widgetWithText(AafiyaTextField, 'البريد الإلكتروني'), 'mourad@aafiya.dz');
-        await tester.enterText(find.widgetWithText(AafiyaTextField, 'كلمة المرور'), 'password123');
-        await tester.enterText(find.widgetWithText(AafiyaTextField, 'تأكيد كلمة المرور'), 'password123');
+        await tester.enterText(
+            find.widgetWithText(AafiyaTextField, 'الاسم الكامل'), 'مراد قادري');
+        await tester.enterText(
+            find.widgetWithText(AafiyaTextField, 'رقم الهاتف'), '0555333444');
+        await tester.enterText(
+            find.widgetWithText(AafiyaTextField, 'البريد الإلكتروني'),
+            'mourad@aafiya.dz');
+        await tester.enterText(
+            find.widgetWithText(AafiyaTextField, 'كلمة المرور'), 'password123');
+        await tester.enterText(
+            find.widgetWithText(AafiyaTextField, 'تأكيد كلمة المرور'),
+            'password123');
 
         // Select Wilaya
         final wilayaField = find.byType(AafiyaWilayaSelector);
@@ -876,7 +998,8 @@ void main() {
         expect(registerCalled, isTrue);
         expect(find.byType(PatientHomeShell), findsOneWidget);
         expect(find.textContaining('مراد قادري'), findsOneWidget);
-        expect(await tokenStorage.getToken(), equals('new_registered_patient_token_888'));
+        expect(await tokenStorage.getToken(),
+            equals('new_registered_patient_token_888'));
       });
     });
 
@@ -884,9 +1007,11 @@ void main() {
     // 6. PASSWORD VISIBILITY TOGGLE
     // =========================================================================
     group('6. Password Visibility Toggle', () {
-      testWidgets('tapping password visibility icon toggles obscurity', (tester) async {
+      testWidgets('tapping password visibility icon toggles obscurity',
+          (tester) async {
         final client = ApiClient(tokenStorage: tokenStorage);
-        final manager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
+        final manager =
+            AuthSessionManager(tokenStorage: tokenStorage, apiClient: client);
 
         await tester.pumpWidget(
           AafiyaPatientApp(

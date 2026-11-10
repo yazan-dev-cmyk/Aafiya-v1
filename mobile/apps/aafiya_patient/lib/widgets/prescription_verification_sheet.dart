@@ -57,7 +57,8 @@ class _PrescriptionVerificationSheetState
   @override
   void initState() {
     super.initState();
-    _prescriptionService = widget.prescriptionService ?? PrescriptionService(widget.apiClient);
+    _prescriptionService =
+        widget.prescriptionService ?? PrescriptionService(widget.apiClient);
     _verifyPrescription();
   }
 
@@ -201,7 +202,8 @@ class _PrescriptionVerificationSheetState
     }
 
     final data = _verificationData!;
-    final status = (data['verification_status'] as String? ?? 'active').toLowerCase();
+    final status =
+        (data['verification_status'] as String? ?? 'active').toLowerCase();
     final reference = data['prescription_reference'] as String? ?? '';
     final doctorName = data['doctor_name'] as String?;
     final doctorSpecialty = data['doctor_specialty'] as String?;
@@ -246,11 +248,13 @@ class _PrescriptionVerificationSheetState
             child: Column(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                   decoration: BoxDecoration(
                     color: statusBgColor,
                     borderRadius: BorderRadius.circular(AafiyaRadius.sm),
-                    border: Border.all(color: statusColor.withValues(alpha: 0.4)),
+                    border:
+                        Border.all(color: statusColor.withValues(alpha: 0.4)),
                   ),
                   child: Text(
                     statusLabel,
@@ -306,7 +310,8 @@ class _PrescriptionVerificationSheetState
                       color: AafiyaColors.primaryText,
                     ),
                   ),
-                  if (doctorSpecialty != null && doctorSpecialty.isNotEmpty) ...[
+                  if (doctorSpecialty != null &&
+                      doctorSpecialty.isNotEmpty) ...[
                     const SizedBox(height: 4),
                     Text(
                       doctorSpecialty,
@@ -512,7 +517,8 @@ class _PrescriptionVerificationSheetState
                                   if (dosage != null)
                                     Text(
                                       '${strings.dosage}: $dosage',
-                                      style: AafiyaTypography.bodySmall.copyWith(
+                                      style:
+                                          AafiyaTypography.bodySmall.copyWith(
                                         color: AafiyaColors.secondaryText,
                                       ),
                                     ),
@@ -521,7 +527,8 @@ class _PrescriptionVerificationSheetState
                                   if (frequency != null)
                                     Text(
                                       '${strings.frequency}: $frequency',
-                                      style: AafiyaTypography.bodySmall.copyWith(
+                                      style:
+                                          AafiyaTypography.bodySmall.copyWith(
                                         color: AafiyaColors.secondaryText,
                                       ),
                                     ),
@@ -537,7 +544,8 @@ class _PrescriptionVerificationSheetState
                                 ),
                               ),
                             ],
-                            if (instructions != null && instructions.isNotEmpty) ...[
+                            if (instructions != null &&
+                                instructions.isNotEmpty) ...[
                               const SizedBox(height: 4),
                               Text(
                                 '${strings.instructions}: $instructions',

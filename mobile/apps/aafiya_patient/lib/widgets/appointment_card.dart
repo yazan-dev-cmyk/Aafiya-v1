@@ -34,7 +34,8 @@ class AppointmentCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 22,
-                  backgroundColor: AafiyaColors.healthBlue.withValues(alpha: 0.1),
+                  backgroundColor:
+                      AafiyaColors.healthBlue.withValues(alpha: 0.1),
                   child: const Icon(
                     Icons.medical_services_outlined,
                     color: AafiyaColors.healthBlue,
@@ -208,19 +209,6 @@ class AppointmentCard extends StatelessWidget {
       AppointmentStatus.rescheduled ||
       AppointmentStatus.unknown =>
         AafiyaStatusType.custom,
-    };
-  }
-
-  Color _resolveStatusColor(AppointmentStatus status) {
-    return switch (status) {
-      AppointmentStatus.pending => AafiyaColors.warning,
-      AppointmentStatus.confirmed => AafiyaColors.success,
-      AppointmentStatus.attended => AafiyaColors.healthBlue,
-      AppointmentStatus.noShow => AafiyaColors.warning,
-      AppointmentStatus.cancelled || AppointmentStatus.rejected => AafiyaColors.error,
-      AppointmentStatus.expired => AafiyaColors.secondaryText,
-      AppointmentStatus.rescheduled => AafiyaColors.info,
-      AppointmentStatus.unknown => AafiyaColors.secondaryText,
     };
   }
 

@@ -20,18 +20,21 @@ void main() {
       tokenStorage = InMemoryTokenStorage();
       final mockHttpClient = MockClient((request) async {
         if (request.url.path.contains('/appointments')) {
-          return http.Response(jsonEncode({'data': []}), 200, headers: {'content-type': 'application/json'});
+          return http.Response(jsonEncode({'data': []}), 200,
+              headers: {'content-type': 'application/json'});
         }
         return http.Response('{"message": "Not found"}', 404);
       });
-      apiClient = ApiClient(httpClient: mockHttpClient, tokenStorage: tokenStorage);
+      apiClient =
+          ApiClient(httpClient: mockHttpClient, tokenStorage: tokenStorage);
       sessionManager = AuthSessionManager(
         tokenStorage: tokenStorage,
         apiClient: apiClient,
       );
     });
 
-    testWidgets('initializes in splash state and displays brand title', (tester) async {
+    testWidgets('initializes in splash state and displays brand title',
+        (tester) async {
       await tester.pumpWidget(
         AafiyaPatientApp(
           sessionManager: sessionManager,
@@ -45,7 +48,9 @@ void main() {
       await tester.pump(const Duration(milliseconds: 700));
     });
 
-    testWidgets('displays auth shell with email, password fields and sign in button', (tester) async {
+    testWidgets(
+        'displays auth shell with email, password fields and sign in button',
+        (tester) async {
       await tester.pumpWidget(
         AafiyaPatientApp(
           sessionManager: sessionManager,
@@ -59,7 +64,9 @@ void main() {
       expect(find.text('كلمة المرور'), findsOneWidget);
     });
 
-    testWidgets('renders patient home shell with DISC-01 notice and NO direct booking button', (tester) async {
+    testWidgets(
+        'renders patient home shell with DISC-01 notice and NO direct booking button',
+        (tester) async {
       const patientUser = User(
         id: 'patient-42',
         name: 'Ahmed Benali',
@@ -85,7 +92,8 @@ void main() {
       expect(find.textContaining('Ahmed Benali'), findsOneWidget);
 
       // Verify DISC-01 Notice is present
-      expect(find.text('يتم حجز المواعيد حصرياً عبر مراكز الحجز المعتمدة.'), findsOneWidget);
+      expect(find.text('يتم حجز المواعيد حصرياً عبر مراكز الحجز المعتمدة.'),
+          findsOneWidget);
 
       // Verify NO direct booking button exists
       expect(find.text('احجز موعد'), findsNothing);
@@ -95,7 +103,9 @@ void main() {
     });
 
     group('Session Expiration & Stack Teardown (TASK-06-02)', () {
-      testWidgets('runtime session expiration tears down pushed screens, routes to auth shell, and shows localized modal', (tester) async {
+      testWidgets(
+          'runtime session expiration tears down pushed screens, routes to auth shell, and shows localized modal',
+          (tester) async {
         const patientUser = User(
           id: 'patient-42',
           name: 'Ahmed Benali',
@@ -144,7 +154,8 @@ void main() {
 
         // Verify session expired modal is displayed with localized strings
         expect(find.text('انتهت الجلسة'), findsOneWidget);
-        expect(find.text('انتهت جلستك. يرجى تسجيل الدخول مجدداً للمتابعة.'), findsOneWidget);
+        expect(find.text('انتهت جلستك. يرجى تسجيل الدخول مجدداً للمتابعة.'),
+            findsOneWidget);
         expect(find.text('تسجيل الدخول مجدداً'), findsOneWidget);
 
         // Dismiss the modal
@@ -157,7 +168,9 @@ void main() {
         expect(find.text('Sensitive Patient Sub-Route'), findsNothing);
       });
 
-      testWidgets('session expiration disposes in-flight form state (PHI isolation)', (tester) async {
+      testWidgets(
+          'session expiration disposes in-flight form state (PHI isolation)',
+          (tester) async {
         const patientUser = User(
           id: 'patient-99',
           name: 'Samir Patient',
@@ -183,7 +196,8 @@ void main() {
         await tester.pumpAndSettle();
 
         // Push a form with sensitive text input
-        final testController = TextEditingController(text: 'Confidential Diagnosis Note');
+        final testController =
+            TextEditingController(text: 'Confidential Diagnosis Note');
         navKey.currentState!.push(
           MaterialPageRoute<void>(
             builder: (_) => Scaffold(
@@ -206,30 +220,35 @@ void main() {
 
     group('resolveAppConfig', () {
       test('resolves devAndroidEmulator on Android non-web', () {
-        final config = resolveAppConfig(platform: TargetPlatform.android, isWeb: false);
+        final config =
+            resolveAppConfig(platform: TargetPlatform.android, isWeb: false);
         expect(config, equals(AppConfig.devAndroidEmulator));
         expect(config.apiBaseUrl, equals('http://10.0.2.2:8000/api/v1'));
       });
 
       test('resolves devLocal on non-Android platforms', () {
-        final iosConfig = resolveAppConfig(platform: TargetPlatform.iOS, isWeb: false);
+        final iosConfig =
+            resolveAppConfig(platform: TargetPlatform.iOS, isWeb: false);
         expect(iosConfig, equals(AppConfig.devLocal));
         expect(iosConfig.apiBaseUrl, equals('http://localhost:8000/api/v1'));
 
-        final linuxConfig = resolveAppConfig(platform: TargetPlatform.linux, isWeb: false);
+        final linuxConfig =
+            resolveAppConfig(platform: TargetPlatform.linux, isWeb: false);
         expect(linuxConfig, equals(AppConfig.devLocal));
         expect(linuxConfig.apiBaseUrl, equals('http://localhost:8000/api/v1'));
       });
 
       test('resolves devLocal on web even if target platform is Android', () {
-        final webConfig = resolveAppConfig(platform: TargetPlatform.android, isWeb: true);
+        final webConfig =
+            resolveAppConfig(platform: TargetPlatform.android, isWeb: true);
         expect(webConfig, equals(AppConfig.devLocal));
         expect(webConfig.apiBaseUrl, equals('http://localhost:8000/api/v1'));
       });
     });
 
     group('Appointment Date Formatting Tests (DEF-04 / TASK-B-04)', () {
-      Widget createTestApp({required Widget child, Locale locale = const Locale('ar')}) {
+      Widget createTestApp(
+          {required Widget child, Locale locale = const Locale('ar')}) {
         return MaterialApp(
           locale: locale,
           theme: AafiyaTheme.lightTheme,
@@ -260,7 +279,9 @@ void main() {
         expect(frStrings.formatDate(dateOnly), equals('15 oct. 2026'));
       });
 
-      test('formatDate handles null, empty, short, and malformed strings without throwing', () {
+      test(
+          'formatDate handles null, empty, short, and malformed strings without throwing',
+          () {
         final strings = LocalizedStrings(const Locale('en'));
 
         expect(strings.formatDate(null), equals('-'));
@@ -272,7 +293,9 @@ void main() {
         expect(strings.formatDate('bad-date'), equals('bad-date'));
       });
 
-      testWidgets('AppointmentDetailScreen renders localized dates without substring crash on short dates', (tester) async {
+      testWidgets(
+          'AppointmentDetailScreen renders localized dates without substring crash on short dates',
+          (tester) async {
         const dangerousAppointment = Appointment(
           id: 'app-danger',
           bookingReference: 'BK-SHORT-001',
@@ -280,15 +303,18 @@ void main() {
           timeSlot: '09:00',
           status: AppointmentStatus.confirmed,
           confirmedAt: 'short', // 5 chars — would crash substring(0, 10)
-          checkedInAt: 'bad',   // 3 chars — would crash substring(0, 10)
-          doctor: AppointmentDoctor(id: 'doc-1', name: 'Dr. Benali', specialty: 'أمراض القلب'),
-          clinic: AppointmentClinic(id: 'cln-1', name: 'Clinique El Chifa', wilaya: 'الجزائر'),
+          checkedInAt: 'bad', // 3 chars — would crash substring(0, 10)
+          doctor: AppointmentDoctor(
+              id: 'doc-1', name: 'Dr. Benali', specialty: 'أمراض القلب'),
+          clinic: AppointmentClinic(
+              id: 'cln-1', name: 'Clinique El Chifa', wilaya: 'الجزائر'),
           patient: AppointmentPatient(id: 'pat-1', name: 'Amine'),
         );
 
         await tester.pumpWidget(
           createTestApp(
-            child: const AppointmentDetailScreen(appointment: dangerousAppointment),
+            child: const AppointmentDetailScreen(
+                appointment: dangerousAppointment),
           ),
         );
         await tester.pumpAndSettle();
@@ -299,7 +325,9 @@ void main() {
         expect(find.text('تم تسجيل الحضور بتاريخ: bad'), findsOneWidget);
       });
 
-      testWidgets('AppointmentDetailScreen renders localized dates across AR, EN, FR', (tester) async {
+      testWidgets(
+          'AppointmentDetailScreen renders localized dates across AR, EN, FR',
+          (tester) async {
         const appointment = Appointment(
           id: 'app-valid',
           bookingReference: 'BK-VALID-001',
@@ -308,8 +336,10 @@ void main() {
           status: AppointmentStatus.confirmed,
           confirmedAt: '2026-09-01T10:00:00.000Z',
           checkedInAt: '2026-10-15T08:50:00.000Z',
-          doctor: AppointmentDoctor(id: 'doc-1', name: 'Dr. Benali', specialty: 'أمراض القلب'),
-          clinic: AppointmentClinic(id: 'cln-1', name: 'Clinique El Chifa', wilaya: 'الجزائر'),
+          doctor: AppointmentDoctor(
+              id: 'doc-1', name: 'Dr. Benali', specialty: 'أمراض القلب'),
+          clinic: AppointmentClinic(
+              id: 'cln-1', name: 'Clinique El Chifa', wilaya: 'الجزائر'),
           patient: AppointmentPatient(id: 'pat-1', name: 'Amine'),
         );
 
@@ -322,7 +352,8 @@ void main() {
         );
         await tester.pumpAndSettle();
         expect(find.text('تم التأكيد بتاريخ: 1 سبتمبر 2026'), findsOneWidget);
-        expect(find.text('تم تسجيل الحضور بتاريخ: 15 أكتوبر 2026'), findsOneWidget);
+        expect(find.text('تم تسجيل الحضور بتاريخ: 15 أكتوبر 2026'),
+            findsOneWidget);
         expect(find.text('15 أكتوبر 2026'), findsOneWidget);
         expect(find.text('أمراض القلب'), findsOneWidget);
         expect(find.text('الجزائر'), findsOneWidget);
@@ -350,7 +381,8 @@ void main() {
         );
         await tester.pumpAndSettle();
         expect(find.text('Confirmé le: 1 sept. 2026'), findsOneWidget);
-        expect(find.text('Présence enregistrée le: 15 oct. 2026'), findsOneWidget);
+        expect(
+            find.text('Présence enregistrée le: 15 oct. 2026'), findsOneWidget);
         expect(find.text('15 oct. 2026'), findsOneWidget);
         expect(find.text('Cardiologie'), findsOneWidget);
         expect(find.text('Alger'), findsOneWidget);
@@ -358,4 +390,3 @@ void main() {
     });
   });
 }
-

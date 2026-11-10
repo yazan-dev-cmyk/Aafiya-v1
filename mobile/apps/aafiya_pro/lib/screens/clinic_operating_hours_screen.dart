@@ -640,7 +640,10 @@ class _ClinicOperatingHoursScreenState
             Row(
               children: [
                 Expanded(
-                  child: Row(
+                  child: Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: AafiyaSpacing.sm,
+                    runSpacing: 4,
                     children: [
                       Text(
                         dayName,
@@ -651,7 +654,6 @@ class _ClinicOperatingHoursScreenState
                               : AafiyaColors.secondaryText,
                         ),
                       ),
-                      const SizedBox(width: AafiyaSpacing.sm),
                       Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 6, vertical: 2),
@@ -796,7 +798,7 @@ class _ClinicOperatingHoursScreenState
         color: AafiyaColors.pureWhite,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: AafiyaColors.primaryText.withValues(alpha: 0.05),
             offset: const Offset(0, -4),
             blurRadius: 10,
           ),

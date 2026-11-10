@@ -47,7 +47,8 @@ class SharedRecordViewerSheet extends StatefulWidget {
   }
 
   @override
-  State<SharedRecordViewerSheet> createState() => _SharedRecordViewerSheetState();
+  State<SharedRecordViewerSheet> createState() =>
+      _SharedRecordViewerSheetState();
 }
 
 class _SharedRecordViewerSheetState extends State<SharedRecordViewerSheet> {
@@ -225,7 +226,8 @@ class _SharedRecordViewerSheetState extends State<SharedRecordViewerSheet> {
                 // Drag handle pill
                 Center(
                   child: Container(
-                    margin: const EdgeInsets.symmetric(vertical: AafiyaSpacing.sm),
+                    margin:
+                        const EdgeInsets.symmetric(vertical: AafiyaSpacing.sm),
                     width: 44,
                     height: 4,
                     decoration: BoxDecoration(
@@ -259,7 +261,8 @@ class _SharedRecordViewerSheetState extends State<SharedRecordViewerSheet> {
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.close, color: AafiyaColors.secondaryText),
+                        icon: const Icon(Icons.close,
+                            color: AafiyaColors.secondaryText),
                         onPressed: () => Navigator.of(context).pop(),
                       ),
                     ],
@@ -270,7 +273,8 @@ class _SharedRecordViewerSheetState extends State<SharedRecordViewerSheet> {
                 // Main body
                 Flexible(
                   child: SingleChildScrollView(
-                    keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
                     padding: const EdgeInsets.all(AafiyaSpacing.lg),
                     child: _record != null
                         ? _buildRecordView(context, _record!, strings)
@@ -361,17 +365,25 @@ class _SharedRecordViewerSheetState extends State<SharedRecordViewerSheet> {
           Container(
             padding: const EdgeInsets.all(AafiyaSpacing.md),
             decoration: BoxDecoration(
-              color: _isTerminal ? const Color(0xFFFEE2E2) : const Color(0xFFFEF3C7),
+              color: _isTerminal
+                  ? const Color(0xFFFEE2E2)
+                  : const Color(0xFFFEF3C7),
               borderRadius: BorderRadius.circular(AafiyaRadius.md),
               border: Border.all(
-                color: _isTerminal ? const Color(0xFFF87171) : const Color(0xFFFCD34D),
+                color: _isTerminal
+                    ? const Color(0xFFF87171)
+                    : const Color(0xFFFCD34D),
               ),
             ),
             child: Row(
               children: [
                 Icon(
-                  _isTerminal ? Icons.error_outline : Icons.warning_amber_rounded,
-                  color: _isTerminal ? const Color(0xFFDC2626) : const Color(0xFFD97706),
+                  _isTerminal
+                      ? Icons.error_outline
+                      : Icons.warning_amber_rounded,
+                  color: _isTerminal
+                      ? const Color(0xFFDC2626)
+                      : const Color(0xFFD97706),
                   size: 20,
                 ),
                 const SizedBox(width: AafiyaSpacing.sm),
@@ -379,7 +391,9 @@ class _SharedRecordViewerSheetState extends State<SharedRecordViewerSheet> {
                   child: Text(
                     _errorMessage!,
                     style: AafiyaTypography.bodySmall.copyWith(
-                      color: _isTerminal ? const Color(0xFF991B1B) : const Color(0xFF92400E),
+                      color: _isTerminal
+                          ? const Color(0xFF991B1B)
+                          : const Color(0xFF92400E),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -409,7 +423,8 @@ class _SharedRecordViewerSheetState extends State<SharedRecordViewerSheet> {
                       height: 22,
                       child: CircularProgressIndicator(
                         strokeWidth: 2.5,
-                        valueColor: AlwaysStoppedAnimation<Color>(AafiyaColors.pureWhite),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                            AafiyaColors.pureWhite),
                       ),
                     )
                   : Text(
@@ -446,11 +461,13 @@ class _SharedRecordViewerSheetState extends State<SharedRecordViewerSheet> {
           ),
           child: Row(
             children: [
-              const Icon(Icons.verified_outlined, color: Color(0xFF16A34A), size: 20),
+              const Icon(Icons.verified_outlined,
+                  color: Color(0xFF16A34A), size: 20),
               const SizedBox(width: AafiyaSpacing.sm),
               Expanded(
                 child: Text(
-                  metadata.authorizedClinicalScope ?? strings.sharedRecordSecurityNotice,
+                  metadata.authorizedClinicalScope ??
+                      strings.sharedRecordSecurityNotice,
                   style: AafiyaTypography.bodySmall.copyWith(
                     color: const Color(0xFF166534),
                     fontWeight: FontWeight.w600,
@@ -487,15 +504,19 @@ class _SharedRecordViewerSheetState extends State<SharedRecordViewerSheet> {
                   spacing: AafiyaSpacing.md,
                   runSpacing: AafiyaSpacing.xs,
                   children: [
-                    Text('MRN: ${patient.mrn}', style: AafiyaTypography.bodySmall),
+                    Text('MRN: ${patient.mrn}',
+                        style: AafiyaTypography.bodySmall),
                     if (patient.gender != null)
-                      Text('${strings.isArabic ? "الجنس" : "Gender"}: ${patient.gender}',
+                      Text(
+                          '${strings.isArabic ? "الجنس" : "Gender"}: ${patient.gender}',
                           style: AafiyaTypography.bodySmall),
                     if (patient.bloodGroup != null)
-                      Text('${strings.isArabic ? "فصيلة الدم" : "Blood"}: ${patient.bloodGroup}',
+                      Text(
+                          '${strings.isArabic ? "فصيلة الدم" : "Blood"}: ${patient.bloodGroup}',
                           style: AafiyaTypography.bodySmall),
                     if (patient.dateOfBirth != null)
-                      Text('${strings.isArabic ? "تاريخ الميلاد" : "DOB"}: ${patient.dateOfBirth}',
+                      Text(
+                          '${strings.isArabic ? "تاريخ الميلاد" : "DOB"}: ${patient.dateOfBirth}',
                           style: AafiyaTypography.bodySmall),
                   ],
                 ),
@@ -539,7 +560,8 @@ class _SharedRecordViewerSheetState extends State<SharedRecordViewerSheet> {
           ),
         ] else ...[
           // Allergies Section
-          _buildSectionHeader(Icons.warning_amber_rounded, strings.sharedRecordAllergiesTitle),
+          _buildSectionHeader(
+              Icons.warning_amber_rounded, strings.sharedRecordAllergiesTitle),
           const SizedBox(height: AafiyaSpacing.sm),
           if (patient.allergies.isEmpty)
             _buildEmptyItem(strings.sharedRecordNoAllergies)
@@ -553,7 +575,8 @@ class _SharedRecordViewerSheetState extends State<SharedRecordViewerSheet> {
                   ),
                   child: ListTile(
                     dense: true,
-                    title: Text(allergy.allergen, style: const TextStyle(fontWeight: FontWeight.w600)),
+                    title: Text(allergy.allergen,
+                        style: const TextStyle(fontWeight: FontWeight.w600)),
                     subtitle: Text(
                       [
                         if (allergy.severity != null) allergy.severity,
@@ -566,7 +589,8 @@ class _SharedRecordViewerSheetState extends State<SharedRecordViewerSheet> {
           const SizedBox(height: AafiyaSpacing.lg),
 
           // Chronic Conditions Section
-          _buildSectionHeader(Icons.healing_outlined, strings.sharedRecordConditionsTitle),
+          _buildSectionHeader(
+              Icons.healing_outlined, strings.sharedRecordConditionsTitle),
           const SizedBox(height: AafiyaSpacing.sm),
           if (patient.chronicConditions.isEmpty)
             _buildEmptyItem(strings.sharedRecordNoConditions)
@@ -580,12 +604,15 @@ class _SharedRecordViewerSheetState extends State<SharedRecordViewerSheet> {
                   ),
                   child: ListTile(
                     dense: true,
-                    title: Text(condition.conditionName, style: const TextStyle(fontWeight: FontWeight.w600)),
+                    title: Text(condition.conditionName,
+                        style: const TextStyle(fontWeight: FontWeight.w600)),
                     subtitle: Text(
                       [
-                        if (condition.icd10Code != null) 'ICD: ${condition.icd10Code}',
+                        if (condition.icd10Code != null)
+                          'ICD: ${condition.icd10Code}',
                         if (condition.status != null) condition.status,
-                        if (condition.diagnosedDate != null) condition.diagnosedDate,
+                        if (condition.diagnosedDate != null)
+                          condition.diagnosedDate,
                       ].join(' • '),
                     ),
                   ),
@@ -593,7 +620,8 @@ class _SharedRecordViewerSheetState extends State<SharedRecordViewerSheet> {
           const SizedBox(height: AafiyaSpacing.lg),
 
           // Current Medications Section
-          _buildSectionHeader(Icons.medication_outlined, strings.sharedRecordMedicationsTitle),
+          _buildSectionHeader(
+              Icons.medication_outlined, strings.sharedRecordMedicationsTitle),
           const SizedBox(height: AafiyaSpacing.sm),
           if (patient.currentMedications.isEmpty)
             _buildEmptyItem(strings.sharedRecordNoMedications)
@@ -607,7 +635,8 @@ class _SharedRecordViewerSheetState extends State<SharedRecordViewerSheet> {
                   ),
                   child: ListTile(
                     dense: true,
-                    title: Text(med.medicationName, style: const TextStyle(fontWeight: FontWeight.w600)),
+                    title: Text(med.medicationName,
+                        style: const TextStyle(fontWeight: FontWeight.w600)),
                     subtitle: Text(
                       [
                         if (med.dosage != null) med.dosage,

@@ -140,11 +140,13 @@ class _CalendarIllustrationPainter extends CustomPainter {
     // Rings/Hangers (Navy #023E73)
     final ringPaint = Paint()..color = AafiyaColors.navy;
     canvas.drawRRect(
-      RRect.fromRectAndRadius(const Rect.fromLTWH(30, 12, 6, 16), const Radius.circular(3)),
+      RRect.fromRectAndRadius(
+          const Rect.fromLTWH(30, 12, 6, 16), const Radius.circular(3)),
       ringPaint,
     );
     canvas.drawRRect(
-      RRect.fromRectAndRadius(const Rect.fromLTWH(60, 12, 6, 16), const Radius.circular(3)),
+      RRect.fromRectAndRadius(
+          const Rect.fromLTWH(60, 12, 6, 16), const Radius.circular(3)),
       ringPaint,
     );
 

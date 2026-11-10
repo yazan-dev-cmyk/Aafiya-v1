@@ -107,38 +107,51 @@ void main() {
 
   group('AafiyaAdsTicker URL Safety Tests', () {
     test('Allows safe HTTPS external URLs', () {
-      final validation = AafiyaAdsTicker.validateTargetUrl('https://example.com/promo');
+      final validation =
+          AafiyaAdsTicker.validateTargetUrl('https://example.com/promo');
       expect(validation.isSafe, isTrue);
       expect(validation.isExternal, isTrue);
       expect(validation.url, 'https://example.com/promo');
     });
 
     test('Allows safe relative internal URLs', () {
-      final validation = AafiyaAdsTicker.validateTargetUrl('/doctors?specialty=cardio');
+      final validation =
+          AafiyaAdsTicker.validateTargetUrl('/doctors?specialty=cardio');
       expect(validation.isSafe, isTrue);
       expect(validation.isExternal, isFalse);
       expect(validation.url, '/doctors?specialty=cardio');
     });
 
     test('Rejects plain HTTP external URLs', () {
-      final validation = AafiyaAdsTicker.validateTargetUrl('http://insecure.com');
+      final validation =
+          AafiyaAdsTicker.validateTargetUrl('http://insecure.com');
       expect(validation.isSafe, isFalse);
     });
 
     test('Rejects dangerous javascript: and data: schemes', () {
-      expect(AafiyaAdsTicker.validateTargetUrl('javascript:alert(1)').isSafe, isFalse);
-      expect(AafiyaAdsTicker.validateTargetUrl('data:text/html,<script>').isSafe, isFalse);
+      expect(AafiyaAdsTicker.validateTargetUrl('javascript:alert(1)').isSafe,
+          isFalse);
+      expect(
+          AafiyaAdsTicker.validateTargetUrl('data:text/html,<script>').isSafe,
+          isFalse);
     });
 
     test('Rejects directory traversal and backslashes in internal routes', () {
-      expect(AafiyaAdsTicker.validateTargetUrl('/internal/../../etc/passwd').isSafe, isFalse);
-      expect(AafiyaAdsTicker.validateTargetUrl('/internal\\escape').isSafe, isFalse);
-      expect(AafiyaAdsTicker.validateTargetUrl('//protocol-relative.com').isSafe, isFalse);
+      expect(
+          AafiyaAdsTicker.validateTargetUrl('/internal/../../etc/passwd')
+              .isSafe,
+          isFalse);
+      expect(AafiyaAdsTicker.validateTargetUrl('/internal\\escape').isSafe,
+          isFalse);
+      expect(
+          AafiyaAdsTicker.validateTargetUrl('//protocol-relative.com').isSafe,
+          isFalse);
     });
   });
 
   group('AafiyaAdsTicker Widget Tests (Zero Mock Policy & Zero Height)', () {
-    testWidgets('Renders SizedBox.shrink (0 height) when ads list is empty', (tester) async {
+    testWidgets('Renders SizedBox.shrink (0 height) when ads list is empty',
+        (tester) async {
       await tester.pumpWidget(
         createTestWidget(
           child: Scaffold(
@@ -159,7 +172,9 @@ void main() {
       expect(find.byType(InkWell), findsNothing);
     });
 
-    testWidgets('Renders active ad campaign with sponsored badge and title in Arabic', (tester) async {
+    testWidgets(
+        'Renders active ad campaign with sponsored badge and title in Arabic',
+        (tester) async {
       AdsTickerItem? clickedAd;
 
       final testAd = AdsTickerItem(
@@ -183,7 +198,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('فحص دوري لمرضى السكري'), findsOneWidget);
-      expect(find.text('سجل الآن في برنامج المتابعة السريرية بأسعار مخفضة.'), findsOneWidget);
+      expect(find.text('سجل الآن في برنامج المتابعة السريرية بأسعار مخفضة.'),
+          findsOneWidget);
       expect(find.text('إعلان'), findsOneWidget); // Arabic sponsored label
 
       // Tap ad
@@ -194,7 +210,9 @@ void main() {
       expect(clickedAd!.id, 'ad-1');
     });
 
-    testWidgets('Renders active ad campaign in English and French with correct localization', (tester) async {
+    testWidgets(
+        'Renders active ad campaign in English and French with correct localization',
+        (tester) async {
       final testAd = AdsTickerItem(
         id: 'ad-2',
         title: 'Health Checkup',
@@ -288,7 +306,8 @@ void main() {
       expect(fetchCount, 2);
     });
 
-    test('recordClick sends POST request and parses telemetry result', () async {
+    test('recordClick sends POST request and parses telemetry result',
+        () async {
       final mockClient = MockClient((request) async {
         if (request.url.path == '/api/v1/ads/ticker/ad-test-99/click') {
           expect(request.method, 'POST');

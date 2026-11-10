@@ -97,7 +97,8 @@ class _KhatamPainter extends CustomPainter {
 
         // Square 1: unrotated
         canvas.drawRect(
-          Rect.fromCenter(center: Offset(cx, cy), width: rectSize, height: rectSize),
+          Rect.fromCenter(
+              center: Offset(cx, cy), width: rectSize, height: rectSize),
           paint,
         );
 
@@ -106,7 +107,8 @@ class _KhatamPainter extends CustomPainter {
         canvas.translate(cx, cy);
         canvas.rotate(45 * math.pi / 180);
         canvas.drawRect(
-          Rect.fromCenter(center: Offset.zero, width: rectSize, height: rectSize),
+          Rect.fromCenter(
+              center: Offset.zero, width: rectSize, height: rectSize),
           paint,
         );
         canvas.restore();

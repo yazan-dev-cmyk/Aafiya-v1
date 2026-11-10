@@ -67,27 +67,46 @@ void main() {
       expect(AafiyaSpacing.insetAllMd, equals(const EdgeInsets.all(16.0)));
       expect(AafiyaSpacing.insetAllLg, equals(const EdgeInsets.all(24.0)));
       expect(AafiyaSpacing.insetAllXl, equals(const EdgeInsets.all(32.0)));
-      expect(AafiyaSpacing.insetScreen, equals(const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0)));
+      expect(AafiyaSpacing.insetScreen,
+          equals(const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0)));
       expect(AafiyaSpacing.insetCard, equals(const EdgeInsets.all(16.0)));
     });
 
     test('directional insets provide logical start/end values', () {
-      expect(AafiyaSpacing.insetDirectionalAllXs, equals(const EdgeInsetsDirectional.all(4.0)));
-      expect(AafiyaSpacing.insetDirectionalAllSm, equals(const EdgeInsetsDirectional.all(8.0)));
-      expect(AafiyaSpacing.insetDirectionalAllMd, equals(const EdgeInsetsDirectional.all(16.0)));
-      expect(AafiyaSpacing.insetDirectionalAllLg, equals(const EdgeInsetsDirectional.all(24.0)));
-      expect(AafiyaSpacing.insetDirectionalAllXl, equals(const EdgeInsetsDirectional.all(32.0)));
-      expect(AafiyaSpacing.insetDirectionalScreen, equals(const EdgeInsetsDirectional.symmetric(horizontal: 16.0, vertical: 8.0)));
-      expect(AafiyaSpacing.insetDirectionalCard, equals(const EdgeInsetsDirectional.all(16.0)));
-      expect(AafiyaSpacing.insetHorizontalSm, equals(const EdgeInsetsDirectional.symmetric(horizontal: 8.0)));
-      expect(AafiyaSpacing.insetHorizontalMd, equals(const EdgeInsetsDirectional.symmetric(horizontal: 16.0)));
-      expect(AafiyaSpacing.insetHorizontalLg, equals(const EdgeInsetsDirectional.symmetric(horizontal: 24.0)));
-      expect(AafiyaSpacing.insetStartSm, equals(const EdgeInsetsDirectional.only(start: 8.0)));
-      expect(AafiyaSpacing.insetStartMd, equals(const EdgeInsetsDirectional.only(start: 16.0)));
-      expect(AafiyaSpacing.insetStartLg, equals(const EdgeInsetsDirectional.only(start: 24.0)));
-      expect(AafiyaSpacing.insetEndSm, equals(const EdgeInsetsDirectional.only(end: 8.0)));
-      expect(AafiyaSpacing.insetEndMd, equals(const EdgeInsetsDirectional.only(end: 16.0)));
-      expect(AafiyaSpacing.insetEndLg, equals(const EdgeInsetsDirectional.only(end: 24.0)));
+      expect(AafiyaSpacing.insetDirectionalAllXs,
+          equals(const EdgeInsetsDirectional.all(4.0)));
+      expect(AafiyaSpacing.insetDirectionalAllSm,
+          equals(const EdgeInsetsDirectional.all(8.0)));
+      expect(AafiyaSpacing.insetDirectionalAllMd,
+          equals(const EdgeInsetsDirectional.all(16.0)));
+      expect(AafiyaSpacing.insetDirectionalAllLg,
+          equals(const EdgeInsetsDirectional.all(24.0)));
+      expect(AafiyaSpacing.insetDirectionalAllXl,
+          equals(const EdgeInsetsDirectional.all(32.0)));
+      expect(
+          AafiyaSpacing.insetDirectionalScreen,
+          equals(const EdgeInsetsDirectional.symmetric(
+              horizontal: 16.0, vertical: 8.0)));
+      expect(AafiyaSpacing.insetDirectionalCard,
+          equals(const EdgeInsetsDirectional.all(16.0)));
+      expect(AafiyaSpacing.insetHorizontalSm,
+          equals(const EdgeInsetsDirectional.symmetric(horizontal: 8.0)));
+      expect(AafiyaSpacing.insetHorizontalMd,
+          equals(const EdgeInsetsDirectional.symmetric(horizontal: 16.0)));
+      expect(AafiyaSpacing.insetHorizontalLg,
+          equals(const EdgeInsetsDirectional.symmetric(horizontal: 24.0)));
+      expect(AafiyaSpacing.insetStartSm,
+          equals(const EdgeInsetsDirectional.only(start: 8.0)));
+      expect(AafiyaSpacing.insetStartMd,
+          equals(const EdgeInsetsDirectional.only(start: 16.0)));
+      expect(AafiyaSpacing.insetStartLg,
+          equals(const EdgeInsetsDirectional.only(start: 24.0)));
+      expect(AafiyaSpacing.insetEndSm,
+          equals(const EdgeInsetsDirectional.only(end: 8.0)));
+      expect(AafiyaSpacing.insetEndMd,
+          equals(const EdgeInsetsDirectional.only(end: 16.0)));
+      expect(AafiyaSpacing.insetEndLg,
+          equals(const EdgeInsetsDirectional.only(end: 24.0)));
     });
 
     test('gap constants have matching width and height dimensions', () {
@@ -129,15 +148,41 @@ void main() {
       expect(AafiyaRadius.borderPill, equals(BorderRadius.circular(999.0)));
     });
 
-    test('directional border radius tokens have correct start and end orientations', () {
-      expect(AafiyaRadius.directionalSmStart, equals(const BorderRadiusDirectional.horizontal(start: Radius.circular(4.0))));
-      expect(AafiyaRadius.directionalSmEnd, equals(const BorderRadiusDirectional.horizontal(end: Radius.circular(4.0))));
-      expect(AafiyaRadius.directionalMdStart, equals(const BorderRadiusDirectional.horizontal(start: Radius.circular(8.0))));
-      expect(AafiyaRadius.directionalMdEnd, equals(const BorderRadiusDirectional.horizontal(end: Radius.circular(8.0))));
-      expect(AafiyaRadius.directionalLgStart, equals(const BorderRadiusDirectional.horizontal(start: Radius.circular(12.0))));
-      expect(AafiyaRadius.directionalLgEnd, equals(const BorderRadiusDirectional.horizontal(end: Radius.circular(12.0))));
-      expect(AafiyaRadius.directionalXlStart, equals(const BorderRadiusDirectional.horizontal(start: Radius.circular(16.0))));
-      expect(AafiyaRadius.directionalXlEnd, equals(const BorderRadiusDirectional.horizontal(end: Radius.circular(16.0))));
+    test(
+        'directional border radius tokens have correct start and end orientations',
+        () {
+      expect(
+          AafiyaRadius.directionalSmStart,
+          equals(const BorderRadiusDirectional.horizontal(
+              start: Radius.circular(4.0))));
+      expect(
+          AafiyaRadius.directionalSmEnd,
+          equals(const BorderRadiusDirectional.horizontal(
+              end: Radius.circular(4.0))));
+      expect(
+          AafiyaRadius.directionalMdStart,
+          equals(const BorderRadiusDirectional.horizontal(
+              start: Radius.circular(8.0))));
+      expect(
+          AafiyaRadius.directionalMdEnd,
+          equals(const BorderRadiusDirectional.horizontal(
+              end: Radius.circular(8.0))));
+      expect(
+          AafiyaRadius.directionalLgStart,
+          equals(const BorderRadiusDirectional.horizontal(
+              start: Radius.circular(12.0))));
+      expect(
+          AafiyaRadius.directionalLgEnd,
+          equals(const BorderRadiusDirectional.horizontal(
+              end: Radius.circular(12.0))));
+      expect(
+          AafiyaRadius.directionalXlStart,
+          equals(const BorderRadiusDirectional.horizontal(
+              start: Radius.circular(16.0))));
+      expect(
+          AafiyaRadius.directionalXlEnd,
+          equals(const BorderRadiusDirectional.horizontal(
+              end: Radius.circular(16.0))));
     });
   });
 
@@ -147,7 +192,9 @@ void main() {
       expect(AafiyaTypography.package, equals('aafiya_ui'));
     });
 
-    test('all text styles bind to IBMPlexSansArabic font family and aafiya_ui package', () {
+    test(
+        'all text styles bind to IBMPlexSansArabic font family and aafiya_ui package',
+        () {
       final styles = [
         AafiyaTypography.displayLarge,
         AafiyaTypography.displayMedium,
@@ -176,16 +223,20 @@ void main() {
       expect(AafiyaTypography.displayLarge.fontWeight, equals(FontWeight.bold));
 
       expect(AafiyaTypography.displayMedium.fontSize, equals(24.0));
-      expect(AafiyaTypography.displayMedium.fontWeight, equals(FontWeight.bold));
+      expect(
+          AafiyaTypography.displayMedium.fontWeight, equals(FontWeight.bold));
 
       expect(AafiyaTypography.headlineLarge.fontSize, equals(24.0));
-      expect(AafiyaTypography.headlineLarge.fontWeight, equals(FontWeight.w700));
+      expect(
+          AafiyaTypography.headlineLarge.fontWeight, equals(FontWeight.w700));
 
       expect(AafiyaTypography.headlineMedium.fontSize, equals(22.0));
-      expect(AafiyaTypography.headlineMedium.fontWeight, equals(FontWeight.w700));
+      expect(
+          AafiyaTypography.headlineMedium.fontWeight, equals(FontWeight.w700));
 
       expect(AafiyaTypography.headlineSmall.fontSize, equals(20.0));
-      expect(AafiyaTypography.headlineSmall.fontWeight, equals(FontWeight.w700));
+      expect(
+          AafiyaTypography.headlineSmall.fontWeight, equals(FontWeight.w700));
 
       expect(AafiyaTypography.titleLarge.fontSize, equals(18.0));
       expect(AafiyaTypography.titleLarge.fontWeight, equals(FontWeight.w600));
@@ -218,61 +269,107 @@ void main() {
       expect(AafiyaTypography.caption.fontWeight, equals(FontWeight.normal));
     });
 
-    test('textTheme getter produces full Material 3 text theme with IBMPlexSansArabic', () {
+    test(
+        'textTheme getter produces full Material 3 text theme with IBMPlexSansArabic',
+        () {
       final textTheme = AafiyaTypography.textTheme;
-      expect(textTheme.displayLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
-      expect(textTheme.displayMedium?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
-      expect(textTheme.headlineLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
-      expect(textTheme.headlineMedium?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
-      expect(textTheme.headlineSmall?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
-      expect(textTheme.titleLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
-      expect(textTheme.titleMedium?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
-      expect(textTheme.titleSmall?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
-      expect(textTheme.bodyLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
-      expect(textTheme.bodyMedium?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
-      expect(textTheme.bodySmall?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
-      expect(textTheme.labelLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
-      expect(textTheme.labelMedium?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
-      expect(textTheme.labelSmall?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(textTheme.displayLarge?.fontFamily?.contains('IBMPlexSansArabic'),
+          isTrue);
+      expect(textTheme.displayMedium?.fontFamily?.contains('IBMPlexSansArabic'),
+          isTrue);
+      expect(textTheme.headlineLarge?.fontFamily?.contains('IBMPlexSansArabic'),
+          isTrue);
+      expect(
+          textTheme.headlineMedium?.fontFamily?.contains('IBMPlexSansArabic'),
+          isTrue);
+      expect(textTheme.headlineSmall?.fontFamily?.contains('IBMPlexSansArabic'),
+          isTrue);
+      expect(textTheme.titleLarge?.fontFamily?.contains('IBMPlexSansArabic'),
+          isTrue);
+      expect(textTheme.titleMedium?.fontFamily?.contains('IBMPlexSansArabic'),
+          isTrue);
+      expect(textTheme.titleSmall?.fontFamily?.contains('IBMPlexSansArabic'),
+          isTrue);
+      expect(textTheme.bodyLarge?.fontFamily?.contains('IBMPlexSansArabic'),
+          isTrue);
+      expect(textTheme.bodyMedium?.fontFamily?.contains('IBMPlexSansArabic'),
+          isTrue);
+      expect(textTheme.bodySmall?.fontFamily?.contains('IBMPlexSansArabic'),
+          isTrue);
+      expect(textTheme.labelLarge?.fontFamily?.contains('IBMPlexSansArabic'),
+          isTrue);
+      expect(textTheme.labelMedium?.fontFamily?.contains('IBMPlexSansArabic'),
+          isTrue);
+      expect(textTheme.labelSmall?.fontFamily?.contains('IBMPlexSansArabic'),
+          isTrue);
     });
 
-    test('darkTextTheme getter produces text theme with dark-mode colors and IBMPlexSansArabic', () {
+    test(
+        'darkTextTheme getter produces text theme with dark-mode colors and IBMPlexSansArabic',
+        () {
       final darkTextTheme = AafiyaTypography.darkTextTheme;
-      expect(darkTextTheme.displayLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
-      expect(darkTextTheme.displayLarge?.color, equals(AafiyaColors.darkPrimaryText));
-      expect(darkTextTheme.titleLarge?.color, equals(AafiyaColors.darkPrimaryText));
-      expect(darkTextTheme.bodyLarge?.color, equals(AafiyaColors.darkPrimaryText));
-      expect(darkTextTheme.bodyMedium?.color, equals(AafiyaColors.darkSecondaryText));
+      expect(
+          darkTextTheme.displayLarge?.fontFamily?.contains('IBMPlexSansArabic'),
+          isTrue);
+      expect(darkTextTheme.displayLarge?.color,
+          equals(AafiyaColors.darkPrimaryText));
+      expect(darkTextTheme.titleLarge?.color,
+          equals(AafiyaColors.darkPrimaryText));
+      expect(
+          darkTextTheme.bodyLarge?.color, equals(AafiyaColors.darkPrimaryText));
+      expect(darkTextTheme.bodyMedium?.color,
+          equals(AafiyaColors.darkSecondaryText));
     });
   });
 
   group('AafiyaTheme Configuration', () {
-    test('lightTheme contains official brand colors, IBMPlexSansArabic font, and textTheme', () {
+    test(
+        'lightTheme contains official brand colors, IBMPlexSansArabic font, and textTheme',
+        () {
       final theme = AafiyaTheme.lightTheme;
-      expect(theme.textTheme.bodyLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
-      expect(theme.textTheme.titleLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(
+          theme.textTheme.bodyLarge?.fontFamily?.contains('IBMPlexSansArabic'),
+          isTrue);
+      expect(
+          theme.textTheme.titleLarge?.fontFamily?.contains('IBMPlexSansArabic'),
+          isTrue);
       expect(theme.colorScheme.primary, equals(AafiyaColors.healthBlue));
       expect(theme.colorScheme.secondary, equals(AafiyaColors.healingGreen));
-      expect(theme.colorScheme.onSecondary, equals(AafiyaColors.onHealingGreen));
-      expect(theme.scaffoldBackgroundColor, equals(AafiyaColors.lightBackground));
-      expect(theme.inputDecorationTheme.contentPadding, equals(const EdgeInsetsDirectional.symmetric(horizontal: 16, vertical: 14)));
+      expect(
+          theme.colorScheme.onSecondary, equals(AafiyaColors.onHealingGreen));
+      expect(
+          theme.scaffoldBackgroundColor, equals(AafiyaColors.lightBackground));
+      expect(
+          theme.inputDecorationTheme.contentPadding,
+          equals(const EdgeInsetsDirectional.symmetric(
+              horizontal: 16, vertical: 14)));
     });
 
-    test('darkTheme contains dark surfaces, IBMPlexSansArabic font, and dark textTheme', () {
+    test(
+        'darkTheme contains dark surfaces, IBMPlexSansArabic font, and dark textTheme',
+        () {
       final theme = AafiyaTheme.darkTheme;
-      expect(theme.textTheme.bodyLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
-      expect(theme.textTheme.titleLarge?.fontFamily?.contains('IBMPlexSansArabic'), isTrue);
+      expect(
+          theme.textTheme.bodyLarge?.fontFamily?.contains('IBMPlexSansArabic'),
+          isTrue);
+      expect(
+          theme.textTheme.titleLarge?.fontFamily?.contains('IBMPlexSansArabic'),
+          isTrue);
       expect(theme.colorScheme.primary, equals(AafiyaColors.healthBlue));
       expect(theme.colorScheme.secondary, equals(AafiyaColors.healingGreen));
-      expect(theme.colorScheme.onSecondary, equals(AafiyaColors.onHealingGreen));
-      expect(theme.scaffoldBackgroundColor, equals(AafiyaColors.darkBackground));
+      expect(
+          theme.colorScheme.onSecondary, equals(AafiyaColors.onHealingGreen));
+      expect(
+          theme.scaffoldBackgroundColor, equals(AafiyaColors.darkBackground));
       expect(theme.colorScheme.surface, equals(AafiyaColors.darkSurface));
-      expect(theme.textTheme.titleLarge?.color, equals(AafiyaColors.darkPrimaryText));
+      expect(theme.textTheme.titleLarge?.color,
+          equals(AafiyaColors.darkPrimaryText));
     });
   });
 
   group('RTL Geometry Resolution', () {
-    test('EdgeInsetsDirectional resolves start to right in RTL and left in LTR', () {
+    test('EdgeInsetsDirectional resolves start to right in RTL and left in LTR',
+        () {
       const insetsStart = AafiyaSpacing.insetStartMd;
 
       final resolvedRtl = insetsStart.resolve(TextDirection.rtl);
@@ -294,7 +391,9 @@ void main() {
       expect(resolvedEndLtr.left, equals(0.0));
     });
 
-    test('BorderRadiusDirectional resolves start corner correctly in RTL and LTR', () {
+    test(
+        'BorderRadiusDirectional resolves start corner correctly in RTL and LTR',
+        () {
       const radiusStart = AafiyaRadius.directionalMdStart;
 
       final resolvedRtl = radiusStart.resolve(TextDirection.rtl);
@@ -310,7 +409,9 @@ void main() {
       expect(resolvedLtr.bottomRight, equals(Radius.zero));
     });
 
-    testWidgets('Padding widget with EdgeInsetsDirectional renders properly in RTL', (tester) async {
+    testWidgets(
+        'Padding widget with EdgeInsetsDirectional renders properly in RTL',
+        (tester) async {
       await tester.pumpWidget(
         const Directionality(
           textDirection: TextDirection.rtl,
@@ -349,7 +450,9 @@ void main() {
       expect(tapped, isTrue);
     });
 
-    testWidgets('AafiyaButton secondary variant uses accessible onHealingGreen foreground', (tester) async {
+    testWidgets(
+        'AafiyaButton secondary variant uses accessible onHealingGreen foreground',
+        (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: AafiyaTheme.lightTheme,
@@ -365,11 +468,15 @@ void main() {
 
       final button = tester.widget<ElevatedButton>(find.byType(ElevatedButton));
       final style = button.style!;
-      expect(style.backgroundColor?.resolve({}), equals(AafiyaColors.healingGreen));
-      expect(style.foregroundColor?.resolve({}), equals(AafiyaColors.onHealingGreen));
+      expect(style.backgroundColor?.resolve({}),
+          equals(AafiyaColors.healingGreen));
+      expect(style.foregroundColor?.resolve({}),
+          equals(AafiyaColors.onHealingGreen));
     });
 
-    testWidgets('AafiyaButton action variant uses accessible actionGreen background with pureWhite foreground', (tester) async {
+    testWidgets(
+        'AafiyaButton action variant uses accessible actionGreen background with pureWhite foreground',
+        (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: AafiyaTheme.lightTheme,
@@ -385,8 +492,10 @@ void main() {
 
       final button = tester.widget<ElevatedButton>(find.byType(ElevatedButton));
       final style = button.style!;
-      expect(style.backgroundColor?.resolve({}), equals(AafiyaColors.actionGreen));
-      expect(style.foregroundColor?.resolve({}), equals(AafiyaColors.pureWhite));
+      expect(
+          style.backgroundColor?.resolve({}), equals(AafiyaColors.actionGreen));
+      expect(
+          style.foregroundColor?.resolve({}), equals(AafiyaColors.pureWhite));
     });
 
     testWidgets('AafiyaCard renders child content with border', (tester) async {
@@ -404,7 +513,8 @@ void main() {
       expect(find.text('Card Content'), findsOneWidget);
     });
 
-    testWidgets('AafiyaAppBar renders in RTL directionality correctly', (tester) async {
+    testWidgets('AafiyaAppBar renders in RTL directionality correctly',
+        (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: AafiyaTheme.lightTheme,
@@ -421,7 +531,9 @@ void main() {
       expect(find.text('عافية'), findsOneWidget);
     });
 
-    testWidgets('AafiyaButton with isLocked displays lock icon and shows notice on tap', (tester) async {
+    testWidgets(
+        'AafiyaButton with isLocked displays lock icon and shows notice on tap',
+        (tester) async {
       bool tapped = false;
       await tester.pumpWidget(
         MaterialApp(
@@ -453,10 +565,13 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(tapped, isFalse);
-      expect(find.text('هذه الميزة مغلقة حاليًا لأسباب إدارية وتنظيمية.'), findsOneWidget);
+      expect(find.text('هذه الميزة مغلقة حاليًا لأسباب إدارية وتنظيمية.'),
+          findsOneWidget);
     });
 
-    testWidgets('AafiyaLockedButton displays lock icon and shows notice on tap in English', (tester) async {
+    testWidgets(
+        'AafiyaLockedButton displays lock icon and shows notice on tap in English',
+        (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           locale: const Locale('en'),
@@ -483,12 +598,14 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        find.text('This feature is currently unavailable for administrative and organizational reasons.'),
+        find.text(
+            'This feature is currently unavailable for administrative and organizational reasons.'),
         findsOneWidget,
       );
     });
 
-    testWidgets('AafiyaLockedAction wraps child and intercepts tap in French', (tester) async {
+    testWidgets('AafiyaLockedAction wraps child and intercepts tap in French',
+        (tester) async {
       bool innerTapped = false;
       await tester.pumpWidget(
         MaterialApp(
@@ -522,10 +639,10 @@ void main() {
 
       expect(innerTapped, isFalse);
       expect(
-        find.text('Cette fonctionnalité est temporairement désactivée pour des raisons administratives et organisationnelles.'),
+        find.text(
+            'Cette fonctionnalité est temporairement désactivée pour des raisons administratives et organisationnelles.'),
         findsOneWidget,
       );
     });
   });
 }
-

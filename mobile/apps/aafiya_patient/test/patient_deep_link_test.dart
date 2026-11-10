@@ -85,124 +85,182 @@ void main() {
   // =========================================================================
   group('1. PatientDeepLinkRouter Pure Dart Parser Tests', () {
     test('parses canonical prescription URI', () {
-      final dest = PatientDeepLinkRouter.parse('aafiya://prescription/$validToken');
+      final dest =
+          PatientDeepLinkRouter.parse('aafiya://prescription/$validToken');
       expect(dest, isA<PrescriptionVerificationDestination>());
-      expect((dest as PrescriptionVerificationDestination).token, equals(validToken));
+      expect((dest as PrescriptionVerificationDestination).token,
+          equals(validToken));
     });
 
     test('parses canonical appointment URI', () {
-      final dest = PatientDeepLinkRouter.parse('aafiya://appointment/$validUuid');
+      final dest =
+          PatientDeepLinkRouter.parse('aafiya://appointment/$validUuid');
       expect(dest, isA<AppointmentDetailsDestination>());
-      expect((dest as AppointmentDetailsDestination).appointmentId, equals(validUuid));
+      expect((dest as AppointmentDetailsDestination).appointmentId,
+          equals(validUuid));
     });
 
     test('parses plural prescription alias', () {
-      final dest = PatientDeepLinkRouter.parse('aafiya://prescriptions/$validToken');
+      final dest =
+          PatientDeepLinkRouter.parse('aafiya://prescriptions/$validToken');
       expect(dest, isA<PrescriptionVerificationDestination>());
-      expect((dest as PrescriptionVerificationDestination).token, equals(validToken));
+      expect((dest as PrescriptionVerificationDestination).token,
+          equals(validToken));
     });
 
     test('parses plural appointment alias', () {
-      final dest = PatientDeepLinkRouter.parse('aafiya://appointments/$validUuid');
+      final dest =
+          PatientDeepLinkRouter.parse('aafiya://appointments/$validUuid');
       expect(dest, isA<AppointmentDetailsDestination>());
-      expect((dest as AppointmentDetailsDestination).appointmentId, equals(validUuid));
+      expect((dest as AppointmentDetailsDestination).appointmentId,
+          equals(validUuid));
     });
 
     test('parses path-form URIs (aafiya:///...)', () {
-      final rxDest = PatientDeepLinkRouter.parse('aafiya:///prescription/$validToken');
+      final rxDest =
+          PatientDeepLinkRouter.parse('aafiya:///prescription/$validToken');
       expect(rxDest, equals(PrescriptionVerificationDestination(validToken)));
 
-      final apptDest = PatientDeepLinkRouter.parse('aafiya:///appointment/$validUuid');
+      final apptDest =
+          PatientDeepLinkRouter.parse('aafiya:///appointment/$validUuid');
       expect(apptDest, equals(AppointmentDetailsDestination(validUuid)));
     });
 
     test('parses host-form URIs (aafiya://...)', () {
-      final rxDest = PatientDeepLinkRouter.parse('aafiya://prescription/$validToken');
+      final rxDest =
+          PatientDeepLinkRouter.parse('aafiya://prescription/$validToken');
       expect(rxDest, equals(PrescriptionVerificationDestination(validToken)));
 
-      final apptDest = PatientDeepLinkRouter.parse('aafiya://appointment/$validUuid');
+      final apptDest =
+          PatientDeepLinkRouter.parse('aafiya://appointment/$validUuid');
       expect(apptDest, equals(AppointmentDetailsDestination(validUuid)));
     });
 
     test('matches path case-insensitively', () {
-      final rxUpper = PatientDeepLinkRouter.parse('AAFIYA://PRESCRIPTION/$validToken');
+      final rxUpper =
+          PatientDeepLinkRouter.parse('AAFIYA://PRESCRIPTION/$validToken');
       expect(rxUpper, equals(PrescriptionVerificationDestination(validToken)));
 
-      final rxMixed = PatientDeepLinkRouter.parse('aafiya://Prescriptions/$validToken');
+      final rxMixed =
+          PatientDeepLinkRouter.parse('aafiya://Prescriptions/$validToken');
       expect(rxMixed, equals(PrescriptionVerificationDestination(validToken)));
 
-      final apptUpper = PatientDeepLinkRouter.parse('AAFIYA://APPOINTMENT/$validUuid');
+      final apptUpper =
+          PatientDeepLinkRouter.parse('AAFIYA://APPOINTMENT/$validUuid');
       expect(apptUpper, equals(AppointmentDetailsDestination(validUuid)));
 
-      final apptMixed = PatientDeepLinkRouter.parse('aafiya://Appointments/$validUuid');
+      final apptMixed =
+          PatientDeepLinkRouter.parse('aafiya://Appointments/$validUuid');
       expect(apptMixed, equals(AppointmentDetailsDestination(validUuid)));
 
-      final recUpper = PatientDeepLinkRouter.parse('AAFIYA://RECORD/$validToken');
+      final recUpper =
+          PatientDeepLinkRouter.parse('AAFIYA://RECORD/$validToken');
       expect(recUpper, equals(SharedRecordDestination(validToken)));
 
-      final recPlural = PatientDeepLinkRouter.parse('aafiya://records/$validToken');
+      final recPlural =
+          PatientDeepLinkRouter.parse('aafiya://records/$validToken');
       expect(recPlural, equals(SharedRecordDestination(validToken)));
 
-      final recPath = PatientDeepLinkRouter.parse('aafiya:///record/$validToken');
+      final recPath =
+          PatientDeepLinkRouter.parse('aafiya:///record/$validToken');
       expect(recPath, equals(SharedRecordDestination(validToken)));
     });
 
-    test('accepts valid prescription tokens with alphanumeric, hyphens, and underscores', () {
-      final dest1 = PatientDeepLinkRouter.parse('aafiya://prescription/token-123_ABC');
-      expect(dest1, equals(const PrescriptionVerificationDestination('token-123_ABC')));
+    test(
+        'accepts valid prescription tokens with alphanumeric, hyphens, and underscores',
+        () {
+      final dest1 =
+          PatientDeepLinkRouter.parse('aafiya://prescription/token-123_ABC');
+      expect(dest1,
+          equals(const PrescriptionVerificationDestination('token-123_ABC')));
     });
 
     test('accepts valid UUID format for appointments', () {
-      final dest = PatientDeepLinkRouter.parse('aafiya://appointment/12345678-1234-1234-1234-123456789abc');
-      expect(dest, equals(const AppointmentDetailsDestination('12345678-1234-1234-1234-123456789abc')));
+      final dest = PatientDeepLinkRouter.parse(
+          'aafiya://appointment/12345678-1234-1234-1234-123456789abc');
+      expect(
+          dest,
+          equals(const AppointmentDetailsDestination(
+              '12345678-1234-1234-1234-123456789abc')));
     });
 
     test('rejects invalid UUID formats', () {
-      expect(PatientDeepLinkRouter.parse('aafiya://appointment/not-a-uuid'), isA<UnknownDestination>());
-      expect(PatientDeepLinkRouter.parse('aafiya://appointment/12345'), isA<UnknownDestination>());
-      expect(PatientDeepLinkRouter.parse('aafiya://appointment/12345678-1234-1234-1234-123456789abz'), isA<UnknownDestination>());
+      expect(PatientDeepLinkRouter.parse('aafiya://appointment/not-a-uuid'),
+          isA<UnknownDestination>());
+      expect(PatientDeepLinkRouter.parse('aafiya://appointment/12345'),
+          isA<UnknownDestination>());
+      expect(
+          PatientDeepLinkRouter.parse(
+              'aafiya://appointment/12345678-1234-1234-1234-123456789abz'),
+          isA<UnknownDestination>());
     });
 
     test('rejects malformed prescription tokens', () {
-      expect(PatientDeepLinkRouter.parse('aafiya://prescription/token with space'), isA<UnknownDestination>());
-      expect(PatientDeepLinkRouter.parse('aafiya://prescription/token@special!'), isA<UnknownDestination>());
+      expect(
+          PatientDeepLinkRouter.parse('aafiya://prescription/token with space'),
+          isA<UnknownDestination>());
+      expect(
+          PatientDeepLinkRouter.parse('aafiya://prescription/token@special!'),
+          isA<UnknownDestination>());
     });
 
     test('rejects missing identifiers', () {
-      expect(PatientDeepLinkRouter.parse('aafiya://prescription'), isA<UnknownDestination>());
-      expect(PatientDeepLinkRouter.parse('aafiya://appointment'), isA<UnknownDestination>());
-      expect(PatientDeepLinkRouter.parse('aafiya://prescription/'), isA<UnknownDestination>());
-      expect(PatientDeepLinkRouter.parse('aafiya://appointment/'), isA<UnknownDestination>());
+      expect(PatientDeepLinkRouter.parse('aafiya://prescription'),
+          isA<UnknownDestination>());
+      expect(PatientDeepLinkRouter.parse('aafiya://appointment'),
+          isA<UnknownDestination>());
+      expect(PatientDeepLinkRouter.parse('aafiya://prescription/'),
+          isA<UnknownDestination>());
+      expect(PatientDeepLinkRouter.parse('aafiya://appointment/'),
+          isA<UnknownDestination>());
     });
 
     test('rejects unknown paths', () {
-      expect(PatientDeepLinkRouter.parse('aafiya://doctor/123'), isA<UnknownDestination>());
-      expect(PatientDeepLinkRouter.parse('aafiya://clinic/456'), isA<UnknownDestination>());
-      expect(PatientDeepLinkRouter.parse('aafiya://settings/profile'), isA<UnknownDestination>());
+      expect(PatientDeepLinkRouter.parse('aafiya://doctor/123'),
+          isA<UnknownDestination>());
+      expect(PatientDeepLinkRouter.parse('aafiya://clinic/456'),
+          isA<UnknownDestination>());
+      expect(PatientDeepLinkRouter.parse('aafiya://settings/profile'),
+          isA<UnknownDestination>());
     });
 
     test('rejects unauthorized schemes', () {
-      expect(PatientDeepLinkRouter.parse('https://prescription/$validToken'), isA<UnknownDestination>());
-      expect(PatientDeepLinkRouter.parse('http://appointment/$validUuid'), isA<UnknownDestination>());
-      expect(PatientDeepLinkRouter.parse('custom://prescription/$validToken'), isA<UnknownDestination>());
+      expect(PatientDeepLinkRouter.parse('https://prescription/$validToken'),
+          isA<UnknownDestination>());
+      expect(PatientDeepLinkRouter.parse('http://appointment/$validUuid'),
+          isA<UnknownDestination>());
+      expect(PatientDeepLinkRouter.parse('custom://prescription/$validToken'),
+          isA<UnknownDestination>());
     });
 
     test('strict whitelist: rejects query parameters', () {
-      expect(PatientDeepLinkRouter.parse('aafiya://prescription/$validToken?foo=bar'), isA<UnknownDestination>());
-      expect(PatientDeepLinkRouter.parse('aafiya://appointment/$validUuid?source=notification'), isA<UnknownDestination>());
+      expect(
+          PatientDeepLinkRouter.parse(
+              'aafiya://prescription/$validToken?foo=bar'),
+          isA<UnknownDestination>());
+      expect(
+          PatientDeepLinkRouter.parse(
+              'aafiya://appointment/$validUuid?source=notification'),
+          isA<UnknownDestination>());
     });
 
     test('strict whitelist: rejects URI fragments', () {
-      expect(PatientDeepLinkRouter.parse('aafiya://prescription/$validToken#section'), isA<UnknownDestination>());
-      expect(PatientDeepLinkRouter.parse('aafiya://appointment/$validUuid#top'), isA<UnknownDestination>());
+      expect(
+          PatientDeepLinkRouter.parse(
+              'aafiya://prescription/$validToken#section'),
+          isA<UnknownDestination>());
+      expect(PatientDeepLinkRouter.parse('aafiya://appointment/$validUuid#top'),
+          isA<UnknownDestination>());
     });
 
     test('rejects arbitrary or null URIs', () {
       expect(PatientDeepLinkRouter.parse(null), isA<UnknownDestination>());
       expect(PatientDeepLinkRouter.parse(''), isA<UnknownDestination>());
       expect(PatientDeepLinkRouter.parse('   '), isA<UnknownDestination>());
-      expect(PatientDeepLinkRouter.parse('mailto:doctor@aafiya.dz'), isA<UnknownDestination>());
-      expect(PatientDeepLinkRouter.parse('random_text_without_scheme'), isA<UnknownDestination>());
+      expect(PatientDeepLinkRouter.parse('mailto:doctor@aafiya.dz'),
+          isA<UnknownDestination>());
+      expect(PatientDeepLinkRouter.parse('random_text_without_scheme'),
+          isA<UnknownDestination>());
     });
   });
 
@@ -210,7 +268,9 @@ void main() {
   // 2. Prescription Deep Link Flow & Verification Sheet Tests
   // =========================================================================
   group('2. Prescription Deep Link Flow & Public Verification Sheet', () {
-    testWidgets('calls GET /api/v1/v/{token} and renders public verification details for unauthenticated user', (tester) async {
+    testWidgets(
+        'calls GET /api/v1/v/{token} and renders public verification details for unauthenticated user',
+        (tester) async {
       final requestedUrls = <String>[];
 
       final mockClient = MockClient((request) async {
@@ -222,8 +282,10 @@ void main() {
       });
 
       final tokenStorage = InMemoryTokenStorage();
-      final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
-      final sessionManager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
+      final apiClient =
+          ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+      final sessionManager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
 
       await tester.pumpWidget(
         AafiyaPatientApp(
@@ -235,7 +297,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Trigger prescription verification link
-      final appState = tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
+      final appState =
+          tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
       await appState.handleDeepLinkUri('aafiya://prescription/$validToken');
       await tester.pumpAndSettle();
 
@@ -243,7 +306,8 @@ void main() {
       expect(requestedUrls, contains('/api/v1/v/$validToken'));
 
       // Verify ZERO private prescription / EHR calls made
-      expect(requestedUrls.any((url) => url.contains('/prescriptions/')), isFalse);
+      expect(
+          requestedUrls.any((url) => url.contains('/prescriptions/')), isFalse);
       expect(requestedUrls.any((url) => url.contains('/patients/')), isFalse);
 
       // Verify public verification sheet content
@@ -259,7 +323,9 @@ void main() {
       expect(find.text('Paracetamol 1g'), findsOneWidget);
     });
 
-    testWidgets('renders public verification sheet identically for authenticated user without altering auth state', (tester) async {
+    testWidgets(
+        'renders public verification sheet identically for authenticated user without altering auth state',
+        (tester) async {
       final mockClient = MockClient((request) async {
         if (request.url.path == '/api/v1/v/$validToken') {
           return jsonResponse({'data': mockPublicPrescriptionJson});
@@ -268,9 +334,12 @@ void main() {
       });
 
       final tokenStorage = InMemoryTokenStorage();
-      final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
-      final sessionManager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
-      await sessionManager.setAuthenticatedUser(token: 'mock_jwt', user: testPatientUser);
+      final apiClient =
+          ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+      final sessionManager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
+      await sessionManager.setAuthenticatedUser(
+          token: 'mock_jwt', user: testPatientUser);
 
       await tester.pumpWidget(
         AafiyaPatientApp(
@@ -281,7 +350,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final appState = tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
+      final appState =
+          tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
       await appState.handleDeepLinkUri('aafiya://prescription/$validToken');
       await tester.pumpAndSettle();
 
@@ -289,7 +359,8 @@ void main() {
       expect(sessionManager.isAuthenticated, isTrue);
     });
 
-    testWidgets('displays error state when token is invalid or returns 404', (tester) async {
+    testWidgets('displays error state when token is invalid or returns 404',
+        (tester) async {
       final mockClient = MockClient((request) async {
         return jsonResponse({
           'message': 'رمز التحقق غير صالح أو لم يتم العثور على الوصفة الطبية.',
@@ -298,8 +369,10 @@ void main() {
       });
 
       final tokenStorage = InMemoryTokenStorage();
-      final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
-      final sessionManager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
+      final apiClient =
+          ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+      final sessionManager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
 
       await tester.pumpWidget(
         AafiyaPatientApp(
@@ -310,16 +383,20 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final appState = tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
+      final appState =
+          tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
       await appState.handleDeepLinkUri('aafiya://prescription/$validToken');
       await tester.pumpAndSettle();
 
       expect(find.byType(PrescriptionVerificationSheet), findsOneWidget);
-      expect(find.text('رمز التحقق غير صالح أو لم يتم العثور على الوصفة الطبية.'), findsOneWidget);
+      expect(
+          find.text('رمز التحقق غير صالح أو لم يتم العثور على الوصفة الطبية.'),
+          findsOneWidget);
       expect(find.text('إعادة المحاولة'), findsOneWidget);
     });
 
-    testWidgets('renders expired and voided prescription statuses correctly', (tester) async {
+    testWidgets('renders expired and voided prescription statuses correctly',
+        (tester) async {
       final expiredJson = Map<String, dynamic>.from(mockPublicPrescriptionJson)
         ..['verification_status'] = 'expired'
         ..['is_valid'] = true;
@@ -329,8 +406,10 @@ void main() {
       });
 
       final tokenStorage = InMemoryTokenStorage();
-      final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
-      final sessionManager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
+      final apiClient =
+          ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+      final sessionManager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
 
       await tester.pumpWidget(
         AafiyaPatientApp(
@@ -341,7 +420,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final appState = tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
+      final appState =
+          tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
       await appState.handleDeepLinkUri('aafiya://prescription/$validToken');
       await tester.pumpAndSettle();
 
@@ -353,7 +433,9 @@ void main() {
   // 3. Authenticated Appointment Deep Link Flow Tests
   // =========================================================================
   group('3. Authenticated Appointment Deep Link Flow', () {
-    testWidgets('authenticated patient navigates directly to AppointmentDetailScreen', (tester) async {
+    testWidgets(
+        'authenticated patient navigates directly to AppointmentDetailScreen',
+        (tester) async {
       final requestedUrls = <String>[];
 
       final mockClient = MockClient((request) async {
@@ -365,9 +447,12 @@ void main() {
       });
 
       final tokenStorage = InMemoryTokenStorage();
-      final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
-      final sessionManager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
-      await sessionManager.setAuthenticatedUser(token: 'mock_jwt', user: testPatientUser);
+      final apiClient =
+          ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+      final sessionManager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
+      await sessionManager.setAuthenticatedUser(
+          token: 'mock_jwt', user: testPatientUser);
 
       await tester.pumpWidget(
         AafiyaPatientApp(
@@ -378,7 +463,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final appState = tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
+      final appState =
+          tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
       await appState.handleDeepLinkUri('aafiya://appointment/$validUuid');
       await tester.pumpAndSettle();
 
@@ -388,18 +474,24 @@ void main() {
       expect(find.text('رقم الحجز: #BK-2026-789'), findsOneWidget);
     });
 
-    testWidgets('unauthorized appointment (403/404) preserves backend authorization and shows error feedback', (tester) async {
+    testWidgets(
+        'unauthorized appointment (403/404) preserves backend authorization and shows error feedback',
+        (tester) async {
       final mockClient = MockClient((request) async {
         if (request.url.path == '/api/v1/appointments/$validUuid') {
-          return jsonResponse({'message': 'غير مصرح لك بالوصول إلى هذا الموعد.'}, 403);
+          return jsonResponse(
+              {'message': 'غير مصرح لك بالوصول إلى هذا الموعد.'}, 403);
         }
         return jsonResponse({'message': 'Not found'}, 404);
       });
 
       final tokenStorage = InMemoryTokenStorage();
-      final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
-      final sessionManager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
-      await sessionManager.setAuthenticatedUser(token: 'mock_jwt', user: testPatientUser);
+      final apiClient =
+          ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+      final sessionManager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
+      await sessionManager.setAuthenticatedUser(
+          token: 'mock_jwt', user: testPatientUser);
 
       await tester.pumpWidget(
         AafiyaPatientApp(
@@ -410,7 +502,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final appState = tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
+      final appState =
+          tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
       await appState.handleDeepLinkUri('aafiya://appointment/$validUuid');
       await tester.pumpAndSettle();
 
@@ -425,7 +518,9 @@ void main() {
   // 4. Unauthenticated Appointment Flow & Volatile State Lifecycle
   // =========================================================================
   group('4. Unauthenticated Appointment Flow & Pending Lifecycle', () {
-    testWidgets('stores pending appointment in volatile memory with ZERO API calls when unauthenticated', (tester) async {
+    testWidgets(
+        'stores pending appointment in volatile memory with ZERO API calls when unauthenticated',
+        (tester) async {
       int apiCallCount = 0;
       final mockClient = MockClient((request) async {
         apiCallCount++;
@@ -433,8 +528,10 @@ void main() {
       });
 
       final tokenStorage = InMemoryTokenStorage();
-      final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
-      final sessionManager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
+      final apiClient =
+          ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+      final sessionManager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
 
       await tester.pumpWidget(
         AafiyaPatientApp(
@@ -445,7 +542,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final appState = tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
+      final appState =
+          tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
       await appState.handleDeepLinkUri('aafiya://appointment/$validUuid');
       await tester.pumpAndSettle();
 
@@ -457,17 +555,21 @@ void main() {
       expect(find.text('تسجيل الدخول'), findsWidgets);
     });
 
-    testWidgets('failed login preserves pending appointment ID', (tester) async {
+    testWidgets('failed login preserves pending appointment ID',
+        (tester) async {
       final mockClient = MockClient((request) async {
         if (request.url.path == '/api/v1/auth/login') {
-          return jsonResponse({'message': 'البريد الإلكتروني أو كلمة المرور غير صحيحة.'}, 422);
+          return jsonResponse(
+              {'message': 'البريد الإلكتروني أو كلمة المرور غير صحيحة.'}, 422);
         }
         return jsonResponse({});
       });
 
       final tokenStorage = InMemoryTokenStorage();
-      final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
-      final sessionManager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
+      final apiClient =
+          ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+      final sessionManager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
 
       await tester.pumpWidget(
         AafiyaPatientApp(
@@ -478,7 +580,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final appState = tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
+      final appState =
+          tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
       await appState.handleDeepLinkUri('aafiya://appointment/$validUuid');
       await tester.pumpAndSettle();
 
@@ -495,10 +598,13 @@ void main() {
       expect(find.byType(AppointmentDetailScreen), findsNothing);
     });
 
-    testWidgets('explicit abandonment / clearPendingAppointment clears volatile pending appointment ID', (tester) async {
+    testWidgets(
+        'explicit abandonment / clearPendingAppointment clears volatile pending appointment ID',
+        (tester) async {
       final tokenStorage = InMemoryTokenStorage();
       final apiClient = ApiClient(tokenStorage: tokenStorage);
-      final sessionManager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
+      final sessionManager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
 
       await tester.pumpWidget(
         AafiyaPatientApp(
@@ -509,7 +615,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final appState = tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
+      final appState =
+          tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
       await appState.handleDeepLinkUri('aafiya://appointment/$validUuid');
       expect(appState.pendingAppointmentId, equals(validUuid));
 
@@ -518,7 +625,9 @@ void main() {
       expect(appState.pendingAppointmentId, isNull);
     });
 
-    testWidgets('successful login consumes pending appointment atomically with exactly-once consumption', (tester) async {
+    testWidgets(
+        'successful login consumes pending appointment atomically with exactly-once consumption',
+        (tester) async {
       int appointmentFetchCount = 0;
 
       final mockClient = MockClient((request) async {
@@ -543,8 +652,10 @@ void main() {
       });
 
       final tokenStorage = InMemoryTokenStorage();
-      final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
-      final sessionManager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
+      final apiClient =
+          ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+      final sessionManager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
 
       await tester.pumpWidget(
         AafiyaPatientApp(
@@ -555,7 +666,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final appState = tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
+      final appState =
+          tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
       await appState.handleDeepLinkUri('aafiya://appointment/$validUuid');
       expect(appState.pendingAppointmentId, equals(validUuid));
 
@@ -572,11 +684,15 @@ void main() {
       expect(appointmentFetchCount, equals(1));
     });
 
-    testWidgets('TASK-06-02 session expiration clears pending appointment ID and pops stack', (tester) async {
+    testWidgets(
+        'TASK-06-02 session expiration clears pending appointment ID and pops stack',
+        (tester) async {
       final tokenStorage = InMemoryTokenStorage();
       final apiClient = ApiClient(tokenStorage: tokenStorage);
-      final sessionManager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
-      await sessionManager.setAuthenticatedUser(token: 'mock_jwt', user: testPatientUser);
+      final sessionManager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
+      await sessionManager.setAuthenticatedUser(
+          token: 'mock_jwt', user: testPatientUser);
 
       await tester.pumpWidget(
         AafiyaPatientApp(
@@ -587,7 +703,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final appState = tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
+      final appState =
+          tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
       // Store pending appointment ID
       await appState.handleDeepLinkUri('aafiya://appointment/$validUuid');
       expect(find.byType(AafiyaPatientApp), findsOneWidget);
@@ -616,8 +733,10 @@ void main() {
       });
 
       final tokenStorage = InMemoryTokenStorage();
-      final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
-      final sessionManager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
+      final apiClient =
+          ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+      final sessionManager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
 
       await tester.pumpWidget(
         AafiyaPatientApp(
@@ -632,7 +751,8 @@ void main() {
       expect(find.byType(PrescriptionVerificationSheet), findsOneWidget);
     });
 
-    testWidgets('deduplicates rapid delivery of identical deep link URI', (tester) async {
+    testWidgets('deduplicates rapid delivery of identical deep link URI',
+        (tester) async {
       int sheetPresentations = 0;
       final mockClient = MockClient((request) async {
         if (request.url.path == '/api/v1/v/$validToken') {
@@ -643,8 +763,10 @@ void main() {
       });
 
       final tokenStorage = InMemoryTokenStorage();
-      final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
-      final sessionManager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
+      final apiClient =
+          ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+      final sessionManager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
 
       await tester.pumpWidget(
         AafiyaPatientApp(
@@ -655,7 +777,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final appState = tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
+      final appState =
+          tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
 
       // Fire duplicate deliveries in rapid succession
       await appState.handleDeepLinkUri('aafiya://prescription/$validToken');
@@ -667,10 +790,12 @@ void main() {
       expect(find.byType(PrescriptionVerificationSheet), findsOneWidget);
     });
 
-    testWidgets('normal boot without deep link does not trigger routing', (tester) async {
+    testWidgets('normal boot without deep link does not trigger routing',
+        (tester) async {
       final tokenStorage = InMemoryTokenStorage();
       final apiClient = ApiClient(tokenStorage: tokenStorage);
-      final sessionManager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
+      final sessionManager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
 
       await tester.pumpWidget(
         AafiyaPatientApp(
@@ -691,24 +816,35 @@ void main() {
   // =========================================================================
   group('6. Cross-Role Defense & Security Boundaries', () {
     test('rejects Pro application routes in Patient deep-link router', () {
-      expect(PatientDeepLinkRouter.parse('aafiya://doctor/dashboard'), isA<UnknownDestination>());
-      expect(PatientDeepLinkRouter.parse('aafiya://assistant/queue'), isA<UnknownDestination>());
-      expect(PatientDeepLinkRouter.parse('aafiya://booking-center/create'), isA<UnknownDestination>());
-      expect(PatientDeepLinkRouter.parse('aafiya://pro/appointments'), isA<UnknownDestination>());
+      expect(PatientDeepLinkRouter.parse('aafiya://doctor/dashboard'),
+          isA<UnknownDestination>());
+      expect(PatientDeepLinkRouter.parse('aafiya://assistant/queue'),
+          isA<UnknownDestination>());
+      expect(PatientDeepLinkRouter.parse('aafiya://booking-center/create'),
+          isA<UnknownDestination>());
+      expect(PatientDeepLinkRouter.parse('aafiya://pro/appointments'),
+          isA<UnknownDestination>());
     });
 
-    test('UUID alone does not grant appointment authorization without backend verification', () {
+    test(
+        'UUID alone does not grant appointment authorization without backend verification',
+        () {
       // The router only produces an AppointmentDetailsDestination containing the parsed UUID.
       // It never grants access or constructs data.
-      final dest = PatientDeepLinkRouter.parse('aafiya://appointment/$validUuid');
+      final dest =
+          PatientDeepLinkRouter.parse('aafiya://appointment/$validUuid');
       expect(dest, isA<AppointmentDetailsDestination>());
-      expect((dest as AppointmentDetailsDestination).appointmentId, equals(validUuid));
+      expect((dest as AppointmentDetailsDestination).appointmentId,
+          equals(validUuid));
     });
 
-    test('public prescription token does not allow private prescription fetch', () {
-      final dest = PatientDeepLinkRouter.parse('aafiya://prescription/$validToken');
+    test('public prescription token does not allow private prescription fetch',
+        () {
+      final dest =
+          PatientDeepLinkRouter.parse('aafiya://prescription/$validToken');
       expect(dest, isA<PrescriptionVerificationDestination>());
-      expect((dest as PrescriptionVerificationDestination).token, equals(validToken));
+      expect((dest as PrescriptionVerificationDestination).token,
+          equals(validToken));
     });
   });
 
@@ -716,14 +852,18 @@ void main() {
   // 7. Localization & Directionality Tests (AR / EN / FR)
   // =========================================================================
   group('7. Localization & Directionality Tests (AR / EN / FR)', () {
-    testWidgets('renders prescription verification in Arabic with RTL directionality', (tester) async {
+    testWidgets(
+        'renders prescription verification in Arabic with RTL directionality',
+        (tester) async {
       final mockClient = MockClient((request) async {
         return jsonResponse({'data': mockPublicPrescriptionJson});
       });
 
       final tokenStorage = InMemoryTokenStorage();
-      final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
-      final sessionManager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
+      final apiClient =
+          ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+      final sessionManager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
 
       await tester.pumpWidget(
         AafiyaPatientApp(
@@ -735,12 +875,14 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final appState = tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
+      final appState =
+          tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
       await appState.handleDeepLinkUri('aafiya://prescription/$validToken');
       await tester.pumpAndSettle();
 
       expect(find.byType(PrescriptionVerificationSheet), findsOneWidget);
-      final sheetContext = tester.element(find.byType(PrescriptionVerificationSheet));
+      final sheetContext =
+          tester.element(find.byType(PrescriptionVerificationSheet));
       expect(Directionality.of(sheetContext), equals(TextDirection.rtl));
 
       expect(find.text('التحقق الرقمي (QR)'), findsOneWidget);
@@ -753,14 +895,18 @@ void main() {
       expect(find.text('تاريخ الانتهاء'), findsOneWidget);
     });
 
-    testWidgets('renders prescription verification in English with LTR directionality', (tester) async {
+    testWidgets(
+        'renders prescription verification in English with LTR directionality',
+        (tester) async {
       final mockClient = MockClient((request) async {
         return jsonResponse({'data': mockPublicPrescriptionJson});
       });
 
       final tokenStorage = InMemoryTokenStorage();
-      final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
-      final sessionManager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
+      final apiClient =
+          ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+      final sessionManager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
 
       await tester.pumpWidget(
         AafiyaPatientApp(
@@ -772,12 +918,14 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final appState = tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
+      final appState =
+          tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
       await appState.handleDeepLinkUri('aafiya://prescription/$validToken');
       await tester.pumpAndSettle();
 
       expect(find.byType(PrescriptionVerificationSheet), findsOneWidget);
-      final sheetContext = tester.element(find.byType(PrescriptionVerificationSheet));
+      final sheetContext =
+          tester.element(find.byType(PrescriptionVerificationSheet));
       expect(Directionality.of(sheetContext), equals(TextDirection.ltr));
 
       expect(find.text('QR Verification'), findsOneWidget);
@@ -790,14 +938,18 @@ void main() {
       expect(find.text('Expires on'), findsOneWidget);
     });
 
-    testWidgets('renders prescription verification in French with LTR directionality', (tester) async {
+    testWidgets(
+        'renders prescription verification in French with LTR directionality',
+        (tester) async {
       final mockClient = MockClient((request) async {
         return jsonResponse({'data': mockPublicPrescriptionJson});
       });
 
       final tokenStorage = InMemoryTokenStorage();
-      final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
-      final sessionManager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
+      final apiClient =
+          ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+      final sessionManager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
 
       await tester.pumpWidget(
         AafiyaPatientApp(
@@ -809,12 +961,14 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final appState = tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
+      final appState =
+          tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
       await appState.handleDeepLinkUri('aafiya://prescription/$validToken');
       await tester.pumpAndSettle();
 
       expect(find.byType(PrescriptionVerificationSheet), findsOneWidget);
-      final sheetContext = tester.element(find.byType(PrescriptionVerificationSheet));
+      final sheetContext =
+          tester.element(find.byType(PrescriptionVerificationSheet));
       expect(Directionality.of(sheetContext), equals(TextDirection.ltr));
 
       expect(find.text('Vérification QR'), findsOneWidget);
@@ -832,14 +986,18 @@ void main() {
   // Shared Medical Record Deep Link Tests (Parity Ingress)
   // =========================================================================
   group('Shared Medical Record Deep Link Ingress Tests', () {
-    testWidgets('unauthenticated deep link ignores token without volatile storage and shows SnackBar warning', (tester) async {
+    testWidgets(
+        'unauthenticated deep link ignores token without volatile storage and shows SnackBar warning',
+        (tester) async {
       final mockClient = MockClient((request) async {
         return jsonResponse({'message': 'Unused'}, 200);
       });
 
       final tokenStorage = InMemoryTokenStorage();
-      final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
-      final sessionManager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
+      final apiClient =
+          ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+      final sessionManager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
 
       await tester.pumpWidget(
         AafiyaPatientApp(
@@ -850,18 +1008,23 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final appState = tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
-      final handled = await appState.handleDeepLinkUri('aafiya://record/$validToken');
+      final appState =
+          tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
+      final handled =
+          await appState.handleDeepLinkUri('aafiya://record/$validToken');
       await tester.pumpAndSettle();
 
       expect(handled, isTrue);
       // Sheet should NOT be presented
       expect(find.byType(SharedRecordViewerSheet), findsNothing);
       // SnackBar should be displayed warning the user
-      expect(find.text('يرجى تسجيل الدخول أولاً ثم إعادة فتح رابط المشاركة.'), findsOneWidget);
+      expect(find.text('يرجى تسجيل الدخول أولاً ثم إعادة فتح رابط المشاركة.'),
+          findsOneWidget);
     });
 
-    testWidgets('authenticated deep link presents SharedRecordViewerSheet with initialToken', (tester) async {
+    testWidgets(
+        'authenticated deep link presents SharedRecordViewerSheet with initialToken',
+        (tester) async {
       final mockClient = MockClient((request) async {
         if (request.url.path == '/api/v1/appointments') {
           return jsonResponse({'data': []});
@@ -870,9 +1033,12 @@ void main() {
       });
 
       final tokenStorage = InMemoryTokenStorage();
-      final apiClient = ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
-      final sessionManager = AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
-      await sessionManager.setAuthenticatedUser(token: 'mock_jwt', user: testPatientUser);
+      final apiClient =
+          ApiClient(httpClient: mockClient, tokenStorage: tokenStorage);
+      final sessionManager =
+          AuthSessionManager(tokenStorage: tokenStorage, apiClient: apiClient);
+      await sessionManager.setAuthenticatedUser(
+          token: 'mock_jwt', user: testPatientUser);
 
       await tester.pumpWidget(
         AafiyaPatientApp(
@@ -883,8 +1049,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final appState = tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
-      final handled = await appState.handleDeepLinkUri('aafiya://record/$validToken');
+      final appState =
+          tester.state<AafiyaPatientAppState>(find.byType(AafiyaPatientApp));
+      final handled =
+          await appState.handleDeepLinkUri('aafiya://record/$validToken');
       await tester.pumpAndSettle();
 
       expect(handled, isTrue);

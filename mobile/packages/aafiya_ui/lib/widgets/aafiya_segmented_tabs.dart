@@ -61,12 +61,16 @@ class AafiyaSegmentedTabs<T> extends StatelessWidget {
                     minHeight: 48.0,
                     minWidth: 48.0,
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 10.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 18.0, vertical: 10.0),
                   decoration: BoxDecoration(
-                    color: isSelected ? AafiyaColors.navy : AafiyaColors.pureWhite,
+                    color:
+                        isSelected ? AafiyaColors.navy : AafiyaColors.pureWhite,
                     borderRadius: BorderRadius.circular(AafiyaRadius.pill),
                     border: Border.all(
-                      color: isSelected ? AafiyaColors.navy : AafiyaColors.lineDivider,
+                      color: isSelected
+                          ? AafiyaColors.navy
+                          : AafiyaColors.lineDivider,
                       width: 1.5,
                     ),
                   ),
@@ -78,7 +82,9 @@ class AafiyaSegmentedTabs<T> extends StatelessWidget {
                           Icon(
                             item.icon,
                             size: 16.0,
-                            color: isSelected ? AafiyaColors.pureWhite : AafiyaColors.secondaryText,
+                            color: isSelected
+                                ? AafiyaColors.pureWhite
+                                : AafiyaColors.secondaryText,
                           ),
                           const SizedBox(width: 6.0),
                         ],
@@ -86,8 +92,11 @@ class AafiyaSegmentedTabs<T> extends StatelessWidget {
                           item.label,
                           style: AafiyaTypography.titleSmall.copyWith(
                             fontSize: 14.5,
-                            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                            color: isSelected ? AafiyaColors.pureWhite : AafiyaColors.secondaryText,
+                            fontWeight:
+                                isSelected ? FontWeight.w600 : FontWeight.w500,
+                            color: isSelected
+                                ? AafiyaColors.pureWhite
+                                : AafiyaColors.secondaryText,
                           ),
                         ),
                       ],

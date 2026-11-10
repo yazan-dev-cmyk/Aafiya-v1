@@ -528,4 +528,215 @@ void main() {
       expect(find.text('تغيير الملف'), findsNothing);
     });
   });
+
+  group('AssistantRewardSummary Model — Threshold Contract Tests (FIND-03)', () {
+    test('1. Valid positive threshold is preserved and used', () {
+      final json = Map<String, dynamic>.from(sampleSummary);
+      json['payout_threshold'] = 15000.0;
+      final summary = AssistantRewardSummary.fromJson(json);
+      expect(summary.payoutThreshold, 15000.0);
+    });
+
+    test('2. Null payout_threshold is parsed as null', () {
+      final json = Map<String, dynamic>.from(sampleSummary);
+      json['payout_threshold'] = null;
+      final summary = AssistantRewardSummary.fromJson(json);
+      expect(summary.payoutThreshold, isNull);
+    });
+
+    test('3. Missing payout_threshold field defaults to null', () {
+      final json = Map<String, dynamic>.from(sampleSummary);
+      json.remove('payout_threshold');
+      final summary = AssistantRewardSummary.fromJson(json);
+      expect(summary.payoutThreshold, isNull);
+    });
+
+    test('4. Zero payout_threshold is sanitized to null', () {
+      final json = Map<String, dynamic>.from(sampleSummary);
+      json['payout_threshold'] = 0.0;
+      final summary = AssistantRewardSummary.fromJson(json);
+      expect(summary.payoutThreshold, isNull);
+    });
+
+    test('5. Negative payout_threshold is sanitized to null', () {
+      final json = Map<String, dynamic>.from(sampleSummary);
+      json['payout_threshold'] = -2500.0;
+      final summary = AssistantRewardSummary.fromJson(json);
+      expect(summary.payoutThreshold, isNull);
+    });
+  });
+
+  group('AssistantRewardsScreen — Payout Threshold Missing, Null & Invalid Handling (FIND-03)', () {
+    testWidgets('8. Mandatory null case: payout_threshold = null renders unavailable message and disables payout', (tester) async {
+      final nullThresholdSummary = Map<String, dynamic>.from(sampleSummary);
+      nullThresholdSummary['payout_threshold'] = null;
+      nullThresholdSummary['is_eligible_for_payout'] = true;
+
+      final mockClient = MockClient((request) async {
+        if (request.url.path.contains('/assistant/rewards/summary')) {
+          return http.Response(
+            jsonEncode({'status': 'success', 'data': nullThresholdSummary}),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        }
+        return http.Response(jsonEncode({'data': []}), 200, headers: {'content-type': 'application/json'});
+      });
+
+      final apiClient = ApiClient(httpClient: mockClient);
+      final sessionManager = AuthSessionManager(
+        tokenStorage: InMemoryTokenStorage('test-token'),
+        apiClient: apiClient,
+      );
+
+      await tester.pumpWidget(createTestWidget(
+        sessionManager: sessionManager,
+        apiClient: apiClient,
+      ));
+      await tester.pumpAndSettle();
+
+      // Verify strings.payoutThresholdUnavailable ('غير متاح حالياً') is displayed
+      expect(find.textContaining('غير متاح حالياً'), findsWidgets);
+
+      // Verify eligibility is NOT active
+      expect(find.byIcon(Icons.check_circle_rounded), findsNothing);
+      expect(find.byIcon(Icons.info_outline_rounded), findsWidgets);
+      expect(find.text('مؤهل للصرف المالي'), findsNothing);
+
+      // Verify no withdrawal trigger button exists in UI
+      expect(find.textContaining('طلب سحب'), findsNothing);
+      expect(find.textContaining('سحب الرصيد'), findsNothing);
+    });
+
+    testWidgets('9. Missing payout_threshold field renders unavailable state and blocks payout', (tester) async {
+      final missingThresholdSummary = Map<String, dynamic>.from(sampleSummary);
+      missingThresholdSummary.remove('payout_threshold');
+      missingThresholdSummary['is_eligible_for_payout'] = true;
+
+      final mockClient = MockClient((request) async {
+        if (request.url.path.contains('/assistant/rewards/summary')) {
+          return http.Response(
+            jsonEncode({'status': 'success', 'data': missingThresholdSummary}),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        }
+        return http.Response(jsonEncode({'data': []}), 200, headers: {'content-type': 'application/json'});
+      });
+
+      final apiClient = ApiClient(httpClient: mockClient);
+      final sessionManager = AuthSessionManager(
+        tokenStorage: InMemoryTokenStorage('test-token'),
+        apiClient: apiClient,
+      );
+
+      await tester.pumpWidget(createTestWidget(
+        sessionManager: sessionManager,
+        apiClient: apiClient,
+      ));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('غير متاح حالياً'), findsWidgets);
+      expect(find.byIcon(Icons.check_circle_rounded), findsNothing);
+      expect(find.text('مؤهل للصرف المالي'), findsNothing);
+    });
+
+    testWidgets('10. Negative and Zero payout_threshold values are rejected as invalid and block payout', (tester) async {
+      final zeroThresholdSummary = Map<String, dynamic>.from(sampleSummary);
+      zeroThresholdSummary['payout_threshold'] = 0.0;
+      zeroThresholdSummary['is_eligible_for_payout'] = true;
+
+      final mockClient = MockClient((request) async {
+        if (request.url.path.contains('/assistant/rewards/summary')) {
+          return http.Response(
+            jsonEncode({'status': 'success', 'data': zeroThresholdSummary}),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        }
+        return http.Response(jsonEncode({'data': []}), 200, headers: {'content-type': 'application/json'});
+      });
+
+      final apiClient = ApiClient(httpClient: mockClient);
+      final sessionManager = AuthSessionManager(
+        tokenStorage: InMemoryTokenStorage('test-token'),
+        apiClient: apiClient,
+      );
+
+      await tester.pumpWidget(createTestWidget(
+        sessionManager: sessionManager,
+        apiClient: apiClient,
+      ));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('غير متاح حالياً'), findsWidgets);
+      expect(find.byIcon(Icons.check_circle_rounded), findsNothing);
+      expect(find.text('مؤهل للصرف المالي'), findsNothing);
+    });
+
+    testWidgets('11. Invalid data type in threshold payload transitions to error state without enabling withdrawal', (tester) async {
+      final invalidTypeSummary = Map<String, dynamic>.from(sampleSummary);
+      invalidTypeSummary['payout_threshold'] = 'invalid_string_amount';
+
+      final mockClient = MockClient((request) async {
+        if (request.url.path.contains('/assistant/rewards/summary')) {
+          return http.Response(
+            jsonEncode({'status': 'success', 'data': invalidTypeSummary}),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        }
+        return http.Response(jsonEncode({'data': []}), 200, headers: {'content-type': 'application/json'});
+      });
+
+      final apiClient = ApiClient(httpClient: mockClient);
+      final sessionManager = AuthSessionManager(
+        tokenStorage: InMemoryTokenStorage('test-token'),
+        apiClient: apiClient,
+      );
+
+      await tester.pumpWidget(createTestWidget(
+        sessionManager: sessionManager,
+        apiClient: apiClient,
+      ));
+      await tester.pumpAndSettle();
+
+      // Screen must display error icon and message
+      expect(find.byIcon(Icons.error_outline), findsOneWidget);
+      expect(find.textContaining('Failed to parse rewards summary'), findsOneWidget);
+      // Payout is completely un-enabled
+      expect(find.byIcon(Icons.check_circle_rounded), findsNothing);
+      expect(find.text('مؤهل للصرف المالي'), findsNothing);
+    });
+
+    testWidgets('12. API error (500) displays error state and blocks withdrawal completely', (tester) async {
+      final mockClient = MockClient((request) async {
+        if (request.url.path.contains('/assistant/rewards/summary')) {
+          return http.Response(
+            jsonEncode({'status': 'error', 'message': 'Internal Server Error'}),
+            500,
+            headers: {'content-type': 'application/json'},
+          );
+        }
+        return http.Response('{}', 500);
+      });
+
+      final apiClient = ApiClient(httpClient: mockClient);
+      final sessionManager = AuthSessionManager(
+        tokenStorage: InMemoryTokenStorage('test-token'),
+        apiClient: apiClient,
+      );
+
+      await tester.pumpWidget(createTestWidget(
+        sessionManager: sessionManager,
+        apiClient: apiClient,
+      ));
+      await tester.pumpAndSettle();
+
+      expect(find.byIcon(Icons.error_outline), findsOneWidget);
+      expect(find.text('إعادة المحاولة'), findsOneWidget);
+      expect(find.text('مؤهل للصرف المالي'), findsNothing);
+      expect(find.byIcon(Icons.check_circle_rounded), findsNothing);
+    });
+  });
 }

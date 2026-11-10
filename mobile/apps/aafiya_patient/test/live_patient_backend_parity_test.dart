@@ -20,7 +20,8 @@ void main() {
   });
 
   const baseUrl = 'http://localhost:8000/api/v1';
-  const manageScriptPath = '/home/yazan/.gemini/antigravity/brain/f68d43bb-272b-4354-9f48-63a2872a6b3f/scratch/manage_test_data.php';
+  const manageScriptPath =
+      '/home/yazan/.gemini/antigravity/brain/f68d43bb-272b-4354-9f48-63a2872a6b3f/scratch/manage_test_data.php';
 
   String? authToken;
   late ApiClient apiClient;
@@ -61,7 +62,8 @@ void main() {
         }),
       );
 
-      expect(loginRes.statusCode, 200, reason: 'Live login for patient001 must succeed: ${loginRes.body}');
+      expect(loginRes.statusCode, 200,
+          reason: 'Live login for patient001 must succeed: ${loginRes.body}');
       final loginData = jsonDecode(loginRes.body) as Map<String, dynamic>;
       final dataField = loginData['data'] as Map<String, dynamic>;
       authToken = dataField['token'] as String;
@@ -86,13 +88,18 @@ void main() {
       expect(baselineRes.statusCode, 200);
       final baselineData = jsonDecode(baselineRes.body) as Map<String, dynamic>;
       final baselineItems = baselineData['data'] as List<dynamic>;
-      expect(baselineItems.length, 4, reason: 'Baseline appointments count must be exactly 4');
+      expect(baselineItems.length, 4,
+          reason: 'Baseline appointments count must be exactly 4');
 
       // 3. Create isolated test appointments
       runTag = '[E2E-FLUTTER-LIVE-${DateTime.now().millisecondsSinceEpoch}]';
-      final proc = Process.runSync('php', [manageScriptPath, 'create', runTag!]);
-      expect(proc.exitCode, 0, reason: 'Test appointment creation script must succeed: ${proc.stderr}');
-      final createdJson = jsonDecode(proc.stdout as String) as Map<String, dynamic>;
+      final proc =
+          Process.runSync('php', [manageScriptPath, 'create', runTag!]);
+      expect(proc.exitCode, 0,
+          reason:
+              'Test appointment creation script must succeed: ${proc.stderr}');
+      final createdJson =
+          jsonDecode(proc.stdout as String) as Map<String, dynamic>;
       appt1Id = createdJson['appt1']['id'] as String;
       appt2Id = createdJson['appt2']['id'] as String;
       appt2Ref = createdJson['appt2']['booking_reference'] as String;
@@ -105,8 +112,10 @@ void main() {
 
     tearDownAll(() async {
       // Cleanup all test appointments and reconcile slots
-      final cleanProc = Process.runSync('php', [manageScriptPath, 'cleanup', appt1Id ?? '', appt2Id ?? '']);
-      expect(cleanProc.exitCode, 0, reason: 'Cleanup script must succeed: ${cleanProc.stderr}');
+      final cleanProc = Process.runSync(
+          'php', [manageScriptPath, 'cleanup', appt1Id ?? '', appt2Id ?? '']);
+      expect(cleanProc.exitCode, 0,
+          reason: 'Cleanup script must succeed: ${cleanProc.stderr}');
 
       // Verify appointments returned to baseline count (4)
       if (authToken != null) {
@@ -119,14 +128,16 @@ void main() {
         );
         final verifyData = jsonDecode(verifyRes.body) as Map<String, dynamic>;
         final verifyItems = verifyData['data'] as List<dynamic>;
-        expect(verifyItems.length, 4, reason: 'Final appointments count must return exactly to 4');
+        expect(verifyItems.length, 4,
+            reason: 'Final appointments count must return exactly to 4');
       }
     });
 
     // -------------------------------------------------------------------------
     // TEST 1: FIX-PAT-01 Appointment Cancellation
     // -------------------------------------------------------------------------
-    test('1. FIX-PAT-01: Live Appointment Cancellation against Backend API', () async {
+    test('1. FIX-PAT-01: Live Appointment Cancellation against Backend API',
+        () async {
       // Verify appointment 1 starts as pending/confirmed
       final apptRes = await http.get(
         Uri.parse('$baseUrl/appointments/$appt1Id'),
@@ -136,7 +147,8 @@ void main() {
         },
       );
       expect(apptRes.statusCode, 200);
-      final apptData = (jsonDecode(apptRes.body) as Map<String, dynamic>)['data'] as Map<String, dynamic>;
+      final apptData = (jsonDecode(apptRes.body)
+          as Map<String, dynamic>)['data'] as Map<String, dynamic>;
       expect(apptData['status'], isNot('cancelled'));
 
       // Perform cancellation via ApiClient
@@ -157,7 +169,8 @@ void main() {
         },
       );
       expect(verifyApptRes.statusCode, 200);
-      final verifyApptData = (jsonDecode(verifyApptRes.body) as Map<String, dynamic>)['data'] as Map<String, dynamic>;
+      final verifyApptData = (jsonDecode(verifyApptRes.body)
+          as Map<String, dynamic>)['data'] as Map<String, dynamic>;
       expect(verifyApptData['status'], 'cancelled');
 
       final history = verifyApptData['status_history'] as List<dynamic>?;
@@ -165,28 +178,32 @@ void main() {
       final hasCancelHistory = history!.any((h) =>
           (h as Map<String, dynamic>)['to_status'] == 'cancelled' &&
           (h['reason'] as String? ?? '').contains('ظرف عائلي'));
-      expect(hasCancelHistory, isTrue, reason: 'Status history must record cancellation reason');
+      expect(hasCancelHistory, isTrue,
+          reason: 'Status history must record cancellation reason');
     });
 
     // -------------------------------------------------------------------------
     // TEST 2: TASK-PAR-PAT-02 Digital Visit Pass QR Display
     // -------------------------------------------------------------------------
-    testWidgets('2. TASK-PAR-PAT-02: Live Digital Visit Pass QR Sheet Rendering', (tester) async {
+    testWidgets(
+        '2. TASK-PAR-PAT-02: Live Digital Visit Pass QR Sheet Rendering',
+        (tester) async {
       tester.view.physicalSize = const Size(800, 1600);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
 
       // Fetch live appointment 2 data within runAsync
       final apptRes = await tester.runAsync(() => http.get(
-        Uri.parse('$baseUrl/appointments/$appt2Id'),
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $authToken',
-        },
-      ));
+            Uri.parse('$baseUrl/appointments/$appt2Id'),
+            headers: {
+              'Accept': 'application/json',
+              'Authorization': 'Bearer $authToken',
+            },
+          ));
       expect(apptRes, isNotNull);
       expect(apptRes!.statusCode, 200);
-      final apptData = (jsonDecode(apptRes.body) as Map<String, dynamic>)['data'] as Map<String, dynamic>;
+      final apptData = (jsonDecode(apptRes.body)
+          as Map<String, dynamic>)['data'] as Map<String, dynamic>;
 
       final appt = Appointment(
         id: apptData['id'] as String,
@@ -194,17 +211,25 @@ void main() {
         secureToken: apptData['secure_token'] as String?,
         status: AppointmentStatus.fromString(apptData['status'] as String),
         doctor: AppointmentDoctor(
-          id: (apptData['doctor'] as Map<String, dynamic>?)?['id'] as String? ?? '',
-          name: (apptData['doctor'] as Map<String, dynamic>?)?['name'] as String? ?? 'د. كمال عماري',
+          id: (apptData['doctor'] as Map<String, dynamic>?)?['id'] as String? ??
+              '',
+          name: (apptData['doctor'] as Map<String, dynamic>?)?['name']
+                  as String? ??
+              'د. كمال عماري',
           specialty: 'Cardiology',
         ),
         clinic: AppointmentClinic(
-          id: (apptData['clinic'] as Map<String, dynamic>?)?['id'] as String? ?? '',
-          name: (apptData['clinic'] as Map<String, dynamic>?)?['name'] as String? ?? 'عيادة النور',
+          id: (apptData['clinic'] as Map<String, dynamic>?)?['id'] as String? ??
+              '',
+          name: (apptData['clinic'] as Map<String, dynamic>?)?['name']
+                  as String? ??
+              'عيادة النور',
           wilaya: '16',
         ),
         patient: AppointmentPatient(
-          id: (apptData['patient'] as Map<String, dynamic>?)?['id'] as String? ?? '',
+          id: (apptData['patient'] as Map<String, dynamic>?)?['id']
+                  as String? ??
+              '',
           name: apptData['patient_name'] as String? ?? 'مريض اختباري 001',
         ),
         appointmentDate: apptData['appointment_date'] as String?,
@@ -215,7 +240,8 @@ void main() {
       expect(appt.secureToken!.length, 64);
 
       // Render VisitPassSheet
-      await tester.pumpWidget(createTestWidget(VisitPassSheet(appointment: appt)));
+      await tester
+          .pumpWidget(createTestWidget(VisitPassSheet(appointment: appt)));
       await tester.pump(const Duration(milliseconds: 300));
 
       // Verify QR widget is rendered
@@ -231,7 +257,8 @@ void main() {
     // -------------------------------------------------------------------------
     // TEST 3: FIX-PAT-02 Appointment Rescheduling
     // -------------------------------------------------------------------------
-    test('3. FIX-PAT-02: Live Appointment Rescheduling & No-Op Prevention', () async {
+    test('3. FIX-PAT-02: Live Appointment Rescheduling & No-Op Prevention',
+        () async {
       // 1. Fetch available capacity slots
       const clinicId = '01a084d2-021f-71eb-b09c-39d9ddce3458';
       const doctorId = '01a084d2-021e-7014-a462-b9e8efa68225';
@@ -253,8 +280,10 @@ void main() {
       final container = rawData is Map<String, dynamic> ? rawData : slotsData;
       final slotsList = (container['slots'] as List<dynamic>?) ?? [];
       expect(slotsList, isNotEmpty);
-      final hasSlot14 = slotsList.any((s) => (s as Map<String, dynamic>)['time_slot'] == '14:00');
-      expect(hasSlot14, isTrue, reason: 'Slot 14:00 must be available in capacity slots');
+      final hasSlot14 = slotsList
+          .any((s) => (s as Map<String, dynamic>)['time_slot'] == '14:00');
+      expect(hasSlot14, isTrue,
+          reason: 'Slot 14:00 must be available in capacity slots');
 
       // 2. Test No-Op rejection (same date 2026-10-28 and slot 10:00)
       final noopResult = await apiClient.post(
@@ -292,7 +321,8 @@ void main() {
         },
       );
       expect(verifyRes.statusCode, 200);
-      final updatedData = (jsonDecode(verifyRes.body) as Map<String, dynamic>)['data'] as Map<String, dynamic>;
+      final updatedData = (jsonDecode(verifyRes.body)
+          as Map<String, dynamic>)['data'] as Map<String, dynamic>;
 
       expect(updatedData['time_slot'], '14:00');
       expect(updatedData['id'], appt2Id);
@@ -301,17 +331,21 @@ void main() {
 
       final history = updatedData['status_history'] as List<dynamic>?;
       expect(history, isNotNull);
-      final hasReschedHistory = history!.any((h) =>
-          (h['reason'] as String? ?? '').contains('إعادة جدولة'));
+      final hasReschedHistory = history!
+          .any((h) => (h['reason'] as String? ?? '').contains('إعادة جدولة'));
       expect(hasReschedHistory, isTrue);
     });
 
     // -------------------------------------------------------------------------
     // TEST 4: TASK-PAR-PAT-05 & TASK-FIX-WEB-P05-PIN Medical Record Share & PIN
     // -------------------------------------------------------------------------
-    test('4. TASK-PAR-PAT-05: Live Encrypted Record Share Creation & PIN Resolution', () async {
-      final shareService = PatientShareService(apiClient, config: AppConfig.devLocal);
-      final recordService = SharedRecordService(apiClient, config: AppConfig.devLocal);
+    test(
+        '4. TASK-PAR-PAT-05: Live Encrypted Record Share Creation & PIN Resolution',
+        () async {
+      final shareService =
+          PatientShareService(apiClient, config: AppConfig.devLocal);
+      final recordService =
+          SharedRecordService(apiClient, config: AppConfig.devLocal);
 
       const testPin = '849201';
 
@@ -322,7 +356,8 @@ void main() {
       );
 
       expect(createResult, isA<ApiSuccess<PatientShareToken>>());
-      final shareTokenObj = (createResult as ApiSuccess<PatientShareToken>).data;
+      final shareTokenObj =
+          (createResult as ApiSuccess<PatientShareToken>).data;
       final rawToken = shareTokenObj.token;
 
       expect(rawToken, isNotNull);
@@ -366,8 +401,10 @@ void main() {
       );
       expect(rawResolveRes.statusCode, 200);
       final rawBody = rawResolveRes.body;
-      expect(rawBody.contains('patient001@aafiya.test'), isFalse, reason: 'Email must be omitted under data minimization');
-      expect(rawBody.contains('+213550000001'), isFalse, reason: 'Phone must be omitted under data minimization');
+      expect(rawBody.contains('patient001@aafiya.test'), isFalse,
+          reason: 'Email must be omitted under data minimization');
+      expect(rawBody.contains('+213550000001'), isFalse,
+          reason: 'Phone must be omitted under data minimization');
     });
   });
 }

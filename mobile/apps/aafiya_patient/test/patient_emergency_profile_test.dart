@@ -97,7 +97,9 @@ void main() {
     // 1. EmergencyProfileScreen Rendering Tests
     // =========================================================================
     group('1. EmergencyProfileScreen View', () {
-      testWidgets('renders blood group, chronic conditions, allergies, and emergency contacts', (tester) async {
+      testWidgets(
+          'renders blood group, chronic conditions, allergies, and emergency contacts',
+          (tester) async {
         final mockClient = MockClient((request) async {
           expect(request.url.path, endsWith('/patients/me'));
           return http.Response(
@@ -122,7 +124,8 @@ void main() {
 
         // Read-only policy notice
         expect(
-          find.text('هذا الملف مخصص للعرض في حالات الطوارئ. تعديل البيانات يتم حصراً عبر الطبيب أو العيادة المعتمدة.'),
+          find.text(
+              'هذا الملف مخصص للعرض في حالات الطوارئ. تعديل البيانات يتم حصراً عبر الطبيب أو العيادة المعتمدة.'),
           findsOneWidget,
         );
 
@@ -146,7 +149,8 @@ void main() {
         expect(find.text('متوسطة'), findsOneWidget);
 
         // Emergency Contacts Section
-        expect(find.textContaining('جهات الاتصال في حالات الطوارئ'), findsOneWidget);
+        expect(find.textContaining('جهات الاتصال في حالات الطوارئ'),
+            findsOneWidget);
         expect(find.text('أمينة براهيمي'), findsOneWidget);
         expect(find.text('جهة اتصال رئيسية'), findsOneWidget);
         expect(find.textContaining('0555112233'), findsOneWidget);
@@ -160,7 +164,9 @@ void main() {
         expect(find.text('حذف'), findsNothing);
       });
 
-      testWidgets('renders empty/clean state when no allergies or conditions exist', (tester) async {
+      testWidgets(
+          'renders empty/clean state when no allergies or conditions exist',
+          (tester) async {
         final mockClient = MockClient((request) async {
           return http.Response(
             jsonEncode({
@@ -240,7 +246,8 @@ void main() {
     // 2. Home Navigation & <= 2 Taps Requirement Tests
     // =========================================================================
     group('2. Home Shell Navigation & Emergency Access (<= 2 taps)', () {
-      testWidgets('Access to Emergency Profile from Home is exactly 1 tap', (tester) async {
+      testWidgets('Access to Emergency Profile from Home is exactly 1 tap',
+          (tester) async {
         final mockClient = MockClient((request) async {
           if (request.url.path.endsWith('/appointments')) {
             return http.Response(
@@ -312,7 +319,8 @@ void main() {
         await tester.pumpAndSettle();
       });
 
-      testWidgets('Access to Prescriptions from Home is exactly 1 tap', (tester) async {
+      testWidgets('Access to Prescriptions from Home is exactly 1 tap',
+          (tester) async {
         final mockClient = MockClient((request) async {
           if (request.url.path.endsWith('/appointments')) {
             return http.Response(jsonEncode({'data': []}), 200);

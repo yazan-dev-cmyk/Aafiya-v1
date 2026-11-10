@@ -59,7 +59,8 @@ class AafiyaTextField extends StatelessWidget {
             prefixIcon: prefixIcon,
             suffixIcon: suffixIcon,
             filled: true,
-            fillColor: enabled ? AafiyaColors.pureWhite : AafiyaColors.lightBackground,
+            fillColor:
+                enabled ? AafiyaColors.pureWhite : AafiyaColors.lightBackground,
           ),
         ),
       ],
