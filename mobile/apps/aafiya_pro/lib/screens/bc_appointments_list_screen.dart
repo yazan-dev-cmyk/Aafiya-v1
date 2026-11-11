@@ -268,6 +268,7 @@ class _BcAppointmentsListScreenState extends State<BcAppointmentsListScreen> {
     final strings = LocalizedStrings.of(context);
 
     return Scaffold(
+      backgroundColor: AafiyaColors.scaffoldBg,
       appBar: AafiyaAppBar(
         title: strings.centerAppointmentsTitle,
         showBrandMark: true,
@@ -313,6 +314,7 @@ class _BcAppointmentsListScreenState extends State<BcAppointmentsListScreen> {
             child: FilterChip(
               label: Text(entry.value),
               selected: isSelected,
+              shape: const StadiumBorder(),
               onSelected: (selected) {
                 setState(() {
                   _selectedStatus = selected ? entry.key : null;

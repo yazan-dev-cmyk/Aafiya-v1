@@ -42,7 +42,7 @@ class QueuePatientTile extends StatelessWidget {
       child: AafiyaCard(
         borderColor: isAttended
             ? AafiyaColors.healthBlue.withValues(alpha: 0.4)
-            : AafiyaColors.border,
+            : AafiyaColors.cardBorder,
         padding: AafiyaSpacing.insetAllMd,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -303,10 +303,7 @@ class QueuePatientTile extends StatelessWidget {
                             horizontal: AafiyaSpacing.sm,
                             vertical: 12,
                           ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(AafiyaRadius.sm),
-                          ),
+                          shape: const StadiumBorder(),
                         ),
                         onPressed: isProcessing ? null : onAttend,
                       ),
@@ -330,10 +327,7 @@ class QueuePatientTile extends StatelessWidget {
                             horizontal: AafiyaSpacing.sm,
                             vertical: 12,
                           ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(AafiyaRadius.sm),
-                          ),
+                          shape: const StadiumBorder(),
                         ),
                         onPressed: isProcessing ? null : onNoShow,
                       ),
@@ -345,7 +339,7 @@ class QueuePatientTile extends StatelessWidget {
             // Action Button for Pending Appointments (Confirm)
             if (isPending && onConfirm != null) ...[
               const SizedBox(height: AafiyaSpacing.md),
-              const Divider(height: 1, color: AafiyaColors.border),
+              const Divider(height: 1, color: AafiyaColors.cardBorder),
               const SizedBox(height: AafiyaSpacing.sm),
               Row(
                 children: [
@@ -371,9 +365,7 @@ class QueuePatientTile extends StatelessWidget {
                           horizontal: AafiyaSpacing.sm,
                           vertical: 12,
                         ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(AafiyaRadius.sm),
-                        ),
+                        shape: const StadiumBorder(),
                       ),
                       onPressed: isProcessing ? null : onConfirm,
                     ),

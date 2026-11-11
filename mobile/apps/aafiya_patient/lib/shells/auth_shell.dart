@@ -390,6 +390,7 @@ class _PatientAuthShellState extends State<PatientAuthShell> {
         widget.currentLocale ?? Localizations.localeOf(context);
 
     return Scaffold(
+      backgroundColor: AafiyaColors.scaffoldBg,
       appBar: AafiyaAppBar(
         title: strings.patientAppTitle,
         actions: widget.onLocaleChanged != null
@@ -425,6 +426,7 @@ class _PatientAuthShellState extends State<PatientAuthShell> {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 440),
               child: AafiyaCard(
+                borderRadius: AafiyaRadius.borderCardXl,
                 padding: AafiyaSpacing.insetAllXl,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -668,6 +670,8 @@ class _PatientAuthShellState extends State<PatientAuthShell> {
                       label: _mode == AuthMode.login
                           ? strings.signIn
                           : strings.signUp,
+                      variant: AafiyaButtonVariant.gradient,
+                      isPill: true,
                       isLoading: _isLoading,
                       height: 52.0,
                       onPressed: _isLoading

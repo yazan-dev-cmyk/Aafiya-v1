@@ -162,6 +162,7 @@ class _DoctorShellState extends State<DoctorShell> {
     final effectiveIndex = (_tabIndex < destinations.length) ? _tabIndex : 0;
 
     return Scaffold(
+      backgroundColor: AafiyaColors.scaffoldBg,
       appBar: AafiyaAppBar(
         title: '${strings.doctorRoleTitle}: ${widget.user.name}',
         showBrandMark: true,
@@ -386,10 +387,42 @@ class _DoctorShellState extends State<DoctorShell> {
       ),
       body: _buildBody(
           context, strings, effectiveIndex, hasClinicStats, isDirector),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: effectiveIndex,
-        onDestinationSelected: (i) => setState(() => _tabIndex = i),
-        destinations: destinations,
+      bottomNavigationBar: Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          border: Border(
+            top: BorderSide(color: AafiyaColors.cardBorder, width: 1.0),
+          ),
+        ),
+        child: NavigationBarTheme(
+          data: NavigationBarThemeData(
+            indicatorColor: AafiyaColors.tealActiveNavBg,
+            backgroundColor: Colors.transparent,
+            height: 64,
+            iconTheme: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) {
+                return const IconThemeData(color: AafiyaColors.tealActiveNav);
+              }
+              return const IconThemeData(color: AafiyaColors.secondaryText);
+            }),
+            labelTextStyle: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) {
+                return AafiyaTypography.labelSmall.copyWith(
+                  color: AafiyaColors.tealActiveNav,
+                  fontWeight: FontWeight.bold,
+                );
+              }
+              return AafiyaTypography.labelSmall.copyWith(
+                color: AafiyaColors.secondaryText,
+              );
+            }),
+          ),
+          child: NavigationBar(
+            selectedIndex: effectiveIndex,
+            onDestinationSelected: (i) => setState(() => _tabIndex = i),
+            destinations: destinations,
+          ),
+        ),
       ),
     );
   }

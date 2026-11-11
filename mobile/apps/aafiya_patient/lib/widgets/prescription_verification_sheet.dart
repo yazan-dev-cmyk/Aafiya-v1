@@ -109,7 +109,7 @@ class _PrescriptionVerificationSheetState
       decoration: const BoxDecoration(
         color: AafiyaColors.pureWhite,
         borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AafiyaRadius.lg),
+          top: Radius.circular(AafiyaRadius.cardXl),
         ),
       ),
       child: SafeArea(

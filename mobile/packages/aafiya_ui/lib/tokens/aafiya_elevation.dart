@@ -79,4 +79,65 @@ class AafiyaElevation {
 
   /// Specialized modal bottom sheet / dialog shadow token
   static const List<BoxShadow> modal = shadowLg;
+
+  // Approved Design Shadows (AAFIYA-APPS-DESIGN-SYSTEM-ADOPTION-01)
+  /// Canonical soft card elevation shadow: 0 14px 36px rgba(26, 78, 125, 0.10)
+  static const List<BoxShadow> softCardShadow = [
+    BoxShadow(
+      color: Color(0x1A1A4E7D), // rgba(26, 78, 125, 0.10)
+      offset: Offset(0, 14),
+      blurRadius: 36,
+      spreadRadius: 0,
+    ),
+  ];
+
+  /// Hero appointment calendar card shadow: 0 18px 40px rgba(29, 87, 137, 0.13)
+  static const List<BoxShadow> heroCardShadow = [
+    BoxShadow(
+      color: Color(0x211D5789), // rgba(29, 87, 137, 0.13)
+      offset: Offset(0, 18),
+      blurRadius: 40,
+      spreadRadius: 0,
+    ),
+  ];
+
+  /// Primary pill action button gradient shadow: 0 12px 22px rgba(0, 126, 185, 0.20)
+  static const List<BoxShadow> primaryButtonShadow = [
+    BoxShadow(
+      color: Color(0x33007EB9), // rgba(0, 126, 185, 0.20)
+      offset: Offset(0, 12),
+      blurRadius: 22,
+      spreadRadius: 0,
+    ),
+  ];
+
+  /// Circular quick action bubble shadow: 0 8px 17px rgba(38, 83, 120, 0.08)
+  static const List<BoxShadow> bubbleShadow = [
+    BoxShadow(
+      color: Color(0x14265378), // rgba(38, 83, 120, 0.08)
+      offset: Offset(0, 8),
+      blurRadius: 17,
+      spreadRadius: 0,
+    ),
+  ];
+
+  /// Filter pill active state shadow: 0 7px 15px rgba(7, 81, 143, 0.15)
+  static const List<BoxShadow> filterActiveShadow = [
+    BoxShadow(
+      color: Color(0x2607518F), // rgba(7, 81, 143, 0.15)
+      offset: Offset(0, 7),
+      blurRadius: 15,
+      spreadRadius: 0,
+    ),
+  ];
+
+  /// Directory card subtle shadow: 0 9px 22px rgba(32, 77, 117, 0.07)
+  static const List<BoxShadow> directoryCardShadow = [
+    BoxShadow(
+      color: Color(0x12204D75), // rgba(32, 77, 117, 0.07)
+      offset: Offset(0, 9),
+      blurRadius: 22,
+      spreadRadius: 0,
+    ),
+  ];
 }

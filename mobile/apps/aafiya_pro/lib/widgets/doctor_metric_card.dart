@@ -28,17 +28,18 @@ class DoctorMetricCard extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(AafiyaRadius.md),
+          borderRadius: AafiyaRadius.borderCardLg,
           child: Container(
             constraints: const BoxConstraints(minHeight: 74),
             padding: const EdgeInsets.all(AafiyaSpacing.sm + 2),
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(AafiyaRadius.md),
+              color: Colors.white,
+              borderRadius: AafiyaRadius.borderCardLg,
               border: Border.all(
-                color: color.withValues(alpha: 0.25),
+                color: AafiyaColors.cardBorder,
                 width: 1,
               ),
+              boxShadow: AafiyaElevation.softCardShadow,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,22 +51,35 @@ class DoctorMetricCard extends StatelessWidget {
                     Text(
                       '\u200E$count\u200E',
                       style: AafiyaTypography.headlineMedium.copyWith(
-                        color: color,
+                        color: AafiyaColors.navy,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Icon(
-                      icon,
-                      color: color,
-                      size: 20,
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: color.withValues(alpha: 0.12),
+                        shape: BoxShape.circle,
+                        boxShadow: AafiyaElevation.bubbleShadow,
+                      ),
+                      child: SizedBox(
+                        width: 34,
+                        height: 34,
+                        child: Center(
+                          child: Icon(
+                            icon,
+                            color: color,
+                            size: 18,
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
                 Text(
                   label,
                   style: AafiyaTypography.caption.copyWith(
-                    color: AafiyaColors.primaryText,
+                    color: AafiyaColors.secondaryText,
                     fontWeight: FontWeight.w600,
                   ),
                   maxLines: maxLines,

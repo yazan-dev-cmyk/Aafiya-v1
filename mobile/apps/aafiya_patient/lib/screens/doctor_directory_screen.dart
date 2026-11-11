@@ -211,6 +211,7 @@ class _DoctorDirectoryScreenState extends State<DoctorDirectoryScreen> {
     final strings = LocalizedStrings.of(context);
 
     return Scaffold(
+      backgroundColor: AafiyaColors.scaffoldBg,
       appBar: AafiyaAppBar(
         title: strings.doctorDirectory,
         showBrandMark: true,

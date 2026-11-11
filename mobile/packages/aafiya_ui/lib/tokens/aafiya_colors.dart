@@ -53,18 +53,49 @@ abstract final class AafiyaColors {
   static const Color darkPrimaryText = Color(0xFFF8FAFC);
   static const Color darkSecondaryText = Color(0xFF94A3B8);
 
-  // Prototype Visual Palette (aafiya-home-prototype.html)
-  static const Color navy = Color(0xFF023E73);
+  // Approved Design Palette (AAFIYA-APPS-DESIGN-SYSTEM-ADOPTION-01)
+  static const Color navy = Color(0xFF102B59);
+  static const Color medicalBlue = Color(0xFF0879BD);
+  static const Color deepBlue = Color(0xFF07518F);
+  static const Color darkBlueGradient = Color(0xFF0754A1);
+  static const Color teal = Color(0xFF08AD9C);
+  static const Color tealBright = Color(0xFF08BFAE);
+  static const Color tealActiveNav = Color(0xFF087C73);
+  static const Color tealActiveNavBg = Color(0xFFDFF8F3);
   static const Color royalBlue = Color(0xFF0077B6);
   static const Color tealAccent = Color(0xFF0E9F8E);
   static const Color tealDeep = Color(0xFF0B8074);
   static const Color tealButton = Color(0xFF0B8074);
   static const Color tealInk = Color(0xFF0A6F64);
   static const Color tealSoft = Color(0xFFE0F5F2);
-  static const Color scaffoldBg = Color(0xFFF4F8FB);
+  static const Color scaffoldBg = Color(0xFFF1F8FC);
   static const Color cardBg = Color(0xFFFFFFFF);
-  static const Color lineDivider = Color(0xFFDCE6EE);
+  static const Color cardBorder = Color(0xFFE2EBF1);
+  static const Color lineDivider = Color(0xFFDCE8F0);
   static const Color ticketDottedLine = Color(0xFFC3D3E0);
+  static const Color unreadBadge = Color(0xFFE52E3A);
+
+  // Notice Banner Surface Tokens
+  static const Color noticeBg = Color(0xFFE1F8ED);
+  static const Color noticeBorder = Color(0xFFB9EFD3);
+  static const Color noticeText = Color(0xFF16764E);
+
+  // Quick Action Pastel Tokens (68x68 Circular Bubbles)
+  static const Color redSoftBg = Color(0xFFFFF0F1);
+  static const Color redInk = Color(0xFFC82436);
+  static const Color blueSoftBg = Color(0xFFEAF0FF);
+  static const Color blueInk = Color(0xFF2365BD);
+  static const Color greenSoftBg = Color(0xFFE3F8F3);
+  static const Color greenInk = Color(0xFF078B78);
+  static const Color cyanSoftBg = Color(0xFFE8F5FC);
+  static const Color cyanInk = Color(0xFF087BB5);
+
+  // Filter Chip Tokens
+  static const Color filterActiveBg = Color(0xFF07518F);
+  static const Color filterActiveText = Color(0xFFFFFFFF);
+  static const Color filterInactiveBg = Color(0xFFFFFFFF);
+  static const Color filterInactiveBorder = Color(0xFFD7E4EE);
+  static const Color filterInactiveText = Color(0xFF58677D);
 
   // Accessible Status Tokens (WCAG 2.1 AA Compliant >= 4.5:1)
   static const Color statusConfirmedBg = Color(0xFFE3F6EA);
@@ -85,23 +116,47 @@ abstract final class AafiyaColors {
       Color(0xFFDC2626); // Preserved for large text/icons (CR: 4.23:1)
 
   // Gradients
+  /// Primary Action Button Gradient (linear-gradient(100deg, #08BFAE 0%, #0785C5 55%, #0754A1 100%))
+  static const LinearGradient primaryButtonGradient = LinearGradient(
+    begin: AlignmentDirectional.centerStart,
+    end: AlignmentDirectional.centerEnd,
+    colors: [
+      Color(0xFF08BFAE),
+      Color(0xFF0785C5),
+      Color(0xFF0754A1),
+    ],
+    stops: [0.0, 0.55, 1.0],
+  );
+
+  /// Background Scaffold Atmospheric Gradient
+  static const LinearGradient scaffoldGradient = LinearGradient(
+    begin: AlignmentDirectional.topStart,
+    end: AlignmentDirectional.bottomEnd,
+    colors: [
+      Color(0xFFEAF6FC),
+      Color(0xFFF7FBFD),
+      Color(0xFFEDF6FB),
+    ],
+    stops: [0.0, 0.45, 1.0],
+  );
+
   static const LinearGradient heroGradient = LinearGradient(
     begin: AlignmentDirectional.topStart,
     end: AlignmentDirectional.bottomEnd,
     colors: [
-      Color(0xFF023E73),
-      Color(0xFF04569A),
-      Color(0xFF0069A8),
+      Color(0xFF102B59),
+      Color(0xFF07549A),
+      Color(0xFF0879BD),
     ],
-    stops: [0.0, 0.6, 1.0],
+    stops: [0.0, 0.55, 1.0],
   );
 
   static const LinearGradient brandMarkGradient = LinearGradient(
     begin: AlignmentDirectional.topStart,
     end: AlignmentDirectional.bottomEnd,
     colors: [
-      Color(0xFF27C3B1),
-      Color(0xFF0B8074),
+      Color(0xFF08BFAE),
+      Color(0xFF08AD9C),
     ],
   );
 }

@@ -35,6 +35,7 @@ class PrescriptionDetailScreen extends StatelessWidget {
         : 'https://api.aafiya.site/v/${prescription.secureToken}';
 
     return Scaffold(
+      backgroundColor: AafiyaColors.scaffoldBg,
       appBar: AafiyaAppBar(
         title: strings.prescriptionDetailTitle,
         showBrandMark: true,

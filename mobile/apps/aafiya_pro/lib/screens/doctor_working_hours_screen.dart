@@ -337,6 +337,7 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
             : _errorMessage;
 
     return Scaffold(
+      backgroundColor: AafiyaColors.scaffoldBg,
       appBar: AafiyaAppBar(
         title: strings.doctorWorkingHoursTitle,
         showBrandMark: true,
@@ -441,10 +442,9 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
       return Container(
         padding: AafiyaSpacing.insetAllMd,
         decoration: BoxDecoration(
-          color: AafiyaColors.success.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(AafiyaRadius.lg),
-          border:
-              Border.all(color: AafiyaColors.success.withValues(alpha: 0.3)),
+          color: AafiyaColors.noticeBg,
+          borderRadius: AafiyaRadius.borderCardLg,
+          border: Border.all(color: AafiyaColors.noticeBorder),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -452,12 +452,12 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AafiyaColors.success.withValues(alpha: 0.15),
+                color: AafiyaColors.navy.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AafiyaRadius.md),
               ),
               child: const Icon(
                 Icons.lock_rounded,
-                color: AafiyaColors.success,
+                color: AafiyaColors.navy,
                 size: 24,
               ),
             ),
@@ -470,14 +470,14 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
                     strings.scheduleActivatedStatus,
                     style: AafiyaTypography.titleMedium.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: AafiyaColors.success,
+                      color: AafiyaColors.navy,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     strings.scheduleLockedWarning,
                     style: AafiyaTypography.caption.copyWith(
-                      color: AafiyaColors.secondaryText,
+                      color: AafiyaColors.noticeText,
                       height: 1.3,
                     ),
                   ),
@@ -550,12 +550,13 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
     return Card(
       margin: const EdgeInsets.only(bottom: AafiyaSpacing.sm),
       elevation: 0,
+      color: Colors.white,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AafiyaRadius.md),
+        borderRadius: AafiyaRadius.borderCardLg,
         side: BorderSide(
           color: isOpen
-              ? AafiyaColors.primaryBlue.withValues(alpha: 0.3)
-              : AafiyaColors.border,
+              ? AafiyaColors.deepBlue.withValues(alpha: 0.25)
+              : AafiyaColors.cardBorder,
         ),
       ),
       child: Padding(
@@ -624,6 +625,7 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
                     key: Key('slot_${dayItem.dayOfWeek}_$slot'),
                     label: Text(slot),
                     selected: isSelected,
+                    shape: const StadiumBorder(),
                     onSelected: _isLocked
                         ? null
                         : (_) => _handleToggleSlot(dayItem.dayOfWeek, slot),
@@ -640,7 +642,7 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
                     side: BorderSide(
                       color: isSelected
                           ? AafiyaColors.primaryBlue
-                          : AafiyaColors.border,
+                          : AafiyaColors.cardBorder,
                     ),
                   );
                 }).toList(),
@@ -689,9 +691,7 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   foregroundColor: AafiyaColors.primaryBlue,
                   side: const BorderSide(color: AafiyaColors.primaryBlue),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AafiyaRadius.md),
-                  ),
+                  shape: const StadiumBorder(),
                 ),
               ),
             ),
@@ -707,9 +707,7 @@ class _DoctorWorkingHoursScreenState extends State<DoctorWorkingHoursScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   backgroundColor: AafiyaColors.healthBlue,
                   foregroundColor: AafiyaColors.pureWhite,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AafiyaRadius.md),
-                  ),
+                  shape: const StadiumBorder(),
                 ),
               ),
             ),

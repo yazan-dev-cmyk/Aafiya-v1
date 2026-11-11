@@ -148,7 +148,7 @@ class _QrScannerSheetState extends State<QrScannerSheet>
       decoration: const BoxDecoration(
         color: AafiyaColors.darkSurface,
         borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AafiyaRadius.xl),
+          top: Radius.circular(AafiyaRadius.cardXl),
         ),
       ),
       child: Column(

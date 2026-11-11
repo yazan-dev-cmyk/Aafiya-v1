@@ -303,6 +303,7 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
     final theme = Theme.of(context);
 
     return Scaffold(
+      backgroundColor: AafiyaColors.scaffoldBg,
       appBar: AafiyaAppBar(
         title: strings.assistantRewardsTitle,
         showBrandMark: false,
@@ -336,6 +337,7 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             minimumSize: const Size(120, 48),
+                            shape: const StadiumBorder(),
                           ),
                           onPressed: _loadInitialData,
                           child: Text(strings.retry),
@@ -366,9 +368,9 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
                       delegate: _SliverAppBarDelegate(
                         TabBar(
                           controller: _tabController,
-                          labelColor: AafiyaColors.healthBlue,
+                          labelColor: AafiyaColors.deepBlue,
                           unselectedLabelColor: AafiyaColors.secondaryText,
-                          indicatorColor: AafiyaColors.healthBlue,
+                          indicatorColor: AafiyaColors.deepBlue,
                           tabs: [
                             Tab(
                               icon: const Icon(Icons.account_balance_wallet_outlined),
@@ -384,7 +386,7 @@ class _AssistantRewardsScreenState extends State<AssistantRewardsScreen>
                             ),
                           ],
                         ),
-                        theme.scaffoldBackgroundColor,
+                        AafiyaColors.scaffoldBg,
                       ),
                     ),
                   ],

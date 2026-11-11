@@ -554,6 +554,7 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
     }
 
     return Scaffold(
+      backgroundColor: AafiyaColors.scaffoldBg,
       appBar: AafiyaAppBar(
         title: strings.assistantBookingTitle,
         showBrandMark: true,
@@ -597,9 +598,10 @@ class _AssistantBookingScreenState extends State<AssistantBookingScreen> {
                     ? strings.bookingInProgress
                     : strings.confirmBookingButton,
                 height: 52.0,
+                isPill: true,
+                variant: AafiyaButtonVariant.gradient,
                 isLoading: _isSubmitting,
                 onPressed: _isSubmitting ? null : _handleSubmit,
-                variant: AafiyaButtonVariant.primary,
               ),
               const SizedBox(height: AafiyaSpacing.xxl),
             ],

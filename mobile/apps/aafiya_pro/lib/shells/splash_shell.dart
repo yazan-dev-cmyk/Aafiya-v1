@@ -50,7 +50,7 @@ class _ProSplashShellState extends State<ProSplashShell> {
         (widget.currentLocale ?? Localizations.localeOf(context)).languageCode;
 
     return Scaffold(
-      backgroundColor: AafiyaColors.pureWhite,
+      backgroundColor: AafiyaColors.scaffoldBg,
       body: SafeArea(
         child: Stack(
           children: [

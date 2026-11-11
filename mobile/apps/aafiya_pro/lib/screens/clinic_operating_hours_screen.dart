@@ -358,6 +358,7 @@ class _ClinicOperatingHoursScreenState
         _clinicIdMissing ? strings.clinicIdMissingError : _errorMessage;
 
     return Scaffold(
+      backgroundColor: AafiyaColors.scaffoldBg,
       appBar: AafiyaAppBar(
         title: strings.clinicOperatingHoursTitle,
         showBrandMark: true,
@@ -624,12 +625,13 @@ class _ClinicOperatingHoursScreenState
     return Card(
       margin: const EdgeInsets.only(bottom: AafiyaSpacing.sm),
       elevation: 0,
+      color: Colors.white,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AafiyaRadius.md),
+        borderRadius: AafiyaRadius.borderCardLg,
         side: BorderSide(
           color: isOpen
-              ? AafiyaColors.primaryBlue.withValues(alpha: 0.3)
-              : AafiyaColors.border,
+              ? AafiyaColors.deepBlue.withValues(alpha: 0.25)
+              : AafiyaColors.cardBorder,
         ),
       ),
       child: Padding(
@@ -825,12 +827,11 @@ class _ClinicOperatingHoursScreenState
                 : strings.saveClinicHours),
             onPressed: _isSaving ? null : _handleSave,
             style: ElevatedButton.styleFrom(
+              minimumSize: const Size(0, 52),
               padding: const EdgeInsets.symmetric(vertical: 14),
               backgroundColor: AafiyaColors.primaryBlue,
               foregroundColor: AafiyaColors.pureWhite,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AafiyaRadius.md),
-              ),
+              shape: const StadiumBorder(),
             ),
           ),
         ),

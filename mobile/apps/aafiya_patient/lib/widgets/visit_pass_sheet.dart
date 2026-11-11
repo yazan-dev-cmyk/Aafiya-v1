@@ -73,8 +73,8 @@ class VisitPassSheet extends StatelessWidget {
         return Container(
           decoration: const BoxDecoration(
             color: AafiyaColors.pureWhite,
-            borderRadius:
-                BorderRadius.vertical(top: Radius.circular(AafiyaRadius.lg)),
+            borderRadius: BorderRadius.vertical(
+                top: Radius.circular(AafiyaRadius.cardXl)),
           ),
           child: Column(
             children: [
@@ -335,6 +335,7 @@ class VisitPassSheet extends StatelessWidget {
                     AafiyaButton(
                       label: strings.close,
                       height: 52.0,
+                      isPill: true,
                       onPressed: () => Navigator.of(context).pop(),
                       variant: AafiyaButtonVariant.outline,
                     ),

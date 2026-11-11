@@ -217,7 +217,7 @@ class _AddDoctorSheetState extends State<AddDoctorSheet>
       decoration: const BoxDecoration(
         color: AafiyaColors.pureWhite,
         borderRadius:
-            BorderRadius.vertical(top: Radius.circular(AafiyaRadius.lg)),
+            BorderRadius.vertical(top: Radius.circular(AafiyaRadius.cardXl)),
       ),
       padding: EdgeInsets.fromLTRB(
         AafiyaSpacing.lg,
@@ -247,7 +247,7 @@ class _AddDoctorSheetState extends State<AddDoctorSheet>
             children: [
               const CircleAvatar(
                 backgroundColor: AafiyaColors.lightBackground,
-                foregroundColor: AafiyaColors.healthBlue,
+                foregroundColor: AafiyaColors.deepBlue,
                 child: Icon(Icons.person_add_rounded),
               ),
               const SizedBox(width: AafiyaSpacing.sm),
@@ -270,9 +270,9 @@ class _AddDoctorSheetState extends State<AddDoctorSheet>
           // Tab Bar
           TabBar(
             controller: _tabController,
-            labelColor: AafiyaColors.healthBlue,
+            labelColor: AafiyaColors.deepBlue,
             unselectedLabelColor: AafiyaColors.secondaryText,
-            indicatorColor: AafiyaColors.healthBlue,
+            indicatorColor: AafiyaColors.deepBlue,
             tabs: [
               Tab(text: strings.lookupDoctorTab),
               Tab(text: strings.createNewDoctorTab),
@@ -515,9 +515,10 @@ class _AddDoctorSheetState extends State<AddDoctorSheet>
                                       label: Text(strings.sendInvitation),
                                       style: OutlinedButton.styleFrom(
                                         foregroundColor:
-                                            AafiyaColors.healthBlue,
+                                            AafiyaColors.deepBlue,
                                         side: const BorderSide(
-                                            color: AafiyaColors.healthBlue),
+                                            color: AafiyaColors.deepBlue),
+                                        shape: const StadiumBorder(),
                                       ),
                                     ),
                                 ],
@@ -681,6 +682,8 @@ class _AddDoctorSheetState extends State<AddDoctorSheet>
             AafiyaButton(
               label: strings.createNewDoctorTab,
               isLoading: _isCreating,
+              variant: AafiyaButtonVariant.gradient,
+              isPill: true,
               onPressed: _isCreating ? null : _submitCreateDoctor,
             ),
           ],

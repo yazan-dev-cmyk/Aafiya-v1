@@ -371,6 +371,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
     final strings = LocalizedStrings.of(context);
 
     return Scaffold(
+      backgroundColor: AafiyaColors.scaffoldBg,
       appBar: AafiyaAppBar(
         title: strings.appointmentDetails,
         leading: IconButton(
@@ -746,9 +747,10 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
                         : 'Digital Visit Pass (QR)',
                 icon: const Icon(Icons.qr_code_2_rounded, size: 20),
                 height: 52.0,
+                isPill: true,
                 onPressed: () =>
                     VisitPassSheet.show(context, appointment: appointment),
-                variant: AafiyaButtonVariant.primary,
+                variant: AafiyaButtonVariant.gradient,
               ),
               const SizedBox(height: 12),
 
@@ -760,6 +762,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
                   icon: const Icon(Icons.edit_calendar_outlined,
                       size: 20, color: AafiyaColors.healthBlue),
                   height: 52.0,
+                  isPill: true,
                   onPressed: _isCancelling ? null : _handleReschedule,
                   variant: AafiyaButtonVariant.outline,
                 ),
@@ -774,6 +777,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
                   icon: const Icon(Icons.cancel_outlined,
                       size: 20, color: AafiyaColors.error),
                   height: 52.0,
+                  isPill: true,
                   onPressed: _isCancelling ? null : _handleCancel,
                   isLoading: _isCancelling,
                   variant: AafiyaButtonVariant.outline,
@@ -785,6 +789,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
               AafiyaButton(
                 label: strings.close,
                 height: 52.0,
+                isPill: true,
                 onPressed: () => Navigator.of(context).pop(),
                 variant: AafiyaButtonVariant.outline,
               ),

@@ -194,7 +194,7 @@ class _RegisterVacationSheetState extends State<RegisterVacationSheet> {
       decoration: const BoxDecoration(
         color: AafiyaColors.pureWhite,
         borderRadius:
-            BorderRadius.vertical(top: Radius.circular(AafiyaRadius.lg)),
+            BorderRadius.vertical(top: Radius.circular(AafiyaRadius.cardXl)),
       ),
       padding: EdgeInsets.fromLTRB(
         AafiyaSpacing.lg,
@@ -445,6 +445,9 @@ class _RegisterVacationSheetState extends State<RegisterVacationSheet> {
             // Submit Button
             AafiyaButton(
               label: strings.registerVacationAction,
+              variant: AafiyaButtonVariant.gradient,
+              isPill: true,
+              height: 52.0,
               isLoading: _isSubmitting,
               onPressed: _isSubmitting ? null : _submit,
             ),

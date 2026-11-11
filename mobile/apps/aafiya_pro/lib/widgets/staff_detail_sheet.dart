@@ -111,6 +111,9 @@ class _StaffDetailSheetState extends State<StaffDetailSheet> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogCtx) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AafiyaRadius.cardXl),
+        ),
         title: Text(
           willSuspend
               ? strings.confirmSuspendTitle
@@ -127,14 +130,16 @@ class _StaffDetailSheetState extends State<StaffDetailSheet> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogCtx).pop(false),
+            style: TextButton.styleFrom(shape: const StadiumBorder()),
             child: Text(strings.cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(dialogCtx).pop(true),
             style: ElevatedButton.styleFrom(
               backgroundColor:
-                  willSuspend ? AafiyaColors.error : AafiyaColors.healthBlue,
+                  willSuspend ? AafiyaColors.error : AafiyaColors.deepBlue,
               foregroundColor: AafiyaColors.pureWhite,
+              shape: const StadiumBorder(),
             ),
             child: Text(
                 willSuspend ? strings.suspendStaff : strings.activateStaff),
@@ -190,6 +195,9 @@ class _StaffDetailSheetState extends State<StaffDetailSheet> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogCtx) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AafiyaRadius.cardXl),
+        ),
         title: Text(
           _isDoctor
               ? strings.confirmDetachDoctorTitle
@@ -206,6 +214,7 @@ class _StaffDetailSheetState extends State<StaffDetailSheet> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogCtx).pop(false),
+            style: TextButton.styleFrom(shape: const StadiumBorder()),
             child: Text(strings.cancel),
           ),
           ElevatedButton(
@@ -213,6 +222,7 @@ class _StaffDetailSheetState extends State<StaffDetailSheet> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AafiyaColors.error,
               foregroundColor: AafiyaColors.pureWhite,
+              shape: const StadiumBorder(),
             ),
             child: Text(
               _isDoctor ? strings.detachDoctor : strings.deleteAssistant,
@@ -270,7 +280,7 @@ class _StaffDetailSheetState extends State<StaffDetailSheet> {
       decoration: const BoxDecoration(
         color: AafiyaColors.pureWhite,
         borderRadius:
-            BorderRadius.vertical(top: Radius.circular(AafiyaRadius.lg)),
+            BorderRadius.vertical(top: Radius.circular(AafiyaRadius.cardXl)),
       ),
       padding: EdgeInsets.fromLTRB(
         AafiyaSpacing.lg,
@@ -572,6 +582,7 @@ class _StaffDetailSheetState extends State<StaffDetailSheet> {
                             ? AafiyaColors.warning
                             : AafiyaColors.success,
                       ),
+                      shape: const StadiumBorder(),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
@@ -590,6 +601,7 @@ class _StaffDetailSheetState extends State<StaffDetailSheet> {
                     ),
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: AafiyaColors.error),
+                      shape: const StadiumBorder(),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),

@@ -5,6 +5,7 @@ import '../tokens/aafiya_colors.dart';
 import '../tokens/aafiya_radius.dart';
 import '../tokens/aafiya_spacing.dart';
 import '../tokens/aafiya_typography.dart';
+import 'aafiya_button.dart';
 
 /// Self-contained recipient modal sheet for decrypting and viewing shared medical records.
 ///
@@ -211,7 +212,7 @@ class _SharedRecordViewerSheetState extends State<SharedRecordViewerSheet> {
         decoration: const BoxDecoration(
           color: AafiyaColors.pureWhite,
           borderRadius: BorderRadius.vertical(
-            top: Radius.circular(AafiyaRadius.lg),
+            top: Radius.circular(AafiyaRadius.cardXl),
           ),
         ),
         child: GestureDetector(
@@ -247,7 +248,7 @@ class _SharedRecordViewerSheetState extends State<SharedRecordViewerSheet> {
                     children: [
                       const Icon(
                         Icons.lock_person_outlined,
-                        color: AafiyaColors.primaryBlue,
+                        color: AafiyaColors.deepBlue,
                         size: 24,
                       ),
                       const SizedBox(width: AafiyaSpacing.sm),
@@ -256,7 +257,7 @@ class _SharedRecordViewerSheetState extends State<SharedRecordViewerSheet> {
                           strings.sharedRecordViewerTitle,
                           style: AafiyaTypography.titleMedium.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: AafiyaColors.primaryBlue,
+                            color: AafiyaColors.deepBlue,
                           ),
                         ),
                       ),
@@ -268,7 +269,7 @@ class _SharedRecordViewerSheetState extends State<SharedRecordViewerSheet> {
                     ],
                   ),
                 ),
-                const Divider(height: 1, color: AafiyaColors.border),
+                const Divider(height: 1, color: AafiyaColors.cardBorder),
 
                 // Main body
                 Flexible(
@@ -406,34 +407,12 @@ class _SharedRecordViewerSheetState extends State<SharedRecordViewerSheet> {
 
         // Submit Button
         if (!_isTerminal) ...[
-          SizedBox(
-            height: 48,
-            child: ElevatedButton(
-              onPressed: _isLoading ? null : _handleResolve,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AafiyaColors.primaryBlue,
-                foregroundColor: AafiyaColors.pureWhite,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AafiyaRadius.md),
-                ),
-              ),
-              child: _isLoading
-                  ? const SizedBox(
-                      width: 22,
-                      height: 22,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.5,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                            AafiyaColors.pureWhite),
-                      ),
-                    )
-                  : Text(
-                      strings.sharedRecordResolveButton,
-                      style: AafiyaTypography.labelLarge.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-            ),
+          AafiyaButton(
+            label: strings.sharedRecordResolveButton,
+            isLoading: _isLoading,
+            variant: AafiyaButtonVariant.gradient,
+            isPill: true,
+            onPressed: _isLoading ? null : _handleResolve,
           ),
         ],
       ],
@@ -484,8 +463,8 @@ class _SharedRecordViewerSheetState extends State<SharedRecordViewerSheet> {
           elevation: 0,
           color: const Color(0xFFF8FAFC),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AafiyaRadius.md),
-            side: const BorderSide(color: AafiyaColors.border),
+            borderRadius: BorderRadius.circular(AafiyaRadius.cardLg),
+            side: const BorderSide(color: AafiyaColors.cardBorder),
           ),
           child: Padding(
             padding: const EdgeInsets.all(AafiyaSpacing.md),
@@ -496,7 +475,7 @@ class _SharedRecordViewerSheetState extends State<SharedRecordViewerSheet> {
                   patient.fullName,
                   style: AafiyaTypography.titleMedium.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: AafiyaColors.primaryBlue,
+                    color: AafiyaColors.navy,
                   ),
                 ),
                 const SizedBox(height: AafiyaSpacing.xs),
@@ -570,8 +549,8 @@ class _SharedRecordViewerSheetState extends State<SharedRecordViewerSheet> {
                   elevation: 0,
                   margin: const EdgeInsets.only(bottom: AafiyaSpacing.xs),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AafiyaRadius.sm),
-                    side: const BorderSide(color: AafiyaColors.border),
+                    borderRadius: BorderRadius.circular(AafiyaRadius.card),
+                    side: const BorderSide(color: AafiyaColors.cardBorder),
                   ),
                   child: ListTile(
                     dense: true,
@@ -599,8 +578,8 @@ class _SharedRecordViewerSheetState extends State<SharedRecordViewerSheet> {
                   elevation: 0,
                   margin: const EdgeInsets.only(bottom: AafiyaSpacing.xs),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AafiyaRadius.sm),
-                    side: const BorderSide(color: AafiyaColors.border),
+                    borderRadius: BorderRadius.circular(AafiyaRadius.card),
+                    side: const BorderSide(color: AafiyaColors.cardBorder),
                   ),
                   child: ListTile(
                     dense: true,
@@ -630,8 +609,8 @@ class _SharedRecordViewerSheetState extends State<SharedRecordViewerSheet> {
                   elevation: 0,
                   margin: const EdgeInsets.only(bottom: AafiyaSpacing.xs),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AafiyaRadius.sm),
-                    side: const BorderSide(color: AafiyaColors.border),
+                    borderRadius: BorderRadius.circular(AafiyaRadius.card),
+                    side: const BorderSide(color: AafiyaColors.cardBorder),
                   ),
                   child: ListTile(
                     dense: true,
@@ -654,13 +633,13 @@ class _SharedRecordViewerSheetState extends State<SharedRecordViewerSheet> {
   Widget _buildSectionHeader(IconData icon, String title) {
     return Row(
       children: [
-        Icon(icon, size: 18, color: AafiyaColors.primaryBlue),
+        Icon(icon, size: 18, color: AafiyaColors.deepBlue),
         const SizedBox(width: AafiyaSpacing.xs),
         Text(
           title,
           style: AafiyaTypography.titleSmall.copyWith(
             fontWeight: FontWeight.bold,
-            color: AafiyaColors.primaryBlue,
+            color: AafiyaColors.navy,
           ),
         ),
       ],

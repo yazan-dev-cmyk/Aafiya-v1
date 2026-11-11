@@ -133,6 +133,7 @@ class _PrescriptionsScreenState extends State<PrescriptionsScreen> {
     final strings = LocalizedStrings.of(context);
 
     return Scaffold(
+      backgroundColor: AafiyaColors.scaffoldBg,
       appBar: AafiyaAppBar(
         title: strings.prescriptionsTitle,
         showBrandMark: true,

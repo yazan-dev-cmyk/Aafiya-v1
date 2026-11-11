@@ -145,7 +145,7 @@ class _AddAssistantSheetState extends State<AddAssistantSheet> {
     return Material(
       color: AafiyaColors.pureWhite,
       borderRadius:
-          const BorderRadius.vertical(top: Radius.circular(AafiyaRadius.lg)),
+          const BorderRadius.vertical(top: Radius.circular(AafiyaRadius.cardXl)),
       child: Padding(
         padding: EdgeInsets.fromLTRB(
           AafiyaSpacing.lg,
@@ -335,6 +335,8 @@ class _AddAssistantSheetState extends State<AddAssistantSheet> {
                 AafiyaButton(
                   label: strings.addAssistant,
                   isLoading: _isLoading,
+                  variant: AafiyaButtonVariant.gradient,
+                  isPill: true,
                   onPressed: _isLoading ? null : _submit,
                 ),
               ],

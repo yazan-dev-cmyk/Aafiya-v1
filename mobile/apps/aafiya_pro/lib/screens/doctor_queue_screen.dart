@@ -403,7 +403,7 @@ class _DoctorQueueScreenState extends State<DoctorQueueScreen> {
       decoration: const BoxDecoration(
         color: AafiyaColors.pureWhite,
         border: Border(
-          bottom: BorderSide(color: AafiyaColors.border, width: 1),
+          bottom: BorderSide(color: AafiyaColors.cardBorder, width: 1),
         ),
       ),
       child: Row(
@@ -449,10 +449,10 @@ class _DoctorQueueScreenState extends State<DoctorQueueScreen> {
     return Material(
       color:
           isSelected ? accentColor.withValues(alpha: 0.1) : Colors.transparent,
-      borderRadius: BorderRadius.circular(AafiyaRadius.md),
+      borderRadius: AafiyaRadius.borderPill,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(AafiyaRadius.md),
+        borderRadius: AafiyaRadius.borderPill,
         child: Container(
           constraints: const BoxConstraints(minHeight: 48),
           padding: const EdgeInsets.symmetric(
@@ -461,10 +461,10 @@ class _DoctorQueueScreenState extends State<DoctorQueueScreen> {
           ),
           decoration: BoxDecoration(
             border: Border.all(
-              color: isSelected ? accentColor : AafiyaColors.border,
+              color: isSelected ? accentColor : AafiyaColors.cardBorder,
               width: isSelected ? 1.5 : 1,
             ),
-            borderRadius: BorderRadius.circular(AafiyaRadius.md),
+            borderRadius: AafiyaRadius.borderPill,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,

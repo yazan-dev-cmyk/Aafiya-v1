@@ -377,8 +377,8 @@ class _RescheduleAppointmentSheetState
           return Container(
             decoration: const BoxDecoration(
               color: AafiyaColors.pureWhite,
-              borderRadius:
-                  BorderRadius.vertical(top: Radius.circular(AafiyaRadius.lg)),
+              borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(AafiyaRadius.cardXl)),
             ),
             child: Column(
               children: [
@@ -786,16 +786,20 @@ class _RescheduleAppointmentSheetState
                         label: strings.confirmRescheduleAction,
                         icon: const Icon(Icons.check_circle_outline_rounded,
                             size: 20),
+                        isPill: true,
+                        height: 52.0,
                         onPressed: (_selectedSlot == null || _isSubmitting)
                             ? null
                             : _confirmReschedule,
                         isLoading: _isSubmitting,
-                        variant: AafiyaButtonVariant.primary,
+                        variant: AafiyaButtonVariant.gradient,
                       ),
                       const SizedBox(height: 10),
 
                       AafiyaButton(
                         label: strings.cancel,
+                        isPill: true,
+                        height: 52.0,
                         onPressed: _isSubmitting
                             ? null
                             : () => Navigator.of(context).pop(),

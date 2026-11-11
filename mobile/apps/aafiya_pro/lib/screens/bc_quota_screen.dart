@@ -621,6 +621,7 @@ class _BcQuotaScreenState extends State<BcQuotaScreen>
     final quotaBalance = _quotaData?.quotaBalance ?? 0;
 
     return Scaffold(
+      backgroundColor: AafiyaColors.scaffoldBg,
       appBar: AafiyaAppBar(
         title: strings.bookingCenterDashboardTitle,
         showBrandMark: true,
@@ -676,9 +677,9 @@ class _BcQuotaScreenState extends State<BcQuotaScreen>
             ),
           TabBar(
             controller: _tabController,
-            labelColor: AafiyaColors.healthBlue,
+            labelColor: AafiyaColors.deepBlue,
             unselectedLabelColor: AafiyaColors.secondaryText,
-            indicatorColor: AafiyaColors.healthBlue,
+            indicatorColor: AafiyaColors.deepBlue,
             tabs: [
               Tab(text: strings.availablePackages),
               Tab(text: strings.purchaseHistoryTitle),

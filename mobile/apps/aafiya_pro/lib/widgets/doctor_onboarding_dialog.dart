@@ -58,7 +58,7 @@ class DoctorOnboardingDialog extends StatelessWidget {
 
     return AlertDialog(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AafiyaRadius.lg),
+        borderRadius: BorderRadius.circular(AafiyaRadius.cardXl),
       ),
       contentPadding: AafiyaSpacing.insetAllLg,
       title: Column(
@@ -208,6 +208,9 @@ class DoctorOnboardingDialog extends StatelessWidget {
             Navigator.of(context).pop();
             onLater();
           },
+          style: TextButton.styleFrom(
+            shape: const StadiumBorder(),
+          ),
           child: Text(
             strings.onboardingLaterAction,
             style: const TextStyle(color: AafiyaColors.secondaryText),
@@ -224,6 +227,7 @@ class DoctorOnboardingDialog extends StatelessWidget {
             style: FilledButton.styleFrom(
               backgroundColor: AafiyaColors.warning,
               foregroundColor: AafiyaColors.primaryText,
+              shape: const StadiumBorder(),
             ),
             icon: const Icon(Icons.store_mall_directory_outlined, size: 18),
             label: Text(
@@ -238,8 +242,9 @@ class DoctorOnboardingDialog extends StatelessWidget {
               onConfigureDoctorSchedule();
             },
             style: FilledButton.styleFrom(
-              backgroundColor: AafiyaColors.primaryBlue,
+              backgroundColor: AafiyaColors.deepBlue,
               foregroundColor: AafiyaColors.pureWhite,
+              shape: const StadiumBorder(),
             ),
             icon: const Icon(Icons.event_available_rounded, size: 18),
             label: Text(
@@ -256,6 +261,7 @@ class DoctorOnboardingDialog extends StatelessWidget {
             style: FilledButton.styleFrom(
               backgroundColor: AafiyaColors.info,
               foregroundColor: AafiyaColors.pureWhite,
+              shape: const StadiumBorder(),
             ),
             child: Text(
               strings.onboardingUnderstoodAction,

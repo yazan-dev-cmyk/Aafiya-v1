@@ -8,13 +8,16 @@ abstract final class AafiyaRadius {
   static const double xl = 16.0;
   static const double pill = 999.0;
 
-  // Prototype Specific Radii
+  // Prototype & Approved Design Radii (AAFIYA-APPS-DESIGN-SYSTEM-ADOPTION-01)
   static const double brandMark = 13.0;
   static const double button = 14.0;
   static const double card = 16.0;
+  static const double cardLg = 24.0;
+  static const double cardXl = 28.0;
+  static const double cardHero = 34.0;
   static const double ticket = 22.0;
   static const double sheet = 26.0;
-  static const double shortcutCircle = 58.0;
+  static const double shortcutCircle = 68.0;
 
   // Circular Radius constants
   static const Radius circularSm = Radius.circular(sm);
@@ -25,6 +28,9 @@ abstract final class AafiyaRadius {
   static const Radius circularBrandMark = Radius.circular(brandMark);
   static const Radius circularButton = Radius.circular(button);
   static const Radius circularCard = Radius.circular(card);
+  static const Radius circularCardLg = Radius.circular(cardLg);
+  static const Radius circularCardXl = Radius.circular(cardXl);
+  static const Radius circularCardHero = Radius.circular(cardHero);
   static const Radius circularTicket = Radius.circular(ticket);
   static const Radius circularSheet = Radius.circular(sheet);
 
@@ -41,6 +47,12 @@ abstract final class AafiyaRadius {
       BorderRadius.all(Radius.circular(button));
   static const BorderRadius borderCard =
       BorderRadius.all(Radius.circular(card));
+  static const BorderRadius borderCardLg =
+      BorderRadius.all(Radius.circular(cardLg));
+  static const BorderRadius borderCardXl =
+      BorderRadius.all(Radius.circular(cardXl));
+  static const BorderRadius borderCardHero =
+      BorderRadius.all(Radius.circular(cardHero));
   static const BorderRadius borderTicket =
       BorderRadius.all(Radius.circular(ticket));
   static const BorderRadius borderSheet =

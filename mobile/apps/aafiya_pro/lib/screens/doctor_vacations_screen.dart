@@ -231,6 +231,7 @@ class _DoctorVacationsScreenState extends State<DoctorVacationsScreen> {
     final strings = LocalizedStrings.of(context);
 
     return Scaffold(
+      backgroundColor: AafiyaColors.scaffoldBg,
       appBar: AafiyaAppBar(
         title: strings.doctorVacationsTitle,
         showBrandMark: true,
@@ -377,9 +378,10 @@ class _DoctorVacationsScreenState extends State<DoctorVacationsScreen> {
     return Container(
       padding: AafiyaSpacing.insetAllMd,
       decoration: BoxDecoration(
-        color: AafiyaColors.lightBackground,
-        borderRadius: BorderRadius.circular(AafiyaRadius.md),
-        border: Border.all(color: AafiyaColors.border),
+        color: Colors.white,
+        borderRadius: AafiyaRadius.borderCardLg,
+        border: Border.all(color: AafiyaColors.cardBorder),
+        boxShadow: AafiyaElevation.softCardShadow,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -469,7 +471,9 @@ class _DoctorVacationsScreenState extends State<DoctorVacationsScreen> {
     final isCancelling = _cancellingVacationId == vacation.id;
 
     return AafiyaCard(
-      borderColor: isEffective ? AafiyaColors.primaryBlue : AafiyaColors.border,
+      borderColor: isEffective
+          ? AafiyaColors.navy.withValues(alpha: 0.3)
+          : AafiyaColors.cardBorder,
       padding: AafiyaSpacing.insetAllMd,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

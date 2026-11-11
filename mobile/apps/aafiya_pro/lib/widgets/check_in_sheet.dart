@@ -213,7 +213,7 @@ class _CheckInSheetState extends State<CheckInSheet> {
       decoration: const BoxDecoration(
         color: AafiyaColors.pureWhite,
         borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AafiyaRadius.xl),
+          top: Radius.circular(AafiyaRadius.cardXl),
         ),
       ),
       padding: const EdgeInsets.symmetric(
@@ -387,14 +387,14 @@ class _CheckInSheetState extends State<CheckInSheet> {
             Row(
               children: [
                 Expanded(
-                  child: TextButton(
-                    style: TextButton.styleFrom(
-                      minimumSize: const Size(0, 52),
-                    ),
+                  child: AafiyaButton(
+                    label: strings.cancel,
+                    variant: AafiyaButtonVariant.outline,
+                    isPill: true,
+                    height: 52.0,
                     onPressed: _isLoading
                         ? null
                         : () => Navigator.of(context).pop(false),
-                    child: Text(strings.cancel),
                   ),
                 ),
                 const SizedBox(width: AafiyaSpacing.sm),
@@ -402,6 +402,8 @@ class _CheckInSheetState extends State<CheckInSheet> {
                   flex: 2,
                   child: AafiyaButton(
                     label: strings.submitCheckIn,
+                    variant: AafiyaButtonVariant.gradient,
+                    isPill: true,
                     height: 52.0,
                     isLoading: _isLoading,
                     onPressed: _submitCheckIn,

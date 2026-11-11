@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import '../tokens/aafiya_colors.dart';
+import '../tokens/aafiya_elevation.dart';
 import '../tokens/aafiya_radius.dart';
 import '../tokens/aafiya_typography.dart';
 import 'aafiya_locked_action.dart';
 
-enum AafiyaButtonVariant { primary, secondary, outline, action }
+enum AafiyaButtonVariant { primary, secondary, outline, action, gradient }
 
 /// Reusable AAFIYA button component adhering to brand kit tokens.
 class AafiyaButton extends StatelessWidget {
@@ -17,6 +18,8 @@ class AafiyaButton extends StatelessWidget {
     this.isLocked = false,
     this.icon,
     this.height = 48.0,
+    this.isPill = false,
+    this.useGradient = false,
   });
 
   final String label;
@@ -26,6 +29,13 @@ class AafiyaButton extends StatelessWidget {
   final bool isLocked;
   final Widget? icon;
   final double height;
+  final bool isPill;
+  final bool useGradient;
+
+  BorderRadius get _borderRadius =>
+      (isPill || variant == AafiyaButtonVariant.gradient)
+          ? AafiyaRadius.borderPill
+          : AafiyaRadius.borderButton;
 
   @override
   Widget build(BuildContext context) {
@@ -46,8 +56,7 @@ class AafiyaButton extends StatelessWidget {
             foregroundColor: AafiyaColors.secondaryText,
             textStyle: AafiyaTypography.labelLarge,
             side: const BorderSide(color: Color(0xFFCBD5E1), width: 1.5),
-            shape: const RoundedRectangleBorder(
-                borderRadius: AafiyaRadius.borderButton),
+            shape: RoundedRectangleBorder(borderRadius: _borderRadius),
             elevation: 0,
           ),
           icon: effectiveIcon,
@@ -56,25 +65,89 @@ class AafiyaButton extends StatelessWidget {
       );
     }
 
+    final isGrad = variant == AafiyaButtonVariant.gradient || useGradient;
+
     if (isLoading) {
       final spinnerColor = switch (variant) {
         AafiyaButtonVariant.primary => AafiyaColors.pureWhite,
         AafiyaButtonVariant.secondary => AafiyaColors.onHealingGreen,
         AafiyaButtonVariant.outline => AafiyaColors.healthBlue,
         AafiyaButtonVariant.action => AafiyaColors.pureWhite,
+        AafiyaButtonVariant.gradient => AafiyaColors.pureWhite,
       };
+
+      final loader = Center(
+        child: SizedBox(
+          height: 20,
+          width: 20,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            valueColor: AlwaysStoppedAnimation<Color>(spinnerColor),
+          ),
+        ),
+      );
+
+      if (isGrad) {
+        return Container(
+          height: height,
+          decoration: BoxDecoration(
+            gradient: AafiyaColors.primaryButtonGradient,
+            borderRadius: _borderRadius,
+            boxShadow: AafiyaElevation.primaryButtonShadow,
+          ),
+          child: loader,
+        );
+      }
 
       return SizedBox(
         height: height,
         child: ElevatedButton(
           onPressed: null,
           style: _buttonStyle,
-          child: SizedBox(
-            height: 20,
-            width: 20,
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation<Color>(spinnerColor),
+          child: loader,
+        ),
+      );
+    }
+
+    if (isGrad) {
+      final labelWidget = Text(
+        label,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: AafiyaTypography.labelLarge.copyWith(
+          color: AafiyaColors.pureWhite,
+          fontWeight: FontWeight.w700,
+        ),
+      );
+
+      return Container(
+        height: height,
+        decoration: BoxDecoration(
+          gradient: onPressed != null ? AafiyaColors.primaryButtonGradient : null,
+          color: onPressed == null ? const Color(0xFFCBD5E1) : null,
+          borderRadius: _borderRadius,
+          boxShadow: onPressed != null ? AafiyaElevation.primaryButtonShadow : null,
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onPressed,
+            borderRadius: _borderRadius,
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: icon != null
+                    ? Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          icon!,
+                          const SizedBox(width: 8.0),
+                          Flexible(child: labelWidget),
+                        ],
+                      )
+                    : labelWidget,
+              ),
             ),
           ),
         ),
@@ -105,12 +178,12 @@ class AafiyaButton extends StatelessWidget {
 
   ButtonStyle get _buttonStyle {
     return switch (variant) {
-      AafiyaButtonVariant.primary => ElevatedButton.styleFrom(
+      AafiyaButtonVariant.primary || AafiyaButtonVariant.gradient =>
+        ElevatedButton.styleFrom(
           backgroundColor: AafiyaColors.healthBlue,
           foregroundColor: AafiyaColors.pureWhite,
           textStyle: AafiyaTypography.labelLarge,
-          shape: const RoundedRectangleBorder(
-              borderRadius: AafiyaRadius.borderButton),
+          shape: RoundedRectangleBorder(borderRadius: _borderRadius),
           elevation: 0,
         ),
       AafiyaButtonVariant.secondary => ElevatedButton.styleFrom(
@@ -118,8 +191,7 @@ class AafiyaButton extends StatelessWidget {
           foregroundColor: AafiyaColors.onHealingGreen,
           textStyle: AafiyaTypography.labelLarge
               .copyWith(color: AafiyaColors.onHealingGreen),
-          shape: const RoundedRectangleBorder(
-              borderRadius: AafiyaRadius.borderButton),
+          shape: RoundedRectangleBorder(borderRadius: _borderRadius),
           elevation: 0,
         ),
       AafiyaButtonVariant.outline => ElevatedButton.styleFrom(
@@ -128,16 +200,14 @@ class AafiyaButton extends StatelessWidget {
           textStyle: AafiyaTypography.labelLarge
               .copyWith(color: AafiyaColors.healthBlue),
           side: const BorderSide(color: AafiyaColors.healthBlue, width: 1.5),
-          shape: const RoundedRectangleBorder(
-              borderRadius: AafiyaRadius.borderButton),
+          shape: RoundedRectangleBorder(borderRadius: _borderRadius),
           elevation: 0,
         ),
       AafiyaButtonVariant.action => ElevatedButton.styleFrom(
           backgroundColor: AafiyaColors.actionGreen,
           foregroundColor: AafiyaColors.pureWhite,
           textStyle: AafiyaTypography.labelLarge,
-          shape: const RoundedRectangleBorder(
-              borderRadius: AafiyaRadius.borderButton),
+          shape: RoundedRectangleBorder(borderRadius: _borderRadius),
           elevation: 0,
         ),
     };

@@ -381,8 +381,8 @@ void main() {
 
           expect(find.byType(PatientHomeShell), findsOneWidget);
           expect(find.byType(AafiyaShortcutTile), findsNWidgets(4));
-          // Verifies legacy AafiyaHeroHeader is completely eliminated per DEC-UI-01
-          expect(find.byType(AafiyaHeroHeader), findsNothing);
+          // Verifies restored AafiyaHeroHeader renders properly
+          expect(find.byType(AafiyaHeroHeader), findsOneWidget);
           expect(tester.takeException(), isNull);
         });
 

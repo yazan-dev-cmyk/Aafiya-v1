@@ -432,6 +432,7 @@ class _BcAppointmentBookingScreenState
     final strings = LocalizedStrings.of(context);
 
     return Scaffold(
+      backgroundColor: AafiyaColors.scaffoldBg,
       appBar: AafiyaAppBar(
         title: strings.newBookingAction,
         showBrandMark: true,
@@ -1262,7 +1263,10 @@ class _BcAppointmentBookingScreenState
     final isLastStep = _currentStep == 3;
 
     return Container(
-      color: AafiyaColors.pureWhite,
+      decoration: const BoxDecoration(
+        color: AafiyaColors.pureWhite,
+        border: Border(top: BorderSide(color: AafiyaColors.cardBorder, width: 1)),
+      ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: SafeArea(
         child: Row(
@@ -1275,9 +1279,7 @@ class _BcAppointmentBookingScreenState
                   minimumSize: const Size(0, 52),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
+                  shape: const StadiumBorder(),
                 ),
                 child: Text(strings.previousStepAction),
               ),
@@ -1298,9 +1300,7 @@ class _BcAppointmentBookingScreenState
                   foregroundColor: AafiyaColors.pureWhite,
                   minimumSize: const Size(0, 52),
                   padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
+                  shape: const StadiumBorder(),
                 ),
                 child: _isSubmitting
                     ? const SizedBox(

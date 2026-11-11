@@ -1052,6 +1052,7 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
     final canCreateBooking = widget.user.hasPermission('booking.create');
 
     return Scaffold(
+      backgroundColor: AafiyaColors.scaffoldBg,
       body: RefreshIndicator(
         onRefresh: _loadQueueData,
         child: Column(
@@ -1163,10 +1164,7 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
                               side: const BorderSide(
                                   color: AafiyaColors.healingGreen),
                               padding: const EdgeInsets.symmetric(vertical: 10),
-                              shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.circular(AafiyaRadius.md),
-                              ),
+                              shape: const StadiumBorder(),
                             ),
                             onPressed: _openCheckInSheet,
                             icon: const Icon(Icons.qr_code_scanner_rounded,
@@ -1188,12 +1186,9 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
                         child: OutlinedButton.icon(
                           style: OutlinedButton.styleFrom(
                             foregroundColor: AafiyaColors.primaryText,
-                            side: const BorderSide(color: AafiyaColors.border),
+                            side: const BorderSide(color: AafiyaColors.cardBorder),
                             padding: const EdgeInsets.symmetric(vertical: 10),
-                            shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(AafiyaRadius.md),
-                            ),
+                            shape: const StadiumBorder(),
                           ),
                           onPressed: _openPatientSearch,
                           icon: const Icon(Icons.search_rounded, size: 18),
@@ -1216,10 +1211,9 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AafiyaColors.healingGreen,
                         foregroundColor: AafiyaColors.pureWhite,
+                        minimumSize: const Size(0, 52),
                         padding: const EdgeInsets.symmetric(vertical: 10),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(AafiyaRadius.md),
-                        ),
+                        shape: const StadiumBorder(),
                       ),
                       onPressed: () => _openNewBooking(),
                       icon: const Icon(Icons.add_rounded, size: 20),
@@ -1266,10 +1260,10 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
       color: isSelected
           ? accentColor.withValues(alpha: 0.1)
           : AafiyaColors.pureWhite,
-      borderRadius: BorderRadius.circular(AafiyaRadius.md),
+      borderRadius: AafiyaRadius.borderPill,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(AafiyaRadius.md),
+        borderRadius: AafiyaRadius.borderPill,
         child: Container(
           padding: const EdgeInsets.symmetric(
             horizontal: 6,
@@ -1277,10 +1271,10 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
           ),
           decoration: BoxDecoration(
             border: Border.all(
-              color: isSelected ? accentColor : AafiyaColors.border,
+              color: isSelected ? accentColor : AafiyaColors.cardBorder,
               width: isSelected ? 1.5 : 1,
             ),
-            borderRadius: BorderRadius.circular(AafiyaRadius.md),
+            borderRadius: AafiyaRadius.borderPill,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,

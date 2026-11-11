@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import '../tokens/aafiya_colors.dart';
+import '../tokens/aafiya_elevation.dart';
 import '../tokens/aafiya_radius.dart';
 import '../tokens/aafiya_typography.dart';
 import 'aafiya_button.dart';
 
-/// Reusable Empty State widget matching the prototype visual specification.
-///
-/// Features:
-/// - Rounded card (radius 22px) with subtle elevation
+/// Reusable Empty State widget matching the approved design reference:
+/// - Hero card radius: 34px (AafiyaRadius.cardHero)
+/// - Elevation shadow: AafiyaElevation.heroCardShadow (0 18px 40px rgba(29,87,137,.13))
 /// - Calendar illustration with teal plus badge
-/// - Bold title (18pt)
-/// - Explanatory guidance text (14.5pt, line height 1.7)
-/// - Full-width primary CTA button
+/// - Bold title (22pt, Navy #142E5D)
+/// - Explanatory guidance text (15pt, line height 1.7)
+/// - Full-width primary pill gradient CTA button (52dp height)
 class AafiyaEmptyState extends StatelessWidget {
   const AafiyaEmptyState({
     super.key,
@@ -40,17 +40,15 @@ class AafiyaEmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 22.0),
+      padding: const EdgeInsets.symmetric(horizontal: 22.0, vertical: 26.0),
       decoration: BoxDecoration(
         color: AafiyaColors.pureWhite,
-        borderRadius: BorderRadius.circular(AafiyaRadius.ticket),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF023E73).withValues(alpha: 0.12),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(AafiyaRadius.cardHero),
+        border: Border.all(
+          color: Colors.white,
+          width: 1.0,
+        ),
+        boxShadow: AafiyaElevation.heroCardShadow,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -60,15 +58,15 @@ class AafiyaEmptyState extends StatelessWidget {
           Center(
             child: illustration ?? const _DefaultEmptyIllustration(),
           ),
-          const SizedBox(height: 12.0),
+          const SizedBox(height: 14.0),
 
           // Title
           Text(
             title,
             style: AafiyaTypography.titleLarge.copyWith(
-              fontSize: 18.0,
+              fontSize: 22.0,
               fontWeight: FontWeight.w700,
-              color: AafiyaColors.primaryText,
+              color: AafiyaColors.navy,
             ),
             textAlign: TextAlign.center,
           ),
@@ -78,19 +76,21 @@ class AafiyaEmptyState extends StatelessWidget {
           Text(
             description,
             style: AafiyaTypography.bodyMedium.copyWith(
-              fontSize: 14.5,
-              color: AafiyaColors.secondaryText,
+              fontSize: 15.0,
+              color: const Color(0xFF63718B),
               height: 1.6,
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 20.0),
+          const SizedBox(height: 22.0),
 
-          // Full-width CTA Button
+          // Full-width Gradient Pill CTA Button
           AafiyaButton(
             label: buttonLabel,
             onPressed: onButtonPressed,
-            variant: AafiyaButtonVariant.primary,
+            variant: AafiyaButtonVariant.gradient,
+            isPill: true,
+            height: 52.0,
           ),
         ],
       ),

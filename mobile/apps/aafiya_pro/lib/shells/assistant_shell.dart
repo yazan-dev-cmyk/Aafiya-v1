@@ -91,6 +91,7 @@ class _AssistantShellState extends State<AssistantShell> {
         widget.user.hasPermission('booking.manage_queue');
 
     return Scaffold(
+      backgroundColor: AafiyaColors.scaffoldBg,
       appBar: AafiyaAppBar(
         title: '${strings.assistantRoleTitle}: ${widget.user.name}',
         showBrandMark: true,

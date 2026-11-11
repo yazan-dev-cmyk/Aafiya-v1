@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../tokens/aafiya_colors.dart';
+import '../tokens/aafiya_elevation.dart';
 import '../tokens/aafiya_radius.dart';
 import '../tokens/aafiya_typography.dart';
 
@@ -64,15 +65,19 @@ class AafiyaSegmentedTabs<T> extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(
                       horizontal: 18.0, vertical: 10.0),
                   decoration: BoxDecoration(
-                    color:
-                        isSelected ? AafiyaColors.navy : AafiyaColors.pureWhite,
+                    color: isSelected
+                        ? AafiyaColors.deepBlue
+                        : AafiyaColors.pureWhite,
                     borderRadius: BorderRadius.circular(AafiyaRadius.pill),
                     border: Border.all(
                       color: isSelected
-                          ? AafiyaColors.navy
-                          : AafiyaColors.lineDivider,
-                      width: 1.5,
+                          ? AafiyaColors.deepBlue
+                          : AafiyaColors.filterInactiveBorder,
+                      width: 1.0,
                     ),
+                    boxShadow: isSelected
+                        ? AafiyaElevation.filterActiveShadow
+                        : null,
                   ),
                   child: Center(
                     child: Row(
@@ -84,19 +89,19 @@ class AafiyaSegmentedTabs<T> extends StatelessWidget {
                             size: 16.0,
                             color: isSelected
                                 ? AafiyaColors.pureWhite
-                                : AafiyaColors.secondaryText,
+                                : AafiyaColors.filterInactiveText,
                           ),
                           const SizedBox(width: 6.0),
                         ],
                         Text(
                           item.label,
                           style: AafiyaTypography.titleSmall.copyWith(
-                            fontSize: 14.5,
+                            fontSize: 14.0,
                             fontWeight:
-                                isSelected ? FontWeight.w600 : FontWeight.w500,
+                                isSelected ? FontWeight.w700 : FontWeight.w600,
                             color: isSelected
                                 ? AafiyaColors.pureWhite
-                                : AafiyaColors.secondaryText,
+                                : AafiyaColors.filterInactiveText,
                           ),
                         ),
                       ],

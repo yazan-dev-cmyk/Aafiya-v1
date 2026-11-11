@@ -126,7 +126,8 @@ class _PatientShareRecordDialogState extends State<PatientShareRecordDialog> {
     return Container(
       decoration: const BoxDecoration(
         color: AafiyaColors.pureWhite,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: BorderRadius.vertical(
+            top: Radius.circular(AafiyaRadius.cardXl)),
       ),
       padding: EdgeInsets.only(
         left: 20,
@@ -281,6 +282,9 @@ class _PatientShareRecordDialogState extends State<PatientShareRecordDialog> {
 
           AafiyaButton(
             label: strings.createShareButton,
+            variant: AafiyaButtonVariant.gradient,
+            isPill: true,
+            height: 52.0,
             isLoading: _isLoading,
             onPressed: _isLoading ? null : _handleGenerate,
           ),
@@ -438,6 +442,9 @@ class _PatientShareRecordDialogState extends State<PatientShareRecordDialog> {
 
         AafiyaButton(
           label: strings.dismiss,
+          variant: AafiyaButtonVariant.outline,
+          isPill: true,
+          height: 52.0,
           onPressed: () => Navigator.of(context).pop(share),
         ),
       ],

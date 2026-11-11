@@ -221,11 +221,18 @@ class _PatientHomeShellState extends State<PatientHomeShell>
                 constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
                 icon: Badge(
                   isLabelVisible: count > 0,
+                  backgroundColor: AafiyaColors.unreadBadge,
                   label: Text(
                     count > 99 ? '99+' : '$count',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: AafiyaColors.pureWhite,
+                    ),
                   ),
-                  child: const Icon(Icons.notifications_outlined),
+                  child: const Icon(
+                    Icons.notifications_outlined,
+                    color: AafiyaColors.navy,
+                  ),
                 ),
                 tooltip: strings.patientNotificationsTitle,
                 onPressed: () async {
@@ -247,15 +254,20 @@ class _PatientHomeShellState extends State<PatientHomeShell>
           ),
           IconButton(
             constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-            icon: const Icon(Icons.health_and_safety_rounded,
-                color: AafiyaColors.error),
+            icon: const Icon(
+              Icons.health_and_safety_rounded,
+              color: AafiyaColors.redInk,
+            ),
             tooltip: strings.emergencyProfileTitle,
             onPressed: () => EmergencyProfileScreen.show(context,
                 apiClient: widget.apiClient),
           ),
           IconButton(
             constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-            icon: const Icon(Icons.logout_rounded),
+            icon: const Icon(
+              Icons.logout_rounded,
+              color: AafiyaColors.navy,
+            ),
             tooltip: strings.signOut,
             onPressed: () async {
               final confirmed = await AafiyaSignOutDialog.show(
@@ -286,43 +298,73 @@ class _PatientHomeShellState extends State<PatientHomeShell>
       ),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
-          color: AafiyaColors.pureWhite,
+          color: Color(0xF0FFFFFF), // rgba(255, 255, 255, 0.94)
           border: Border(
             top: BorderSide(
               color: AafiyaColors.lineDivider,
               width: 1.0,
             ),
           ),
-        ),
-        child: NavigationBar(
-          height: 64.0,
-          backgroundColor: AafiyaColors.pureWhite,
-          elevation: 0,
-          selectedIndex: _selectedTabIndex,
-          onDestinationSelected: (index) =>
-              setState(() => _selectedTabIndex = index),
-          destinations: [
-            NavigationDestination(
-              icon: const Icon(Icons.home_outlined),
-              selectedIcon: const Icon(Icons.home),
-              label: strings.patientHomeTitle,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.calendar_month_outlined),
-              selectedIcon: const Icon(Icons.calendar_month),
-              label: strings.patientAppointmentsTitle,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.folder_shared_outlined),
-              selectedIcon: const Icon(Icons.folder_shared),
-              label: strings.patientRecordsTitle,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.person_outline),
-              selectedIcon: const Icon(Icons.person),
-              label: strings.patientProfileTitle,
+          boxShadow: [
+            BoxShadow(
+              color: Color(0x101D4569), // rgba(29, 69, 105, 0.06)
+              offset: Offset(0, -8),
+              blurRadius: 24,
             ),
           ],
+        ),
+        child: NavigationBarTheme(
+          data: NavigationBarThemeData(
+            indicatorColor: AafiyaColors.tealActiveNavBg,
+            iconTheme: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) {
+                return const IconThemeData(color: AafiyaColors.tealActiveNav);
+              }
+              return const IconThemeData(color: Color(0xFF647286));
+            }),
+            labelTextStyle: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) {
+                return AafiyaTypography.labelSmall.copyWith(
+                  color: AafiyaColors.tealActiveNav,
+                  fontWeight: FontWeight.w700,
+                );
+              }
+              return AafiyaTypography.labelSmall.copyWith(
+                color: const Color(0xFF647286),
+                fontWeight: FontWeight.w500,
+              );
+            }),
+          ),
+          child: NavigationBar(
+            height: 64.0,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            selectedIndex: _selectedTabIndex,
+            onDestinationSelected: (index) =>
+                setState(() => _selectedTabIndex = index),
+            destinations: [
+              NavigationDestination(
+                icon: const Icon(Icons.home_outlined),
+                selectedIcon: const Icon(Icons.home),
+                label: strings.patientHomeTitle,
+              ),
+              NavigationDestination(
+                icon: const Icon(Icons.calendar_month_outlined),
+                selectedIcon: const Icon(Icons.calendar_month),
+                label: strings.patientAppointmentsTitle,
+              ),
+              NavigationDestination(
+                icon: const Icon(Icons.folder_shared_outlined),
+                selectedIcon: const Icon(Icons.folder_shared),
+                label: strings.patientRecordsTitle,
+              ),
+              NavigationDestination(
+                icon: const Icon(Icons.person_outline),
+                selectedIcon: const Icon(Icons.person),
+                label: strings.patientProfileTitle,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -404,108 +446,80 @@ class _PatientHomeShellState extends State<PatientHomeShell>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // 1. Luminous White Greeting Header Row (DEC-UI-01)
-            Container(
-              color: AafiyaColors.pureWhite,
-              padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 14.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+            // 1. Prototype Hero Header with Khatam Pattern & Brand Mark
+            AafiyaHeroHeader(
+              title: greetingTitle,
+              subtitle: heroSubtitle,
+              brandTitle: strings.appBrandName,
+              bottomPadding: 56.0,
+              trailingAction: Semantics(
+                button: true,
+                label: strings.emergencyProfileTitle,
+                child: InkWell(
+                  onTap: () => EmergencyProfileScreen.show(context,
+                      apiClient: widget.apiClient),
+                  borderRadius: BorderRadius.circular(15.0),
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.14),
+                      borderRadius: BorderRadius.circular(15.0),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.28),
+                        width: 1.0,
+                      ),
+                    ),
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      alignment: Alignment.center,
                       children: [
-                        Text(
-                          greetingTitle,
-                          style: AafiyaTypography.headlineMedium.copyWith(
-                            color: AafiyaColors.primaryText,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                        const Icon(
+                          Icons.notifications_none_rounded,
+                          color: Colors.white,
+                          size: 22,
                         ),
-                        const SizedBox(height: 4.0),
-                        Text(
-                          heroSubtitle,
-                          style: AafiyaTypography.bodyMedium.copyWith(
-                            color: AafiyaColors.secondaryText,
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: Container(
+                            width: 8,
+                            height: 8,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFF59E0B),
+                              shape: BoxShape.circle,
+                            ),
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(width: 12.0),
-                  // Emergency Profile / Notification Action Button (48dp touch target)
-                  Semantics(
-                    button: true,
-                    label: strings.emergencyProfileTitle,
-                    child: InkWell(
-                      onTap: () => EmergencyProfileScreen.show(context,
-                          apiClient: widget.apiClient),
-                      borderRadius: BorderRadius.circular(15.0),
-                      child: Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: AafiyaColors.lightBackground,
-                          borderRadius: BorderRadius.circular(15.0),
-                          border: Border.all(
-                            color: AafiyaColors.border,
-                            width: 1.0,
-                          ),
-                        ),
-                        child: Stack(
-                          clipBehavior: Clip.none,
-                          alignment: Alignment.center,
-                          children: [
-                            const Icon(
-                              Icons.notifications_none_rounded,
-                              color: AafiyaColors.primaryText,
-                              size: 22,
-                            ),
-                            Positioned(
-                              top: 10,
-                              right: 10,
-                              child: Container(
-                                width: 8,
-                                height: 8,
-                                decoration: const BoxDecoration(
-                                  color: AafiyaColors.amberDark,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
-            const SizedBox(height: 14.0),
 
-            // 2. Luminous Upcoming Appointment Card or Empty State (Natural Flow, DEC-UI-01)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: hasUpcoming && topAppointment != null
-                  ? _buildTicketCard(
-                      context, strings, topAppointment, isEligible)
-                  : AafiyaEmptyState(
-                      title: strings.emptyAppointmentTitle,
-                      description: strings.emptyAppointmentDescription,
-                      buttonLabel: strings.findBookingCenterAction,
-                      onButtonPressed: () {
-                        setState(() => _selectedDirectoryTab = 'centers');
-                        BookingCenterDirectoryScreen.show(context,
-                            apiClient: widget.apiClient);
-                      },
-                    ),
+            // 2. Overlapping Slot: Ticket Card or Empty State (Header Overlap)
+            Transform.translate(
+              offset: const Offset(0, -36.0),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: hasUpcoming && topAppointment != null
+                    ? _buildTicketCard(
+                        context, strings, topAppointment, isEligible)
+                    : AafiyaEmptyState(
+                        title: strings.emptyAppointmentTitle,
+                        description: strings.emptyAppointmentDescription,
+                        buttonLabel: strings.findBookingCenterAction,
+                        onButtonPressed: () {
+                          setState(() => _selectedDirectoryTab = 'centers');
+                          BookingCenterDirectoryScreen.show(context,
+                              apiClient: widget.apiClient);
+                        },
+                      ),
+              ),
             ),
-            const SizedBox(height: 16.0),
 
-            // 3. Shortcuts (4-grid icons matching prototype in natural flow)
+            // 3. Shortcuts (4-grid icons matching approved design system in natural flow)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
               child: Row(
@@ -518,8 +532,8 @@ class _PatientHomeShellState extends State<PatientHomeShell>
                           ? 'ابحث عن طبيب'
                           : strings.doctorDirectory,
                       icon: Icons.search_rounded,
-                      backgroundColor: AafiyaColors.blueSoft,
-                      iconColor: AafiyaColors.royalBlue,
+                      backgroundColor: AafiyaColors.cyanSoftBg,
+                      iconColor: AafiyaColors.cyanInk,
                       onTap: () => DoctorDirectoryScreen.show(context,
                           apiClient: widget.apiClient),
                     ),
@@ -528,8 +542,8 @@ class _PatientHomeShellState extends State<PatientHomeShell>
                     child: AafiyaShortcutTile(
                       label: strings.prescriptionsTitle,
                       icon: Icons.receipt_long_rounded,
-                      backgroundColor: AafiyaColors.tealSoft,
-                      iconColor: AafiyaColors.tealInk,
+                      backgroundColor: AafiyaColors.greenSoftBg,
+                      iconColor: AafiyaColors.greenInk,
                       onTap: () => PrescriptionsScreen.show(context,
                           apiClient: widget.apiClient),
                     ),
@@ -538,8 +552,8 @@ class _PatientHomeShellState extends State<PatientHomeShell>
                     child: AafiyaShortcutTile(
                       label: strings.patientRecordsTitle,
                       icon: Icons.folder_shared_outlined,
-                      backgroundColor: AafiyaColors.indigoSoft,
-                      iconColor: AafiyaColors.indigoInk,
+                      backgroundColor: AafiyaColors.blueSoftBg,
+                      iconColor: AafiyaColors.blueInk,
                       onTap: () => setState(() => _selectedTabIndex = 2),
                     ),
                   ),
@@ -547,9 +561,9 @@ class _PatientHomeShellState extends State<PatientHomeShell>
                     child: AafiyaShortcutTile(
                       label: strings.emergencyProfileTitle,
                       icon: Icons.health_and_safety_rounded,
-                      backgroundColor: AafiyaColors.statusUrgentBg,
-                      iconColor: AafiyaColors.statusUrgentInk,
-                      textColor: AafiyaColors.statusUrgentInk,
+                      backgroundColor: AafiyaColors.redSoftBg,
+                      iconColor: AafiyaColors.redInk,
+                      textColor: AafiyaColors.redInk,
                       onTap: () => EmergencyProfileScreen.show(context,
                           apiClient: widget.apiClient),
                     ),
@@ -558,40 +572,12 @@ class _PatientHomeShellState extends State<PatientHomeShell>
               ),
             ),
 
-            // 4. Mandatory Business Model Notice Card (DISC-01)
+            // 4. Mandatory Business Model Notice Banner (DISC-01)
             const SizedBox(height: 16.0),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0, vertical: 12.0),
-                decoration: BoxDecoration(
-                  color: AafiyaColors.statusConfirmedBg,
-                  borderRadius: BorderRadius.circular(16.0),
-                  border: Border.all(
-                      color: AafiyaColors.statusConfirmedBorder, width: 1.0),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Icon(
-                      Icons.shield_outlined,
-                      color: AafiyaColors.actionGreen,
-                      size: 22,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        strings.patientNoticeDirectBookingNotice,
-                        style: AafiyaTypography.bodyMedium.copyWith(
-                          color: AafiyaColors.statusConfirmedInk,
-                          fontWeight: FontWeight.w500,
-                          height: 1.45,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+              child: AafiyaNoticeBanner(
+                message: strings.patientNoticeDirectBookingNotice,
               ),
             ),
 
@@ -882,7 +868,7 @@ class _PatientHomeShellState extends State<PatientHomeShell>
                 ),
                 const SizedBox(width: 10.0),
 
-                // Button 1: Pass Action (Teal Primary)
+                // Button 1: Pass Action (Gradient Pill)
                 Expanded(
                   flex: 3,
                   child: AafiyaButton(
@@ -892,7 +878,8 @@ class _PatientHomeShellState extends State<PatientHomeShell>
                             ? 'Pass de visite'
                             : 'Visit Pass',
                     icon: const Icon(Icons.qr_code_2_rounded),
-                    variant: AafiyaButtonVariant.primary,
+                    variant: AafiyaButtonVariant.gradient,
+                    isPill: true,
                     height: 52.0,
                     onPressed: () =>
                         PatientQrDialog.show(context, appointment: appointment),
@@ -900,12 +887,13 @@ class _PatientHomeShellState extends State<PatientHomeShell>
                 ),
                 const SizedBox(width: 10.0),
 
-                // Button 2: Details (Outline)
+                // Button 2: Details (Outline Pill)
                 Expanded(
                   flex: 2,
                   child: AafiyaButton(
                     label: strings.appointmentDetails,
                     variant: AafiyaButtonVariant.outline,
+                    isPill: true,
                     height: 52.0,
                     onPressed: () => AppointmentDetailScreen.show(
                       context,
@@ -924,6 +912,7 @@ class _PatientHomeShellState extends State<PatientHomeShell>
                   child: AafiyaButton(
                     label: strings.appointmentDetails,
                     variant: AafiyaButtonVariant.outline,
+                    isPill: true,
                     height: 52.0,
                     onPressed: () => AppointmentDetailScreen.show(
                       context,

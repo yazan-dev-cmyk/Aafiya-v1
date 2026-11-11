@@ -51,9 +51,9 @@ class AafiyaTicketCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(cardRadius),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF023E73).withValues(alpha: 0.16),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
+            color: AafiyaColors.navy.withValues(alpha: 0.10),
+            blurRadius: 28,
+            offset: const Offset(0, 10),
           ),
         ],
       ),

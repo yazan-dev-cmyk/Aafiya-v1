@@ -215,6 +215,7 @@ class _UnresolvedReschedulesScreenState
     final filtered = _filteredItems;
 
     return Scaffold(
+      backgroundColor: AafiyaColors.scaffoldBg,
       appBar: AafiyaAppBar(
         title: strings.unresolvedReschedulesTitle,
         showBrandMark: true,

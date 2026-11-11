@@ -51,7 +51,7 @@ class _ScheduleActivationDialogState extends State<ScheduleActivationDialog> {
 
     return AlertDialog(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AafiyaRadius.lg),
+        borderRadius: BorderRadius.circular(AafiyaRadius.cardXl),
       ),
       contentPadding: AafiyaSpacing.insetAllMd,
       title: Row(
@@ -281,9 +281,7 @@ class _ScheduleActivationDialogState extends State<ScheduleActivationDialog> {
           style: ElevatedButton.styleFrom(
             backgroundColor: AafiyaColors.error,
             foregroundColor: AafiyaColors.pureWhite,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AafiyaRadius.sm),
-            ),
+            shape: const StadiumBorder(),
           ),
           child: _isActivating
               ? const SizedBox(

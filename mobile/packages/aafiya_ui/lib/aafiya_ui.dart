@@ -35,3 +35,4 @@ export 'widgets/aafiya_ticket_card.dart';
 export 'widgets/aafiya_ads_ticker.dart';
 export 'widgets/aafiya_change_password_card.dart';
 export 'widgets/aafiya_forgot_password_sheet.dart';
+export 'widgets/aafiya_notice_banner.dart';

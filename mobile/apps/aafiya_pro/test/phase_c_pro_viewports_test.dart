@@ -375,10 +375,8 @@ void main() {
 
           final dashboardService = DoctorDashboardService(apiClient: apiClient);
 
-          FlutterErrorDetails? caughtDetails;
           final originalOnError = FlutterError.onError;
           FlutterError.onError = (details) {
-            caughtDetails = details;
             // ignore: avoid_print
             print('EXACT OVERFLOW: ${details.summary}');
             // ignore: avoid_print

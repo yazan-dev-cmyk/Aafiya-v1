@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../tokens/aafiya_colors.dart';
+import '../tokens/aafiya_elevation.dart';
 import '../tokens/aafiya_radius.dart';
 import '../tokens/aafiya_typography.dart';
 
@@ -50,81 +51,96 @@ class AafiyaDirectoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: width,
-      child: Material(
-        color: AafiyaColors.pureWhite,
-        borderRadius: BorderRadius.circular(AafiyaRadius.card),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(AafiyaRadius.card),
-          child: Container(
-            padding: const EdgeInsets.all(14.0),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(AafiyaRadius.card),
-              border: Border.all(
-                color: AafiyaColors.lineDivider,
-                width: 1.0,
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Avatar
-                Container(
-                  width: 44.0,
-                  height: 44.0,
-                  decoration: BoxDecoration(
-                    color: avatarColor ?? const Color(0xFFE6F1F9),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Icon(
-                      icon,
-                      color: AafiyaColors.royalBlue,
-                      size: 22.0,
+      child: Container(
+        decoration: BoxDecoration(
+          color: AafiyaColors.pureWhite,
+          borderRadius: AafiyaRadius.borderCardLg,
+          border: Border.all(
+            color: AafiyaColors.cardBorder,
+            width: 1.0,
+          ),
+          boxShadow: AafiyaElevation.directoryCardShadow,
+        ),
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: AafiyaRadius.borderCardLg,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: AafiyaRadius.borderCardLg,
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 14.0, vertical: 12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Avatar / Icon Container
+                  Container(
+                    width: 45.0,
+                    height: 45.0,
+                    decoration: BoxDecoration(
+                      color: avatarColor ?? const Color(0xFFE9F5FC),
+                      borderRadius: BorderRadius.circular(16.0),
                     ),
-                  ),
-                ),
-                const SizedBox(height: 10.0),
-
-                // Name / Title
-                Text(
-                  title,
-                  style: AafiyaTypography.directoryCardTitle,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4.0),
-
-                // Specialty / Subtitle
-                Text(
-                  subtitle,
-                  style: AafiyaTypography.directoryCardSubtitle,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 6.0),
-
-                // Location Row
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.location_on_outlined,
-                      size: 14.0,
-                      color: AafiyaColors.secondaryText,
-                    ),
-                    const SizedBox(width: 4.0),
-                    Expanded(
-                      child: Text(
-                        location,
-                        style: AafiyaTypography.directoryCardSubtitle,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                    child: Center(
+                      child: Icon(
+                        icon,
+                        color: const Color(0xFF087BB7),
+                        size: 23.0,
                       ),
                     ),
-                  ],
-                ),
-              ],
+                  ),
+                  const SizedBox(height: 10.0),
+
+                  // Name / Title
+                  Text(
+                    title,
+                    style: AafiyaTypography.directoryCardTitle.copyWith(
+                      color: AafiyaColors.navy,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 15.5,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4.0),
+
+                  // Specialty / Subtitle
+                  Text(
+                    subtitle,
+                    style: AafiyaTypography.directoryCardSubtitle.copyWith(
+                      color: const Color(0xFF697991),
+                      fontSize: 13.0,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 8.0),
+
+                  // Location Row
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.location_on_outlined,
+                        size: 14.0,
+                        color: Color(0xFF596B88),
+                      ),
+                      const SizedBox(width: 4.0),
+                      Expanded(
+                        child: Text(
+                          location,
+                          style: AafiyaTypography.directoryCardSubtitle.copyWith(
+                            color: const Color(0xFF596B88),
+                            fontSize: 12.0,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),

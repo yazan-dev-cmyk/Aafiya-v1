@@ -118,7 +118,7 @@ class _PatientSummarySheetState extends State<PatientSummarySheet> {
       decoration: const BoxDecoration(
         color: AafiyaColors.lightBackground,
         borderRadius: BorderRadius.vertical(
-          top: Radius.circular(AafiyaRadius.xl),
+          top: Radius.circular(AafiyaRadius.cardXl),
         ),
       ),
       child: Column(

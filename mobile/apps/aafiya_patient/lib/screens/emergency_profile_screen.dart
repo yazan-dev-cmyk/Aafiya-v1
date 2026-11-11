@@ -72,6 +72,7 @@ class _EmergencyProfileScreenState extends State<EmergencyProfileScreen> {
     final strings = LocalizedStrings.of(context);
 
     return Scaffold(
+      backgroundColor: AafiyaColors.scaffoldBg,
       appBar: AafiyaAppBar(
         title: strings.emergencyProfileTitle,
         showBrandMark: true,

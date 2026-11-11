@@ -722,11 +722,11 @@ class _ClinicDirectorStatsScreenState extends State<ClinicDirectorStatsScreen> {
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
             color: isSelected
-                ? AafiyaColors.healthBlue
+                ? AafiyaColors.deepBlue
                 : AafiyaColors.lightBackground,
-            borderRadius: BorderRadius.circular(AafiyaRadius.md),
+            borderRadius: AafiyaRadius.borderPill,
             border: Border.all(
-              color: isSelected ? AafiyaColors.healthBlue : AafiyaColors.border,
+              color: isSelected ? AafiyaColors.deepBlue : AafiyaColors.cardBorder,
             ),
           ),
           alignment: Alignment.center,
@@ -940,11 +940,12 @@ class _ClinicDirectorStatsScreenState extends State<ClinicDirectorStatsScreen> {
       child: Container(
         padding: const EdgeInsets.all(AafiyaSpacing.md),
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(AafiyaRadius.lg),
+          color: Colors.white,
+          borderRadius: AafiyaRadius.borderCardLg,
           border: Border.all(
-            color: color.withValues(alpha: 0.25),
+            color: AafiyaColors.cardBorder,
           ),
+          boxShadow: AafiyaElevation.softCardShadow,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -955,19 +956,32 @@ class _ClinicDirectorStatsScreenState extends State<ClinicDirectorStatsScreen> {
                 Text(
                   count.toString(),
                   style: AafiyaTypography.headlineLarge.copyWith(
-                    color: color,
+                    color: AafiyaColors.navy,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Icon(icon, color: color, size: 22),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.12),
+                    shape: BoxShape.circle,
+                    boxShadow: AafiyaElevation.bubbleShadow,
+                  ),
+                  child: SizedBox(
+                    width: 34,
+                    height: 34,
+                    child: Center(
+                      child: Icon(icon, color: color, size: 18),
+                    ),
+                  ),
+                ),
               ],
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 6),
             Text(
               label,
               style: AafiyaTypography.caption.copyWith(
                 fontWeight: FontWeight.w600,
-                color: AafiyaColors.primaryText,
+                color: AafiyaColors.secondaryText,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,

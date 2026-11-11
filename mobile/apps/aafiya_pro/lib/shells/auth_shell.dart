@@ -106,6 +106,7 @@ class _ProAuthShellState extends State<ProAuthShell> {
         widget.currentLocale ?? Localizations.localeOf(context);
 
     return Scaffold(
+      backgroundColor: AafiyaColors.scaffoldBg,
       appBar: AafiyaAppBar(
         title: strings.proAppTitle,
         actions: widget.onLocaleChanged != null
@@ -141,6 +142,7 @@ class _ProAuthShellState extends State<ProAuthShell> {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 400),
               child: AafiyaCard(
+                borderRadius: AafiyaRadius.borderCardXl,
                 padding: AafiyaSpacing.insetAllXl,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -236,6 +238,8 @@ class _ProAuthShellState extends State<ProAuthShell> {
                     const SizedBox(height: 24),
                     AafiyaButton(
                       label: strings.signIn,
+                      variant: AafiyaButtonVariant.gradient,
+                      isPill: true,
                       height: 52.0,
                       isLoading: _isLoading,
                       onPressed: _isLoading ? null : _handleLogin,

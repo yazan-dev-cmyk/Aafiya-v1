@@ -200,6 +200,7 @@ class _DoctorStaffScreenState extends State<DoctorStaffScreen>
     }
 
     return Scaffold(
+      backgroundColor: AafiyaColors.scaffoldBg,
       body: SafeArea(
         child: Column(
           children: [
@@ -272,7 +273,7 @@ class _DoctorStaffScreenState extends State<DoctorStaffScreen>
             Container(
               decoration: const BoxDecoration(
                 border: Border(
-                  bottom: BorderSide(color: AafiyaColors.border),
+                  bottom: BorderSide(color: AafiyaColors.cardBorder),
                 ),
               ),
               child: Row(
@@ -280,9 +281,9 @@ class _DoctorStaffScreenState extends State<DoctorStaffScreen>
                   Expanded(
                     child: TabBar(
                       controller: _tabController,
-                      labelColor: AafiyaColors.healthBlue,
+                      labelColor: AafiyaColors.deepBlue,
                       unselectedLabelColor: AafiyaColors.secondaryText,
-                      indicatorColor: AafiyaColors.healthBlue,
+                      indicatorColor: AafiyaColors.deepBlue,
                       tabs: [
                         Tab(
                           text: _staffData != null

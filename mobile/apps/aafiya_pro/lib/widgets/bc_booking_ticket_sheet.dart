@@ -78,7 +78,7 @@ class BcBookingTicketSheet extends StatelessWidget {
         return Container(
           decoration: const BoxDecoration(
             color: AafiyaColors.pureWhite,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(AafiyaRadius.cardXl)),
           ),
           child: Column(
             children: [
@@ -355,10 +355,9 @@ class BcBookingTicketSheet extends StatelessWidget {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AafiyaColors.healthBlue,
                             foregroundColor: AafiyaColors.pureWhite,
+                            minimumSize: const Size(0, 52),
                             padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
+                            shape: const StadiumBorder(),
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -366,10 +365,9 @@ class BcBookingTicketSheet extends StatelessWidget {
                       OutlinedButton(
                         onPressed: () => Navigator.of(context).pop(),
                         style: OutlinedButton.styleFrom(
+                          minimumSize: const Size(0, 52),
                           padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
+                          shape: const StadiumBorder(),
                         ),
                         child: Text(strings.dismiss),
                       ),

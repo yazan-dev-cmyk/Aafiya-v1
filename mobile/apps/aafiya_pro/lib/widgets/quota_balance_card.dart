@@ -156,9 +156,7 @@ class QuotaBalanceCard extends StatelessWidget {
                           horizontal: 12, vertical: 8),
                       textStyle: AafiyaTypography.labelSmall
                           .copyWith(fontWeight: FontWeight.bold),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: AafiyaRadius.borderSm,
-                      ),
+                      shape: const StadiumBorder(),
                     ),
                   ),
               ],

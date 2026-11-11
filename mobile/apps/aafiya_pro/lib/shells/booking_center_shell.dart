@@ -155,6 +155,7 @@ class _BookingCenterShellState extends State<BookingCenterShell> {
     final centerName = _quotaData?.name ?? widget.user.name;
 
     return Scaffold(
+      backgroundColor: AafiyaColors.scaffoldBg,
       appBar: AafiyaAppBar(
         title: '${strings.bookingCenterRoleTitle}: ${widget.user.name}',
         showBrandMark: true,

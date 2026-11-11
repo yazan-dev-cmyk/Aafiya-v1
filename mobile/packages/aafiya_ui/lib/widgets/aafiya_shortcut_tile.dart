@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import '../tokens/aafiya_colors.dart';
+import '../tokens/aafiya_elevation.dart';
 import '../tokens/aafiya_typography.dart';
 
 /// Interactive circular shortcut tile matching the 4-grid shortcuts in the prototype.
 ///
 /// Features:
-/// - 58x58 circular icon container
+/// - 68x68 circular icon container
+/// - Subtle atmospheric shadow (AafiyaElevation.bubbleShadow)
+/// - Inner subtle border for crisp contrast
 /// - Tactile scale feedback animation on press
 /// - 14pt readable label with center alignment
 /// - Minimum touch target compliant (height >= 48px)
@@ -18,7 +21,7 @@ class AafiyaShortcutTile extends StatefulWidget {
     this.backgroundColor = const Color(0xFFE6F1F9),
     this.iconColor = AafiyaColors.royalBlue,
     this.textColor,
-    this.size = 58.0,
+    this.size = 68.0,
   });
 
   /// The text label below the circular icon.
@@ -39,7 +42,7 @@ class AafiyaShortcutTile extends StatefulWidget {
   /// Optional text color (e.g. for emergency shortcut #B91C1C).
   final Color? textColor;
 
-  /// Diameter of the circular icon container (defaults to 58.0).
+  /// Diameter of the circular icon container (defaults to 68.0).
   final double size;
 
   @override
@@ -51,7 +54,7 @@ class _AafiyaShortcutTileState extends State<AafiyaShortcutTile> {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveTextColor = widget.textColor ?? AafiyaColors.primaryText;
+    final effectiveTextColor = widget.textColor ?? AafiyaColors.navy;
 
     return Semantics(
       button: true,
@@ -78,12 +81,17 @@ class _AafiyaShortcutTileState extends State<AafiyaShortcutTile> {
                   decoration: BoxDecoration(
                     color: widget.backgroundColor,
                     shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.8),
+                      width: 1.0,
+                    ),
+                    boxShadow: AafiyaElevation.bubbleShadow,
                   ),
                   child: Center(
                     child: Icon(
                       widget.icon,
                       color: widget.iconColor,
-                      size: widget.size * 0.44,
+                      size: widget.size * 0.46,
                     ),
                   ),
                 ),
@@ -93,6 +101,9 @@ class _AafiyaShortcutTileState extends State<AafiyaShortcutTile> {
                 widget.label,
                 style: AafiyaTypography.shortcutLabel.copyWith(
                   color: effectiveTextColor,
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w600,
+                  height: 1.35,
                 ),
                 textAlign: TextAlign.center,
                 maxLines: 2,

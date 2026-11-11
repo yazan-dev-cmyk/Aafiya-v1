@@ -39,18 +39,19 @@ abstract final class AafiyaTheme {
       scaffoldBackgroundColor: AafiyaColors.lightBackground,
       appBarTheme: AppBarTheme(
         backgroundColor: AafiyaColors.pureWhite,
-        foregroundColor: AafiyaColors.primaryText,
+        foregroundColor: AafiyaColors.navy,
         elevation: 0,
         centerTitle: true,
         scrolledUnderElevation: 1,
-        titleTextStyle: textTheme.titleLarge ?? AafiyaTypography.titleLarge,
+        titleTextStyle: textTheme.titleLarge?.copyWith(color: AafiyaColors.navy) ??
+            AafiyaTypography.titleLarge.copyWith(color: AafiyaColors.navy),
       ),
       cardTheme: const CardThemeData(
         color: AafiyaColors.pureWhite,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: AafiyaRadius.borderCard,
-          side: BorderSide(color: AafiyaColors.border, width: 1),
+          borderRadius: AafiyaRadius.borderCardLg,
+          side: BorderSide(color: AafiyaColors.cardBorder, width: 1),
         ),
         margin: EdgeInsets.zero,
       ),
