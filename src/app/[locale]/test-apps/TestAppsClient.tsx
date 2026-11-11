@@ -158,7 +158,7 @@ export default function TestAppsClient({ locale }: TestAppsClientProps) {
               <div className="bg-slate-900/90 rounded-2xl p-4 border border-slate-800/80 space-y-2.5 text-xs">
                 <div className="flex justify-between items-center text-slate-400">
                   <span>{isRtl ? 'حجم الملف:' : 'File Size:'}</span>
-                  <span className="text-white font-mono font-bold">61.0 MB (61,013,579 bytes)</span>
+                  <span className="text-white font-mono font-bold">61.0 MB (61,013,863 bytes)</span>
                 </div>
                 <div className="flex justify-between items-center text-slate-400">
                   <span>{isRtl ? 'النظام المدعوم:' : 'Target OS:'}</span>
@@ -176,7 +176,7 @@ export default function TestAppsClient({ locale }: TestAppsClientProps) {
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider font-bold">SHA-256 Checksum:</span>
                     <button
-                      onClick={() => copyToClipboard('258da9578446a3af6d9575bac9f8ba82bff705f4ac4cd2c01bf3e954d3e3551e', 'patient-hash')}
+                      onClick={() => copyToClipboard('32d2f405c666888a1cbb702624f2b0c5931d7dfee348f104b912dc2f92fa0269', 'patient-hash')}
                       className="text-[10px] text-teal-400 hover:text-teal-300 flex items-center gap-1 transition-colors cursor-pointer"
                     >
                       {copiedKey === 'patient-hash' ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
@@ -184,7 +184,7 @@ export default function TestAppsClient({ locale }: TestAppsClientProps) {
                     </button>
                   </div>
                   <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800/80 font-mono text-[10px] text-slate-300 break-all select-all">
-                    258da9578446a3af6d9575bac9f8ba82bff705f4ac4cd2c01bf3e954d3e3551e
+                    32d2f405c666888a1cbb702624f2b0c5931d7dfee348f104b912dc2f92fa0269
                   </div>
                 </div>
               </div>
@@ -254,7 +254,7 @@ export default function TestAppsClient({ locale }: TestAppsClientProps) {
               <div className="bg-slate-900/90 rounded-2xl p-4 border border-slate-800/80 space-y-2.5 text-xs">
                 <div className="flex justify-between items-center text-slate-400">
                   <span>{isRtl ? 'حجم الملف:' : 'File Size:'}</span>
-                  <span className="text-white font-mono font-bold">82.3 MB (82,342,029 bytes)</span>
+                  <span className="text-white font-mono font-bold">82.3 MB (82,342,245 bytes)</span>
                 </div>
                 <div className="flex justify-between items-center text-slate-400">
                   <span>{isRtl ? 'النظام المدعوم:' : 'Target OS:'}</span>
@@ -272,7 +272,7 @@ export default function TestAppsClient({ locale }: TestAppsClientProps) {
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider font-bold">SHA-256 Checksum:</span>
                     <button
-                      onClick={() => copyToClipboard('e26eaa9d333538a71c3b2a5f595ffe90d7103b002a75012598b9dfa5a4a4a449', 'pro-hash')}
+                      onClick={() => copyToClipboard('e9ff27ec46585c08d4909f2a36ecc5ee4bf0419d2d46797e340cb7e7f631a11c', 'pro-hash')}
                       className="text-[10px] text-emerald-400 hover:text-emerald-300 flex items-center gap-1 transition-colors cursor-pointer"
                     >
                       {copiedKey === 'pro-hash' ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
@@ -280,7 +280,7 @@ export default function TestAppsClient({ locale }: TestAppsClientProps) {
                     </button>
                   </div>
                   <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800/80 font-mono text-[10px] text-slate-300 break-all select-all">
-                    e26eaa9d333538a71c3b2a5f595ffe90d7103b002a75012598b9dfa5a4a4a449
+                    e9ff27ec46585c08d4909f2a36ecc5ee4bf0419d2d46797e340cb7e7f631a11c
                   </div>
                 </div>
               </div>
