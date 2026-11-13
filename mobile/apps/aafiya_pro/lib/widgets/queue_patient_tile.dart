@@ -41,7 +41,7 @@ class QueuePatientTile extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: AafiyaSpacing.xs),
       child: AafiyaCard(
         borderColor: isAttended
-            ? AafiyaColors.healthBlue.withValues(alpha: 0.4)
+            ? AafiyaColors.healingGreen.withValues(alpha: 0.4)
             : AafiyaColors.cardBorder,
         padding: AafiyaSpacing.insetAllMd,
         child: Column(
@@ -57,8 +57,8 @@ class QueuePatientTile extends StatelessWidget {
                     height: 32,
                     decoration: BoxDecoration(
                       color: isAttended
-                          ? AafiyaColors.healthBlue.withValues(alpha: 0.12)
-                          : AafiyaColors.lightBackground,
+                          ? AafiyaColors.healingGreenSurface
+                          : AafiyaColors.blueSoft,
                       shape: BoxShape.circle,
                     ),
                     alignment: Alignment.center,
@@ -66,27 +66,29 @@ class QueuePatientTile extends StatelessWidget {
                       '$queueIndex',
                       style: AafiyaTypography.bodyMedium.copyWith(
                         color: isAttended
-                            ? AafiyaColors.healthBlue
-                            : AafiyaColors.primaryText,
+                            ? AafiyaColors.actionGreen
+                            : AafiyaColors.deepBlue,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   )
                 else
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(7),
                     decoration: BoxDecoration(
                       color: isAttended
-                          ? AafiyaColors.healthBlue.withValues(alpha: 0.1)
-                          : AafiyaColors.lightBackground,
-                      borderRadius: BorderRadius.circular(AafiyaRadius.sm),
+                          ? AafiyaColors.healingGreenSurface
+                          : AafiyaColors.blueSoft,
+                      borderRadius: BorderRadius.circular(AafiyaRadius.pill),
                     ),
                     child: Icon(
                       isAttended
-                          ? Icons.person_pin_circle_outlined
-                          : Icons.schedule_outlined,
-                      size: 20,
-                      color: AafiyaColors.healthBlue,
+                          ? Icons.how_to_reg_rounded
+                          : Icons.schedule_rounded,
+                      size: 18,
+                      color: isAttended
+                          ? AafiyaColors.actionGreen
+                          : AafiyaColors.deepBlue,
                     ),
                   ),
                 const SizedBox(width: AafiyaSpacing.sm),
@@ -95,17 +97,17 @@ class QueuePatientTile extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: AafiyaSpacing.sm,
-                    vertical: AafiyaSpacing.xs,
+                    vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: AafiyaColors.healthBlue.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(AafiyaRadius.sm),
+                    color: AafiyaColors.blueSoft,
+                    borderRadius: BorderRadius.circular(AafiyaRadius.pill),
                   ),
                   child: Text(
                     '\u200E${appointment.timeSlot ?? "--:--"}\u200E',
                     style: AafiyaTypography.caption.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: AafiyaColors.healthBlue,
+                      color: AafiyaColors.deepBlue,
                     ),
                   ),
                 ),
@@ -116,28 +118,28 @@ class QueuePatientTile extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: AafiyaSpacing.sm,
-                      vertical: AafiyaSpacing.xs,
+                      vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: AafiyaColors.info.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(AafiyaRadius.sm),
+                      color: AafiyaColors.healingGreenSurface,
+                      borderRadius: BorderRadius.circular(AafiyaRadius.pill),
                       border: Border.all(
-                        color: AafiyaColors.info.withValues(alpha: 0.3),
+                        color: AafiyaColors.healingGreen.withValues(alpha: 0.4),
                       ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const Icon(
-                          Icons.how_to_reg_rounded,
+                          Icons.check_circle_rounded,
                           size: 14,
-                          color: AafiyaColors.info,
+                          color: AafiyaColors.actionGreen,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           strings.patientInWaitingRoomBadge,
                           style: AafiyaTypography.caption.copyWith(
-                            color: AafiyaColors.info,
+                            color: AafiyaColors.actionGreen,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -164,14 +166,14 @@ class QueuePatientTile extends StatelessWidget {
                 if (onViewSummary != null) ...[
                   const SizedBox(width: 8),
                   InkWell(
-                    borderRadius: BorderRadius.circular(AafiyaRadius.sm),
+                    borderRadius: BorderRadius.circular(AafiyaRadius.pill),
                     onTap: onViewSummary,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
+                          horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
                         color: AafiyaColors.healthBlue.withValues(alpha: 0.08),
-                        borderRadius: BorderRadius.circular(AafiyaRadius.sm),
+                        borderRadius: BorderRadius.circular(AafiyaRadius.pill),
                         border: Border.all(
                           color:
                               AafiyaColors.healthBlue.withValues(alpha: 0.25),
@@ -274,7 +276,7 @@ class QueuePatientTile extends StatelessWidget {
             // Action Buttons for Confirmed Appointments
             if (isConfirmed && (onAttend != null || onNoShow != null)) ...[
               const SizedBox(height: AafiyaSpacing.md),
-              const Divider(height: 1, color: AafiyaColors.border),
+              const Divider(height: 1, color: AafiyaColors.cardBorder),
               const SizedBox(height: AafiyaSpacing.sm),
               Row(
                 children: [

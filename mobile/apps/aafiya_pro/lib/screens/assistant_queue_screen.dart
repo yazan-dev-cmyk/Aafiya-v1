@@ -823,17 +823,34 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
             )),
       ],
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
         decoration: BoxDecoration(
-          color: AafiyaColors.lightBackground,
-          borderRadius: BorderRadius.circular(AafiyaRadius.md),
-          border: Border.all(color: AafiyaColors.border),
+          color: AafiyaColors.pureWhite,
+          borderRadius: BorderRadius.circular(AafiyaRadius.pill),
+          border: Border.all(
+            color: _selectedDoctorId != null
+                ? AafiyaColors.deepBlue
+                : AafiyaColors.filterInactiveBorder,
+            width: 1.0,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.02),
+              blurRadius: 4,
+              offset: const Offset(0, 1),
+            ),
+          ],
         ),
         child: Row(
           children: [
-            const Icon(Icons.person_outline,
-                size: 16, color: AafiyaColors.secondaryText),
-            const SizedBox(width: 6),
+            Icon(
+              Icons.medical_services_outlined,
+              size: 16,
+              color: _selectedDoctorId != null
+                  ? AafiyaColors.deepBlue
+                  : AafiyaColors.primaryBlue,
+            ),
+            const SizedBox(width: 8),
             Expanded(
               child: Text(
                 label,
@@ -844,8 +861,11 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            const Icon(Icons.arrow_drop_down,
-                size: 18, color: AafiyaColors.secondaryText),
+            const Icon(
+              Icons.arrow_drop_down,
+              size: 18,
+              color: AafiyaColors.secondaryText,
+            ),
           ],
         ),
       ),
@@ -947,17 +967,34 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
         ),
       ],
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
         decoration: BoxDecoration(
-          color: AafiyaColors.lightBackground,
-          borderRadius: BorderRadius.circular(AafiyaRadius.md),
-          border: Border.all(color: AafiyaColors.border),
+          color: AafiyaColors.pureWhite,
+          borderRadius: BorderRadius.circular(AafiyaRadius.pill),
+          border: Border.all(
+            color: _dateFilterMode != AssistantDateFilterMode.allDates
+                ? AafiyaColors.healingGreen
+                : AafiyaColors.filterInactiveBorder,
+            width: 1.0,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.02),
+              blurRadius: 4,
+              offset: const Offset(0, 1),
+            ),
+          ],
         ),
         child: Row(
           children: [
-            const Icon(Icons.calendar_month_outlined,
-                size: 16, color: AafiyaColors.secondaryText),
-            const SizedBox(width: 6),
+            Icon(
+              Icons.calendar_month_outlined,
+              size: 16,
+              color: _dateFilterMode != AssistantDateFilterMode.allDates
+                  ? AafiyaColors.actionGreen
+                  : AafiyaColors.secondaryText,
+            ),
+            const SizedBox(width: 8),
             Expanded(
               child: Text(
                 label,
@@ -968,8 +1005,11 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            const Icon(Icons.arrow_drop_down,
-                size: 18, color: AafiyaColors.secondaryText),
+            const Icon(
+              Icons.arrow_drop_down,
+              size: 18,
+              color: AafiyaColors.secondaryText,
+            ),
           ],
         ),
       ),
@@ -1059,19 +1099,67 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
           children: [
             // Top Controls: Sub-Tabs, Filters & Action Buttons
             Container(
-              color: AafiyaColors.pureWhite,
+              decoration: BoxDecoration(
+                color: AafiyaColors.pureWhite,
+                border: const Border(
+                  bottom: BorderSide(color: AafiyaColors.cardBorder, width: 1.0),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.025),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
               padding: const EdgeInsets.symmetric(
-                horizontal: AafiyaSpacing.lg,
+                horizontal: AafiyaSpacing.md,
                 vertical: AafiyaSpacing.sm,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
-                    strings.assistantDashboardTitle,
-                    style: AafiyaTypography.titleMedium.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        strings.assistantDashboardTitle,
+                        style: AafiyaTypography.titleMedium.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      if (_waitingRoomItems.isNotEmpty)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AafiyaColors.healingGreenSurface,
+                            borderRadius:
+                                BorderRadius.circular(AafiyaRadius.pill),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 6,
+                                height: 6,
+                                decoration: const BoxDecoration(
+                                  color: AafiyaColors.actionGreen,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 5),
+                              Text(
+                                '${_waitingRoomItems.length} ${strings.waitingRoomTab}',
+                                style: AafiyaTypography.caption.copyWith(
+                                  color: AafiyaColors.actionGreen,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
                   ),
                   const SizedBox(height: AafiyaSpacing.sm),
 
@@ -1095,7 +1183,7 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
                           count: _waitingRoomItems.length,
                           isSelected:
                               _activeTab == AssistantQueueSubTab.waitingRoom,
-                          accentColor: AafiyaColors.healingGreen,
+                          accentColor: AafiyaColors.actionGreen,
                           onTap: () {
                             if (_activeTab !=
                                 AssistantQueueSubTab.waitingRoom) {
@@ -1115,7 +1203,7 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
                           count: _expectedItems.length,
                           isSelected: _activeTab ==
                               AssistantQueueSubTab.expectedCheckIn,
-                          accentColor: AafiyaColors.healthBlue,
+                          accentColor: AafiyaColors.deepBlue,
                           onTap: () {
                             if (_activeTab !=
                                 AssistantQueueSubTab.expectedCheckIn) {
@@ -1160,10 +1248,14 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
                         Expanded(
                           child: OutlinedButton.icon(
                             style: OutlinedButton.styleFrom(
-                              foregroundColor: AafiyaColors.healingGreen,
+                              backgroundColor:
+                                  AafiyaColors.healingGreenSurface,
+                              foregroundColor: AafiyaColors.actionGreen,
                               side: const BorderSide(
                                   color: AafiyaColors.healingGreen),
-                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              minimumSize: const Size(0, 44),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 8),
                               shape: const StadiumBorder(),
                             ),
                             onPressed: _openCheckInSheet,
@@ -1173,7 +1265,7 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
                               strings.quickCheckInAction,
                               style: AafiyaTypography.caption.copyWith(
                                 fontWeight: FontWeight.bold,
-                                color: AafiyaColors.healingGreen,
+                                color: AafiyaColors.actionGreen,
                               ),
                             ),
                           ),
@@ -1185,9 +1277,14 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
                       Expanded(
                         child: OutlinedButton.icon(
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: AafiyaColors.primaryText,
-                            side: const BorderSide(color: AafiyaColors.cardBorder),
-                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            backgroundColor: AafiyaColors.blueSoft,
+                            foregroundColor: AafiyaColors.linkBlue,
+                            side: BorderSide(
+                              color: AafiyaColors.linkBlue.withValues(alpha: 0.3),
+                            ),
+                            minimumSize: const Size(0, 44),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 8),
                             shape: const StadiumBorder(),
                           ),
                           onPressed: _openPatientSearch,
@@ -1196,6 +1293,7 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
                             strings.assistantPatientsTab,
                             style: AafiyaTypography.caption.copyWith(
                               fontWeight: FontWeight.bold,
+                              color: AafiyaColors.linkBlue,
                             ),
                           ),
                         ),
@@ -1209,9 +1307,10 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
                     ElevatedButton.icon(
                       key: const ValueKey('new_booking_action_button'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AafiyaColors.healingGreen,
+                        backgroundColor: AafiyaColors.actionGreen,
                         foregroundColor: AafiyaColors.pureWhite,
-                        minimumSize: const Size(0, 52),
+                        elevation: 0,
+                        minimumSize: const Size(0, 48),
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         shape: const StadiumBorder(),
                       ),
@@ -1256,61 +1355,75 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
     required Color accentColor,
     required VoidCallback onTap,
   }) {
-    return Material(
-      color: isSelected
-          ? accentColor.withValues(alpha: 0.1)
-          : AafiyaColors.pureWhite,
-      borderRadius: AafiyaRadius.borderPill,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: AafiyaRadius.borderPill,
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 6,
-            vertical: AafiyaSpacing.sm,
-          ),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: isSelected ? accentColor : AafiyaColors.cardBorder,
-              width: isSelected ? 1.5 : 1,
+    final effectiveBg = isSelected ? accentColor : AafiyaColors.pureWhite;
+    final effectiveBorder =
+        isSelected ? accentColor : AafiyaColors.filterInactiveBorder;
+    final effectiveTextColor =
+        isSelected ? AafiyaColors.pureWhite : AafiyaColors.secondaryText;
+    final badgeBg =
+        isSelected ? AafiyaColors.pureWhite : AafiyaColors.lightBackground;
+    final badgeTextColor =
+        isSelected ? accentColor : AafiyaColors.secondaryText;
+
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AafiyaRadius.pill),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            curve: Curves.easeInOut,
+            constraints: const BoxConstraints(minHeight: 44),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 8,
+              vertical: 8,
             ),
-            borderRadius: AafiyaRadius.borderPill,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Flexible(
-                child: Text(
-                  title,
-                  style: AafiyaTypography.bodyMedium.copyWith(
-                    color: isSelected ? accentColor : AafiyaColors.primaryText,
-                    fontWeight:
-                        isSelected ? FontWeight.bold : FontWeight.normal,
-                    fontSize: 12,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
+            decoration: BoxDecoration(
+              color: effectiveBg,
+              borderRadius: BorderRadius.circular(AafiyaRadius.pill),
+              border: Border.all(
+                color: effectiveBorder,
+                width: 1.2,
               ),
-              const SizedBox(width: 4),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                decoration: BoxDecoration(
-                  color:
-                      isSelected ? accentColor : AafiyaColors.lightBackground,
-                  shape: BoxShape.circle,
-                ),
-                child: Text(
-                  '$count',
-                  style: AafiyaTypography.caption.copyWith(
-                    color: isSelected
-                        ? AafiyaColors.pureWhite
-                        : AafiyaColors.secondaryText,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 10,
+              boxShadow: isSelected ? AafiyaElevation.filterActiveShadow : null,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Flexible(
+                  child: Text(
+                    title,
+                    style: AafiyaTypography.titleSmall.copyWith(
+                      color: effectiveTextColor,
+                      fontWeight:
+                          isSelected ? FontWeight.w700 : FontWeight.w600,
+                      fontSize: 12.5,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(width: 5),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: badgeBg,
+                    borderRadius: BorderRadius.circular(AafiyaRadius.pill),
+                  ),
+                  child: Text(
+                    '$count',
+                    style: AafiyaTypography.caption.copyWith(
+                      color: badgeTextColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 11,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -1454,10 +1567,7 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
                           style: OutlinedButton.styleFrom(
                             side: const BorderSide(
                                 color: AafiyaColors.healthBlue),
-                            shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(AafiyaRadius.sm),
-                            ),
+                            shape: const StadiumBorder(),
                             padding: const EdgeInsets.symmetric(
                                 horizontal: AafiyaSpacing.sm, vertical: 4),
                           ),
@@ -1478,10 +1588,7 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
                           ),
                           style: OutlinedButton.styleFrom(
                             side: const BorderSide(color: AafiyaColors.error),
-                            shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(AafiyaRadius.sm),
-                            ),
+                            shape: const StadiumBorder(),
                             padding: const EdgeInsets.symmetric(
                                 horizontal: AafiyaSpacing.sm, vertical: 4),
                           ),
@@ -1579,10 +1686,7 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
                           style: OutlinedButton.styleFrom(
                             side: const BorderSide(
                                 color: AafiyaColors.healthBlue),
-                            shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(AafiyaRadius.sm),
-                            ),
+                            shape: const StadiumBorder(),
                             padding: const EdgeInsets.symmetric(
                                 horizontal: AafiyaSpacing.sm, vertical: 4),
                           ),
@@ -1603,10 +1707,7 @@ class _AssistantQueueScreenState extends State<AssistantQueueScreen> {
                           ),
                           style: OutlinedButton.styleFrom(
                             side: const BorderSide(color: AafiyaColors.error),
-                            shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(AafiyaRadius.sm),
-                            ),
+                            shape: const StadiumBorder(),
                             padding: const EdgeInsets.symmetric(
                                 horizontal: AafiyaSpacing.sm, vertical: 4),
                           ),

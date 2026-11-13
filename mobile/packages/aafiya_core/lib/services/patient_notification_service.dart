@@ -18,7 +18,8 @@ class PatientNotificationService {
     int page = 1,
   }) async {
     final result = await _apiClient.get(
-      '${ApiEndpoints.patientNotifications}?page=$page',
+      ApiEndpoints.patientNotifications,
+      queryParameters: {'page': page.toString()},
       allowRetry: true,
     );
 

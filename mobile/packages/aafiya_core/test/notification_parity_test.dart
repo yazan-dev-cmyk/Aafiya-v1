@@ -257,61 +257,121 @@ void main() {
   });
 
   group('Service Layer Integration Tests', () {
-    test('PatientNotificationService.fetchNotifications success', () async {
+    test('PatientNotificationService.fetchNotifications verifies exact URI, query params, and no %3F',
+        () async {
+      http.BaseRequest? capturedRequest;
       final client = MockClient((request) async {
-        if (request.url.path.contains('/patient/notifications')) {
-          return http.Response(
-            jsonEncode({
-              'data': [
-                {
-                  'id': 'uuid-p1',
-                  'created_at': '2026-10-23T08:00:00Z',
-                  'template': 'vacation_reschedule_success',
-                  'payload': {'message': 'تمت إعادة الجدولة'},
-                }
-              ],
-              'current_page': 1,
-              'last_page': 1,
-              'per_page': 20,
-              'total': 1,
-            }),
-            200,
-            headers: {'content-type': 'application/json'},
-          );
-        }
-        return http.Response('Not Found', 404);
+        capturedRequest = request;
+        expect(request.url.path, equals('/api/v1/patient/notifications'));
+        expect(request.url.path.contains('%3F'), isFalse);
+        expect(request.url.queryParameters, equals({'page': '2'}));
+        return http.Response(
+          jsonEncode({
+            'data': [
+              {
+                'id': 'uuid-p1',
+                'created_at': '2026-10-23T08:00:00Z',
+                'template': 'vacation_reschedule_success',
+                'payload': {'message': 'تمت إعادة الجدولة'},
+              }
+            ],
+            'current_page': 2,
+            'last_page': 3,
+            'per_page': 20,
+            'total': 45,
+          }),
+          200,
+          headers: {'content-type': 'application/json'},
+        );
       });
 
       final apiClient = ApiClient(httpClient: client);
       final service = PatientNotificationService(apiClient: apiClient);
 
-      final result = await service.fetchNotifications();
+      final result = await service.fetchNotifications(page: 2);
       expect(result, isA<ApiSuccess<PatientNotificationsResponse>>());
       final data = (result as ApiSuccess<PatientNotificationsResponse>).data;
       expect(data.items.length, equals(1));
       expect(data.items.first.id, equals('uuid-p1'));
+      expect(data.currentPage, equals(2));
+      expect(data.hasMore, isTrue);
+      expect(capturedRequest, isNotNull);
+      expect(capturedRequest!.url.query, equals('page=2'));
+    });
+
+    test('PatientNotificationService.fetchNotifications empty list handling',
+        () async {
+      final client = MockClient((request) async {
+        expect(request.url.path, equals('/api/v1/patient/notifications'));
+        expect(request.url.path.contains('%3F'), isFalse);
+        expect(request.url.queryParameters, equals({'page': '1'}));
+        return http.Response(
+          jsonEncode({
+            'data': <Map<String, dynamic>>[],
+            'current_page': 1,
+            'last_page': 1,
+            'per_page': 20,
+            'total': 0,
+          }),
+          200,
+          headers: {'content-type': 'application/json'},
+        );
+      });
+
+      final apiClient = ApiClient(httpClient: client);
+      final service = PatientNotificationService(apiClient: apiClient);
+
+      final result = await service.fetchNotifications(page: 1);
+      expect(result, isA<ApiSuccess<PatientNotificationsResponse>>());
+      final data = (result as ApiSuccess<PatientNotificationsResponse>).data;
+      expect(data.items, isEmpty);
+      expect(data.total, equals(0));
+      expect(data.hasMore, isFalse);
+    });
+
+    test('PatientNotificationService.fetchNotifications error propagation',
+        () async {
+      final client = MockClient((request) async {
+        return http.Response(
+          jsonEncode({
+            'status': 'error',
+            'code': 500,
+            'message': 'خطأ داخلي في الخادم.',
+          }),
+          500,
+          headers: {'content-type': 'application/json'},
+        );
+      });
+
+      final apiClient = ApiClient(httpClient: client);
+      final service = PatientNotificationService(apiClient: apiClient);
+
+      final result = await service.fetchNotifications(page: 1);
+      expect(result, isA<ApiFailure<PatientNotificationsResponse>>());
+      final failure = result as ApiFailure<PatientNotificationsResponse>;
+      expect(failure.exception.message, equals('خطأ داخلي في الخادم.'));
     });
 
     test('PatientNotificationService.acknowledgeNotification success',
         () async {
       final client = MockClient((request) async {
-        if (request.url.path.contains('/acknowledge')) {
-          return http.Response(
-            jsonEncode({
-              'message': 'تم تأكيد استلام الإشعار بنجاح.',
-              'data': {
-                'id': 'uuid-p1',
-                'created_at': '2026-10-23T08:00:00Z',
-                'acknowledged_at': '2026-10-23T09:00:00Z',
-                'template': 'vacation_reschedule_success',
-                'payload': {'message': 'تمت إعادة الجدولة'},
-              },
-            }),
-            200,
-            headers: {'content-type': 'application/json'},
-          );
-        }
-        return http.Response('Not Found', 404);
+        expect(request.url.path,
+            equals('/api/v1/patient/notifications/uuid-p1/acknowledge'));
+        expect(request.url.path.contains('%3F'), isFalse);
+        return http.Response(
+          jsonEncode({
+            'message': 'تم تأكيد استلام الإشعار بنجاح.',
+            'data': {
+              'id': 'uuid-p1',
+              'created_at': '2026-10-23T08:00:00Z',
+              'acknowledged_at': '2026-10-23T09:00:00Z',
+              'template': 'vacation_reschedule_success',
+              'payload': {'message': 'تمت إعادة الجدولة'},
+            },
+          }),
+          200,
+          headers: {'content-type': 'application/json'},
+        );
       });
 
       final apiClient = ApiClient(httpClient: client);
@@ -322,6 +382,87 @@ void main() {
       final notification = (result as ApiSuccess<PatientNotification>).data;
       expect(notification.isAcknowledged, isTrue);
       expect(notification.id, equals('uuid-p1'));
+    });
+
+    test('ClinicNotificationService.fetchEscalations verifies exact URI, query params, and no %3F',
+        () async {
+      http.BaseRequest? capturedRequest;
+      final client = MockClient((request) async {
+        capturedRequest = request;
+        expect(
+            request.url.path, equals('/api/v1/clinic/notifications/escalations'));
+        expect(request.url.path.contains('%3F'), isFalse);
+        expect(
+            request.url.queryParameters,
+            equals({
+              'status': 'pending',
+              'page': '1',
+              'per_page': '20',
+            }));
+        return http.Response(
+          jsonEncode({
+            'data': [
+              {
+                'id': 'esc-101',
+                'created_at': '2026-10-23T10:00:00Z',
+                'acknowledged_at': null,
+                'patient_name': 'فاطمة بن علي',
+                'patient_phone': '0555112233',
+                'doctor_name': 'د. أحمد',
+                'specialty': 'طب عام',
+                'original_appointment_date': '2026-10-24',
+                'original_slot': '10:00',
+              }
+            ],
+            'meta': {
+              'current_page': 1,
+              'last_page': 2,
+              'per_page': 20,
+              'total': 25,
+            },
+          }),
+          200,
+          headers: {'content-type': 'application/json'},
+        );
+      });
+
+      final apiClient = ApiClient(httpClient: client);
+      final service = ClinicNotificationService(apiClient: apiClient);
+
+      final result = await service.fetchEscalations(
+          status: 'pending', page: 1, perPage: 20);
+      expect(result, isA<ApiSuccess<ClinicEscalationsResponse>>());
+      final data = (result as ApiSuccess<ClinicEscalationsResponse>).data;
+      expect(data.items.length, equals(1));
+      expect(data.items.first.id, equals('esc-101'));
+      expect(data.hasMore, isTrue);
+      expect(capturedRequest, isNotNull);
+      expect(capturedRequest!.url.query,
+          equals('status=pending&page=1&per_page=20'));
+    });
+
+    test('ClinicNotificationService.fetchEscalations error propagation',
+        () async {
+      final client = MockClient((request) async {
+        return http.Response(
+          jsonEncode({
+            'status': 'error',
+            'code': 403,
+            'message': 'غير مصرح: لا تملك صلاحية إدارة طابور العيادة.',
+          }),
+          403,
+          headers: {'content-type': 'application/json'},
+        );
+      });
+
+      final apiClient = ApiClient(httpClient: client);
+      final service = ClinicNotificationService(apiClient: apiClient);
+
+      final result = await service.fetchEscalations();
+      expect(result, isA<ApiFailure<ClinicEscalationsResponse>>());
+      final failure = result as ApiFailure<ClinicEscalationsResponse>;
+      expect(failure.exception.message,
+          equals('غير مصرح: لا تملك صلاحية إدارة طابور العيادة.'));
     });
 
     test(

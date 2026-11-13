@@ -20,7 +20,12 @@ class ClinicNotificationService {
     int perPage = 20,
   }) async {
     final result = await _apiClient.get(
-      '${ApiEndpoints.clinicEscalations}?status=$status&page=$page&per_page=$perPage',
+      ApiEndpoints.clinicEscalations,
+      queryParameters: {
+        'status': status,
+        'page': page.toString(),
+        'per_page': perPage.toString(),
+      },
       allowRetry: true,
     );
 

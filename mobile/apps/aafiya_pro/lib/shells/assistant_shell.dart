@@ -93,8 +93,37 @@ class _AssistantShellState extends State<AssistantShell> {
     return Scaffold(
       backgroundColor: AafiyaColors.scaffoldBg,
       appBar: AafiyaAppBar(
-        title: '${strings.assistantRoleTitle}: ${widget.user.name}',
-        showBrandMark: true,
+        titleWidget: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const AafiyaBrandMark(markSize: 28, showWordmark: false),
+            const SizedBox(width: 10),
+            Flexible(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${strings.assistantRoleTitle}: ${widget.user.name}',
+                    style: AafiyaTypography.titleMedium.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (widget.sessionManager.activeClinic != null)
+                    Text(
+                      widget.sessionManager.activeClinic!.name,
+                      style: AafiyaTypography.caption.copyWith(
+                        color: AafiyaColors.healingGreen,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
         actions: [
           if (canManageQueue)
             IconButton(
@@ -158,54 +187,14 @@ class _AssistantShellState extends State<AssistantShell> {
             icon: const Icon(Icons.more_vert_rounded),
             tooltip: strings.moreOptions,
             onSelected: (value) async {
-              if (value == 'assistant_rewards') {
-                Navigator.of(context).push(
-                  AssistantRewardsScreen.route(
-                    sessionManager: widget.sessionManager,
-                    user: widget.user,
-                    apiClient: effectiveClient,
-                  ),
-                );
-              } else if (value == 'change_password') {
+              if (value == 'change_password') {
                 await AafiyaChangePasswordCard.show(
                   context,
                   apiClient: effectiveClient,
                 );
-              } else if (value == 'sign_out') {
-                final confirmed = await AafiyaSignOutDialog.show(
-                  context,
-                  title: strings.signOutConfirmTitle,
-                  message: strings.signOutConfirmMessage,
-                  cancelLabel: strings.cancel,
-                  confirmLabel: strings.signOut,
-                );
-                if (confirmed == true) {
-                  _adsTickerService.clearCache();
-                  await widget.sessionManager.logout();
-                  widget.onSignOut();
-                }
               }
             },
             itemBuilder: (context) => [
-              PopupMenuItem<String>(
-                value: 'assistant_rewards',
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.account_balance_wallet_outlined,
-                      color: AafiyaColors.primaryBlue,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        strings.assistantRewardsTitle,
-                        style: AafiyaTypography.bodyMedium,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
               PopupMenuItem<String>(
                 value: 'change_password',
                 child: Row(
@@ -220,28 +209,6 @@ class _AssistantShellState extends State<AssistantShell> {
                       child: Text(
                         strings.changePassword,
                         style: AafiyaTypography.bodyMedium,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const PopupMenuDivider(),
-              PopupMenuItem<String>(
-                value: 'sign_out',
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.logout_rounded,
-                      color: AafiyaColors.error,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        strings.signOut,
-                        style: AafiyaTypography.bodyMedium.copyWith(
-                          color: AafiyaColors.error,
-                        ),
                       ),
                     ),
                   ],
